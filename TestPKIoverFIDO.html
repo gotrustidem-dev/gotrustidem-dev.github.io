@@ -48,7 +48,34 @@
 
         }
 
+        
+
         $(document).ready(function () {
+
+            var pctd = document.getElementById('pc-td');
+            var androidtd = document.getElementById('android-td');
+            var safaritd = document.getElementById('safari-td');
+            var WhatSystem = navigator.userAgent;
+            console.log(WhatSystem);
+            if(WhatSystem.match("Android")){
+                console.log("This is android");
+                pctd.style.display = 'none';
+                safaritd.style.display = 'none';
+            }else if(WhatSystem.match("Windows")){
+                pctd.style.display = 'none';
+                androidtd.style.display = 'none';
+            }else if(WhatSystem.match("Safari")){
+
+                if(WhatSystem.match("Chrome")){
+                    safaritd.style.display = 'none';
+                    androidtd.style.display = 'none';
+                }else{
+                    pctd.style.display = 'none';
+                    androidtd.style.display = 'none';
+                }
+
+            }
+      
 
             var btnDecode = document.getElementById('decode');
             btnDecode.style.visibility = 'hidden';
@@ -63,13 +90,12 @@
 </head>
 
 <body>
-    <table style="height: 492px; width: 888px;">
+    <img style=" width: 100%; height: 100%;" src="./IdemHeader.png" alt="Idem Key icon " height="476" />
+    <div>
+    <table style="height: 492px;">
         <tbody>
             <tr>
-                <td style="width: 496px;"><img src="http://www.go-trust.com/download/idem_key/idem_key_on_pc.png"
-                        alt="Idem Key " width="477" height="519" />&nbsp;&nbsp;</td>
-                <td style="width: 329px;">
-                    <h1 style="text-align: center;"></h1>
+                <td id = "pc-td" style="width: 329px;">
                     <h3 style="text-align: center;">A demo of operating PKI over FIDO2 on PC with all browers & on Mac with Chrome brower</h3>
                     <table style="height: 160px;" border="1" width="395">
                         <tbody>
@@ -77,13 +103,11 @@
                                 <td style="width: 385px;">
                                     <p style="text-align: center;">Operate Certificate by CKA_LABEL</p>
 
-                                    <p>
-                                        <form style="text-align: center;" id="use-label" onsubmit="return false">
+                                    <p><form style="text-align: center;" id="use-label" onsubmit="return false">
                                             <input type="text" name="ckaLabel" placeholder="CKA_LABEL"
                                                 style="width: 342px; height:41px">
 
-                                        </form>
-                                    </p>
+                                        </form></p>
                                     <form style="text-align: center;" id="search-ckalabel" onsubmit="return false">
                                         <button class="btn btn-primary" action="submit"
                                             style="width: 162px; height:34px;background-color: #008CBA;">Read
@@ -121,27 +145,18 @@
                                     </p>
                                 </td>
                             </tr>
-
-
                         </tbody>
                     </table>
+                </td>
 
-                    <h3 style="text-align: center;">A demo of operating PKI over FIDO2 on Ａndroid</h3>
+                <td id = "android-td" style="width: 329px;" >
+                    <h3 style="text-align: center; height: 99px">A demo of operating PKI over FIDO2 on Ａndroid</h3>
                     <table style="height: 160px;" border="1" width="395">
                         <tbody>
-
                             <tr>
-                                <td style="width: 385px;">
+                                <td style="width: 385px; height: 233px; vertical-align:top">
                                     <p style="text-align: center;">Operate Certificate by CKA_LABEL</p>
-
-                                    <p>
-                                        <form style="text-align: center;" id="android-ckalabel-pin"
-                                            onsubmit="return false">
-                                            <input type="text" name="pin" placeholder="User PIN"
-                                                style="width: 342px; height:41px">
-                                        </form>
-                                    </p>
-
+    
                                     <p>
                                         <form style="text-align: center;" id="android-label" onsubmit="return false">
                                             <input type="text" name="ckaLabel" placeholder="CKA_LABEL"
@@ -161,16 +176,8 @@
                             </tr>
 
                             <tr>
-                                <td style="width: 385px;">
+                                <td style="width: 385px; height: 233px; vertical-align:top">
                                     <p style="text-align: center;">Operate Certificate by Index (1~8)</p>
-
-                                    <p>
-                                        <form style="text-align: center;" id="android-index-pin"
-                                            onsubmit="return false">
-                                            <input type="text" name="pin" placeholder="User PIN"
-                                                style="width: 342px; height:41px">
-                                        </form>
-                                    </p>
 
                                     <p>
                                         <form style="text-align: center;" id="android-index" onsubmit="return false">
@@ -189,19 +196,15 @@
                                     </p>
                                 </td>
                             </tr>
-
-
                         </tbody>
                     </table>
                 </td>
-
-                <td style="width: 329px;">
-                    <h1 style="text-align: center;"></h1>
-                    <h3 style="text-align: center;">A demo of operating PKI over FIDO2 on iOS/Mac with Safari</h3>
+                <td id = "safari-td" style="width: 329px; ">
+                    <h3 style="text-align: center;height: 99px">A demo of operating PKI over FIDO2 on iOS/Mac with Safari</h3>
                     <table style="height: 160px;" border="1" width="395">
                         <tbody>
                             <tr>
-                                <td style="width: 385px;">
+                                <td style="width: 385px; ">
                                     <p style="text-align: center;">Operate Certificate by CKA_LABEL</p>
 
                                     <p>
@@ -212,12 +215,6 @@
                                         </form>
                                     </p>
 
-                                    <p>
-                                        <form style="text-align: center;" id="safari-pin-label" onsubmit="return false">
-                                            <input type="text" name="pin" placeholder="User PIN"
-                                                style="width: 342px; height:41px">
-                                        </form>
-                                    </p>
 
                                     <form style="text-align: center;" id="search-ckalabel-safari"
                                         onsubmit="return false">
@@ -242,13 +239,6 @@
                                     <p>
                                         <form style="text-align:center" id="use-index-safari" onsubmit="return false">
                                             <input type="number" name="certIndex" placeholder="index"
-                                                style="width: 342px; height:41px">
-                                        </form>
-                                    </p>
-
-                                    <p>
-                                        <form style="text-align: center;" id="safari-pin-index" onsubmit="return false">
-                                            <input type="text" name="pin" placeholder="User PIN"
                                                 style="width: 342px; height:41px">
                                         </form>
                                     </p>
@@ -282,12 +272,8 @@
             </tr>
         </tbody>
     </table>
+</div>
 
-    <div>
-        <textarea style="width:100%;height:150px;" id="show-sign">
-
-	</textarea>
-    </div>
 
     <!--  Laurence -->
     <div class="container mt-2">
@@ -339,11 +325,15 @@
     </div>
 
     <script>
-        var GTheader = 'R29UcnVzdC1JZGVtLVBLSQ=='; // GoTrust-Idem-PKI
-        // 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef  
+        // Command Header GoTrust-Idem-PKI
+        var GTheader = 'R29UcnVzdC1JZGVtLVBLSQ=='; 
+
+        // signed Data1: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef  
         var signData =
             'MTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWYxMjM0NTY3ODkwYWJjZGVmMTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWYxMjM0NTY3ODkwYWJjZGVmMTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWY=';
-        //    1234567890abcdef1234567890abcdef
+        
+        
+         //  signed Data2:  1234567890abcdef1234567890abcdef
         var signShortData = 'MTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWY=';
 
 
@@ -608,15 +598,15 @@
                     'publicKey': getAssertionChallenge
                 })
                 .then((newCredentialInfo) => {
-                    alert('Sign finished!')
+              
                     console.log('SUCCESS', newCredentialInfo);
                     console.log("Sign", newCredentialInfo.response.signature);
 
                     const sign = newCredentialInfo.response.signature;
                     var str = String.fromCharCode.apply(null, new Uint8Array(sign));
-
-                    document.getElementById('show-sign').value = "Data:" + "\n" + signData + "\n" +
-                        "sign:" + "\n" + btoa(str);
+                    alert("Data:" + "\n" + signData +
+                            "\n" +
+                            "sign:" + "\n" + btoa(str));
 
 
                 })
@@ -906,9 +896,9 @@
                     console.log("Sign", newCredentialInfo.response.signature)
                     const sign = newCredentialInfo.response.signature;
                     var str = String.fromCharCode.apply(null, new Uint8Array(sign));
-
-                    document.getElementById('show-sign').value = "Data:" + "\n" + signData + "\n" +
-                        "sign:" + "\n" + btoa(str);
+                    alert("Data:" + "\n" + signData +
+                            "\n" +
+                            "sign:" + "\n" + btoa(str));
 
                 })
                 .catch((error) => {
@@ -924,7 +914,12 @@
 
 
             let ckaLabel = document.getElementById('android-label').ckaLabel.value;
-            let userpin = document.getElementById('android-ckalabel-pin').pin.value;
+            //let userpin = document.getElementById('android-ckalabel-pin').pin.value;
+
+            var userpin = prompt("Input your PIN", "");
+            if (userpin == null) {
+                return;
+            }
             console.log('android-label', ckaLabel);
             console.log('android-ckalabel-pin', userpin);
 
@@ -1231,7 +1226,7 @@
                                 'publicKey': android_getSignature
                             }).then((newCredentialInfo) => {
 
-                                alert('Sign finished');
+                         
                                 let attestationObject = CBOR.decode(newCredentialInfo
                                     .response.attestationObject);
                                 let authData = parseAuthData(attestationObject.authData);
@@ -1245,10 +1240,9 @@
                                 console.log('Signature:', bufToHex(sig_buffer));
                                 var str = String.fromCharCode.apply(null, new Uint8Array(
                                     sig_buffer));
-                                document.getElementById('show-sign').value = "Data:" +
-                                    "\n" + signShortData +
+                               alert("Data:" + "\n" + signShortData +
                                     "\n" +
-                                    "sign:" + "\n" + btoa(str);
+                                    "sign:" + "\n" + btoa(str));        
 
                             })
                             .catch((error) => {
@@ -1257,7 +1251,6 @@
                             })
                     } else {
 
-                        alert('Sign finished');
                         console.log('SUCCESS', newCredentialInfo);
                         console.log("Sign", newCredentialInfo.response.signature);
                         const sign1 = newCredentialInfo.response.signature;
@@ -1265,12 +1258,10 @@
 
                         var str = String.fromCharCode.apply(null, new Uint8Array(
                             sign1));
-                        document.getElementById('show-sign').value = "Data:" +
-                            "\n" + signData +
+                        alert("Data:" + "\n" + signData +
                             "\n" +
-                            "sign:" + "\n" + btoa(str);
+                            "sign:" + "\n" + btoa(str));
                     }
-
                 });
 
             });
@@ -1282,7 +1273,12 @@
 
 
             let certIndex = document.getElementById('android-index').certIndex.value;
-            let userpin = document.getElementById('android-index-pin').pin.value;
+            //let userpin = document.getElementById('android-index-pin').pin.value;
+
+            var userpin = prompt("Input your PIN", "");
+            if (userpin == null) {
+                return;
+            }
             console.log('android-index', certIndex);
             console.log('android-index-pin', userpin);
 
@@ -1587,7 +1583,7 @@
                                 'publicKey': android_getSignature
                             }).then((newCredentialInfo) => {
 
-                                alert('Sign finished');
+                      
                                 let attestationObject = CBOR.decode(newCredentialInfo
                                     .response.attestationObject);
                                 let authData = parseAuthData(attestationObject.authData);
@@ -1601,10 +1597,10 @@
                                 console.log('Signature:', bufToHex(sig_buffer));
                                 var str = String.fromCharCode.apply(null, new Uint8Array(
                                     sig_buffer));
-                                document.getElementById('show-sign').value = "Data:" +
-                                    "\n" + signShortData +
+                            
+                                alert("Data:" + "\n" + signShortData +
                                     "\n" +
-                                    "sign:" + "\n" + btoa(str);
+                                    "sign:" + "\n" + btoa(str));    
 
                             })
                             .catch((error) => {
@@ -1613,7 +1609,6 @@
                             })
                     } else {
 
-                        alert('Sign finished');
                         console.log('SUCCESS', newCredentialInfo);
                         console.log("Sign", newCredentialInfo.response.signature);
                         const sign1 = newCredentialInfo.response.signature;
@@ -1621,10 +1616,9 @@
 
                         var str = String.fromCharCode.apply(null, new Uint8Array(
                             sign1));
-                        document.getElementById('show-sign').value = "Data:" +
-                            "\n" + signData +
+                            alert("Data:" + "\n" + signData +
                             "\n" +
-                            "sign:" + "\n" + btoa(str);
+                            "sign:" + "\n" + btoa(str));
                     }
 
                 });
@@ -1640,8 +1634,11 @@
 
 
             let certIndex = document.getElementById('use-index-safari').certIndex.value;
-            let userpin = document.getElementById('safari-pin-index').pin.value;
-
+            //let userpin = document.getElementById('safari-pin-index').pin.value;
+            var userpin = prompt("Input your PIN", "");
+            if (userpin == null) {
+                return;
+            }
 
             console.log('use-index-safari', certIndex);
             console.log('safari-pin-index', userpin);
@@ -1902,15 +1899,15 @@
                         'publicKey': getAssertionChallenge
                     })
                     .then((newCredentialInfo) => {
-                        alert('Sign finished');
+                        //alert('Sign finished');
                         console.log('SUCCESS', newCredentialInfo)
                         console.log("Sign", newCredentialInfo.response.signature)
                         const sign = newCredentialInfo.response.signature;
                         var str = String.fromCharCode.apply(null, new Uint8Array(sign));
-
-                        document.getElementById('show-sign').value = "Data:" + "\n" + signData +
+                        alert("Data:" + "\n" + signData +
                             "\n" +
-                            "sign:" + "\n" + btoa(str);
+                            "sign:" + "\n" + btoa(str));
+
 
                     })
                     .catch((error) => {
@@ -1964,9 +1961,12 @@
 
 
             let ckaLabel = document.getElementById('use-label-safari').ckaLabel.value;
-            let userpin = document.getElementById('safari-pin-label').pin.value;
+            //let userpin = document.getElementById('safari-pin-label').pin.value;
 
-
+            var userpin = prompt("Input your PIN", "");
+            if (userpin == null) {
+                return;
+            }
             console.log('use-label-safari', ckaLabel);
             console.log('safari-pin-label', userpin);
 
@@ -2235,16 +2235,14 @@
                     })
                     .then((newCredentialInfo) => {
 
-                        alert('Sign finished');
                         console.log('SUCCESS', newCredentialInfo)
                         console.log("Sign", newCredentialInfo.response.signature)
                         const sign = newCredentialInfo.response.signature;
                         var str = String.fromCharCode.apply(null, new Uint8Array(sign));
 
-                        document.getElementById('show-sign').value = "Data:" + "\n" + signData +
+                        alert("Data:" + "\n" + signData +
                             "\n" +
-                            "sign:" + "\n" + btoa(str);
-
+                            "sign:" + "\n" + btoa(str));
                     })
                     .catch((error) => {
                         alert(error)
