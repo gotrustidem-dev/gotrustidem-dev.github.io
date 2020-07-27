@@ -1644,7 +1644,7 @@
             var exportECPublicKeyArray;
             var pinEncKey;
             var EncryptedPINArray;
-
+            var userpin;
             //Prepare PKI commmand
             //Header
             var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
@@ -1704,7 +1704,7 @@
                 'publicKey': safari_readecdh
             }).then((newCredentialInfo) => {
 
-                var userpin = prompt("Input your PIN", "");
+                userpin = prompt("Input your PIN", "");
                 if (userpin == null) {
                     return;
                 }
@@ -1974,7 +1974,7 @@
             var exportECPublicKeyArray;
             var pinEncKey;
             var EncryptedPINArray;
-
+            var userpin;
             var challenge = new Uint8Array(32);
             window.crypto.getRandomValues(challenge);
 
@@ -2040,7 +2040,7 @@
             }).then((newCredentialInfo) => {
 
                 
-                var userpin = prompt("Input your PIN", "");
+                userpin = prompt("Input your PIN", "");
                 if (userpin == null) {
                     return;
                 }
