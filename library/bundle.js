@@ -2617,11 +2617,11 @@
                 value: function(t, n) {
                     
                     
-                        alert("\nIssued  To :" + n.subject +
-                        "\nIssued By  :" + n.issuer +
-                        "\nSerial Number :" + n.serialNumber +
-                        "\nIssued On  :" + n.notBefore +
-                        "\nExpires On :" + n.notAfter +
+                        alert("\nIssued To: " + n.subject +
+                        "\nIssued By: " + n.issuer +
+                        "\nSerial Number: " + n.serialNumber +
+                        "\nIssued On: " + n.notBefore +
+                        "\nExpires On : " + n.notAfter +
                         "\nSHA-1 Fingerprint: " + n.sha1FingerPrint);      
                         //"\nSHA-256 Fingerprint: " + n.sha256FingerPrint +
                      
