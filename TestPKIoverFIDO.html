@@ -1252,9 +1252,9 @@
                                 console.log('Signature:', bufToHex(sig_buffer));
                                 var str = String.fromCharCode.apply(null, new Uint8Array(
                                     sig_buffer));
-                               alert("Data:" + "\n" + signShortData +
+                               alert("Plaintext:" + "\n" + signShortData +
                                     "\n" +
-                                    "sign:" + "\n" + btoa(str));        
+                                    "Signature:" + "\n" + btoa(str));        
 
                             })
                             .catch((error) => {
@@ -1610,9 +1610,9 @@
                                 var str = String.fromCharCode.apply(null, new Uint8Array(
                                     sig_buffer));
                             
-                                alert("Data:" + "\n" + signShortData +
+                                alert("Plaintext:" + "\n" + signShortData +
                                     "\n" +
-                                    "sign:" + "\n" + btoa(str));    
+                                    "Signature:" + "\n" + btoa(str));    
 
                             })
                             .catch((error) => {
@@ -1917,9 +1917,9 @@
                         console.log("Sign", newCredentialInfo.response.signature)
                         const sign = newCredentialInfo.response.signature;
                         var str = String.fromCharCode.apply(null, new Uint8Array(sign));
-                        alert("Data:" + "\n" + signData +
+                        alert("Plaintext:" + "\n" + signData +
                             "\n" +
-                            "sign:" + "\n" + btoa(str));
+                            "Signature:" + "\n" + btoa(str));
 
 
                     })
