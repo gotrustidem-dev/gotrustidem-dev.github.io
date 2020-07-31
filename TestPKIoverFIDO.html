@@ -97,7 +97,9 @@
             margin-right:auto;
             height: 160px;
         }
-
+        table td, table td * {
+            vertical-align: top;
+        }
         h3 {
             text-align: center;
         }   
@@ -115,7 +117,7 @@
                         <tbody>
                             <tr>
                                 <td style="width: 385px;">
-                                    <p style="text-align: center;">Operate Certificate by CKA_LABEL</p>
+                                    <p style="text-align: center;">Operate by CKA_LABEL</p>
 
                                     <p><form style="text-align: center;" id="use-label" onsubmit="return false">
                                             <input type="text" name="ckaLabel" 
@@ -138,7 +140,7 @@
                               
 
                                 <td style="width: 385px;">
-                                    <p style="text-align: center;">Operate Certificate by Index (1~8)</p>
+                                    <p style="text-align: center;">Operate by Index (1~8)</p>
                                     <p>
                                         <form style="text-align:center" id="use-index" onsubmit="return false">
                                             <input type="number" name="certIndex" 
@@ -171,7 +173,7 @@
                         <tbody>
                             <tr>
                                 <td style="width: 385px; height: 233px; vertical-align:top">
-                                    <p style="text-align: center;">Operate Certificate by CKA_LABEL</p>
+                                    <p style="text-align: center;">Operate by CKA_LABEL</p>
     
                                     <p>
                                         <form style="text-align: center;" id="android-label" onsubmit="return false">
@@ -184,7 +186,7 @@
                                         <form style="text-align: center;" id="android-ckalabel-getassertion"
                                             onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
-                                                style="width: 162px; height:34px;background-color: #008CBA;">Sign (Mode 5)</button>
+                                                style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
                                         </form>
                                     </p>
                                 </td>
@@ -192,7 +194,7 @@
 
                             <tr>
                                 <td style="width: 385px; height: 233px; vertical-align:top">
-                                    <p style="text-align: center;">Operate Certificate by Index (1~8)</p>
+                                    <p style="text-align: center;">Operate by Index (1~8)</p>
 
                                     <p>
                                         <form style="text-align: center;" id="android-index" onsubmit="return false">
@@ -205,7 +207,7 @@
                                         <form style="text-align: center;" id="android-index-getassertion"
                                             onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
-                                                style="width: 162px; height:34px;background-color: #008CBA;">Sign (Mode 5)</button>
+                                                style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
                                         </form>
                                     </p>
                                 </td>
@@ -219,7 +221,7 @@
                         <tbody>
                             <tr>
                                 <td style="width: 385px; ">
-                                    <p style="text-align: center;">Operate Certificate by CKA_LABEL</p>
+                                    <p style="text-align: center;">Operate by CKA_LABEL</p>
 
                                     <p>
                                         <form style="text-align: center;" id="use-label-safari" onsubmit="return false">
@@ -234,13 +236,13 @@
                                         onsubmit="return false">
                                         <button class="btn btn-primary" action="submit"
                                             style="width: 162px; height:34px;background-color: #008CBA;">Read
-                                            Cert. (Mode 1)</button>
+                                            Certificate</button>
                                     </form>
                                     <p>
                                         <form style="text-align: center;" id="sign-ckalabel-safari"
                                             onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
-                                                style="width: 162px; height:34px;background-color: #008CBA;">Sign (Mode 4)</button>
+                                                style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
                                         </form>
                                     </p>
                                 </td>
@@ -260,7 +262,7 @@
                                             onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
                                                 style="width: 162px; height:34px;background-color: #008CBA;">Read
-                                                Cert. (Mode 1)</button>
+                                                Certificate</button>
                                         </form>
                                     </p>
 
@@ -268,7 +270,7 @@
                                         <form style="text-align: center;" id="sign-index-safari"
                                             onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
-                                                style="width: 162px; height:34px;background-color: #008CBA;">Sign (Mode 4)</button>
+                                                style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
                                         </form>
                                     </p>
                                 </td>
