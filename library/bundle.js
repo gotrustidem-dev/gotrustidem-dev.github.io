@@ -2622,8 +2622,9 @@
                         "\nSerial Number :" + n.serialNumber +
                         "\nIssued On  :" + n.notBefore +
                         "\nExpires On :" + n.notAfter +
-                        "\nSHA-256 Fingerprint: " + n.sha256FingerPrint +
-                        "\nSHA-1 Fingerprint: " + n.sha1FingerPrint);
+                        "\nSHA-1 Fingerprint: " + n.sha1FingerPrint);      
+                        //"\nSHA-256 Fingerprint: " + n.sha256FingerPrint +
+                     
 //                     var r = $('<ul style="height: 410px;overflow-y: auto;">');
 //                     t.append(r),
 //                     e.addBasicContentItem(r, "Issued  To", n.subject),
