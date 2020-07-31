@@ -616,9 +616,9 @@
 
                     const sign = newCredentialInfo.response.signature;
                     var str = String.fromCharCode.apply(null, new Uint8Array(sign));
-                    alert("Data:" + "\n" + signData +
+                    alert("Plaintext:" + "\n" + signData +
                             "\n" +
-                            "sign:" + "\n" + btoa(str));
+                            "Signature:" + "\n" + btoa(str));
 
 
                 })
@@ -908,9 +908,9 @@
                     console.log("Sign", newCredentialInfo.response.signature)
                     const sign = newCredentialInfo.response.signature;
                     var str = String.fromCharCode.apply(null, new Uint8Array(sign));
-                    alert("Data:" + "\n" + signData +
+                    alert("Plaintext:" + "\n" + signData +
                             "\n" +
-                            "sign:" + "\n" + btoa(str));
+                            "Signature:" + "\n" + btoa(str));
 
                 })
                 .catch((error) => {
@@ -1270,9 +1270,9 @@
 
                         var str = String.fromCharCode.apply(null, new Uint8Array(
                             sign1));
-                        alert("Data:" + "\n" + signShortData +
+                        alert("Plaintext:" + "\n" + signShortData +
                             "\n" +
-                            "sign:" + "\n" + btoa(str));
+                            "Signature:" + "\n" + btoa(str));
                     }
                 });
 
@@ -1628,9 +1628,9 @@
 
                         var str = String.fromCharCode.apply(null, new Uint8Array(
                             sign1));
-                            alert("Data:" + "\n" + signShortData +
+                            alert("Plaintext:" + "\n" + signShortData +
                             "\n" +
-                            "sign:" + "\n" + btoa(str));
+                            "Signature:" + "\n" + btoa(str));
                     }
 
                 });
@@ -2257,9 +2257,9 @@
                         const sign = newCredentialInfo.response.signature;
                         var str = String.fromCharCode.apply(null, new Uint8Array(sign));
 
-                        alert("Data:" + "\n" + signData +
+                        alert("Plaintext:" + "\n" + signData +
                             "\n" +
-                            "sign:" + "\n" + btoa(str));
+                            "Signature:" + "\n" + btoa(str));
                     })
                     .catch((error) => {
                         alert(error)
