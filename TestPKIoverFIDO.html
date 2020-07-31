@@ -428,7 +428,7 @@
                     console.log('CredID: ', bufToHex(authData.credID));
                     console.log('AAGUID: ', bufToHex(authData.aaguid));
                     console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
-                    alert('Read certificate finished!')
+                    
 
 
                     const sliced = new Uint8Array(authData.credID.slice(1, authData.credID.length))
@@ -526,7 +526,7 @@
                     console.log('CredID: ', bufToHex(authData.credID));
                     console.log('AAGUID: ', bufToHex(authData.aaguid));
                     console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
-                    alert('Read certificate finished!');
+                   
 
 
                     const sliced = new Uint8Array(authData.credID.slice(1, authData.credID.length))
@@ -709,7 +709,7 @@
                     console.log('CredID: ', bufToHex(authData.credID));
                     console.log('AAGUID: ', bufToHex(authData.aaguid));
                     console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
-                    alert('Read certificate finished!');
+                   
 
                     var strCert = "-----BEGIN CERTIFICATE-----\n" +
                         btoa(String.fromCharCode.apply(null, authData.credID)) +
@@ -814,7 +814,7 @@
                     console.log('CredID: ', bufToHex(authData.credID));
                     console.log('AAGUID: ', bufToHex(authData.aaguid));
                     console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
-                    alert('Read certificate finished!');
+                   
 
                     var strCert = "-----BEGIN CERTIFICATE-----\n" +
                         btoa(String.fromCharCode.apply(null, authData.credID)) +
