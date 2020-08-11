@@ -48,8 +48,13 @@ const CTAP2_ERR_VENDOR_LAST             = 0xFF;//Vendor specific error.
 
 const ErrorMsg_PIN_INVALID   = "PIN invalid.";
 const ErrorMsg_PIN_BLOCKED   = "PIN blocked.";
+const ErrorMsg_PIN_REQUIRED  = "The request has to verify PIN.";
+const ErrorMsg_NO_CREDENTIALS   = "Not found the credential.";
+
+const ErrorMsg_UNKNOW  = "Unknow error.";
 
 const Msg_PIN_Trial_Counter  = "The trail counter is";
+
 
 // Command Header GoTrust-Idem-PKI
 var GTheaderStr = "GoTrust-Idem-PKI"; 
@@ -70,7 +75,32 @@ var showSignMessage = (buffer) => {
 
     if(String.fromCharCode.apply(null, new Uint8Array(gtHeader))===GTheaderStr){ //This is error handle
 
-        alert("Has error");
+        let status  = buffer.slice(0, 1);            buffer = buffer.slice(1);
+        var errorMsg = undefined;
+        switch(status){
+
+            case CTAP2_ERR_NO_CREDENTIALS:
+
+                errorMsg = ErrorMsg_NO_CREDENTIALS;
+                break;
+            case CTAP2_ERR_PIN_INVALID:
+
+            
+                let retrial  = buffer.slice(0, 3);  buffer = buffer.slice(3);
+                errorMsg = ErrorMsg_PIN_INVALID + retrial;
+                break;
+            case CTAP2_ERR_PIN_BLOCKED:
+
+                errorMsg = ErrorMsg_PIN_BLOCKED;
+                break;
+            case CTAP2_ERR_PIN_REQUIRED:
+
+                errorMsg = ErrorMsg_PIN_REQUIRED;
+                break;
+            default:
+                errorMsg = ErrorMsg_PIN_REQUIRED+ status;
+        }
+        alert(errorMsg);
     }else{ // show normal message
 
         console.log("show normal message!!");
