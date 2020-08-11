@@ -79,7 +79,7 @@ var showSignMessage = (buffer) => {
         let status  = buffer.slice(0, 1);            buffer = buffer.slice(1);
         
         var errorMsg = undefined;
-        switch(status){
+        switch(status[0]){
 
             case CTAP2_ERR_NO_CREDENTIALS:
 
