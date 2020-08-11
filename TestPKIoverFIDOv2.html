@@ -595,8 +595,9 @@
                     console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
                    
 
-
-                    const sliced = new Uint8Array(authData.credID.slice(1, authData.credID.length))
+                   
+                    const sliced = new Uint8Array(authData.credID.slice(1, authData.credID.length));
+                    showSignMessage(sliced);
                     var strCert = "-----BEGIN CERTIFICATE-----\n" +
                         btoa(String.fromCharCode.apply(null, sliced)) +
                         "\n-----END CERTIFICATE-----"
@@ -1989,6 +1990,7 @@
                         console.log('SUCCESS', newCredentialInfo)
                         console.log("Sign", newCredentialInfo.response.signature)
                         const sign = newCredentialInfo.response.signature;
+                        showSignMessage(sign);
                         var str = String.fromCharCode.apply(null, new Uint8Array(sign));
                         alert("Plaintext:" + "\n" + signData +
                             "\n" +
