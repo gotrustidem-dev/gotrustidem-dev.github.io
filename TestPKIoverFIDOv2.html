@@ -495,16 +495,16 @@
                     console.log('AAGUID: ', bufToHex(authData.aaguid));
                     console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
                     
-
+                    showCertificMessage(authData.credID);
                     
 
-                    const sliced = new Uint8Array(authData.credID.slice(1, authData.credID.length));
-                    showCertificMessage(authData.credID);
-                    var strCert = "-----BEGIN CERTIFICATE-----\n" +
-                        btoa(String.fromCharCode.apply(null, sliced)) +
-                        "\n-----END CERTIFICATE-----"
+                    // const sliced = new Uint8Array(authData.credID.slice(1, authData.credID.length));
+                    
+                    // var strCert = "-----BEGIN CERTIFICATE-----\n" +
+                    //     btoa(String.fromCharCode.apply(null, sliced)) +
+                    //     "\n-----END CERTIFICATE-----"
 
-                    console.log('Certificatie : \n', strCert)
+                    // console.log('Certificatie : \n', strCert)
 
 
 
@@ -595,15 +595,15 @@
                     console.log('AAGUID: ', bufToHex(authData.aaguid));
                     console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
                    
-
+                    showCertificMessage(authData.credID);
                    
-                    const sliced = new Uint8Array(authData.credID.slice(1, authData.credID.length));
-                    showCertificMessage(sliced);
-                    var strCert = "-----BEGIN CERTIFICATE-----\n" +
-                        btoa(String.fromCharCode.apply(null, sliced)) +
-                        "\n-----END CERTIFICATE-----"
+                   // const sliced = new Uint8Array(authData.credID.slice(1, authData.credID.length));
+                    
+                    // var strCert = "-----BEGIN CERTIFICATE-----\n" +
+                    //     btoa(String.fromCharCode.apply(null, sliced)) +
+                    //     "\n-----END CERTIFICATE-----"
 
-                    console.log('Certificatie : \n', strCert)
+                    // console.log('Certificatie : \n', strCert)
 
 
 
@@ -684,11 +684,12 @@
                     console.log("Sign", newCredentialInfo.response.signature);
 
                     const sign = newCredentialInfo.response.signature;
-                    var str = String.fromCharCode.apply(null, new Uint8Array(sign));
-                    alert("Plaintext:" + "\n" + signData +
-                            "\n" +
-                            "\n" +
-                            "Signature:" + "\n" + btoa(str));
+                    showSignMessage(sign);
+                    //var str = String.fromCharCode.apply(null, new Uint8Array(sign));
+                    // alert("Plaintext:" + "\n" + signData +
+                    //         "\n" +
+                    //         "\n" +
+                    //         "Signature:" + "\n" + btoa(str));
 
 
                 })
