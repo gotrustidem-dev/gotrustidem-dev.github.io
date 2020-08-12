@@ -53,7 +53,7 @@ const ErrorMsg_NO_CREDENTIALS   = "Not found the credential.";
 
 const ErrorMsg_UNKNOW  = "Unknow error. ";
 
-const Msg_PIN_Trial_Counter  = "The trail counter is";
+const Msg_PIN_Trial_Counter  = "The retries counter is ";
 
 
 // Command Header GoTrust-Idem-PKI
@@ -140,7 +140,9 @@ var showSignMessage = (buffer) => {
 
             
                 let retrial  = buffer.slice(0, 3);  buffer = buffer.slice(3);
-                errorMsg = ErrorMsg_PIN_INVALID + bufToHex(retrial);
+                let number = new Uint8Array(retrial)[2]
+                errorMsg = ErrorMsg_PIN_INVALID + "\n"+Msg_PIN_Trial_Counter+number
+                
                 break;
             case CTAP2_ERR_PIN_BLOCKED:
 
