@@ -145,7 +145,7 @@ var showSignMessage = (buffer) => {
                 errorMsg = "Command error!";
                 break;
             default:
-                errorMsg = ErrorMsg_UNKNOW+ status;
+                errorMsg = ErrorMsg_UNKNOW+ status[0];
         }
         alert(errorMsg);
     }else{ // show normal message
