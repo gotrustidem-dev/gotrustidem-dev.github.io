@@ -111,14 +111,15 @@ var showCertificMessage = (buffer) => {
 var showSignMessage = (buffer) => {
 
     let gtHeader      = buffer.slice(0, 16);            
-
+    console.log('gtHeader', gtHeader);
     if(String.fromCharCode.apply(null, new Uint8Array(gtHeader))===GTheaderStr){ //This is error handle
         
         buffer = buffer.slice(16);
 
         let total = buffer.slice(0, 1);            buffer = buffer.slice(1);
         let status  = buffer.slice(0, 1);            buffer = buffer.slice(1);
-        
+        console.log('total', total);
+        console.log('status', status[0]);
         var errorMsg = undefined;
         switch(status[0]){
 
