@@ -71,8 +71,8 @@ var showCertificMessage = (buffer) => {
 
     if(String.fromCharCode.apply(null, new Uint8Array(gtHeader))===GTheaderStr){ //This is error handle
 
-        let total = buffer.slice(0, 1);            buffer = buffer.slice(1);
-        let status  = buffer.slice(0, 1);            buffer = buffer.slice(1);
+        var total = buffer.slice(0, 1);            buffer = buffer.slice(1);
+        var status  = buffer.slice(0, 1);            buffer = buffer.slice(1);
         
         var errorMsg = undefined;
         switch(status[0]){
@@ -85,7 +85,7 @@ var showCertificMessage = (buffer) => {
 
             
                 let retrial  = buffer.slice(0, 3);  buffer = buffer.slice(3);
-                errorMsg = ErrorMsg_PIN_INVALID + retrial;
+                errorMsg = ErrorMsg_PIN_INVALID + bufToHex(retrial);
                 break;
             case CTAP2_ERR_PIN_BLOCKED:
 
@@ -100,7 +100,7 @@ var showCertificMessage = (buffer) => {
                 errorMsg = "Command error!";
                 break;
             default:
-                errorMsg = ErrorMsg_UNKNOW+ status;
+                errorMsg = ErrorMsg_UNKNOW+ status[0];
         }
         alert(errorMsg);
     }else{ // show normal message
@@ -125,8 +125,8 @@ var showSignMessage = (buffer) => {
         // console.log('total', totalInt);
         // console.log('status', statusInt);
 
-        let total = buffer.slice(0, 1);            buffer = buffer.slice(1);
-        let status  = buffer.slice(0, 1);            buffer = buffer.slice(1);
+        var total = buffer.slice(0, 1);            buffer = buffer.slice(1);
+        var status  = buffer.slice(0, 1);            buffer = buffer.slice(1);
         var errorMsg = undefined;
 
         switch(status[0]){
@@ -139,7 +139,7 @@ var showSignMessage = (buffer) => {
 
             
                 let retrial  = buffer.slice(0, 3);  buffer = buffer.slice(3);
-                errorMsg = ErrorMsg_PIN_INVALID + retrial;
+                errorMsg = ErrorMsg_PIN_INVALID + bufToHex(retrial);
                 break;
             case CTAP2_ERR_PIN_BLOCKED:
 
