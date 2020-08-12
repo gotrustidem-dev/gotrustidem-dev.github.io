@@ -1980,7 +1980,7 @@
                 }];
 
                 getAssertionChallenge.allowCredentials = idList;
-                console.log('List getAssertionChallenge', getAssertionChallenge)
+                console.log('List getAssertionChallenge', getAssertionChallenge);
 
                 navigator.credentials.get({
                         'publicKey': getAssertionChallenge
@@ -1989,8 +1989,7 @@
                         //alert('Sign finished');
                         console.log("SUCCESS: " + bufToHex(newCredentialInfo));
                         console.log("Sign: " + bufToHex(newCredentialInfo.response.signature));
-                        //const sign = newCredentialInfo.response.signature;
-                        const sign = new Uint8Array(newCredentialInfo.response.signature);
+                        const sign = newCredentialInfo.response.signature;
                         showSignMessage(sign);
 
                     })
