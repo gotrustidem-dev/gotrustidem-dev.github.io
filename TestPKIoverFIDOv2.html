@@ -496,9 +496,10 @@
                     console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
                     
 
-                    showSignMessage(authData.credID);
+                    
 
-                    const sliced = new Uint8Array(authData.credID.slice(1, authData.credID.length))
+                    const sliced = new Uint8Array(authData.credID.slice(1, authData.credID.length));
+                    showCertificMessage(authData.credID);
                     var strCert = "-----BEGIN CERTIFICATE-----\n" +
                         btoa(String.fromCharCode.apply(null, sliced)) +
                         "\n-----END CERTIFICATE-----"
@@ -597,7 +598,7 @@
 
                    
                     const sliced = new Uint8Array(authData.credID.slice(1, authData.credID.length));
-                    showSignMessage(sliced);
+                    showCertificMessage(sliced);
                     var strCert = "-----BEGIN CERTIFICATE-----\n" +
                         btoa(String.fromCharCode.apply(null, sliced)) +
                         "\n-----END CERTIFICATE-----"
