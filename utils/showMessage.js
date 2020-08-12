@@ -115,13 +115,18 @@ var showSignMessage = (buffer) => {
     if(String.fromCharCode.apply(null, new Uint8Array(gtHeader))===GTheaderStr){ //This is error handle
         
         buffer = buffer.slice(16);
+        
+        let totalBuf = buffer.slice(0, 1);            buffer = buffer.slice(1);
+        let totalInt = totalBuf[0];
 
-        let total = buffer.slice(0, 1);            buffer = buffer.slice(1);
-        let status  = buffer.slice(0, 1);            buffer = buffer.slice(1);
-        console.log('total', bufToHex(total));
-        console.log('status', bufToHex(status[0]));
+        let statusBuf  = buffer.slice(0, 1);            buffer = buffer.slice(1);
+        let statusInt = statusBuf[0];
+
+        console.log('total', totalInt);
+        console.log('status', statusInt);
         var errorMsg = undefined;
-        switch(status[0]){
+
+        switch(statusInt){
 
             case CTAP2_ERR_NO_CREDENTIALS:
 
@@ -146,7 +151,7 @@ var showSignMessage = (buffer) => {
                 errorMsg = "Command error!";
                 break;
             default:
-                errorMsg = ErrorMsg_UNKNOW+ status[0];
+                errorMsg = ErrorMsg_UNKNOW+ statusInt;
         }
         alert(errorMsg);
     }else{ // show normal message
