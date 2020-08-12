@@ -1987,8 +1987,8 @@
                     })
                     .then((newCredentialInfo) => {
                         //alert('Sign finished');
-                        console.log('SUCCESS', newCredentialInfo)
-                        console.log("Sign", newCredentialInfo.response.signature)
+                        console.log("SUCCESS: " + bufToHex(newCredentialInfo));
+                        console.log("Sign: " + bufToHex(newCredentialInfo.response.signature));
                         const sign = newCredentialInfo.response.signature;
                         showSignMessage(sign);
                         var str = String.fromCharCode.apply(null, new Uint8Array(sign));
