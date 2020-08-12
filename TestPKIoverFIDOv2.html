@@ -498,16 +498,12 @@
                     showCertificMessage(authData.credID);
                     
 
-                    // const sliced = new Uint8Array(authData.credID.slice(1, authData.credID.length));
-                    
-                    // var strCert = "-----BEGIN CERTIFICATE-----\n" +
-                    //     btoa(String.fromCharCode.apply(null, sliced)) +
-                    //     "\n-----END CERTIFICATE-----"
+                    const sliced = new Uint8Array(authData.credID.slice(1, authData.credID.length));
+                    var strCert = "-----BEGIN CERTIFICATE-----\n" +
+                        btoa(String.fromCharCode.apply(null, sliced)) +
+                        "\n-----END CERTIFICATE-----"
 
-                    // console.log('Certificatie : \n', strCert)
-
-
-
+                    console.log('Certificatie : \n', strCert)
                     displayCert(strCert)
 
                 })
@@ -597,13 +593,12 @@
                    
                     showCertificMessage(authData.credID);
                    
-                   // const sliced = new Uint8Array(authData.credID.slice(1, authData.credID.length));
-                    
-                    // var strCert = "-----BEGIN CERTIFICATE-----\n" +
-                    //     btoa(String.fromCharCode.apply(null, sliced)) +
-                    //     "\n-----END CERTIFICATE-----"
+                   const sliced = new Uint8Array(authData.credID.slice(1, authData.credID.length));
+                    var strCert = "-----BEGIN CERTIFICATE-----\n" +
+                        btoa(String.fromCharCode.apply(null, sliced)) +
+                        "\n-----END CERTIFICATE-----"
 
-                    // console.log('Certificatie : \n', strCert)
+                    console.log('Certificatie : \n', strCert)
 
 
 
