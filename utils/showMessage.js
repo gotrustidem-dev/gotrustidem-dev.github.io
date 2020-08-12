@@ -67,10 +67,6 @@ var GTheaderStr = "GoTrust-Idem-PKI";
 
 var showCertificMessage = (buffer) => {
 
-}
-
-var showSignMessage = (buffer) => {
-
     let gtHeader      = buffer.slice(0, 16);            buffer = buffer.slice(16);
 
     if(String.fromCharCode.apply(null, new Uint8Array(gtHeader))===GTheaderStr){ //This is error handle
@@ -99,11 +95,68 @@ var showSignMessage = (buffer) => {
 
                 errorMsg = ErrorMsg_PIN_REQUIRED;
                 break;
+            case CTAP2_ERR_MISSING_PARAMETER:
+                 
+                errorMsg = "Command error!";
+                break;
             default:
                 errorMsg = ErrorMsg_UNKNOW+ status;
         }
         alert(errorMsg);
     }else{ // show normal message
+        console.log("show normal message!!");
+    }
+}
+
+var showSignMessage = (buffer) => {
+
+    let gtHeader      = buffer.slice(0, 16);            
+
+    if(String.fromCharCode.apply(null, new Uint8Array(gtHeader))===GTheaderStr){ //This is error handle
+        
+        buffer = buffer.slice(16);
+
+        let total = buffer.slice(0, 1);            buffer = buffer.slice(1);
+        let status  = buffer.slice(0, 1);            buffer = buffer.slice(1);
+        
+        var errorMsg = undefined;
+        switch(status[0]){
+
+            case CTAP2_ERR_NO_CREDENTIALS:
+
+                errorMsg = ErrorMsg_NO_CREDENTIALS;
+                break;
+            case CTAP2_ERR_PIN_INVALID:
+
+            
+                let retrial  = buffer.slice(0, 3);  buffer = buffer.slice(3);
+                errorMsg = ErrorMsg_PIN_INVALID + retrial;
+                break;
+            case CTAP2_ERR_PIN_BLOCKED:
+
+                errorMsg = ErrorMsg_PIN_BLOCKED;
+                break;
+            case CTAP2_ERR_PIN_REQUIRED:
+
+                errorMsg = ErrorMsg_PIN_REQUIRED;
+                break;
+            case CTAP2_ERR_MISSING_PARAMETER:
+                 
+                errorMsg = "Command error!";
+                break;
+            default:
+                errorMsg = ErrorMsg_UNKNOW+ status;
+        }
+        alert(errorMsg);
+    }else{ // show normal message
+
+            
+        var str = String.fromCharCode.apply(null, new Uint8Array(sign));
+        alert("Plaintext:" + "\n" + signData +
+            "\n" +
+            "\n" +    
+            "Signature:" + "\n" + btoa(str));
+
 
         console.log("show normal message!!");
     }
