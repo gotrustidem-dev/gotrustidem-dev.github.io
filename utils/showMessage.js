@@ -116,17 +116,20 @@ var showSignMessage = (buffer) => {
         
         buffer = buffer.slice(16);
         
-        let totalBuf = buffer.slice(0, 1);            buffer = buffer.slice(1);
-        let totalInt = totalBuf[0];
+        // let totalBuf = buffer.slice(0, 1);            buffer = buffer.slice(1);
+        // let totalInt = totalBuf[0];
 
-        let statusBuf  = buffer.slice(0, 1);            buffer = buffer.slice(1);
-        let statusInt = statusBuf[0];
+        // let statusBuf  = buffer.slice(0, 1);            buffer = buffer.slice(1);
+        // let statusInt = statusBuf[0];
 
-        console.log('total', totalInt);
-        console.log('status', statusInt);
+        // console.log('total', totalInt);
+        // console.log('status', statusInt);
+
+        let total = buffer.slice(0, 1);            buffer = buffer.slice(1);
+        let status  = buffer.slice(0, 1);            buffer = buffer.slice(1);
         var errorMsg = undefined;
 
-        switch(statusInt){
+        switch(status[0]){
 
             case CTAP2_ERR_NO_CREDENTIALS:
 
@@ -151,7 +154,7 @@ var showSignMessage = (buffer) => {
                 errorMsg = "Command error!";
                 break;
             default:
-                errorMsg = ErrorMsg_UNKNOW+ statusInt;
+                errorMsg = ErrorMsg_UNKNOW+ status[0];
         }
         alert(errorMsg);
     }else{ // show normal message
