@@ -152,11 +152,8 @@ var showSignMessage = (buffer) => {
     }else{ // show normal message
 
             
-        var str = String.fromCharCode.apply(null, new Uint8Array(sign));
-        alert("Plaintext:" + "\n" + signData +
-            "\n" +
-            "\n" +    
-            "Signature:" + "\n" + btoa(str));
+        var str = String.fromCharCode.apply(null, new Uint8Array(buffer));
+        alert("Signature:" + "\n" + btoa(str));
 
 
         console.log("show normal message!!");
