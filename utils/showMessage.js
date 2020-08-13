@@ -170,4 +170,17 @@ var showSignMessage = (buffer) => {
         console.log("show normal message!!");
     }
     
+
+}
+
+var isErrorMessage = (buffer) => {
+
+    let gtHeader      = buffer.slice(0, 16);            
+    console.log('gtHeader', bufToHex(gtHeader));
+    if(String.fromCharCode.apply(null, new Uint8Array(gtHeader))===GTheaderStr){
+
+        return 1;
+    }
+
+    return 0;
 }
