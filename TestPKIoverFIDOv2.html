@@ -1619,11 +1619,11 @@
                 }).then((newCredentialInfo) => {
 
 
-                    console.log("Sign", newCredentialInfo.response.signature);
-
+                    console.log("Sign", bufToHex(newCredentialInfo.response.signature));
+                    const sign1 = newCredentialInfo.response.signature;
                     if(isErrorMessage(sign1)===1){
 
-                        const sign1 = newCredentialInfo.response.signature;
+                        
                         showSignMessage(sign1);
 
                     }else{
