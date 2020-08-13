@@ -1619,85 +1619,95 @@
                 }).then((newCredentialInfo) => {
 
 
-                        console.log("Sign", newCredentialInfo.response.signature);
+                    console.log("Sign", newCredentialInfo.response.signature);
+
+                    if(isErrorMessage(sign1)===1){
+
                         const sign1 = newCredentialInfo.response.signature;
                         showSignMessage(sign1);
 
-                    if (sign1.byteLength > 251) {
-                        console.log('SUCCESS', newCredentialInfo);
-                        console.log("Sign", newCredentialInfo.response.signature);
-                        const sign1 = newCredentialInfo.response.signature;
-                        showSignMessage(sign1);
-                       
-                    } else {
+                    }else{
+
+                        if (sign1.byteLength > 251) {
+                            var str = String.fromCharCode.apply(null, new Uint8Array(
+                            sign1));
+                            alert("Plaintext:" + "\n" + signShortData +
+                                "\n" +
+                                "\n" +
+                                "Signature:" + "\n" + btoa(str));
+
+                            
+                        
+                        } else {
 
                         
 
-                        var challenge = new Uint8Array(32);
-                        window.crypto.getRandomValues(challenge);
+                            var challenge = new Uint8Array(32);
+                            window.crypto.getRandomValues(challenge);
 
-                        var userID = 'Kosv9fPtkDoh4Oz7Yq/pVgWHS8HhdlCto5cR0aBoVMw='
-                        var id = Uint8Array.from(window.atob(userID), c => c.charCodeAt(0))
+                            var userID = 'Kosv9fPtkDoh4Oz7Yq/pVgWHS8HhdlCto5cR0aBoVMw='
+                            var id = Uint8Array.from(window.atob(userID), c => c.charCodeAt(0))
 
-                        var android_getSignature = {
-                            'challenge': challenge,
+                            var android_getSignature = {
+                                'challenge': challenge,
 
-                            'rp': {
-                                'name': 'GoTrustID Inc.'
-                            },
-
-                            'user': {
-                                'id': id,
-                                'name': 'FastCar@example.com',
-                                'displayName': 'Car man'
-                            },
-
-                            "authenticatorSelection": {
-                                "userVerification": "discouraged",
-                                'authenticatorAttachment': "cross-platform",
-                            },
-
-                            'pubKeyCredParams': [{
-                                    'type': 'public-key',
-                                    'alg': -7
+                                'rp': {
+                                    'name': 'GoTrustID Inc.'
                                 },
-                                {
-                                    'type': 'public-key',
-                                    'alg': -257
-                                }
-                            ]
+
+                                'user': {
+                                    'id': id,
+                                    'name': 'FastCar@example.com',
+                                    'displayName': 'Car man'
+                                },
+
+                                "authenticatorSelection": {
+                                    "userVerification": "discouraged",
+                                    'authenticatorAttachment': "cross-platform",
+                                },
+
+                                'pubKeyCredParams': [{
+                                        'type': 'public-key',
+                                        'alg': -7
+                                    },
+                                    {
+                                        'type': 'public-key',
+                                        'alg': -257
+                                    }
+                                ]
+                            }
+
+                            console.log('Get reponse  android', android_getSignature)
+                            navigator.credentials.create({
+                                    'publicKey': android_getSignature
+                                }).then((newCredentialInfo) => {
+
+                        
+                                    let attestationObject = CBOR.decode(newCredentialInfo
+                                        .response.attestationObject);
+                                    let authData = parseAuthData(attestationObject.authData);
+                                    var CredID = authData.credID;
+                                    var publicKEy = CBOR.decode(authData.COSEPublicKey.buffer);
+                                    var externalECPublicKeyX = Object.values(publicKEy)[3];
+                                    console.log(bufToHex(externalECPublicKeyX));
+                                    var sig_buffer = new Uint8Array(256);
+                                    sig_buffer[0] = externalECPublicKeyX[0];
+                                    sig_buffer.set(new Uint8Array(CredID), 1);
+                                    console.log('Signature:', bufToHex(sig_buffer));
+                                    var str = String.fromCharCode.apply(null, new Uint8Array(
+                                        sig_buffer));
+                                
+                                    alert("Plaintext:" + "\n" + signShortData +
+                                        "\n" +
+                                        "\n" +  
+                                        "Signature:" + "\n" + btoa(str));    
+
+                                })
+                                .catch((error) => {
+                                    alert(error)
+                                    console.log('FAIL', error)
+                                })
                         }
-
-                        console.log('Get reponse  android', android_getSignature)
-                        navigator.credentials.create({
-                                'publicKey': android_getSignature
-                            }).then((newCredentialInfo) => {
-
-                      
-                                let attestationObject = CBOR.decode(newCredentialInfo
-                                    .response.attestationObject);
-                                let authData = parseAuthData(attestationObject.authData);
-                                var CredID = authData.credID;
-                                var publicKEy = CBOR.decode(authData.COSEPublicKey.buffer);
-                                var externalECPublicKeyX = Object.values(publicKEy)[3];
-                                console.log(bufToHex(externalECPublicKeyX));
-                                var sig_buffer = new Uint8Array(256);
-                                sig_buffer[0] = externalECPublicKeyX[0];
-                                sig_buffer.set(new Uint8Array(CredID), 1);
-                                console.log('Signature:', bufToHex(sig_buffer));
-                                var str = String.fromCharCode.apply(null, new Uint8Array(
-                                    sig_buffer));
-                            
-                                alert("Plaintext:" + "\n" + signShortData +
-                                    "\n" +
-                                    "\n" +  
-                                    "Signature:" + "\n" + btoa(str));    
-
-                            })
-                            .catch((error) => {
-                                alert(error)
-                                console.log('FAIL', error)
-                            })
                     }
 
                 });
