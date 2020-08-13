@@ -1619,8 +1619,17 @@
                 }).then((newCredentialInfo) => {
 
 
+                        showSignMessage(sign1);
+                        
+                    if (sign1.byteLength > 251) {
+                        console.log('SUCCESS', newCredentialInfo);
+                        console.log("Sign", newCredentialInfo.response.signature);
+                        const sign1 = newCredentialInfo.response.signature;
+                        showSignMessage(sign1);
+                       
+                    } else {
 
-                    if (sign1.byteLength < 251) {
+                        
 
                         var challenge = new Uint8Array(32);
                         window.crypto.getRandomValues(challenge);
@@ -1687,12 +1696,6 @@
                                 alert(error)
                                 console.log('FAIL', error)
                             })
-                    } else {
-
-                        console.log('SUCCESS', newCredentialInfo);
-                        console.log("Sign", newCredentialInfo.response.signature);
-                        const sign1 = newCredentialInfo.response.signature;
-                        showSignMessage(sign1);
                     }
 
                 });
