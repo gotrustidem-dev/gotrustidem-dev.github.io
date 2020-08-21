@@ -179,14 +179,20 @@ var showRSAKeyPair = (buffer) => {
     console.log('gtHeader', bufToHex(gtHeader));
     if(String.fromCharCode.apply(null, new Uint8Array(gtHeader))===GTheaderStr){
         buffer = buffer.slice(16);
-        var total = new Uint8Array(buffer.slice(0, 1))[0];            buffer = buffer.slice(1);
+
+
+        var totalLen = new Uint8Array(buffer.slice(0, 2));            buffer = buffer.slice(2);
         var status  = new Uint8Array(buffer.slice(0, 1))[0];            buffer = buffer.slice(1);
 
         var Msg = undefined;
-        switch(status[0]){
+        switch(status){
 
             case CTAP1_ERR_SUCCESS:
                 //var keydata = 
+                
+                let data = CBOR.decode(buffer);
+               console.log('data: ', data);
+                Msg = "Command error!";
 
             break;
             case CTAP2_ERR_NO_CREDENTIALS:
@@ -212,7 +218,7 @@ var showRSAKeyPair = (buffer) => {
                 Msg = "Command error!";
                 break;
             default:
-                Msg = ErrorMsg_UNKNOW+ status[0];
+                Msg = ErrorMsg_UNKNOW+ status;
         }
         alert(errorMsg);
     }
