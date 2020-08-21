@@ -778,7 +778,7 @@
                    
 
                     var strCert = "-----BEGIN CERTIFICATE-----\n" +
-                        btoa(String.fromCharCode.apply(null, authData.credID)) +
+                        btoa(String.fromCharCode.apply(null, new Uint8Array(authData.credID.slice(1, authData.credID.length)))) +
                         "\n-----END CERTIFICATE-----"
 
                     console.log('Certificatie : \n', strCert)
@@ -883,7 +883,7 @@
                    
 
                     var strCert = "-----BEGIN CERTIFICATE-----\n" +
-                        btoa(String.fromCharCode.apply(null, authData.credID)) +
+                        btoa(String.fromCharCode.apply(null, new Uint8Array(authData.credID.slice(1, authData.credID.length)))) +
                         "\n-----END CERTIFICATE-----"
 
                     console.log('Certificatie : \n', strCert)
