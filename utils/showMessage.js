@@ -190,7 +190,7 @@ var showRSAKeyPair = (buffer) => {
             case CTAP1_ERR_SUCCESS:
                 //var keydata = 
                 
-                let data = CBOR.decode(buffer);
+                let data = CBOR.decode(new Uint8Array(buffer));
                console.log('data: ', data);
                 Msg = "Command error!";
 
