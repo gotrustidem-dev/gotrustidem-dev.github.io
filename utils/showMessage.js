@@ -179,11 +179,42 @@ var showRSAKeyPair = (buffer) => {
     console.log('gtHeader', bufToHex(gtHeader));
     if(String.fromCharCode.apply(null, new Uint8Array(gtHeader))===GTheaderStr){
         buffer = buffer.slice(16);
+        var total = new Uint8Array(buffer.slice(0, 1))[0];            buffer = buffer.slice(1);
+        var status  = new Uint8Array(buffer.slice(0, 1))[0];            buffer = buffer.slice(1);
 
-        
+        var Msg = undefined;
+        switch(status[0]){
 
+            case CTAP1_ERR_SUCCESS:
+                //var keydata = 
 
+            break;
+            case CTAP2_ERR_NO_CREDENTIALS:
 
+                Msg = ErrorMsg_NO_CREDENTIALS;
+                break;
+            case CTAP2_ERR_PIN_INVALID:
+
+            
+                let retrial  = buffer.slice(0, 3);  buffer = buffer.slice(3);
+                Msg = ErrorMsg_PIN_INVALID + bufToHex(retrial);
+                break;
+            case CTAP2_ERR_PIN_BLOCKED:
+
+                Msg = ErrorMsg_PIN_BLOCKED;
+                break;
+            case CTAP2_ERR_PIN_REQUIRED:
+
+                Msg = ErrorMsg_PIN_REQUIRED;
+                break;
+            case CTAP2_ERR_MISSING_PARAMETER:
+                 
+                Msg = "Command error!";
+                break;
+            default:
+                Msg = ErrorMsg_UNKNOW+ status[0];
+        }
+        alert(errorMsg);
     }
 }
 var isErrorMessage = (buffer) => {
