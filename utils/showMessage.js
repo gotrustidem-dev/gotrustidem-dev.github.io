@@ -221,7 +221,7 @@ var showRSAKeyPair = (buffer) => {
             default:
                 Msg = ErrorMsg_UNKNOW+ status;
         }
-        alert(errorMsg);
+        alert(Msg);
     }
 }
 var isErrorMessage = (buffer) => {
