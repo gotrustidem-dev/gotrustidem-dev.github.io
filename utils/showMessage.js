@@ -165,14 +165,27 @@ var showSignMessage = (buffer) => {
             
         var str = String.fromCharCode.apply(null, new Uint8Array(buffer));
         alert("Signature:" + "\n" + btoa(str));
-
-
         console.log("show normal message!!");
     }
     
 
 }
 
+
+
+var showRSAKeyPair = (buffer) => {
+
+    let gtHeader      = buffer.slice(0, 16);            
+    console.log('gtHeader', bufToHex(gtHeader));
+    if(String.fromCharCode.apply(null, new Uint8Array(gtHeader))===GTheaderStr){
+        buffer = buffer.slice(16);
+
+        
+
+
+
+    }
+}
 var isErrorMessage = (buffer) => {
 
     let gtHeader      = buffer.slice(0, 16);            
@@ -184,3 +197,6 @@ var isErrorMessage = (buffer) => {
 
     return 0;
 }
+
+
+
