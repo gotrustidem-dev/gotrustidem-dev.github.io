@@ -192,7 +192,8 @@ var showRSAKeyPair = (buffer) => {
                 
                 let data = CBOR.decode(buffer.buffer);
                console.log('data: ', data);
-                Msg = "Command error!";
+                Msg = "Key handler: "+bufToHex(data[0])+"\n"
+                      +"PublicKey: "+ bufToHex(data[1]);
 
             break;
             case CTAP2_ERR_NO_CREDENTIALS:
