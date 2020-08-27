@@ -2462,9 +2462,14 @@
 
             let keyHandle = document.getElementById('key_handle').textContent;
             let keyId = document.getElementById('key_id').textContent;
+
+
             //let userpin = document.getElementById('safari-pin-label').pin.value;
             console.log('key_handle', keyHandle);
             console.log('key_id', keyId);
+            var keyHandleBuf = hexStringToArrayBuffer(keyHandle);
+            var keyIdBuf = hexStringToArrayBuffer(keyId);
+
 
             let hexCert = Uint8Array.from(window.atob(testCertificate), c => c.charCodeAt(0));
             console.log('hexCert', hexCert);
@@ -2497,17 +2502,17 @@
 
 
 
-            var keyId_buf = new Uint8Array(keyId.length+3);
+            var keyId_buf = new Uint8Array(keyIdBuf.length+3);
             keyId_buf[0] = 0xDF;
             keyId_buf[1] = 0x18;
-            keyId_buf[2] = keyId.length/2;
-            keyId_buf.set(new Uint8Array(hexStringToArrayBuffer(keyId)), 3);
+            keyId_buf[2] = keyIdBuf.length/2;
+            keyId_buf.set(new Uint8Array(keyIdBuf), 3);
 
-            var keyHandle_buf = new Uint8Array(keyHandle.length+3);
+            var keyHandle_buf = new Uint8Array(keyHandleBuf.length+3);
             keyHandle_buf[0] = 0xDF;
             keyHandle_buf[1] = 0x19;
-            keyHandle_buf[2] = keyHandle.length/2;
-            keyHandle_buf.set(new Uint8Array(hexStringToArrayBuffer(keyHandle)), 3);
+            keyHandle_buf[2] = keyHandleBuf;
+            keyHandle_buf.set(new Uint8Array(keyHandleBuf), 3);
 
             var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + cert_buf.byteLength+keyHandle_buf.byteLength + keyId_buf.byteLength);
 
