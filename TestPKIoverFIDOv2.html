@@ -2537,6 +2537,20 @@
             getAssertionChallenge.allowCredentials = idList;
             console.log('Import cert command getAssertionChallenge', getAssertionChallenge);
 
+            navigator.credentials.get({
+                    'publicKey': getAssertionChallenge
+                })
+                .then((newCredentialInfo) => {
+
+                    console.log('SUCCESS', newCredentialInfo)
+                    console.log("Sign", newCredentialInfo.response.signature)
+                    const sign = newCredentialInfo.response.signature;
+                    showSignMessage(sign);
+                })
+                .catch((error) => {
+                    alert(error)
+                    console.log('FAIL', error)
+                })
             
         })
         function base64EncodeURL(byteArray) {
