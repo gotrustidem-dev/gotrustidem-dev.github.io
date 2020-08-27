@@ -2501,13 +2501,13 @@
             keyId_buf[0] = 0xDF;
             keyId_buf[1] = 0x18;
             keyId_buf[2] = keyId.length;
-            keyId_buf.set(toUTF8Array(keyHandle), 3);
+            keyId_buf.set(hexStringToArrayBuffer(keyId), 3);
 
             var keyHandle_buf = new Uint8Array(keyHandle.length+3);
             keyHandle_buf[0] = 0xDF;
             keyHandle_buf[1] = 0x19;
             keyHandle_buf[2] = keyHandle.length;
-            keyHandle_buf.set(toUTF8Array(keyHandle), 3);
+            keyHandle_buf.set(hexStringToArrayBuffer(keyHandle), 3);
 
             var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + cert_buf.byteLength+keyHandle_buf.byteLength + keyId_buf.byteLength);
 
@@ -2589,6 +2589,36 @@
             }
             return utf8;
         }
+
+        function hexStringToArrayBuffer(hexString) {
+            // remove the leading 0x
+            hexString = hexString.replace(/^0x/, '');
+            
+            // ensure even number of characters
+            if (hexString.length % 2 != 0) {
+                console.log('WARNING: expecting an even number of characters in the hexString');
+            }
+            
+            // check for some non-hex characters
+            var bad = hexString.match(/[G-Z\s]/i);
+            if (bad) {
+                console.log('WARNING: found non-hex characters', bad);    
+            }
+            
+            // split the string into pairs of octets
+            var pairs = hexString.match(/[\dA-F]{2}/gi);
+            
+            // convert the octets to integers
+            var integers = pairs.map(function(s) {
+                return parseInt(s, 16);
+            });
+            
+            var array = new Uint8Array(integers);
+            console.log(array);
+            
+            return array.buffer;
+        }
+
     </script>
 
 </body>
