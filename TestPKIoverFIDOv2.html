@@ -2489,25 +2489,25 @@
 
             //PKI Command
             var cert_buf = new Uint8Array(hexCert.length + 4);
-            command_buf[0] = 0xDF
-            command_buf[1] = 0x17;
-            command_buf[2] = hexCert.length>>8;
-            command_buf[3] = hexCert.length;
-            command_buf.set(hexCert, 4);
+            cert_buf[0] = 0xDF
+            cert_buf[1] = 0x17;
+            cert_buf[2] = hexCert.length>>8;
+            cert_buf[3] = hexCert.length;
+            cert_buf.set(hexCert, 4);
 
 
 
             var keyId_buf = new Uint8Array(keyId.length+3);
-            alg_buf[0] = 0xDF;
-            alg_buf[1] = 0x18;
-            alg_buf[2] = keyId.length;
-            command_buf.set(toUTF8Array(keyHandle), 3);
+            keyId_buf[0] = 0xDF;
+            keyId_buf[1] = 0x18;
+            keyId_buf[2] = keyId.length;
+            keyId_buf.set(toUTF8Array(keyHandle), 3);
 
             var keyHandle_buf = new Uint8Array(keyHandle.length+3);
-            alg_buf[0] = 0xDF;
-            alg_buf[1] = 0x19;
-            alg_buf[2] = keyHandle.length;
-            command_buf.set(toUTF8Array(keyHandle), 3);
+            keyHandle_buf[0] = 0xDF;
+            keyHandle_buf[1] = 0x19;
+            keyHandle_buf[2] = keyHandle.length;
+            keyHandle_buf.set(toUTF8Array(keyHandle), 3);
 
             var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + cert_buf.byteLength+keyHandle_buf.byteLength + keyId_buf.byteLength);
 
