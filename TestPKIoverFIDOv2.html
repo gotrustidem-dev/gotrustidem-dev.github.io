@@ -184,8 +184,8 @@
                                             <button class="btn btn-primary" action="submit"
                                                 style="width: 162px; height:34px;background-color: #008CBA;">Import Cert. to Key</button>
                                         </form>
-                                        <label id="key_handle"></label>
-                                        <label id="key_id"></label>
+                                        <label id="key_handle">112233445566778899AABBCCDD000001</label>
+                                        <label id="key_id">ffbbccddeeaa99887766554433221100</label>
                                     </p>
                                 </td>
 
@@ -2466,6 +2466,9 @@
             console.log('key_handle', keyHandle);
             console.log('key_id', keyId);
 
+            let hexCert = Uint8Array.from(window.atob(testCertificate), c => c.charCodeAt(0));
+            console.log('hexCert', hexCert);
+
 
             var challenge = new Uint8Array(32);
             window.crypto.getRandomValues(challenge);
@@ -2485,63 +2488,39 @@
             var pki_header = new Uint8Array(3);
 
             //PKI Command
-            var command_buf = new Uint8Array(ckaLabel.length + 3);
+            var cert_buf = new Uint8Array(hexCert.length + 4);
             command_buf[0] = 0xDF
-            command_buf[1] = 0x01;
-            command_buf[2] = ckaLabel.length;
-            command_buf.set(toUTF8Array(ckaLabel), 3);
+            command_buf[1] = 0x17;
+            command_buf[2] = hexCert.length>>8;
+            command_buf[3] = hexCert.length;
+            command_buf.set(hexCert, 4);
 
 
 
-            var alg_buf = new Uint8Array(4);
+            var keyId_buf = new Uint8Array(keyId.length+3);
             alg_buf[0] = 0xDF;
-            alg_buf[1] = 0x03;
-            alg_buf[2] = 01;
-            alg_buf[3] = 0x02;
+            alg_buf[1] = 0x18;
+            alg_buf[2] = keyId.length;
+            command_buf.set(toUTF8Array(keyHandle), 3);
 
+            var keyHandle_buf = new Uint8Array(keyHandle.length+3);
+            alg_buf[0] = 0xDF;
+            alg_buf[1] = 0x19;
+            alg_buf[2] = keyHandle.length;
+            command_buf.set(toUTF8Array(keyHandle), 3);
 
-            var ecpubkey_buf = new Uint8Array(3 + exportECPublicKeyArray.byteLength);
-            ecpubkey_buf[0] = 0xDF;
-            ecpubkey_buf[1] = 0x04;
-            ecpubkey_buf[2] = exportECPublicKeyArray.byteLength;
-            ecpubkey_buf.set(new Uint8Array(exportECPublicKeyArray), 3);
+            var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + cert_buf.byteLength+keyHandle_buf.byteLength + keyId_buf.byteLength);
 
-
-            var encryptedPIN_buf = new Uint8Array(3 + EncryptedPINArray.byteLength);
-            encryptedPIN_buf[0] = 0xDF;
-            encryptedPIN_buf[1] = 0x05;
-            encryptedPIN_buf[2] = EncryptedPINArray.byteLength;
-            encryptedPIN_buf.set(new Uint8Array(EncryptedPINArray), 3);
-
-            var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
-            var signDataBuf = new Uint8Array(3 + signDataPayload.byteLength);
-            signDataBuf[0] = 0xDF;
-            signDataBuf[1] = 0x06;
-            signDataBuf[2] = signDataPayload.length;
-            signDataBuf.set(signDataPayload, 3);
-
-
-
-            var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_buf.byteLength +
-                alg_buf.byteLength + ecpubkey_buf.byteLength + encryptedPIN_buf.byteLength +
-                signDataBuf.byteLength);
-            var pki_payload_length = command_buf.byteLength + alg_buf.byteLength + ecpubkey_buf
-                .byteLength + encryptedPIN_buf.byteLength + signDataBuf.byteLength;
+            var pki_payload_length = cert_buf.byteLength + keyHandle_buf.byteLength + keyId_buf.byteLength;
             pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
             pki_header[0] = 0xE7;
             pki_header[1] = pki_payload_length >> 8
             pki_header[2] = pki_payload_length;
+
             pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-            pki_buffer.set(new Uint8Array(command_buf), gtheaderbuffer.byteLength + 3);
-            pki_buffer.set(new Uint8Array(alg_buf), gtheaderbuffer.byteLength + 3 + command_buf
-                .byteLength);
-            pki_buffer.set(new Uint8Array(ecpubkey_buf), gtheaderbuffer.byteLength + 3 + command_buf
-                .byteLength + alg_buf.byteLength);
-            pki_buffer.set(new Uint8Array(encryptedPIN_buf), gtheaderbuffer.byteLength + 3 +
-                command_buf.byteLength + alg_buf.byteLength + ecpubkey_buf.byteLength);
-            pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + command_buf
-                .byteLength + alg_buf.byteLength + ecpubkey_buf.byteLength + encryptedPIN_buf
-                .byteLength);
+            pki_buffer.set(new Uint8Array(cert_buf), gtheaderbuffer.byteLength + 3);
+            pki_buffer.set(new Uint8Array(keyId_buf), gtheaderbuffer.byteLength + 3 + cert_buf.byteLength);
+            pki_buffer.set(new Uint8Array(keyHandle_buf), gtheaderbuffer.byteLength + 3 + cert_buf.byteLength + keyId_buf.byteLength);
 
             console.log("Import cert command: " + bufToHex(pki_buffer));
 
