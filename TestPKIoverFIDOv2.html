@@ -2505,13 +2505,13 @@
             var keyId_buf = new Uint8Array(keyIdBuf.length+3);
             keyId_buf[0] = 0xDF;
             keyId_buf[1] = 0x18;
-            keyId_buf[2] = keyIdBuf.length/2;
+            keyId_buf[2] = keyIdBuf.length;
             keyId_buf.set(new Uint8Array(keyIdBuf), 3);
 
             var keyHandle_buf = new Uint8Array(keyHandleBuf.length+3);
             keyHandle_buf[0] = 0xDF;
             keyHandle_buf[1] = 0x19;
-            keyHandle_buf[2] = keyHandleBuf;
+            keyHandle_buf[2] = keyHandleBuf.length;
             keyHandle_buf.set(new Uint8Array(keyHandleBuf), 3);
 
             var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + cert_buf.byteLength+keyHandle_buf.byteLength + keyId_buf.byteLength);
