@@ -1958,7 +1958,7 @@
                 alg_buf[4] = 0x02;
 
 
-                var ecpubkey_buf = new Uint8Array(3 + exportECPublicKeyArray.byteLength);
+                var ecpubkey_buf = new Uint8Array(4 + exportECPublicKeyArray.byteLength);
                 ecpubkey_buf[0] = 0xDF;
                 ecpubkey_buf[1] = 0x04;
                 ecpubkey_buf[2] = exportECPublicKeyArray.byteLength>>8;
@@ -1966,7 +1966,7 @@
                 ecpubkey_buf.set(new Uint8Array(exportECPublicKeyArray), 4);
 
 
-                var encryptedPIN_buf = new Uint8Array(3 + EncryptedPINArray.byteLength);
+                var encryptedPIN_buf = new Uint8Array(4 + EncryptedPINArray.byteLength);
                 encryptedPIN_buf[0] = 0xDF;
                 encryptedPIN_buf[1] = 0x05;
                 encryptedPIN_buf[2] = EncryptedPINArray.byteLength>>8;
@@ -1974,11 +1974,11 @@
                 encryptedPIN_buf.set(new Uint8Array(EncryptedPINArray), 4);
 
                 var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
-                var signDataBuf = new Uint8Array(3 + signDataPayload.byteLength);
+                var signDataBuf = new Uint8Array(4 + signDataPayload.byteLength);
                 signDataBuf[0] = 0xDF;
                 signDataBuf[1] = 0x06;
                 signDataBuf[2] = signDataPayload.length>>8;
-                signDataBuf[3] = signDataPayload.length>>8;
+                signDataBuf[3] = signDataPayload.length;
                 signDataBuf.set(signDataPayload, 4);
 
 
