@@ -71,11 +71,16 @@ var showCertificMessage = (buffer) => {
 
     if(String.fromCharCode.apply(null, new Uint8Array(gtHeader))===GTheaderStr){ //This is error handle
 
-        var total = buffer.slice(0, 1);            buffer = buffer.slice(1);
-        var status  = buffer.slice(0, 1);            buffer = buffer.slice(1);
+        //var total = buffer.slice(0, 1);            buffer = buffer.slice(1);
+        //var status  = buffer.slice(0, 1);            buffer = buffer.slice(1);
         
+
+        var total = new Uint8Array(buffer.slice(0, 2));            buffer = buffer.slice(2);
+        var status  = new Uint8Array(buffer.slice(0, 1))[0];            buffer = buffer.slice(1);
+
+
         var errorMsg = undefined;
-        switch(status[0]){
+        switch(status){
 
             case CTAP2_ERR_NO_CREDENTIALS:
 
@@ -100,7 +105,7 @@ var showCertificMessage = (buffer) => {
                 errorMsg = "Command error!";
                 break;
             default:
-                errorMsg = ErrorMsg_UNKNOW+ status[0];
+                errorMsg = ErrorMsg_UNKNOW+ status;
         }
         alert(errorMsg);
     }else{ // show normal message
@@ -125,8 +130,12 @@ var showSignMessage = (buffer) => {
         // console.log('total', totalInt);
         // console.log('status', statusInt);
 
-        var total = new Uint8Array(buffer.slice(0, 1))[0];            buffer = buffer.slice(1);
+        //var total = new Uint8Array(buffer.slice(0, 1))[0];            buffer = buffer.slice(1);
+        //var status  = new Uint8Array(buffer.slice(0, 1))[0];            buffer = buffer.slice(1);
+
+        var totalLen = new Uint8Array(buffer.slice(0, 2));            buffer = buffer.slice(2);
         var status  = new Uint8Array(buffer.slice(0, 1))[0];            buffer = buffer.slice(1);
+
         var errorMsg = undefined;
      
         console.log('status', status);
