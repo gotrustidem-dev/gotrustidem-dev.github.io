@@ -14,7 +14,6 @@
 
     <script src="./utils/cbor.js"></script>
     <script src="./utils/helpers.js"></script>
-    <script src="./utils/showMessage.js"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
 
@@ -49,7 +48,7 @@
 
         }
 
-
+        
 
         $(document).ready(function () {
 
@@ -57,37 +56,32 @@
             var androidtd = document.getElementById('android-td');
             var safaritd = document.getElementById('safari-td');
             var macsafaritd = document.getElementById('mac-safari-td');
-
+            
             var WhatSystem = navigator.userAgent;
             console.log(WhatSystem);
-            if (WhatSystem.match("Android")) {
+            if(WhatSystem.match("Android")){
                 console.log("This is android");
                 pctd.style.display = 'none';
                 safaritd.style.display = 'none';
                 macsafaritd.style.display = 'none';
-            } else if (WhatSystem.match("Windows")) {
+            }else if(WhatSystem.match("Windows")){
                 safaritd.style.display = 'none';
                 androidtd.style.display = 'none';
                 macsafaritd.style.display = 'none';
-            } else if (WhatSystem.match("Safari")) {
+            }else if(WhatSystem.match("Safari")){
 
-                if (WhatSystem.match("Chrome")) {
+                if(WhatSystem.match("Chrome")){
                     safaritd.style.display = 'none';
                     androidtd.style.display = 'none';
                     macsafaritd.style.display = 'none';
-                }else if(WhatSystem.match("Mac OS X")&&WhatSystem.match("Version/14")){
-                    safaritd.style.display = 'none';
-                    androidtd.style.display = 'none';
-                    macsafaritd.style.display = 'none';
-                } 
-                else {
+                }else{
                     pctd.style.display = 'none';
                     androidtd.style.display = 'none';
                     macsafaritd.style.display = 'none';
                 }
 
             }
-
+      
 
             var btnDecode = document.getElementById('decode');
             btnDecode.style.visibility = 'hidden';
@@ -97,304 +91,265 @@
 
             var ctrlCert = document.getElementById('certificate');
             ctrlCert.style.visibility = 'hidden';
-
+            
             var formcert = document.getElementById('form');
             formcert.style.visibility = 'hidden';
         });
     </script>
     <style>
+    
         table.center {
-            margin-left: auto;
-            margin-right: auto;
+            margin-left:auto; 
+            margin-right:auto;
             height: 160px;
         }
-
-        table td,
-        table td * {
+        table td, table td * {
             vertical-align: top;
         }
-
         h3 {
             text-align: center;
-        }
+        }   
     </style>
 </head>
 
 <body>
     <img style=" width: 100%; height: 100%;" src="./IdemHeader.png" alt="Idem Key icon " height="476" />
     <div>
-        <table style="height: auto; width: 100%;">
-            <tbody>
-                <tr>
-                    <td id="pc-td" style="width: 100% ; ">
-                        <table class="center" border="1" width="395">
-                            <tbody>
-                                <tr>
-                                    <!--PC side-->
-                                    <td style="width: 385px;">
-                                        <p style="text-align: center;">Operate by CKA_LABEL</p>
+    <table style="height: auto; width: 100%;">
+        <tbody>
+            <tr>
+                <td id = "pc-td" style="width: 100% ; ">
+                    <table class="center" border="1" width="395">
+                        <tbody>
+                            <tr>
+                                <td style="width: 385px;">
+                                    <p style="text-align: center;">Operate by CKA_LABEL</p>
 
-                                        <p>
-                                            <form style="text-align: center;" id="use-label" onsubmit="return false">
-                                                <input type="text" name="ckaLabel" style="width: 342px; height:41px">
+                                    <p><form style="text-align: center;" id="use-label" onsubmit="return false">
+                                            <input type="text" name="ckaLabel" 
+                                                style="width: 342px; height:41px">
 
-                                            </form>
-                                        </p>
-                                        <form style="text-align: center;" id="search-ckalabel" onsubmit="return false">
+                                        </form></p>
+                                    <form style="text-align: center;" id="search-ckalabel" onsubmit="return false">
+                                        <button class="btn btn-primary" action="submit"
+                                            style="width: 162px; height:34px;background-color: #008CBA;">Read
+                                            Certificate</button>
+                                    </form>
+                                    <p>
+                                        <form style="text-align: center;" id="sign-byckalabel" onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
-                                                style="width: 162px; height:34px;background-color: #008CBA;">Read
-                                                Certificate</button>
+                                                style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
                                         </form>
-                                        <p>
-                                            <form style="text-align: center;" id="sign-byckalabel"
-                                                onsubmit="return false">
-                                                <button class="btn btn-primary" action="submit"
-                                                    style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
-                                            </form>
-                                        </p>
-                                    </td>
+                                    </p>
+                                </td>
+                              
 
-
-                                    <td style="width: 385px;">
-                                        <p style="text-align: center;">Operate by Index (1~8)</p>
-                                        <p>
-                                            <form style="text-align:center" id="use-index" onsubmit="return false">
-                                                <input type="number" name="certIndex" style="width: 342px; height:41px">
-                                            </form>
-                                        </p>
-                                        <form style="text-align: center;" id="find-index" onsubmit="return false">
+                                <td style="width: 385px;">
+                                    <p style="text-align: center;">Operate by Index (1~8)</p>
+                                    <p>
+                                        <form style="text-align:center" id="use-index" onsubmit="return false">
+                                            <input type="number" name="certIndex" 
+                                                style="width: 342px; height:41px">
+                                        </form>
+                                    </p>
+                                    <form style="text-align: center;" id="find-index" onsubmit="return false">
+                                        <button class="btn btn-primary" action="submit"
+                                            style="width: 162px; height:34px;background-color: #008CBA;">Read
+                                            Certificate</button>
+                                    </form>
+                                    <p>
+                                        <form style="text-align: center;" id="sign-byindex" onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
-                                                style="width: 162px; height:34px;background-color: #008CBA;">Read
-                                                Certificate</button>
+                                                style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
                                         </form>
-                                        <p>
-                                            <form style="text-align: center;" id="sign-byindex" onsubmit="return false">
-                                                <button class="btn btn-primary" action="submit"
-                                                    style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
-                                            </form>
-                                        </p>
-                                    </td>
-<!--
-                                    <td style="width: 385px;">
-                                        <p style="text-align: center;">Regisitration </p>
-                                        <p>
-                                            <form style="text-align: center;" id="btn_gen_rsakeypair"
-                                                onsubmit="return false">
-                                                <button class="btn btn-primary" action="submit"
-                                                    style="width: 162px; height:34px;background-color: #008CBA;">Gen RSA
-                                                    Key Pair</button>
+                                    </p>
+                                </td>
 
-                                                <p>
-                                                    <label id="key_handle_value">Key Handle:</label>
-                                                    <label id="target_key_handle"></label>
-                                                </p>
-                                            </form>
-                                            <form>
-                                                <button class="btn btn-primary" action="submit"
-                                                    style="width: 162px; height:34px;background-color: #008CBA;">Sign a
-                                                    CRS</button>
-                                            </form>
-                                            <form>
-                                                <p>
-                                                    <label id="key_id_value">Key ID:</label><br>
-                                                    <label id="target_key_id">ffbbccddeeaa99887766554433221100</label>
-                                                </p>
-                                                <button class="btn btn-primary" action="submit"
-                                                    style="width: 162px; height:34px;background-color: #008CBA;">Import
-                                                    Cert. to Key</button>
+                            </tr>
+                           
+                        </tbody>
+                    </table>
+                </td>
 
-                                            </form>
-                                        </p>
-                                    </td>
--->
+                <td id = "android-td" style="width: 329px;" >
+                   
+                    <table style="height: 160px;" border="1" width="395">
+                        <tbody>
+                            <tr>
+                                <td style="width: 385px; height: 233px; vertical-align:top">
+                                    <p style="text-align: center;">Operate by CKA_LABEL</p>
+    
+                                    <p>
+                                        <form style="text-align: center;" id="android-label" onsubmit="return false">
+                                            <input type="text" name="ckaLabel"
+                                                style="width: 342px; height:41px">
+                                        </form>
+                                    </p>
 
+                                    <p>
+                                        <form style="text-align: center;" id="android-ckalabel-getassertion"
+                                            onsubmit="return false">
+                                            <button class="btn btn-primary" action="submit"
+                                                style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
+                                        </form>
+                                    </p>
+                                </td>
+                            </tr>
 
+                            <tr>
+                                <td style="width: 385px; height: 233px; vertical-align:top">
+                                    <p style="text-align: center;">Operate by Index (1~8)</p>
 
-                                </tr>
+                                    <p>
+                                        <form style="text-align: center;" id="android-index" onsubmit="return false">
+                                            <input type="number" name="certIndex" 
+                                                style="width: 342px; height:41px">
+                                        </form>
+                                    </p>
 
-                            </tbody>
-                        </table>
-                    </td>
+                                    <p>
+                                        <form style="text-align: center;" id="android-index-getassertion"
+                                            onsubmit="return false">
+                                            <button class="btn btn-primary" action="submit"
+                                                style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
+                                        </form>
+                                    </p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td id = "safari-td" style="width: 329px; ">
+                   
+                    <table style="height: 160px;" border="1" width="395">
+                        <tbody>
+                            <tr>
+                                <td style="width: 385px; ">
+                                    <p style="text-align: center;">Operate by CKA_LABEL</p>
 
-                    <td id="android-td" style="width: 329px;">
+                                    <p>
+                                        <form style="text-align: center;" id="use-label-safari" onsubmit="return false">
+                                            <input type="text" name="ckaLabel" 
+                                                style="width: 342px; height:41px">
 
-                        <table style="height: 160px;" border="1" width="395">
-                            <tbody>
-                                <tr>
-                                    <td style="width: 385px; height: 233px; vertical-align:top">
-                                        <p style="text-align: center;">Operate by CKA_LABEL</p>
-
-                                        <p>
-                                            <form style="text-align: center;" id="android-label"
-                                                onsubmit="return false">
-                                                <input type="text" name="ckaLabel" style="width: 342px; height:41px">
-                                            </form>
-                                        </p>
-
-                                        <p>
-                                            <form style="text-align: center;" id="android-ckalabel-getassertion"
-                                                onsubmit="return false">
-                                                <button class="btn btn-primary" action="submit"
-                                                    style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
-                                            </form>
-                                        </p>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td style="width: 385px; height: 233px; vertical-align:top">
-                                        <p style="text-align: center;">Operate by Index (1~8)</p>
-
-                                        <p>
-                                            <form style="text-align: center;" id="android-index"
-                                                onsubmit="return false">
-                                                <input type="number" name="certIndex" style="width: 342px; height:41px">
-                                            </form>
-                                        </p>
-
-                                        <p>
-                                            <form style="text-align: center;" id="android-index-getassertion"
-                                                onsubmit="return false">
-                                                <button class="btn btn-primary" action="submit"
-                                                    style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
-                                            </form>
-                                        </p>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                    <td id="safari-td" style="width: 329px; ">
-
-                        <table style="height: 160px;" border="1" width="395">
-                            <tbody>
-                                <tr>
-                                    <td style="width: 385px; ">
-                                        <p style="text-align: center;">Operate by CKA_LABEL</p>
-
-                                        <p>
-                                            <form style="text-align: center;" id="use-label-safari"
-                                                onsubmit="return false">
-                                                <input type="text" name="ckaLabel" style="width: 342px; height:41px">
-
-                                            </form>
-                                        </p>
+                                        </form>
+                                    </p>
 
 
-                                        <form style="text-align: center;" id="search-ckalabel-safari"
+                                    <form style="text-align: center;" id="search-ckalabel-safari"
+                                        onsubmit="return false">
+                                        <button class="btn btn-primary" action="submit"
+                                            style="width: 162px; height:34px;background-color: #008CBA;">Read
+                                            Certificate</button>
+                                    </form>
+                                    <p>
+                                        <form style="text-align: center;" id="sign-ckalabel-safari"
+                                            onsubmit="return false">
+                                            <button class="btn btn-primary" action="submit"
+                                                style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
+                                        </form>
+                                    </p>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <td style="width: 385px;">
+                                    <p style="text-align: center;">Operate Certificate by Index (1~8)</p>
+                                    <p>
+                                        <form style="text-align:center" id="use-index-safari" onsubmit="return false">
+                                            <input type="number" name="certIndex"
+                                                style="width: 342px; height:41px">
+                                        </form>
+                                    </p>
+                                    <p>
+                                        <form style="text-align: center;" id="find-index-safari"
                                             onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
                                                 style="width: 162px; height:34px;background-color: #008CBA;">Read
                                                 Certificate</button>
                                         </form>
-                                        <p>
-                                            <form style="text-align: center;" id="sign-ckalabel-safari"
-                                                onsubmit="return false">
-                                                <button class="btn btn-primary" action="submit"
-                                                    style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
-                                            </form>
-                                        </p>
-                                    </td>
+                                    </p>
 
-                                </tr>
-                                <tr>
-                                    <td style="width: 385px;">
-                                        <p style="text-align: center;">Operate Certificate by Index (1~8)</p>
-                                        <p>
-                                            <form style="text-align:center" id="use-index-safari"
-                                                onsubmit="return false">
-                                                <input type="number" name="certIndex" style="width: 342px; height:41px">
-                                            </form>
-                                        </p>
-                                        <p>
-                                            <form style="text-align: center;" id="find-index-safari"
-                                                onsubmit="return false">
-                                                <button class="btn btn-primary" action="submit"
-                                                    style="width: 162px; height:34px;background-color: #008CBA;">Read
-                                                    Certificate</button>
-                                            </form>
-                                        </p>
-
-                                        <p>
-                                            <form style="text-align: center;" id="sign-index-safari"
-                                                onsubmit="return false">
-                                                <button class="btn btn-primary" action="submit"
-                                                    style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
-                                            </form>
-                                        </p>
-                                    </td>
-                                </tr>
+                                    <p>
+                                        <form style="text-align: center;" id="sign-index-safari"
+                                            onsubmit="return false">
+                                            <button class="btn btn-primary" action="submit"
+                                                style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
+                                        </form>
+                                    </p>
+                                </td>
+                            </tr>
 
 
-                            </tbody>
-                        </table>
-                    </td>
+                        </tbody>
+                    </table>
+                </td>
 
-                    <td id="mac-safari-td" style="width: 329px; ">
+                <td id = "mac-safari-td" style="width: 329px; ">
+                   
+                    <table class="center" style="height: 160px;" border="1" width="395">
+                        <tbody>
+                            <tr>
+                                <td style="width: 385px; ">
+                                    <p style="text-align: center;">Operate by CKA_LABEL</p>
 
-                        <table class="center" style="height: 160px;" border="1" width="395">
-                            <tbody>
-                                <tr>
-                                    <td style="width: 385px; ">
-                                        <p style="text-align: center;">Operate by CKA_LABEL</p>
+                                    <p>
+                                        <form style="text-align: center;" id="use-label-safari" onsubmit="return false">
+                                            <input type="text" name="ckaLabel" 
+                                                style="width: 342px; height:41px">
 
-                                        <p>
-                                            <form style="text-align: center;" id="use-label-safari"
-                                                onsubmit="return false">
-                                                <input type="text" name="ckaLabel" style="width: 342px; height:41px">
-
-                                            </form>
-                                        </p>
+                                        </form>
+                                    </p>
 
 
-                                        <form style="text-align: center;" id="search-ckalabel-safari"
+                                    <form style="text-align: center;" id="search-ckalabel-safari"
+                                        onsubmit="return false">
+                                        <button class="btn btn-primary" action="submit"
+                                            style="width: 162px; height:34px;background-color: #008CBA;">Read
+                                            Certificate</button>
+                                    </form>
+                                    <p>
+                                        <form style="text-align: center;" id="sign-ckalabel-safari"
+                                            onsubmit="return false">
+                                            <button class="btn btn-primary" action="submit"
+                                                style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
+                                        </form>
+                                    </p>
+                                </td>
+                                <td style="width: 385px;">
+                                    <p style="text-align: center;">Operate Certificate by Index (1~8)</p>
+                                    <p>
+                                        <form style="text-align:center" id="use-index-safari" onsubmit="return false">
+                                            <input type="number" name="certIndex"
+                                                style="width: 342px; height:41px">
+                                        </form>
+                                    </p>
+                                    <p>
+                                        <form style="text-align: center;" id="find-index-safari"
                                             onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
                                                 style="width: 162px; height:34px;background-color: #008CBA;">Read
                                                 Certificate</button>
                                         </form>
-                                        <p>
-                                            <form style="text-align: center;" id="sign-ckalabel-safari"
-                                                onsubmit="return false">
-                                                <button class="btn btn-primary" action="submit"
-                                                    style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
-                                            </form>
-                                        </p>
-                                    </td>
-                                    <td style="width: 385px;">
-                                        <p style="text-align: center;">Operate Certificate by Index (1~8)</p>
-                                        <p>
-                                            <form style="text-align:center" id="use-index-safari"
-                                                onsubmit="return false">
-                                                <input type="number" name="certIndex" style="width: 342px; height:41px">
-                                            </form>
-                                        </p>
-                                        <p>
-                                            <form style="text-align: center;" id="find-index-safari"
-                                                onsubmit="return false">
-                                                <button class="btn btn-primary" action="submit"
-                                                    style="width: 162px; height:34px;background-color: #008CBA;">Read
-                                                    Certificate</button>
-                                            </form>
-                                        </p>
+                                    </p>
 
-                                        <p>
-                                            <form style="text-align: center;" id="sign-index-safari"
-                                                onsubmit="return false">
-                                                <button class="btn btn-primary" action="submit"
-                                                    style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
-                                            </form>
-                                        </p>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </td>
+                                    <p>
+                                        <form style="text-align: center;" id="sign-index-safari"
+                                            onsubmit="return false">
+                                            <button class="btn btn-primary" action="submit"
+                                                style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
+                                        </form>
+                                    </p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
 
-                </tr>
-            </tbody>
-        </table>
-    </div>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
 
     <!--  Laurence -->
@@ -448,18 +403,16 @@
 
     <script>
         // Command Header GoTrust-Idem-PKI
-        var GTheader = 'R29UcnVzdC1JZGVtLVBLSQ==';
+        var GTheader = 'R29UcnVzdC1JZGVtLVBLSQ=='; 
 
         // signed Data1: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef  
         var signData =
             'MTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWYxMjM0NTY3ODkwYWJjZGVmMTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWYxMjM0NTY3ODkwYWJjZGVmMTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWY=';
-
-
-        //  signed Data2:  1234567890abcdef1234567890abcdef
+        
+        
+         //  signed Data2:  1234567890abcdef1234567890abcdef
         var signShortData = 'MTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWY=';
 
-        var testCertificate =
-            'MIIDHjCCAgagAwIBAgIEG0BT9zANBgkqhkiG9w0BAQsFADAuMSwwKgYDVQQDEyNZdWJpY28gVTJGIFJvb3QgQ0EgU2VyaWFsIDQ1NzIwMDYzMTAgFw0xNDA4MDEwMDAwMDBaGA8yMDUwMDkwNDAwMDAwMFowLjEsMCoGA1UEAxMjWXViaWNvIFUyRiBSb290IENBIFNlcmlhbCA0NTcyMDA2MzEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC/jwYuhBVlqaiYWEMsrWFisgJ+PtM91eSrpI4TK7U53mwCIawSDHy8vUmk5N2KAj9abvT9NP5SMS1hQi3usxoYGonXQgfO6ZXyUA9a+KAkqdFnBnlyugSeCOep8EdZFfsaRFtMjkwz5Gcz2Py4vIYvCdMHPtwaz0bVuzneueIEz6TnQjE63Rdt2zbwnebwTG5ZybeWSwbzy+BJ34ZHcUhPAY89yJQXuE0IzMZFcEBbPNRbWECRKgjq//qT9nmDOFVlSRCt2wiqPSzluwn+v+suQEBsUjTGMEd25tKXXTkNW21wIWbxeSyUoTXwLvGS6xlwQSgNpk2qXYwf8iXg7VWZAgMBAAGjQjBAMB0GA1UdDgQWBBQgIvz0bNGJhjgpToksyKpP9xv9oDAPBgNVHRMECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjANBgkqhkiG9w0BAQsFAAOCAQEAjvjuOMDSa+JXFCLyBKsycXtBVZsJ4Ue3LbaEsPY4MYN/hIQ5ZM5p7EjfcnMG4CtYkNsfNHc0AhBLdq45rnT87q/6O3vUEtNMafbhU6kthX7Y+9XFN9NpmYxr+ekVY5xOxi8h9JDIgoMP4VB1uS0aunL1IGqrNooL9mmFnL2kLVVee6/VR6C5+KSTCMCWppMuJIZII2v9o4dkoZ8Y7QRjQlLfYzd3qGtKbw7xaF1UsG/5xUb/Btwb2X2g4InpiB/yt/3CpQXpiWX/K4mBvUKiGn05ZsqeY1gx4g0xLBqcU9psmyPzK+Vsgw2jeRQ5JlKDyqE0hebfC1tvFu0CCrJFcw==';
 
         document.getElementById('find-index').addEventListener('submit', function (event) {
             event.preventDefault();
@@ -476,12 +429,11 @@
             var pki_header = new Uint8Array(3);
 
             //PKI Command
-            var command_bufer = new Uint8Array(5);
+            var command_bufer = new Uint8Array(4);
             command_bufer[0] = 0xDF;
             command_bufer[1] = 0x02;
-            command_bufer[2] = 00;
-            command_bufer[3] = 01;
-            command_bufer[4] = certIndex;
+            command_bufer[2] = 01;
+            command_bufer[3] = certIndex;
 
             var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_bufer.byteLength);
             var pki_payload_length = command_bufer.byteLength;
@@ -541,16 +493,18 @@
                     console.log('CredID: ', bufToHex(authData.credID));
                     console.log('AAGUID: ', bufToHex(authData.aaguid));
                     console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
+                    
 
-                    showCertificMessage(authData.credID);
 
-
-                    const sliced = new Uint8Array(authData.credID.slice(1, authData.credID.length));
+                    const sliced = new Uint8Array(authData.credID.slice(1, authData.credID.length))
                     var strCert = "-----BEGIN CERTIFICATE-----\n" +
                         btoa(String.fromCharCode.apply(null, sliced)) +
                         "\n-----END CERTIFICATE-----"
 
                     console.log('Certificatie : \n', strCert)
+
+
+
                     displayCert(strCert)
 
                 })
@@ -572,12 +526,11 @@
             var pki_header = new Uint8Array(3);
 
             //PKI Command
-            var command_bufer = new Uint8Array(5);
+            var command_bufer = new Uint8Array(4);
             command_bufer[0] = 0xDF;
             command_bufer[1] = 0x02;
-            command_bufer[2] = 0x00;
-            command_bufer[3] = 0x01;
-            command_bufer[4] = certIndex;
+            command_bufer[2] = 01;
+            command_bufer[3] = certIndex;
 
             var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_bufer.byteLength);
             var pki_payload_length = command_bufer.byteLength;
@@ -638,10 +591,10 @@
                     console.log('CredID: ', bufToHex(authData.credID));
                     console.log('AAGUID: ', bufToHex(authData.aaguid));
                     console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
+                   
 
-                    showCertificMessage(authData.credID);
 
-                    const sliced = new Uint8Array(authData.credID.slice(1, authData.credID.length));
+                    const sliced = new Uint8Array(authData.credID.slice(1, authData.credID.length))
                     var strCert = "-----BEGIN CERTIFICATE-----\n" +
                         btoa(String.fromCharCode.apply(null, sliced)) +
                         "\n-----END CERTIFICATE-----"
@@ -671,27 +624,24 @@
             var pki_header = new Uint8Array(3);
 
             //PKI Command
-            var command_buf = new Uint8Array(5);
+            var command_buf = new Uint8Array(4);
             command_buf[0] = 0xDF;
             command_buf[1] = 0x02;
-            command_buf[2] = 0x00;
-            command_buf[3] = 0x01;
-            command_buf[4] = certIndex;
+            command_buf[2] = 01;
+            command_buf[3] = certIndex;
 
-            var alg_buf = new Uint8Array(5);
+            var alg_buf = new Uint8Array(4);
             alg_buf[0] = 0xDF;
             alg_buf[1] = 0x03;
-            alg_buf[2] = 0x00;
-            alg_buf[3] = 0x01;
-            alg_buf[4] = 0x02;
+            alg_buf[2] = 01;
+            alg_buf[3] = 0x02;
 
             var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
-            var signDataBuf = new Uint8Array(4 + signDataPayload.byteLength);
+            var signDataBuf = new Uint8Array(3 + signDataPayload.byteLength);
             signDataBuf[0] = 0xDF;
             signDataBuf[1] = 0x06;
-            signDataBuf[2] = signDataPayload.length >> 8;
-            signDataBuf[3] = signDataPayload.length;
-            signDataBuf.set(signDataPayload, 4);
+            signDataBuf[2] = signDataPayload.length;
+            signDataBuf.set(signDataPayload, 3);
 
 
             var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_buf.byteLength + alg_buf
@@ -725,17 +675,16 @@
                     'publicKey': getAssertionChallenge
                 })
                 .then((newCredentialInfo) => {
-
+              
                     console.log('SUCCESS', newCredentialInfo);
                     console.log("Sign", newCredentialInfo.response.signature);
 
                     const sign = newCredentialInfo.response.signature;
-                    showSignMessage(sign);
-                    //var str = String.fromCharCode.apply(null, new Uint8Array(sign));
-                    // alert("Plaintext:" + "\n" + signData +
-                    //         "\n" +
-                    //         "\n" +
-                    //         "Signature:" + "\n" + btoa(str));
+                    var str = String.fromCharCode.apply(null, new Uint8Array(sign));
+                    alert("Plaintext:" + "\n" + signData +
+                            "\n" +
+                            "\n" +
+                            "Signature:" + "\n" + btoa(str));
 
 
                 })
@@ -755,14 +704,13 @@
 
 
             var pki_header = new Uint8Array(3);
-            var command_bufer = new Uint8Array(ckaLabel.length + 4);
+            var command_bufer = new Uint8Array(ckaLabel.length + 3);
             window.crypto.getRandomValues(command_bufer);
             command_bufer[0] = 0xDF
             command_bufer[1] = 0x01;
-            command_bufer[2] = ckaLabel.length >> 8;
-            command_bufer[3] = ckaLabel.length;
-            command_bufer.set(toUTF8Array(ckaLabel), 4);
 
+            command_bufer[2] = ckaLabel.length;
+            command_bufer.set(toUTF8Array(ckaLabel), 3);
 
 
             var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
@@ -827,11 +775,10 @@
                     console.log('CredID: ', bufToHex(authData.credID));
                     console.log('AAGUID: ', bufToHex(authData.aaguid));
                     console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
-
+                   
 
                     var strCert = "-----BEGIN CERTIFICATE-----\n" +
-                        btoa(String.fromCharCode.apply(null, new Uint8Array(authData.credID.slice(1,
-                            authData.credID.length)))) +
+                        btoa(String.fromCharCode.apply(null, authData.credID)) +
                         "\n-----END CERTIFICATE-----"
 
                     console.log('Certificatie : \n', strCert)
@@ -860,13 +807,13 @@
 
 
             var pki_header = new Uint8Array(3);
-            var command_bufer = new Uint8Array(ckaLabel.length + 4);
+            var command_bufer = new Uint8Array(ckaLabel.length + 3);
             window.crypto.getRandomValues(command_bufer);
             command_bufer[0] = 0xDF
             command_bufer[1] = 0x01;
-            command_bufer[2] = ckaLabel.length >> 8;
-            command_bufer[3] = ckaLabel.length;
-            command_bufer.set(toUTF8Array(ckaLabel), 4);
+
+            command_bufer[2] = ckaLabel.length;
+            command_bufer.set(toUTF8Array(ckaLabel), 3);
 
 
             var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
@@ -933,11 +880,10 @@
                     console.log('CredID: ', bufToHex(authData.credID));
                     console.log('AAGUID: ', bufToHex(authData.aaguid));
                     console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
-
+                   
 
                     var strCert = "-----BEGIN CERTIFICATE-----\n" +
-                        btoa(String.fromCharCode.apply(null, new Uint8Array(authData.credID.slice(1,
-                            authData.credID.length)))) +
+                        btoa(String.fromCharCode.apply(null, authData.credID)) +
                         "\n-----END CERTIFICATE-----"
 
                     console.log('Certificatie : \n', strCert)
@@ -968,29 +914,26 @@
             var pki_header = new Uint8Array(3);
 
             //PKI Command
-            var command_bufer = new Uint8Array(ckaLabel.length + 4);
+            var command_bufer = new Uint8Array(ckaLabel.length + 3);
             window.crypto.getRandomValues(command_bufer);
             command_bufer[0] = 0xDF
             command_bufer[1] = 0x01;
-            command_bufer[2] = ckaLabel.length >> 8;
-            command_bufer[3] = ckaLabel.length;
-            command_bufer.set(toUTF8Array(ckaLabel), 4);
+            command_bufer[2] = ckaLabel.length;
+            command_bufer.set(toUTF8Array(ckaLabel), 3);
 
 
-            var alg_buf = new Uint8Array(5);
+            var alg_buf = new Uint8Array(4);
             alg_buf[0] = 0xDF;
             alg_buf[1] = 0x03;
-            alg_buf[2] = 00;
-            alg_buf[3] = 01;
-            alg_buf[4] = 0x02;
+            alg_buf[2] = 01;
+            alg_buf[3] = 0x02;
 
             var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
-            var signDataBuf = new Uint8Array(4 + signDataPayload.byteLength);
+            var signDataBuf = new Uint8Array(3 + signDataPayload.byteLength);
             signDataBuf[0] = 0xDF;
             signDataBuf[1] = 0x06;
-            signDataBuf[2] = signDataPayload.length >> 8;
-            signDataBuf[3] = signDataPayload.length;
-            signDataBuf.set(signDataPayload, 4);
+            signDataBuf[2] = signDataPayload.length;
+            signDataBuf.set(signDataPayload, 3);
 
 
             var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_bufer.byteLength + alg_buf
@@ -1030,7 +973,11 @@
                     console.log('SUCCESS', newCredentialInfo)
                     console.log("Sign", newCredentialInfo.response.signature)
                     const sign = newCredentialInfo.response.signature;
-                    showSignMessage(sign);
+                    var str = String.fromCharCode.apply(null, new Uint8Array(sign));
+                    alert("Plaintext:" + "\n" + signData +
+                            "\n" +
+                             "\n" +
+                            "Signature:" + "\n" + btoa(str));
 
                 })
                 .catch((error) => {
@@ -1065,13 +1012,12 @@
             var EncryptedPINArray;
 
             var pki_header = new Uint8Array(3);
-            var command_bufer = new Uint8Array(ckaLabel.length + 4);
+            var command_bufer = new Uint8Array(ckaLabel.length + 3);
             window.crypto.getRandomValues(command_bufer);
             command_bufer[0] = 0xDF
             command_bufer[1] = 0x01;
-            command_bufer[2] = ckaLabel.length >> 8;
-            command_bufer[3] = ckaLabel.length;
-            command_bufer.set(toUTF8Array(ckaLabel), 4);
+            command_bufer[2] = ckaLabel.length;
+            command_bufer.set(toUTF8Array(ckaLabel), 3);
 
 
             var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
@@ -1239,45 +1185,40 @@
                 var pki_header = new Uint8Array(3);
 
                 //PKI Command
-                var command_buf = new Uint8Array(ckaLabel.length + 4);
+                var command_buf = new Uint8Array(ckaLabel.length + 3);
                 command_buf[0] = 0xDF
                 command_buf[1] = 0x01;
-                command_buf[2] = ckaLabel.length >> 8;
-                command_buf[3] = ckaLabel.length;
-                command_buf.set(toUTF8Array(ckaLabel), 4);
+                command_buf[2] = ckaLabel.length;
+                command_buf.set(toUTF8Array(ckaLabel), 3);
 
 
 
-                var alg_buf = new Uint8Array(5);
+                var alg_buf = new Uint8Array(4);
                 alg_buf[0] = 0xDF;
                 alg_buf[1] = 0x03;
-                alg_buf[2] = 00;
-                alg_buf[3] = 01;
-                alg_buf[4] = 0x02;
+                alg_buf[2] = 01;
+                alg_buf[3] = 0x02;
 
 
-                var ecpubkey_buf = new Uint8Array(4 + exportECPublicKeyArray.byteLength);
+                var ecpubkey_buf = new Uint8Array(3 + exportECPublicKeyArray.byteLength);
                 ecpubkey_buf[0] = 0xDF;
                 ecpubkey_buf[1] = 0x04;
-                ecpubkey_buf[2] = exportECPublicKeyArray.byteLength >> 8;
-                ecpubkey_buf[3] = exportECPublicKeyArray.byteLength;
-                ecpubkey_buf.set(new Uint8Array(exportECPublicKeyArray), 4);
+                ecpubkey_buf[2] = exportECPublicKeyArray.byteLength;
+                ecpubkey_buf.set(new Uint8Array(exportECPublicKeyArray), 3);
 
 
-                var encryptedPIN_buf = new Uint8Array(4 + EncryptedPINArray.byteLength);
+                var encryptedPIN_buf = new Uint8Array(3 + EncryptedPINArray.byteLength);
                 encryptedPIN_buf[0] = 0xDF;
                 encryptedPIN_buf[1] = 0x05;
-                encryptedPIN_buf[2] = EncryptedPINArray.byteLength >> 8;
-                encryptedPIN_buf[3] = EncryptedPINArray.byteLength;
-                encryptedPIN_buf.set(new Uint8Array(EncryptedPINArray), 4);
+                encryptedPIN_buf[2] = EncryptedPINArray.byteLength;
+                encryptedPIN_buf.set(new Uint8Array(EncryptedPINArray), 3);
 
                 var signDataPayload = Uint8Array.from(window.atob(signShortData), c => c.charCodeAt(0));
-                var signDataBuf = new Uint8Array(4 + signDataPayload.byteLength);
+                var signDataBuf = new Uint8Array(3 + signDataPayload.byteLength);
                 signDataBuf[0] = 0xDF;
                 signDataBuf[1] = 0x06;
-                signDataBuf[2] = signDataPayload.length >> 8;
-                signDataBuf[3] = signDataPayload.length;
-                signDataBuf.set(signDataPayload, 4);
+                signDataBuf[2] = signDataPayload.length;
+                signDataBuf.set(signDataPayload, 3);
 
 
 
@@ -1364,7 +1305,7 @@
                                 'publicKey': android_getSignature
                             }).then((newCredentialInfo) => {
 
-
+                         
                                 let attestationObject = CBOR.decode(newCredentialInfo
                                     .response.attestationObject);
                                 let authData = parseAuthData(attestationObject.authData);
@@ -1378,10 +1319,10 @@
                                 console.log('Signature:', bufToHex(sig_buffer));
                                 var str = String.fromCharCode.apply(null, new Uint8Array(
                                     sig_buffer));
-                                alert("Plaintext:" + "\n" + signShortData +
+                               alert("Plaintext:" + "\n" + signShortData +
                                     "\n" +
                                     "\n" +
-                                    "Signature:" + "\n" + btoa(str));
+                                    "Signature:" + "\n" + btoa(str));        
 
                             })
                             .catch((error) => {
@@ -1413,10 +1354,14 @@
 
 
             let certIndex = document.getElementById('android-index').certIndex.value;
-            var userpin;
+            //let userpin = document.getElementById('android-index-pin').pin.value;
 
-
+            var userpin = prompt("Input your PIN", "");
+            if (userpin == null) {
+                return;
+            }
             console.log('android-index', certIndex);
+            console.log('android-index-pin', userpin);
 
             var challenge = new Uint8Array(32);
             window.crypto.getRandomValues(challenge);
@@ -1433,12 +1378,11 @@
             var pki_header = new Uint8Array(3);
 
             //PKI Command
-            var command_bufer = new Uint8Array(5);
+            var command_bufer = new Uint8Array(4);
             command_bufer[0] = 0xDF;
             command_bufer[1] = 0x02;
-            command_bufer[2] = 0;
-            command_bufer[3] = 01;
-            command_bufer[4] = certIndex;
+            command_bufer[2] = 01;
+            command_bufer[3] = certIndex;
 
             var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_bufer.byteLength);
             var pki_payload_length = command_bufer.byteLength;
@@ -1486,11 +1430,6 @@
             navigator.credentials.create({
                 'publicKey': android_readecdh
             }).then((newCredentialInfo) => {
-                userpin = prompt("Input your PIN", "");
-                if (userpin == null) {
-                    return;
-                }
-                console.log('android-index-pin', userpin);
 
                 let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
                 let authData = parseAuthData(attestationObject.authData);
@@ -1604,43 +1543,38 @@
                 var pki_header = new Uint8Array(3);
 
                 //PKI Command
-                var command_buf = new Uint8Array(5);
+                var command_buf = new Uint8Array(4);
                 command_buf[0] = 0xDF;
                 command_buf[1] = 0x02;
-                command_buf[2] = 0;
-                command_buf[3] = 01;
-                command_buf[4] = certIndex;
+                command_buf[2] = 01;
+                command_buf[3] = certIndex;
 
-                var alg_buf = new Uint8Array(5);
+                var alg_buf = new Uint8Array(4);
                 alg_buf[0] = 0xDF;
                 alg_buf[1] = 0x03;
-                alg_buf[2] = 0;
-                alg_buf[3] = 01;
-                alg_buf[4] = 0x02;
+                alg_buf[2] = 01;
+                alg_buf[3] = 0x02;
 
 
-                var ecpubkey_buf = new Uint8Array(4 + exportECPublicKeyArray.byteLength);
+                var ecpubkey_buf = new Uint8Array(3 + exportECPublicKeyArray.byteLength);
                 ecpubkey_buf[0] = 0xDF;
                 ecpubkey_buf[1] = 0x04;
-                ecpubkey_buf[2] = exportECPublicKeyArray.byteLength >> 8;
-                ecpubkey_buf[3] = exportECPublicKeyArray.byteLength;
-                ecpubkey_buf.set(new Uint8Array(exportECPublicKeyArray), 4);
+                ecpubkey_buf[2] = exportECPublicKeyArray.byteLength;
+                ecpubkey_buf.set(new Uint8Array(exportECPublicKeyArray), 3);
 
 
-                var encryptedPIN_buf = new Uint8Array(4 + EncryptedPINArray.byteLength);
+                var encryptedPIN_buf = new Uint8Array(3 + EncryptedPINArray.byteLength);
                 encryptedPIN_buf[0] = 0xDF;
                 encryptedPIN_buf[1] = 0x05;
-                encryptedPIN_buf[2] = EncryptedPINArray.byteLength >> 8;
-                encryptedPIN_buf[3] = EncryptedPINArray.byteLength;
-                encryptedPIN_buf.set(new Uint8Array(EncryptedPINArray), 4);
+                encryptedPIN_buf[2] = EncryptedPINArray.byteLength;
+                encryptedPIN_buf.set(new Uint8Array(EncryptedPINArray), 3);
 
                 var signDataPayload = Uint8Array.from(window.atob(signShortData), c => c.charCodeAt(0));
-                var signDataBuf = new Uint8Array(4 + signDataPayload.byteLength);
+                var signDataBuf = new Uint8Array(3 + signDataPayload.byteLength);
                 signDataBuf[0] = 0xDF;
                 signDataBuf[1] = 0x06;
-                signDataBuf[2] = signDataPayload.length >> 8;
-                signDataBuf[3] = signDataPayload.length;
-                signDataBuf.set(signDataPayload, 4);
+                signDataBuf[2] = signDataPayload.length;
+                signDataBuf.set(signDataPayload, 3);
 
 
 
@@ -1686,100 +1620,88 @@
                 navigator.credentials.get({
                     'publicKey': getAssertionChallenge
                 }).then((newCredentialInfo) => {
-
-
-                    console.log("Sign", bufToHex(newCredentialInfo.response.signature));
                     const sign1 = newCredentialInfo.response.signature;
-                    if (isErrorMessage(sign1) === 1) {
 
+                    if (sign1.byteLength < 251) {
 
-                        showSignMessage(sign1);
+                        var challenge = new Uint8Array(32);
+                        window.crypto.getRandomValues(challenge);
 
+                        var userID = 'Kosv9fPtkDoh4Oz7Yq/pVgWHS8HhdlCto5cR0aBoVMw='
+                        var id = Uint8Array.from(window.atob(userID), c => c.charCodeAt(0))
+
+                        var android_getSignature = {
+                            'challenge': challenge,
+
+                            'rp': {
+                                'name': 'GoTrustID Inc.'
+                            },
+
+                            'user': {
+                                'id': id,
+                                'name': 'FastCar@example.com',
+                                'displayName': 'Car man'
+                            },
+
+                            "authenticatorSelection": {
+                                "userVerification": "discouraged",
+                                'authenticatorAttachment': "cross-platform",
+                            },
+
+                            'pubKeyCredParams': [{
+                                    'type': 'public-key',
+                                    'alg': -7
+                                },
+                                {
+                                    'type': 'public-key',
+                                    'alg': -257
+                                }
+                            ]
+                        }
+
+                        console.log('Get reponse  android', android_getSignature)
+                        navigator.credentials.create({
+                                'publicKey': android_getSignature
+                            }).then((newCredentialInfo) => {
+
+                      
+                                let attestationObject = CBOR.decode(newCredentialInfo
+                                    .response.attestationObject);
+                                let authData = parseAuthData(attestationObject.authData);
+                                var CredID = authData.credID;
+                                var publicKEy = CBOR.decode(authData.COSEPublicKey.buffer);
+                                var externalECPublicKeyX = Object.values(publicKEy)[3];
+                                console.log(bufToHex(externalECPublicKeyX));
+                                var sig_buffer = new Uint8Array(256);
+                                sig_buffer[0] = externalECPublicKeyX[0];
+                                sig_buffer.set(new Uint8Array(CredID), 1);
+                                console.log('Signature:', bufToHex(sig_buffer));
+                                var str = String.fromCharCode.apply(null, new Uint8Array(
+                                    sig_buffer));
+                            
+                                alert("Plaintext:" + "\n" + signShortData +
+                                    "\n" +
+                                    "\n" +  
+                                    "Signature:" + "\n" + btoa(str));    
+
+                            })
+                            .catch((error) => {
+                                alert(error)
+                                console.log('FAIL', error)
+                            })
                     } else {
 
-                        if (sign1.byteLength > 251) {
-                            var str = String.fromCharCode.apply(null, new Uint8Array(
-                                sign1));
+                        console.log('SUCCESS', newCredentialInfo);
+                        console.log("Sign", newCredentialInfo.response.signature);
+                        const sign1 = newCredentialInfo.response.signature;
+
+
+                        var str = String.fromCharCode.apply(null, new Uint8Array(
+                            sign1));
                             alert("Plaintext:" + "\n" + signShortData +
-                                "\n" +
-                                "\n" +
-                                "Signature:" + "\n" + btoa(str));
-
-
-
-                        } else {
-
-
-
-                            var challenge = new Uint8Array(32);
-                            window.crypto.getRandomValues(challenge);
-
-                            var userID = 'Kosv9fPtkDoh4Oz7Yq/pVgWHS8HhdlCto5cR0aBoVMw='
-                            var id = Uint8Array.from(window.atob(userID), c => c.charCodeAt(0))
-
-                            var android_getSignature = {
-                                'challenge': challenge,
-
-                                'rp': {
-                                    'name': 'GoTrustID Inc.'
-                                },
-
-                                'user': {
-                                    'id': id,
-                                    'name': 'FastCar@example.com',
-                                    'displayName': 'Car man'
-                                },
-
-                                "authenticatorSelection": {
-                                    "userVerification": "discouraged",
-                                    'authenticatorAttachment': "cross-platform",
-                                },
-
-                                'pubKeyCredParams': [{
-                                        'type': 'public-key',
-                                        'alg': -7
-                                    },
-                                    {
-                                        'type': 'public-key',
-                                        'alg': -257
-                                    }
-                                ]
-                            }
-
-                            console.log('Get reponse  android', android_getSignature)
-                            navigator.credentials.create({
-                                    'publicKey': android_getSignature
-                                }).then((newCredentialInfo) => {
-
-
-                                    let attestationObject = CBOR.decode(newCredentialInfo
-                                        .response.attestationObject);
-                                    let authData = parseAuthData(attestationObject
-                                    .authData);
-                                    var CredID = authData.credID;
-                                    var publicKEy = CBOR.decode(authData.COSEPublicKey
-                                        .buffer);
-                                    var externalECPublicKeyX = Object.values(publicKEy)[3];
-                                    console.log(bufToHex(externalECPublicKeyX));
-                                    var sig_buffer = new Uint8Array(256);
-                                    sig_buffer[0] = externalECPublicKeyX[0];
-                                    sig_buffer.set(new Uint8Array(CredID), 1);
-                                    console.log('Signature:', bufToHex(sig_buffer));
-                                    var str = String.fromCharCode.apply(null,
-                                        new Uint8Array(
-                                            sig_buffer));
-
-                                    alert("Plaintext:" + "\n" + signShortData +
-                                        "\n" +
-                                        "\n" +
-                                        "Signature:" + "\n" + btoa(str));
-
-                                })
-                                .catch((error) => {
-                                    alert(error)
-                                    console.log('FAIL', error)
-                                })
-                        }
+                            "\n" +
+                            "\n" +      
+                            "Signature:" + "\n" + btoa(str));
                     }
 
                 });
@@ -1797,7 +1719,7 @@
             let certIndex = document.getElementById('use-index-safari').certIndex.value;
             //let userpin = document.getElementById('safari-pin-index').pin.value;
             console.log('use-index-safari', certIndex);
-
+            
 
             var challenge = new Uint8Array(32);
             window.crypto.getRandomValues(challenge);
@@ -1814,12 +1736,11 @@
             var pki_header = new Uint8Array(3);
 
             //PKI Command
-            var command_bufer = new Uint8Array(5);
+            var command_bufer = new Uint8Array(4);
             command_bufer[0] = 0xDF;
             command_bufer[1] = 0x02;
-            command_bufer[2] = 0x00
-            command_bufer[3] = 0x01;
-            command_bufer[4] = certIndex;
+            command_bufer[2] = 01;
+            command_bufer[3] = certIndex;
 
             var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_bufer.byteLength);
             var pki_payload_length = command_bufer.byteLength;
@@ -1873,7 +1794,7 @@
                     return;
                 }
                 console.log('safari-pin-index', userpin);
-
+                
                 let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
                 let authData = parseAuthData(attestationObject.authData);
                 var publicKEy = CBOR.decode(authData.COSEPublicKey.buffer);
@@ -1986,43 +1907,38 @@
                 var pki_header = new Uint8Array(3);
 
                 //PKI Command
-                var command_buf = new Uint8Array(5);
+                var command_buf = new Uint8Array(4);
                 command_buf[0] = 0xDF;
                 command_buf[1] = 0x02;
-                command_buf[2] = 0x00;
-                command_buf[3] = 0x01;
-                command_buf[4] = certIndex;
+                command_buf[2] = 01;
+                command_buf[3] = certIndex;
 
-                var alg_buf = new Uint8Array(5);
+                var alg_buf = new Uint8Array(4);
                 alg_buf[0] = 0xDF;
                 alg_buf[1] = 0x03;
-                alg_buf[2] = 0x00;
-                alg_buf[3] = 0x01;
-                alg_buf[4] = 0x02;
+                alg_buf[2] = 01;
+                alg_buf[3] = 0x02;
 
 
-                var ecpubkey_buf = new Uint8Array(4 + exportECPublicKeyArray.byteLength);
+                var ecpubkey_buf = new Uint8Array(3 + exportECPublicKeyArray.byteLength);
                 ecpubkey_buf[0] = 0xDF;
                 ecpubkey_buf[1] = 0x04;
-                ecpubkey_buf[2] = exportECPublicKeyArray.byteLength >> 8;
-                ecpubkey_buf[3] = exportECPublicKeyArray.byteLength;
-                ecpubkey_buf.set(new Uint8Array(exportECPublicKeyArray), 4);
+                ecpubkey_buf[2] = exportECPublicKeyArray.byteLength;
+                ecpubkey_buf.set(new Uint8Array(exportECPublicKeyArray), 3);
 
 
-                var encryptedPIN_buf = new Uint8Array(4 + EncryptedPINArray.byteLength);
+                var encryptedPIN_buf = new Uint8Array(3 + EncryptedPINArray.byteLength);
                 encryptedPIN_buf[0] = 0xDF;
                 encryptedPIN_buf[1] = 0x05;
-                encryptedPIN_buf[2] = EncryptedPINArray.byteLength >> 8;
-                encryptedPIN_buf[3] = EncryptedPINArray.byteLength;
-                encryptedPIN_buf.set(new Uint8Array(EncryptedPINArray), 4);
+                encryptedPIN_buf[2] = EncryptedPINArray.byteLength;
+                encryptedPIN_buf.set(new Uint8Array(EncryptedPINArray), 3);
 
                 var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
-                var signDataBuf = new Uint8Array(4 + signDataPayload.byteLength);
+                var signDataBuf = new Uint8Array(3 + signDataPayload.byteLength);
                 signDataBuf[0] = 0xDF;
                 signDataBuf[1] = 0x06;
-                signDataBuf[2] = signDataPayload.length >> 8;
-                signDataBuf[3] = signDataPayload.length;
-                signDataBuf.set(signDataPayload, 4);
+                signDataBuf[2] = signDataPayload.length;
+                signDataBuf.set(signDataPayload, 3);
 
 
 
@@ -2061,17 +1977,22 @@
                 }];
 
                 getAssertionChallenge.allowCredentials = idList;
-                console.log('List getAssertionChallenge', getAssertionChallenge);
+                console.log('List getAssertionChallenge', getAssertionChallenge)
 
                 navigator.credentials.get({
                         'publicKey': getAssertionChallenge
                     })
                     .then((newCredentialInfo) => {
                         //alert('Sign finished');
-                        console.log("SUCCESS: " + bufToHex(newCredentialInfo));
-                        console.log("Sign: " + bufToHex(newCredentialInfo.response.signature));
+                        console.log('SUCCESS', newCredentialInfo)
+                        console.log("Sign", newCredentialInfo.response.signature)
                         const sign = newCredentialInfo.response.signature;
-                        showSignMessage(sign);
+                        var str = String.fromCharCode.apply(null, new Uint8Array(sign));
+                        alert("Plaintext:" + "\n" + signData +
+                            "\n" +
+                            "\n" +    
+                            "Signature:" + "\n" + btoa(str));
+
 
                     })
                     .catch((error) => {
@@ -2127,9 +2048,9 @@
             let ckaLabel = document.getElementById('use-label-safari').ckaLabel.value;
             //let userpin = document.getElementById('safari-pin-label').pin.value;
 
-
+        
             console.log('use-label-safari', ckaLabel);
-
+            
 
             var challenge = new Uint8Array(32);
             window.crypto.getRandomValues(challenge);
@@ -2145,13 +2066,12 @@
 
 
             var pki_header = new Uint8Array(3);
-            var command_bufer = new Uint8Array(ckaLabel.length + 4);
+            var command_bufer = new Uint8Array(ckaLabel.length + 3);
             window.crypto.getRandomValues(command_bufer);
             command_bufer[0] = 0xDF
             command_bufer[1] = 0x01;
-            command_bufer[2] = ckaLabel.length >> 8;
-            command_bufer[3] = ckaLabel.length;
-            command_bufer.set(toUTF8Array(ckaLabel), 4);
+            command_bufer[2] = ckaLabel.length;
+            command_bufer.set(toUTF8Array(ckaLabel), 3);
 
 
             var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
@@ -2205,13 +2125,13 @@
                 'publicKey': safari_readecdh
             }).then((newCredentialInfo) => {
 
-
+                
                 userpin = prompt("Input your PIN", "");
                 if (userpin == null) {
                     return;
                 }
                 console.log('safari-pin-label', userpin);
-
+                
                 let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
                 let authData = parseAuthData(attestationObject.authData);
                 var publicKEy = CBOR.decode(authData.COSEPublicKey.buffer);
@@ -2326,45 +2246,40 @@
                 var pki_header = new Uint8Array(3);
 
                 //PKI Command
-                var command_buf = new Uint8Array(ckaLabel.length + 4);
+                var command_buf = new Uint8Array(ckaLabel.length + 3);
                 command_buf[0] = 0xDF
                 command_buf[1] = 0x01;
-                command_buf[2] = ckaLabel.length >> 8;
-                command_buf[3] = ckaLabel.length;
-                command_buf.set(toUTF8Array(ckaLabel), 4);
+                command_buf[2] = ckaLabel.length;
+                command_buf.set(toUTF8Array(ckaLabel), 3);
 
 
 
-                var alg_buf = new Uint8Array(5);
+                var alg_buf = new Uint8Array(4);
                 alg_buf[0] = 0xDF;
                 alg_buf[1] = 0x03;
-                alg_buf[2] = 0;
-                alg_buf[3] = 1;
-                alg_buf[4] = 0x02;
+                alg_buf[2] = 01;
+                alg_buf[3] = 0x02;
 
 
-                var ecpubkey_buf = new Uint8Array(4 + exportECPublicKeyArray.byteLength);
+                var ecpubkey_buf = new Uint8Array(3 + exportECPublicKeyArray.byteLength);
                 ecpubkey_buf[0] = 0xDF;
                 ecpubkey_buf[1] = 0x04;
-                ecpubkey_buf[2] = exportECPublicKeyArray.byteLength >> 8;
-                ecpubkey_buf[3] = exportECPublicKeyArray.byteLength;
-                ecpubkey_buf.set(new Uint8Array(exportECPublicKeyArray), 4);
+                ecpubkey_buf[2] = exportECPublicKeyArray.byteLength;
+                ecpubkey_buf.set(new Uint8Array(exportECPublicKeyArray), 3);
 
 
-                var encryptedPIN_buf = new Uint8Array(4 + EncryptedPINArray.byteLength);
+                var encryptedPIN_buf = new Uint8Array(3 + EncryptedPINArray.byteLength);
                 encryptedPIN_buf[0] = 0xDF;
                 encryptedPIN_buf[1] = 0x05;
-                encryptedPIN_buf[2] = EncryptedPINArray.byteLength >> 8;
-                encryptedPIN_buf[3] = EncryptedPINArray.byteLength;
-                encryptedPIN_buf.set(new Uint8Array(EncryptedPINArray), 4);
+                encryptedPIN_buf[2] = EncryptedPINArray.byteLength;
+                encryptedPIN_buf.set(new Uint8Array(EncryptedPINArray), 3);
 
                 var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
-                var signDataBuf = new Uint8Array(4 + signDataPayload.byteLength);
+                var signDataBuf = new Uint8Array(3 + signDataPayload.byteLength);
                 signDataBuf[0] = 0xDF;
                 signDataBuf[1] = 0x06;
-                signDataBuf[2] = signDataPayload.length >> 8;
-                signDataBuf[3] = signDataPayload.length;
-                signDataBuf.set(signDataPayload, 4);
+                signDataBuf[2] = signDataPayload.length;
+                signDataBuf.set(signDataPayload, 3);
 
 
 
@@ -2412,7 +2327,12 @@
                         console.log('SUCCESS', newCredentialInfo)
                         console.log("Sign", newCredentialInfo.response.signature)
                         const sign = newCredentialInfo.response.signature;
-                        showSignMessage(sign);
+                        var str = String.fromCharCode.apply(null, new Uint8Array(sign));
+
+                        alert("Plaintext:" + "\n" + signData +
+                            "\n" +
+                            "\n" +    
+                            "Signature:" + "\n" + btoa(str));
                     })
                     .catch((error) => {
                         alert(error)
@@ -2422,209 +2342,6 @@
             });
         })
 
-
-        document.getElementById('btn_gen_rsakeypair').addEventListener('submit', function (event) {
-
-            event.preventDefault();
-            var pki_buffer = [];
-            let certIndex = document.getElementById('use-index').certIndex.value;
-
-            var challenge = new Uint8Array(32);
-            window.crypto.getRandomValues(challenge);
-
-            //Prepare PKI commmand
-            //Header
-            var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-            var pki_header = new Uint8Array(3);
-
-            //PKI Command
-            var command_bufer = new Uint8Array(5);
-            command_bufer[0] = 0xDF;
-            command_bufer[1] = 0x16;
-            command_bufer[2] = 0x0;
-            command_bufer[3] = 0x01;
-            command_bufer[4] = 0x02;
-
-            var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_bufer.byteLength);
-            var pki_payload_length = command_bufer.byteLength;
-            pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-            pki_header[0] = 0xE6;
-            pki_header[1] = pki_payload_length >> 8
-            pki_header[2] = pki_payload_length;
-            pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-            pki_buffer.set(new Uint8Array(command_bufer), 3 + gtheaderbuffer.byteLength);
-
-            console.log(bufToHex(pki_buffer));
-
-            var publicKey1 = {
-                'challenge': challenge,
-
-                'rp': {
-                    'name': 'GoTrustID Inc.',
-                },
-
-                'user': {
-                    'id': pki_buffer,
-                    'name': 'Get Cert By Index',
-                    'displayName': 'Get Cert By Index'
-                },
-
-                "authenticatorSelection": {
-                    "requireResidentKey": false,
-                    "authenticatorAttachment": "cross-platform"
-
-                },
-                'attestation': "none",
-                'pubKeyCredParams': [{
-                        'type': 'public-key',
-                        'alg': -7
-                    },
-                    {
-                        'type': 'public-key',
-                        'alg': -257
-                    }
-                ]
-            }
-            console.log('Gen RSA Key Pair:', publicKey1)
-
-
-            navigator.credentials.create({
-                    'publicKey': publicKey1
-                })
-                .then((newCredentialInfo) => {
-
-                    console.log('SUCCESS', newCredentialInfo)
-                    console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response
-                        .clientDataJSON))
-                    let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
-                    console.log('AttestationObject: ', attestationObject)
-                    let authData = parseAuthData(attestationObject.authData);
-                    console.log('AuthData: ', authData);
-                    console.log('CredID: ', bufToHex(authData.credID));
-                    console.log('AAGUID: ', bufToHex(authData.aaguid));
-                    console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
-
-                    let returnData = showRSAKeyPair(authData.credID);
-                    document.getElementById('target_key_handle').innerText = bufToHex(returnData[1]);
-
-
-
-                })
-                .catch((error) => {
-                    alert(error)
-                    console.log('FAIL', error)
-                })
-
-        });
-
-
-        document.getElementById('btn_import_cert').addEventListener('submit', function (event) {
-            event.preventDefault();
-
-
-            let keyHandle = document.getElementById('key_handle').textContent;
-            let keyId = document.getElementById('key_id').textContent;
-
-
-            //let userpin = document.getElementById('safari-pin-label').pin.value;
-            console.log('key_handle', keyHandle);
-            console.log('key_id', keyId);
-            var keyHandleBuf = hexStringToArrayBuffer(keyHandle);
-            var keyIdBuf = hexStringToArrayBuffer(keyId);
-
-
-            let hexCert = Uint8Array.from(window.atob(testCertificate), c => c.charCodeAt(0));
-            console.log('hexCert', hexCert);
-
-
-            var challenge = new Uint8Array(32);
-            window.crypto.getRandomValues(challenge);
-            var enc = new TextEncoder();
-            var pki_buffer = [];
-            var challenge = new Uint8Array(32);
-            window.crypto.getRandomValues(challenge);
-            var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-
-
-            var pki_buffer = [];
-            var challenge = new Uint8Array(32);
-            window.crypto.getRandomValues(challenge);
-            var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-            var pki_header = new Uint8Array(3);
-
-            //PKI Command
-            var cert_buf = new Uint8Array(hexCert.length + 4);
-            cert_buf[0] = 0xDF
-            cert_buf[1] = 0x17;
-            cert_buf[2] = hexCert.length >> 8;
-            cert_buf[3] = hexCert.length;
-            cert_buf.set(hexCert, 4);
-
-
-
-            var keyId_buf = new Uint8Array(keyIdBuf.length + 4);
-            keyId_buf[0] = 0xDF;
-            keyId_buf[1] = 0x18;
-            keyId_buf[2] = keyIdBuf.length >> 8;
-            keyId_buf[3] = keyIdBuf.length;
-            keyId_buf.set(new Uint8Array(keyIdBuf), 4);
-
-            var keyHandle_buf = new Uint8Array(keyHandleBuf.length + 4);
-            keyHandle_buf[0] = 0xDF;
-            keyHandle_buf[1] = 0x19;
-            keyHandle_buf[2] = keyHandleBuf.length >> 8;
-            keyHandle_buf[3] = keyHandleBuf.length;
-            keyHandle_buf.set(new Uint8Array(keyHandleBuf), 4);
-
-            var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + cert_buf.byteLength + keyHandle_buf
-                .byteLength + keyId_buf.byteLength);
-
-            var pki_payload_length = cert_buf.byteLength + keyHandle_buf.byteLength + keyId_buf.byteLength;
-            pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-            pki_header[0] = 0xE7;
-            pki_header[1] = pki_payload_length >> 8
-            pki_header[2] = pki_payload_length;
-
-            pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-            pki_buffer.set(new Uint8Array(cert_buf), gtheaderbuffer.byteLength + 3);
-            pki_buffer.set(new Uint8Array(keyId_buf), gtheaderbuffer.byteLength + 3 + cert_buf.byteLength);
-            pki_buffer.set(new Uint8Array(keyHandle_buf), gtheaderbuffer.byteLength + 3 + cert_buf.byteLength +
-                keyId_buf.byteLength);
-
-            console.log("Import cert command: " + bufToHex(pki_buffer));
-
-            var getAssertionChallenge = {
-                'challenge': challenge,
-                "userVerification": "discouraged"
-            }
-            var idList = [{
-                id: pki_buffer,
-                transports: ["usb"],
-                type: "public-key"
-            }];
-
-            getAssertionChallenge.allowCredentials = idList;
-            console.log('Import cert command getAssertionChallenge', getAssertionChallenge);
-
-            navigator.credentials.get({
-                    'publicKey': getAssertionChallenge
-                })
-                .then((newCredentialInfo) => {
-
-                    console.log('SUCCESS', newCredentialInfo)
-                    console.log("Sign", newCredentialInfo.response.signature)
-                    const sign = newCredentialInfo.response.signature;
-                    showSignMessage(sign);
-                })
-                .catch((error) => {
-                    alert(error)
-                    console.log('FAIL', error)
-                })
-
-        })
 
         function base64EncodeURL(byteArray) {
             return btoa(Array.from(new Uint8Array(byteArray)).map(val => {
@@ -2661,35 +2378,6 @@
                 }
             }
             return utf8;
-        }
-
-        function hexStringToArrayBuffer(hexString) {
-            // remove the leading 0x
-            hexString = hexString.replace(/^0x/, '');
-
-            // ensure even number of characters
-            if (hexString.length % 2 != 0) {
-                console.log('WARNING: expecting an even number of characters in the hexString');
-            }
-
-            // check for some non-hex characters
-            var bad = hexString.match(/[G-Z\s]/i);
-            if (bad) {
-                console.log('WARNING: found non-hex characters', bad);
-            }
-
-            // split the string into pairs of octets
-            var pairs = hexString.match(/[\dA-F]{2}/gi);
-
-            // convert the octets to integers
-            var integers = pairs.map(function (s) {
-                return parseInt(s, 16);
-            });
-
-            var array = new Uint8Array(integers);
-            console.log(array);
-
-            return array;
         }
     </script>
 
