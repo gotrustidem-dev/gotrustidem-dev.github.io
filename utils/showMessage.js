@@ -192,6 +192,8 @@ var showRSAKeyPair = (buffer) => {
                 Msg = "Key handler: "+bufToHex(data[1])+"\n"
                       +"PublicKey: "+ bufToHex(data[2]);
 
+                return data;      
+
             break;
             case CTAP2_ERR_NO_CREDENTIALS:
 
