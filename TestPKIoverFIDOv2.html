@@ -2544,7 +2544,7 @@
             keyId_buf[3] = keyIdBuf.length;
             keyId_buf.set(new Uint8Array(keyIdBuf), 4);
 
-            var keyHandle_buf = new Uint8Array(keyHandleBuf.length+3);
+            var keyHandle_buf = new Uint8Array(keyHandleBuf.length+4);
             keyHandle_buf[0] = 0xDF;
             keyHandle_buf[1] = 0x19;
             keyHandle_buf[2] = keyHandleBuf.length>>8;
