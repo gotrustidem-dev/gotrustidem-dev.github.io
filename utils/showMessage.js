@@ -120,18 +120,6 @@ var showSignMessage = (buffer) => {
     if(String.fromCharCode.apply(null, new Uint8Array(gtHeader))===GTheaderStr){ //This is error handle
         
         buffer = buffer.slice(16);
-        
-        // let totalBuf = buffer.slice(0, 1);            buffer = buffer.slice(1);
-        // let totalInt = totalBuf[0];
-
-        // let statusBuf  = buffer.slice(0, 1);            buffer = buffer.slice(1);
-        // let statusInt = statusBuf[0];
-
-        // console.log('total', totalInt);
-        // console.log('status', statusInt);
-
-        //var total = new Uint8Array(buffer.slice(0, 1))[0];            buffer = buffer.slice(1);
-        //var status  = new Uint8Array(buffer.slice(0, 1))[0];            buffer = buffer.slice(1);
 
         var totalLen = new Uint8Array(buffer.slice(0, 2));            buffer = buffer.slice(2);
         var status  = new Uint8Array(buffer.slice(0, 1))[0];            buffer = buffer.slice(1);
