@@ -2543,7 +2543,7 @@
                 console.log("exportECPublicKeyArray", bufToHex(value[1]));
 
 
-                requestSignDataWithPINByKEYHANDLE(keyhandle,platformECpublickey, encryptedPIN, plaintext).then((newCredentialInfo)=>{
+                requestSignDataWithPINByKEYHANDLE(keyHandleBuf,platformECpublickey, encryptedPIN, plaintext).then((newCredentialInfo)=>{
 
                     console.log('SUCCESS', newCredentialInfo)
                     console.log("Sign", newCredentialInfo.response.signature)
