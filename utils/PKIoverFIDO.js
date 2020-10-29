@@ -152,8 +152,8 @@ async function requirePINVerify(){
         );
     }).then(function (key) { //generate ecdh pair
 
-        local_publicKey = key.publicKey;
-        local_privateKey = key.privateKey;
+        var local_publicKey = key.publicKey;
+        var local_privateKey = key.privateKey;
 
 
         window.crypto.subtle.exportKey("raw", local_publicKey).then(
