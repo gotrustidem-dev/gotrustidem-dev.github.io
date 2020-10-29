@@ -2535,11 +2535,12 @@
             //  let signCRS = new Promise( requirePINVerify(resolve,reject));
 
             requirePINVerify().then((value)=>{
-
-                console.log(value);
-
+                console.log("EncryptedPINArray", bufToHex(value[0]));
+                console.log("exportECPublicKeyArray", bufToHex(value[1]));
 
             });
+
+        
             // const promise = new Promise((resolve, reject) => {
             //     resolve(requirePINVerify());
             // }).then(values => {
