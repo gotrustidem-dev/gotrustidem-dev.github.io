@@ -2537,7 +2537,7 @@
 
 
 
-            requirePINVerify().then((returnValue) => {
+            requirePINVerify().then((EncryptedPINArray,exportECPublicKeyArray) => {
                 console.log(returnValue);
 
                 //console.log("EncryptedPIN", bufToHex(returnValue[EncryptedPINArray]));
