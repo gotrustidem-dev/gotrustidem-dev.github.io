@@ -2539,10 +2539,11 @@
             const promise = new Promise((resolve, reject) => {
                 resolve(requirePINVerify());
             }).then(values => {
+                console.log("1231231");
                 console.log(values[1]);
             });
 
-
+            console.log("test");
 
 
             //requirePINVerify().then(function(EncryptedPINArray){
@@ -2636,13 +2637,7 @@
             //         console.log('FAIL', error)
             // });
 
-
-
-
-
-
-
-        })
+        });
         document.getElementById('btn_import_certificate').addEventListener('submit', function (event) {
             event.preventDefault();
 
