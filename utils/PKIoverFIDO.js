@@ -120,8 +120,6 @@ async function requirePINVerify() {
 
             var externalECPublicKeyX = base64EncodeURL(Object.values(publicKEy)[3]);
             var externalECPublicKeyY = base64EncodeURL(Object.values(publicKEy)[4]);
-            //console.log("externalECPublicKeyX ", externalECPublicKeyX);
-            //console.log("externalECPublicKeyY", externalECPublicKeyY);
             return window.crypto.subtle.importKey(
                 "jwk", //can be "jwk" (public or private), "raw" (public only), "spki" (public only), or "pkcs8" (private only)
                 { //this is an example jwk key, other key types are Uint8Array objects
@@ -155,16 +153,12 @@ async function requirePINVerify() {
 
             var local_publicKey = key.publicKey;
             var local_privateKey = key.privateKey;
-
-
             window.crypto.subtle.exportKey("raw", local_publicKey).then(
                 function (keydata) {
                     exportECPublicKeyArray = keydata;
                     console.log("exportECPublicKeyArray", bufToHex(exportECPublicKeyArray));
                 }
             );
-
-
             return window.crypto.subtle.deriveBits({
                     name: "ECDH",
                     namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
@@ -208,7 +202,7 @@ async function requirePINVerify() {
             EncryptedPINArray = cipherPIN.slice(0, 16);
             resolve(EncryptedPINArray);
 
-            //console.log("EncryptedPINArray", bufToHex(EncryptedPINArray.slice(0, 16)));
+            console.log("EncryptedPINArray", bufToHex(EncryptedPINArray.slice(0, 16)));
             return {
                 EncryptedPINArray,
                 exportECPublicKeyArray
