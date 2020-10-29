@@ -2537,10 +2537,10 @@
 
 
 
-            requirePINVerify().then((EncryptedPIN) => {
+            requirePINVerify().then((returnValue) => {
 
-                console.log("EncryptedPIN", bufToHex(EncryptedPIN));
-
+                console.log("EncryptedPIN", bufToHex(returnValue.encryptedPINArray));
+                console.log("platformPublicKey", bufToHex(returnValue.platformPublicKey));
 
                 // var enc = new TextEncoder();
                 // var pki_buffer = [];
