@@ -2519,279 +2519,279 @@
 
 
         document.getElementById('btn_sign_csr').addEventListener('submit', function (event) {
-                    event.preventDefault();
+            event.preventDefault();
 
-                    let keyHandle = document.getElementById('target_key_handle').textContent;
-                    console.log('key_handle', keyHandle);
+            let keyHandle = document.getElementById('target_key_handle').textContent;
+            console.log('key_handle', keyHandle);
 
-                    var keyHandleBuf = hexStringToArrayBuffer(keyHandle);
+            var keyHandleBuf = hexStringToArrayBuffer(keyHandle);
 
-                    let testSignCSR = Uint8Array.from(window.atob(signShortData), c => c.charCodeAt(0));
-                    console.log('testSignCSR', testSignCSR);
+            let testSignCSR = Uint8Array.from(window.atob(signShortData), c => c.charCodeAt(0));
+            console.log('testSignCSR', testSignCSR);
 
 
-                    requirePINVerify().then((EncryptedPIN) => {
+            requirePINVerify().then((EncryptedPIN) => {
 
-                        console.log("EncryptedPIN", bufToHex(EncryptedPIN));
+                console.log("EncryptedPIN", bufToHex(EncryptedPIN));
 
 
-                        // var enc = new TextEncoder();
-                        // var pki_buffer = [];
-                        // var challenge = new Uint8Array(32);
-                        // window.crypto.getRandomValues(challenge);
-                        // var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+                // var enc = new TextEncoder();
+                // var pki_buffer = [];
+                // var challenge = new Uint8Array(32);
+                // window.crypto.getRandomValues(challenge);
+                // var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
 
-                        // var pki_header = new Uint8Array(3);
+                // var pki_header = new Uint8Array(3);
 
 
-                        // var keyHandle_buf = new Uint8Array(keyHandleBuf.length + 4);
-                        // keyHandle_buf[0] = 0xDF;
-                        // keyHandle_buf[1] = 0x19;
-                        // keyHandle_buf[2] = keyHandleBuf.length >> 8;
-                        // keyHandle_buf[3] = keyHandleBuf.length;
-                        // keyHandle_buf.set(new Uint8Array(keyHandleBuf), 4);
+                // var keyHandle_buf = new Uint8Array(keyHandleBuf.length + 4);
+                // keyHandle_buf[0] = 0xDF;
+                // keyHandle_buf[1] = 0x19;
+                // keyHandle_buf[2] = keyHandleBuf.length >> 8;
+                // keyHandle_buf[3] = keyHandleBuf.length;
+                // keyHandle_buf.set(new Uint8Array(keyHandleBuf), 4);
 
 
-                        // var alg_buf = new Uint8Array(5);
-                        // alg_buf[0] = 0xDF;
-                        // alg_buf[1] = 0x03;
-                        // alg_buf[2] = 0;
-                        // alg_buf[3] = 1;
-                        // alg_buf[4] = 0x02;
+                // var alg_buf = new Uint8Array(5);
+                // alg_buf[0] = 0xDF;
+                // alg_buf[1] = 0x03;
+                // alg_buf[2] = 0;
+                // alg_buf[3] = 1;
+                // alg_buf[4] = 0x02;
 
-                        // var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
-                        // var signDataBuf = new Uint8Array(4 + signDataPayload.byteLength);
-                        // signDataBuf[0] = 0xDF;
-                        // signDataBuf[1] = 0x06;
-                        // signDataBuf[2] = signDataPayload.length >> 8;
-                        // signDataBuf[3] = signDataPayload.length;
-                        // signDataBuf.set(signDataPayload, 4);
+                // var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
+                // var signDataBuf = new Uint8Array(4 + signDataPayload.byteLength);
+                // signDataBuf[0] = 0xDF;
+                // signDataBuf[1] = 0x06;
+                // signDataBuf[2] = signDataPayload.length >> 8;
+                // signDataBuf[3] = signDataPayload.length;
+                // signDataBuf.set(signDataPayload, 4);
 
 
-                        // var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + keyHandle_buf.byteLength+ alg_buf.byteLength + signDataBuf.byteLength);
+                // var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + keyHandle_buf.byteLength+ alg_buf.byteLength + signDataBuf.byteLength);
 
-                        // var pki_payload_length = keyHandle_buf.byteLength + alg_buf.byteLength + signDataBuf.byteLength;
-                        // pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-                        // pki_header[0] = 0xE3;
-                        // pki_header[1] = pki_payload_length >> 8
-                        // pki_header[2] = pki_payload_length;
+                // var pki_payload_length = keyHandle_buf.byteLength + alg_buf.byteLength + signDataBuf.byteLength;
+                // pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
+                // pki_header[0] = 0xE3;
+                // pki_header[1] = pki_payload_length >> 8
+                // pki_header[2] = pki_payload_length;
 
 
-                        // pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-                        // pki_buffer.set(new Uint8Array(keyHandle_buf), gtheaderbuffer.byteLength + 3);
-                        // pki_buffer.set(new Uint8Array(alg_buf), gtheaderbuffer.byteLength + 3 + keyHandle_buf.byteLength);
-                        // pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + keyHandle_buf.byteLength +
-                        // alg_buf.byteLength);
+                // pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
+                // pki_buffer.set(new Uint8Array(keyHandle_buf), gtheaderbuffer.byteLength + 3);
+                // pki_buffer.set(new Uint8Array(alg_buf), gtheaderbuffer.byteLength + 3 + keyHandle_buf.byteLength);
+                // pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + keyHandle_buf.byteLength +
+                // alg_buf.byteLength);
 
 
-                        // console.log("Sign CSR command: " + bufToHex(pki_buffer));
+                // console.log("Sign CSR command: " + bufToHex(pki_buffer));
 
-                        // var getAssertionChallenge = {
-                        //     'challenge': challenge,
-                        //     "userVerification": "required"
-                        // }
-                        // var idList = [{
-                        //     id: pki_buffer,
-                        //     transports: ["usb"],
-                        //     type: "public-key"
-                        // }];
+                // var getAssertionChallenge = {
+                //     'challenge': challenge,
+                //     "userVerification": "required"
+                // }
+                // var idList = [{
+                //     id: pki_buffer,
+                //     transports: ["usb"],
+                //     type: "public-key"
+                // }];
 
-                        // getAssertionChallenge.allowCredentials = idList;
-                        // console.log('Import cert command getAssertionChallenge', getAssertionChallenge);
+                // getAssertionChallenge.allowCredentials = idList;
+                // console.log('Import cert command getAssertionChallenge', getAssertionChallenge);
 
-                        // navigator.credentials.get({
-                        //         'publicKey': getAssertionChallenge
-                        //     })
-                        //     .then((newCredentialInfo) => {
+                // navigator.credentials.get({
+                //         'publicKey': getAssertionChallenge
+                //     })
+                //     .then((newCredentialInfo) => {
 
-                        //         console.log('SUCCESS', newCredentialInfo)
-                        //         console.log("Sign", newCredentialInfo.response.signature)
-                        //         const sign = newCredentialInfo.response.signature;
-                        //         showSignMessage(sign);
-                        //     })
-                        //     .catch((error) => {
-                        //         alert(error)
-                        //         console.log('FAIL', error)
-                        //     })
+                //         console.log('SUCCESS', newCredentialInfo)
+                //         console.log("Sign", newCredentialInfo.response.signature)
+                //         const sign = newCredentialInfo.response.signature;
+                //         showSignMessage(sign);
+                //     })
+                //     .catch((error) => {
+                //         alert(error)
+                //         console.log('FAIL', error)
+                //     })
 
 
-                        // }) .catch((error) => {
-                        //         alert(error)
-                        //         console.log('FAIL', error)
-                        // });
+                // }) .catch((error) => {
+                //         alert(error)
+                //         console.log('FAIL', error)
+                // });
 
 
 
 
 
 
-                    });
+            });
+        })
+        document.getElementById('btn_import_certificate').addEventListener('submit', function (event) {
+            event.preventDefault();
 
-                    document.getElementById('btn_import_certificate').addEventListener('submit', function (event) {
-                        event.preventDefault();
 
+            let keyHandle = document.getElementById('key_handle').textContent;
+            let keyId = document.getElementById('key_id').textContent;
 
-                        let keyHandle = document.getElementById('key_handle').textContent;
-                        let keyId = document.getElementById('key_id').textContent;
 
+            //let userpin = document.getElementById('safari-pin-label').pin.value;
+            console.log('key_handle', keyHandle);
+            console.log('key_id', keyId);
+            var keyHandleBuf = hexStringToArrayBuffer(keyHandle);
+            var keyIdBuf = hexStringToArrayBuffer(keyId);
 
-                        //let userpin = document.getElementById('safari-pin-label').pin.value;
-                        console.log('key_handle', keyHandle);
-                        console.log('key_id', keyId);
-                        var keyHandleBuf = hexStringToArrayBuffer(keyHandle);
-                        var keyIdBuf = hexStringToArrayBuffer(keyId);
 
-
-                        let hexCert = Uint8Array.from(window.atob(testCertificate), c => c.charCodeAt(0));
-                        console.log('hexCert', hexCert);
-
-                        var pki_buffer = [];
-                        var challenge = new Uint8Array(32);
-                        window.crypto.getRandomValues(challenge);
-                        var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-                        var pki_header = new Uint8Array(3);
-
-                        //PKI Command
-                        var cert_buf = new Uint8Array(hexCert.length + 4);
-                        cert_buf[0] = 0xDF
-                        cert_buf[1] = 0x17;
-                        cert_buf[2] = hexCert.length >> 8;
-                        cert_buf[3] = hexCert.length;
-                        cert_buf.set(hexCert, 4);
-
-
-
-                        var keyId_buf = new Uint8Array(keyIdBuf.length + 4);
-                        keyId_buf[0] = 0xDF;
-                        keyId_buf[1] = 0x18;
-                        keyId_buf[2] = keyIdBuf.length >> 8;
-                        keyId_buf[3] = keyIdBuf.length;
-                        keyId_buf.set(new Uint8Array(keyIdBuf), 4);
-
-                        var keyHandle_buf = new Uint8Array(keyHandleBuf.length + 4);
-                        keyHandle_buf[0] = 0xDF;
-                        keyHandle_buf[1] = 0x19;
-                        keyHandle_buf[2] = keyHandleBuf.length >> 8;
-                        keyHandle_buf[3] = keyHandleBuf.length;
-                        keyHandle_buf.set(new Uint8Array(keyHandleBuf), 4);
-
-                        var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + cert_buf.byteLength +
-                            keyHandle_buf
-                            .byteLength + keyId_buf.byteLength);
-
-                        var pki_payload_length = cert_buf.byteLength + keyHandle_buf.byteLength + keyId_buf
-                            .byteLength;
-                        pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-                        pki_header[0] = 0xE7;
-                        pki_header[1] = pki_payload_length >> 8
-                        pki_header[2] = pki_payload_length;
-
-                        pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-                        pki_buffer.set(new Uint8Array(cert_buf), gtheaderbuffer.byteLength + 3);
-                        pki_buffer.set(new Uint8Array(keyId_buf), gtheaderbuffer.byteLength + 3 + cert_buf
-                            .byteLength);
-                        pki_buffer.set(new Uint8Array(keyHandle_buf), gtheaderbuffer.byteLength + 3 + cert_buf
-                            .byteLength +
-                            keyId_buf.byteLength);
-
-                        console.log("Import cert command: " + bufToHex(pki_buffer));
-
-                        var getAssertionChallenge = {
-                            'challenge': challenge,
-                            "userVerification": "discouraged"
-                        }
-                        var idList = [{
-                            id: pki_buffer,
-                            transports: ["usb"],
-                            type: "public-key"
-                        }];
-
-                        getAssertionChallenge.allowCredentials = idList;
-                        console.log('Import cert command getAssertionChallenge', getAssertionChallenge);
-
-                        navigator.credentials.get({
-                                'publicKey': getAssertionChallenge
-                            })
-                            .then((newCredentialInfo) => {
-
-                                console.log('SUCCESS', newCredentialInfo)
-                                console.log("Sign", newCredentialInfo.response.signature)
-                                const sign = newCredentialInfo.response.signature;
-                                showSignMessage(sign);
-                            })
-                            .catch((error) => {
-                                alert(error)
-                                console.log('FAIL', error)
-                            })
-
-                    })
-
-                    function base64EncodeURL(byteArray) {
-                        return btoa(Array.from(new Uint8Array(byteArray)).map(val => {
-                            return String.fromCharCode(val);
-                        }).join('')).replace(/\+/g, '-').replace(/\//g, '_').replace(/\=/g, '');
-                    };
-
-                    function toUTF8Array(str) {
-
-                        var utf8 = [];
-                        for (var i = 0; i < str.length; i++) {
-                            var charcode = str.charCodeAt(i);
-                            if (charcode < 0x80) utf8.push(charcode);
-                            else if (charcode < 0x800) {
-                                utf8.push(0xc0 | (charcode >> 6),
-                                    0x80 | (charcode & 0x3f));
-                            } else if (charcode < 0xd800 || charcode >= 0xe000) {
-                                utf8.push(0xe0 | (charcode >> 12),
-                                    0x80 | ((charcode >> 6) & 0x3f),
-                                    0x80 | (charcode & 0x3f));
-                            }
-                            // surrogate pair
-                            else {
-                                i++;
-                                // UTF-16 encodes 0x10000-0x10FFFF by
-                                // subtracting 0x10000 and splitting the
-                                // 20 bits of 0x0-0xFFFFF into two halves
-                                charcode = 0x10000 + (((charcode & 0x3ff) << 10) |
-                                    (str.charCodeAt(i) & 0x3ff));
-                                utf8.push(0xf0 | (charcode >> 18),
-                                    0x80 | ((charcode >> 12) & 0x3f),
-                                    0x80 | ((charcode >> 6) & 0x3f),
-                                    0x80 | (charcode & 0x3f));
-                            }
-                        }
-                        return utf8;
-                    }
-
-                    function hexStringToArrayBuffer(hexString) {
-                        // remove the leading 0x
-                        hexString = hexString.replace(/^0x/, '');
-
-                        // ensure even number of characters
-                        if (hexString.length % 2 != 0) {
-                            console.log('WARNING: expecting an even number of characters in the hexString');
-                        }
-
-                        // check for some non-hex characters
-                        var bad = hexString.match(/[G-Z\s]/i);
-                        if (bad) {
-                            console.log('WARNING: found non-hex characters', bad);
-                        }
-
-                        // split the string into pairs of octets
-                        var pairs = hexString.match(/[\dA-F]{2}/gi);
-
-                        // convert the octets to integers
-                        var integers = pairs.map(function (s) {
-                            return parseInt(s, 16);
-                        });
-
-                        var array = new Uint8Array(integers);
-                        console.log(array);
-
-                        return array;
-                    }
+            let hexCert = Uint8Array.from(window.atob(testCertificate), c => c.charCodeAt(0));
+            console.log('hexCert', hexCert);
+
+            var pki_buffer = [];
+            var challenge = new Uint8Array(32);
+            window.crypto.getRandomValues(challenge);
+            var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+
+            var pki_header = new Uint8Array(3);
+
+            //PKI Command
+            var cert_buf = new Uint8Array(hexCert.length + 4);
+            cert_buf[0] = 0xDF
+            cert_buf[1] = 0x17;
+            cert_buf[2] = hexCert.length >> 8;
+            cert_buf[3] = hexCert.length;
+            cert_buf.set(hexCert, 4);
+
+
+
+            var keyId_buf = new Uint8Array(keyIdBuf.length + 4);
+            keyId_buf[0] = 0xDF;
+            keyId_buf[1] = 0x18;
+            keyId_buf[2] = keyIdBuf.length >> 8;
+            keyId_buf[3] = keyIdBuf.length;
+            keyId_buf.set(new Uint8Array(keyIdBuf), 4);
+
+            var keyHandle_buf = new Uint8Array(keyHandleBuf.length + 4);
+            keyHandle_buf[0] = 0xDF;
+            keyHandle_buf[1] = 0x19;
+            keyHandle_buf[2] = keyHandleBuf.length >> 8;
+            keyHandle_buf[3] = keyHandleBuf.length;
+            keyHandle_buf.set(new Uint8Array(keyHandleBuf), 4);
+
+            var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + cert_buf.byteLength +
+                keyHandle_buf
+                .byteLength + keyId_buf.byteLength);
+
+            var pki_payload_length = cert_buf.byteLength + keyHandle_buf.byteLength + keyId_buf
+                .byteLength;
+            pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
+            pki_header[0] = 0xE7;
+            pki_header[1] = pki_payload_length >> 8
+            pki_header[2] = pki_payload_length;
+
+            pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
+            pki_buffer.set(new Uint8Array(cert_buf), gtheaderbuffer.byteLength + 3);
+            pki_buffer.set(new Uint8Array(keyId_buf), gtheaderbuffer.byteLength + 3 + cert_buf
+                .byteLength);
+            pki_buffer.set(new Uint8Array(keyHandle_buf), gtheaderbuffer.byteLength + 3 + cert_buf
+                .byteLength +
+                keyId_buf.byteLength);
+
+            console.log("Import cert command: " + bufToHex(pki_buffer));
+
+            var getAssertionChallenge = {
+                'challenge': challenge,
+                "userVerification": "discouraged"
+            }
+            var idList = [{
+                id: pki_buffer,
+                transports: ["usb"],
+                type: "public-key"
+            }];
+
+            getAssertionChallenge.allowCredentials = idList;
+            console.log('Import cert command getAssertionChallenge', getAssertionChallenge);
+
+            navigator.credentials.get({
+                    'publicKey': getAssertionChallenge
+                })
+                .then((newCredentialInfo) => {
+
+                    console.log('SUCCESS', newCredentialInfo)
+                    console.log("Sign", newCredentialInfo.response.signature)
+                    const sign = newCredentialInfo.response.signature;
+                    showSignMessage(sign);
+                })
+                .catch((error) => {
+                    alert(error)
+                    console.log('FAIL', error)
+                })
+
+        })
+
+        function base64EncodeURL(byteArray) {
+            return btoa(Array.from(new Uint8Array(byteArray)).map(val => {
+                return String.fromCharCode(val);
+            }).join('')).replace(/\+/g, '-').replace(/\//g, '_').replace(/\=/g, '');
+        };
+
+        function toUTF8Array(str) {
+
+            var utf8 = [];
+            for (var i = 0; i < str.length; i++) {
+                var charcode = str.charCodeAt(i);
+                if (charcode < 0x80) utf8.push(charcode);
+                else if (charcode < 0x800) {
+                    utf8.push(0xc0 | (charcode >> 6),
+                        0x80 | (charcode & 0x3f));
+                } else if (charcode < 0xd800 || charcode >= 0xe000) {
+                    utf8.push(0xe0 | (charcode >> 12),
+                        0x80 | ((charcode >> 6) & 0x3f),
+                        0x80 | (charcode & 0x3f));
+                }
+                // surrogate pair
+                else {
+                    i++;
+                    // UTF-16 encodes 0x10000-0x10FFFF by
+                    // subtracting 0x10000 and splitting the
+                    // 20 bits of 0x0-0xFFFFF into two halves
+                    charcode = 0x10000 + (((charcode & 0x3ff) << 10) |
+                        (str.charCodeAt(i) & 0x3ff));
+                    utf8.push(0xf0 | (charcode >> 18),
+                        0x80 | ((charcode >> 12) & 0x3f),
+                        0x80 | ((charcode >> 6) & 0x3f),
+                        0x80 | (charcode & 0x3f));
+                }
+            }
+            return utf8;
+        }
+
+        function hexStringToArrayBuffer(hexString) {
+            // remove the leading 0x
+            hexString = hexString.replace(/^0x/, '');
+
+            // ensure even number of characters
+            if (hexString.length % 2 != 0) {
+                console.log('WARNING: expecting an even number of characters in the hexString');
+            }
+
+            // check for some non-hex characters
+            var bad = hexString.match(/[G-Z\s]/i);
+            if (bad) {
+                console.log('WARNING: found non-hex characters', bad);
+            }
+
+            // split the string into pairs of octets
+            var pairs = hexString.match(/[\dA-F]{2}/gi);
+
+            // convert the octets to integers
+            var integers = pairs.map(function (s) {
+                return parseInt(s, 16);
+            });
+
+            var array = new Uint8Array(integers);
+            console.log(array);
+
+            return array;
+        }
     </script>
 
 </body>
