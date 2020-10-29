@@ -2570,6 +2570,14 @@
             pki_header[1] = pki_payload_length >> 8
             pki_header[2] = pki_payload_length;
 
+
+            pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
+            pki_buffer.set(new Uint8Array(keyHandle_buf), gtheaderbuffer.byteLength + 3);
+            pki_buffer.set(new Uint8Array(alg_buf), gtheaderbuffer.byteLength + 3 + keyHandle_buf.byteLength);
+            pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + keyHandle_buf.byteLength +
+            alg_buf.byteLength);
+
+
             console.log("Sign CSR command: " + bufToHex(pki_buffer));
 
             var getAssertionChallenge = {
