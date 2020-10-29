@@ -203,7 +203,7 @@ async function requirePINVerify() {
             console.log("EncryptedPINArray", bufToHex(EncryptedPINArray.slice(0, 16)));
             Promise.resolve([EncryptedPINArray,exportECPublicKeyArray]);
 
-            //return [EncryptedPINArray,exportECPublicKeyArray];
+            return ;
         });
 
     });
