@@ -2542,8 +2542,10 @@
                 var exportECPublicKeyArray = value[1];
                 console.log("exportECPublicKeyArray", bufToHex(value[1]));
 
+                // Test Data as CSR template
+                var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
 
-                requestSignDataWithPINByKEYHANDLE(keyHandleBuf,platformECpublickey, encryptedPIN, plaintext).then((newCredentialInfo)=>{
+                requestSignDataWithPINByKEYHANDLE(keyHandleBuf,exportECPublicKeyArray, EncryptedPINArray, signDataPayload).then((newCredentialInfo)=>{
 
                     console.log('SUCCESS', newCredentialInfo)
                     console.log("Sign", newCredentialInfo.response.signature)
