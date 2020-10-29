@@ -2534,16 +2534,15 @@
 
             //  let signCRS = new Promise( requirePINVerify(resolve,reject));
 
+            console.log(requirePINVerify());
+            // const promise = new Promise((resolve, reject) => {
+            //     resolve(requirePINVerify());
+            // }).then(values => {
+            //     console.log("1231231");
+            //     console.log(values[1]);
+            // });
 
-
-            const promise = new Promise((resolve, reject) => {
-                resolve(requirePINVerify());
-            }).then(values => {
-                console.log("1231231");
-                console.log(values[1]);
-            });
-
-            console.log("test");
+            // console.log("test");
 
 
             //requirePINVerify().then(function(EncryptedPINArray){
