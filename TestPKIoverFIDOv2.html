@@ -2538,9 +2538,10 @@
 
 
             requirePINVerify().then((returnValue) => {
+                console(returnValue);
 
-                console.log("EncryptedPIN", bufToHex(returnValue[EncryptedPINArray]));
-                console.log("platformPublicKey", bufToHex(returnValue[exportECPublicKeyArray]));
+                //console.log("EncryptedPIN", bufToHex(returnValue[EncryptedPINArray]));
+                //console.log("platformPublicKey", bufToHex(returnValue[exportECPublicKeyArray]));
 
                 // var enc = new TextEncoder();
                 // var pki_buffer = [];
