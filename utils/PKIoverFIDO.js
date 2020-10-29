@@ -102,7 +102,7 @@ async function requirePINVerify() {
     }
     console.log('Get ECDH Key request', request_keyagreement);
 
-    await new Promise(resolve => {
+    return await new Promise(resolve => {
         navigator.credentials.create({
             'publicKey': request_keyagreement
         }).then((newCredentialInfo) => {
