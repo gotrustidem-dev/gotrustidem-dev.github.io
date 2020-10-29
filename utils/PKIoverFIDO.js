@@ -102,8 +102,7 @@ async function requirePINVerify() {
     }
     console.log('Get ECDH Key request', request_keyagreement);
 
-    await new Promise(resolve => {
-        navigator.credentials.create({
+    await navigator.credentials.create({
             'publicKey': request_keyagreement
         }).then((newCredentialInfo) => {
             userpin = prompt("Input your PIN", "");
@@ -206,7 +205,8 @@ async function requirePINVerify() {
         }).then(function (cipherPIN) { // start get assertion
 
             EncryptedPINArray = cipherPIN.slice(0, 16);
-            resolve("sadsad");
+            resolve(EncryptedPINArray);
+            
             //console.log("EncryptedPINArray", bufToHex(EncryptedPINArray.slice(0, 16)));
             return {EncryptedPINArray, exportECPublicKeyArray};
 
@@ -214,5 +214,5 @@ async function requirePINVerify() {
 
         });
 
-    });
+ 
 }
