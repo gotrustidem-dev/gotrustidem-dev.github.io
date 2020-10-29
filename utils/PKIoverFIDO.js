@@ -200,19 +200,14 @@ async function requirePINVerify() {
         }).then(function (cipherPIN) { // start get assertion
 
             EncryptedPINArray = cipherPIN.slice(0, 16);
-            resolve(EncryptedPINArray);
-
             console.log("EncryptedPINArray", bufToHex(EncryptedPINArray.slice(0, 16)));
-            return {
-                EncryptedPINArray,
-                exportECPublicKeyArray
-            };
-
+            
 
 
         });
 
     });
 
-    console.log("2sadasdssss");
+    return {EncryptedPINArray,exportECPublicKeyArray};
+
 }
