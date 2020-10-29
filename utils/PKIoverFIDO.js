@@ -42,7 +42,7 @@ function sign(){
 
 
 
-function requirePINVerify(){
+async function requirePINVerify(){
 
     var userpin;
     var challenge = new Uint8Array(32);
@@ -102,7 +102,7 @@ function requirePINVerify(){
     }
     console.log('Get ECDH Key request', request_keyagreement);
 
-    navigator.credentials.create({
+    await navigator.credentials.create({
         'publicKey': request_keyagreement
     }).then((newCredentialInfo) => {
         userpin = prompt("Input your PIN", "");
