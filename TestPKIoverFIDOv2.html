@@ -2537,8 +2537,14 @@
 
 
 
-            requirePINVerify().then(function(EncryptedPINArray){
-                console.log(EncryptedPINArray);
+            let aaa = await requirePINVerify();
+            
+            console.log(aaa[0]);
+            console.log(aaa[1]);
+
+
+            //.then(function(EncryptedPINArray){
+                //console.log(EncryptedPINArray);
                 //console.log(exportECPublicKeyArray);
                 //console.log("EncryptedPIN", bufToHex(returnValue[EncryptedPINArray]));
                 //console.log("platformPublicKey", bufToHex(returnValue[exportECPublicKeyArray]));
