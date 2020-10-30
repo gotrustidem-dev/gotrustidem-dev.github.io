@@ -2567,7 +2567,8 @@
 
 
             let keyHandle = document.getElementById('target_key_handle').textContent;
-            let keyId = document.getElementById('target_key_id').textContent;
+       
+            let keyId = document.getElementById('target_key_id').value;
             if(keyId.value=""){
                 alert("The KEY_ID cannot empty.");
                 return;
@@ -2607,7 +2608,7 @@
             keyHandle_buf[2] = keyHandleBuf.length >> 8;
             keyHandle_buf[3] = keyHandleBuf.length;
             keyHandle_buf.set(new Uint8Array(keyHandleBuf), 4);
-            
+
 
             var keyId_buf = new Uint8Array(keyIdBuf.length + 4);
             keyId_buf[0] = 0xDF;
