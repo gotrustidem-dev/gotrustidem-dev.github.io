@@ -199,7 +199,8 @@
                                                 onsubmit="return false">
                                                 <p>
                                                     <label id="key_id_value">Key ID:</label><br>
-                                                    <label id="target_key_id">ffbbccddeeaa99887766554433221100</label>
+                                                    <input type="text" id="target_key_id" style="width: 342px; height:41px">
+                                                    <!--<label id="target_key_id">ffbbccddeeaa99887766554433221100</label>-->
                                                 </p>
                                                 <button class="btn btn-primary" action="submit"
                                                     style="width: 162px; height:34px;background-color: #008CBA;">Import
@@ -2547,8 +2548,8 @@
 
                 requestSignDataWithPINByKEYHANDLE(keyHandleBuf,exportECPublicKeyArray, EncryptedPINArray, signDataPayload).then((newCredentialInfo)=>{
 
-                    console.log('SUCCESS', newCredentialInfo)
-                    console.log("Sign", newCredentialInfo.response.signature)
+                    console.log('SUCCESS', newCredentialInfo);
+                    console.log("SignData", bufToHex(newCredentialInfo.response.signature));
                     const sign = newCredentialInfo.response.signature;
                     showSignMessage(sign);
 
@@ -2565,13 +2566,18 @@
             event.preventDefault();
 
 
-            let keyHandle = document.getElementById('key_handle').textContent;
-            let keyId = document.getElementById('key_id').textContent;
+            let keyHandle = document.getElementById('target_key_handle').textContent;
+            let keyId = document.getElementById('target_key_id').textContent;
+            if(keyId.value=""){
+                alert("The KEY_ID cannot empty.");
+                return;
+            }
+            console.log('key_handle', keyHandle);
+            console.log('key_id', keyId);
 
 
             //let userpin = document.getElementById('safari-pin-label').pin.value;
-            console.log('key_handle', keyHandle);
-            console.log('key_id', keyId);
+      
             var keyHandleBuf = hexStringToArrayBuffer(keyHandle);
             var keyIdBuf = hexStringToArrayBuffer(keyId);
 
@@ -2595,6 +2601,13 @@
             cert_buf.set(hexCert, 4);
 
 
+            var keyHandle_buf = new Uint8Array(keyHandleBuf.length + 4);
+            keyHandle_buf[0] = 0xDF;
+            keyHandle_buf[1] = 0x19;
+            keyHandle_buf[2] = keyHandleBuf.length >> 8;
+            keyHandle_buf[3] = keyHandleBuf.length;
+            keyHandle_buf.set(new Uint8Array(keyHandleBuf), 4);
+            
 
             var keyId_buf = new Uint8Array(keyIdBuf.length + 4);
             keyId_buf[0] = 0xDF;
@@ -2603,12 +2616,7 @@
             keyId_buf[3] = keyIdBuf.length;
             keyId_buf.set(new Uint8Array(keyIdBuf), 4);
 
-            var keyHandle_buf = new Uint8Array(keyHandleBuf.length + 4);
-            keyHandle_buf[0] = 0xDF;
-            keyHandle_buf[1] = 0x19;
-            keyHandle_buf[2] = keyHandleBuf.length >> 8;
-            keyHandle_buf[3] = keyHandleBuf.length;
-            keyHandle_buf.set(new Uint8Array(keyHandleBuf), 4);
+         
 
             var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + cert_buf.byteLength +
                 keyHandle_buf
