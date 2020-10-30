@@ -2580,7 +2580,7 @@
             //let userpin = document.getElementById('safari-pin-label').pin.value;
       
             var keyHandleBuf = hexStringToArrayBuffer(keyHandle);
-
+       
 
 
             let hexCert = Uint8Array.from(window.atob(testCertificate), c => c.charCodeAt(0));
@@ -2610,11 +2610,11 @@
             keyHandle_buf.set(new Uint8Array(keyHandleBuf), 4);
 
 
-            var keyId_buf = new Uint8Array(keyIdBuf.length + 4);
+            var keyId_buf = new Uint8Array(keyId.length + 4);
             keyId_buf[0] = 0xDF;
             keyId_buf[1] = 0x18;
-            keyId_buf[2] = keyIdBuf.length >> 8;
-            keyId_buf[3] = keyIdBuf.length;
+            keyId_buf[2] = keyId.length >> 8;
+            keyId_buf[3] = keyId.length;
             keyId_buf.set(new Uint8Array(keyIdBuf), 4);
 
          
