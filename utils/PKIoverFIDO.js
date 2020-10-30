@@ -139,11 +139,6 @@ async function requestSignDataWithPINByKEYHANDLE(keyhandle,platformECpublickey, 
             'publicKey': getAssertionChallenge
         })
         .then((newCredentialInfo) => {
-
-            console.log('SUCCESS', newCredentialInfo)
-            console.log("Sign", newCredentialInfo.response.signature)
-            const sign = newCredentialInfo.response.signature;
-            showSignMessage(sign);
             return newCredentialInfo;
         })
         .catch((error) => {
