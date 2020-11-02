@@ -148,8 +148,7 @@ async function requestSignDataWithPINByKEYHANDLE(keyhandle, platformECpublickey,
 
 
 }
-
-async  function requirePINVerify(){
+ function requirePINVerify(){
 
     var userpin;
     var challenge = new Uint8Array(32);
