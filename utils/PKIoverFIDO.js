@@ -149,7 +149,7 @@ async function requestSignDataWithPINByKEYHANDLE(keyhandle, platformECpublickey,
 
 }
 
-async var requirePINVerify = () =>{
+async  function requirePINVerify(){
 
     var userpin;
     var challenge = new Uint8Array(32);
@@ -506,7 +506,7 @@ function requireEncryptedPINandEncryptedNewPIN(oldpin, newpin) {
 }
 
 
-async var ReadCertByIndex = (index)=> {
+async function ReadCertByIndex(index) {
 
 
     var pki_buffer = [];
