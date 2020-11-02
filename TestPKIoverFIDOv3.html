@@ -210,6 +210,52 @@
                                         </p>
                                     </td>
                                 </tr>
+
+                                <tr>
+                                    <td style="width: 385px;">
+                                        <p style="text-align: center;">Change User PIN </p>
+                                        <p>
+                                            <form style="text-align: center;" id="btn_change_userpin"
+                                                onsubmit="return false">
+                                                <p>
+                                                    <label>Old User PIN:</label><br>
+                                                    <input type="text" id="old_userpin" style="width: 342px; height:41px">
+                                                    <label>New User PIN:</label><br>
+                                                    <input type="text" id="new_userpin" style="width: 342px; height:41px">
+                                                    <label>Confirm New User PIN:</label><br>
+                                                    <input type="text" id="confirm_new_userpin" style="width: 342px; height:41px">
+                                                    <!--<label id="target_key_id">ffbbccddeeaa99887766554433221100</label>-->
+                                                </p>
+                                                <button class="btn btn-primary" action="submit"
+                                                    style="width: 162px; height:34px;background-color: #008CBA;">Change User PIN</button>
+
+                                            </form>
+                                        </p>
+                                    </td>
+
+                                    <td style="width: 385px;">
+                                        <p style="text-align: center;">Unlock User PIN </p>
+                                        <p>
+                                            <form style="text-align: center;" id="btn_unlock_userpin"
+                                                onsubmit="return false">
+                                                <p>
+                                                    <label>Unlock PIN:</label><br>
+                                                    <input type="text" id="unlockpin" style="width: 342px; height:41px">
+                                                    <label>New User PIN:</label><br>
+                                                    <input type="text" id="unlock_new_userpin" style="width: 342px; height:41px">
+                                                    <label>Confirm New User PIN:</label><br>
+                                                    <input type="text" id="confirm_unlock_new_userpin" style="width: 342px; height:41px">
+                                                    <!--<label id="target_key_id">ffbbccddeeaa99887766554433221100</label>-->
+                                                </p>
+                                                <button class="btn btn-primary" action="submit"
+                                                    style="width: 162px; height:34px;background-color: #008CBA;">Unlock User PIN</button>
+
+                                            </form>
+                                        </p>
+                                    </td>
+
+
+                                </tr>
                             </tbody>
                         </table>
                     </td>
@@ -557,25 +603,106 @@
                     console.log('FAIL', error)
                 })
         })
-
-
         document.getElementById('find-index-safari').addEventListener('submit', function (event) {
             event.preventDefault();
-
+            var pki_buffer = [];
             let certIndex = document.getElementById('use-index-safari').certIndex.value;
-            ReadCertByIndex(certIndex).then((value)=>{
+            var challenge = new Uint8Array(32);
+            window.crypto.getRandomValues(challenge);
 
-                var strCert = "-----BEGIN CERTIFICATE-----\n" +
-                        btoa(value) +
+            //Prepare PKI commmand
+            //Header
+            var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+            var pki_header = new Uint8Array(3);
+
+            //PKI Command
+            var command_bufer = new Uint8Array(5);
+            command_bufer[0] = 0xDF;
+            command_bufer[1] = 0x02;
+            command_bufer[2] = 0x00;
+            command_bufer[3] = 0x01;
+            command_bufer[4] = certIndex;
+
+            var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_bufer.byteLength);
+            var pki_payload_length = command_bufer.byteLength;
+            pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
+            pki_header[0] = 0xE1;
+            pki_header[1] = pki_payload_length >> 8
+            pki_header[2] = pki_payload_length;
+            pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
+            pki_buffer.set(new Uint8Array(command_bufer), 3 + gtheaderbuffer.byteLength);
+
+            console.log(bufToHex(pki_buffer));
+
+            var publicKey1 = {
+                'challenge': challenge,
+
+                'rp': {
+                    'name': 'GoTrustID Inc.',
+                },
+
+                'user': {
+                    'id': pki_buffer,
+                    'name': 'Get Cert By Index',
+                    'displayName': 'Get Cert By Index'
+                },
+
+                "authenticatorSelection": {
+                    "requireResidentKey": false,
+                    "userVerification": "discouraged",
+                    "authenticatorAttachment": "cross-platform"
+
+                },
+                'attestation': "none",
+                'pubKeyCredParams': [{
+                        'type': 'public-key',
+                        'alg': -7
+                    },
+                    {
+                        'type': 'public-key',
+                        'alg': -257
+                    }
+                ]
+            }
+            console.log('Search_by_Index on Safari:', bufToHex(publicKey1));
+
+
+            navigator.credentials.create({
+                    'publicKey': publicKey1
+                })
+                .then((newCredentialInfo) => {
+
+                    console.log('SUCCESS', newCredentialInfo)
+                    console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response
+                        .clientDataJSON))
+                    let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
+                    console.log('AttestationObject: ', attestationObject)
+                    let authData = parseAuthData(attestationObject.authData);
+                    console.log('AuthData: ', authData);
+                    console.log('CredID: ', bufToHex(authData.credID));
+                    console.log('AAGUID: ', bufToHex(authData.aaguid));
+                    console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
+
+                    showCertificMessage(authData.credID);
+
+                    const sliced = new Uint8Array(authData.credID.slice(1, authData.credID.length));
+                    var strCert = "-----BEGIN CERTIFICATE-----\n" +
+                        btoa(String.fromCharCode.apply(null, sliced)) +
                         "\n-----END CERTIFICATE-----"
 
                     console.log('Certificatie : \n', strCert)
+
+
+
                     displayCert(strCert)
 
+                })
+                .catch((error) => {
+                    alert(error)
+                    console.log('FAIL', error)
+                })
 
-            });
         })
-        
         document.getElementById('sign-byindex').addEventListener('submit', function (event) {
             event.preventDefault();
             var pki_buffer = [];
@@ -2584,6 +2711,59 @@
 
         })
         
+        document.getElementById('btn_change_userpin').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            let old_pin = document.getElementById('old_userpin').textContent;
+            console.log('old_pin', old_pin);
+
+            var oldpinBuf = hexStringToArrayBuffer(old_pin);
+
+            let new_pin = document.getElementById('new_userpin').textContent;
+            console.log('new_pin', new_pin);
+            var newpinBuf = hexStringToArrayBuffer(new_pin);
+
+            let cfm_new_pin = document.getElementById('confirm_new_userpin').textContent;
+            console.log('cfm_new_pin', cfm_new_pin);
+
+            var cfmpinBuf = hexStringToArrayBuffer(cfm_new_pin);
+
+
+
+            //  let signCRS = new Promise( requirePINVerify(resolve,reject));
+
+            requireEncryptedPINandEncryptedNewPIN(oldpinBuf,newpinBuf).then((value) => {
+
+                var EncryptedPINArray = value[0];
+                console.log("EncryptedPINArray", bufToHex(value[0]));
+
+                var EncryptedNewPINArray = value[1];
+                console.log("EncryptedNewPINArray", bufToHex(value[1]));
+
+
+                var exportECPublicKeyArray = value[2];
+                console.log("exportECPublicKeyArray", bufToHex(value[2]));
+
+                // Test Data as CSR template
+                var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
+
+                requestSignDataWithPINByKEYHANDLE(keyHandleBuf,exportECPublicKeyArray, EncryptedPINArray, signDataPayload).then((newCredentialInfo)=>{
+
+                    console.log('SUCCESS', newCredentialInfo);
+                    console.log("SignData", bufToHex(newCredentialInfo.response.signature));
+                    const sign = newCredentialInfo.response.signature;
+                    showSignMessage(sign);
+
+                });
+                
+
+            }).catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            });
+
+        });
+
 
         function base64EncodeURL(byteArray) {
             return btoa(Array.from(new Uint8Array(byteArray)).map(val => {
