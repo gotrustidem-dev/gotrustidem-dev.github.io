@@ -594,7 +594,7 @@ async function ReadCertByIndex(index) {
             alert(error)
             console.log('FAIL', error)
         })
-    }
+    });
 }
 
 
