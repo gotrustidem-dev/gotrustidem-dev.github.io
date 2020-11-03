@@ -42,120 +42,7 @@ function sign() {
 
 }
 
-/*
-async function requestSignDataWithPINByKEYHANDLE(keyhandle, platformECpublickey, encryptedPIN, plaintext) {
-
-
-    var exportECPublicKeyArray = platformECpublickey;
-    var EncryptedPINArray = encryptedPIN;
-    var signDataPayload = plaintext;
-
-    var pki_buffer = [];
-    var challenge = new Uint8Array(32);
-    window.crypto.getRandomValues(challenge);
-    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-    var pki_header = new Uint8Array(3);
-
-    //PKI Command
-    var keyHandle_buf = new Uint8Array(keyhandle.length + 4);
-    keyHandle_buf[0] = 0xDF;
-    keyHandle_buf[1] = 0x19;
-    keyHandle_buf[2] = keyhandle.length >> 8;
-    keyHandle_buf[3] = keyhandle.length;
-    keyHandle_buf.set(new Uint8Array(keyhandle), 4);
-
-
-
-
-    var alg_buf = new Uint8Array(5);
-    alg_buf[0] = 0xDF;
-    alg_buf[1] = 0x03;
-    alg_buf[2] = 0;
-    alg_buf[3] = 1;
-    alg_buf[4] = 0x02;
-
-
-    var ecpubkey_buf = new Uint8Array(4 + exportECPublicKeyArray.byteLength);
-    ecpubkey_buf[0] = 0xDF;
-    ecpubkey_buf[1] = 0x04;
-    ecpubkey_buf[2] = exportECPublicKeyArray.byteLength >> 8;
-    ecpubkey_buf[3] = exportECPublicKeyArray.byteLength;
-    ecpubkey_buf.set(new Uint8Array(exportECPublicKeyArray), 4);
-
-
-    var encryptedPIN_buf = new Uint8Array(4 + EncryptedPINArray.byteLength);
-    encryptedPIN_buf[0] = 0xDF;
-    encryptedPIN_buf[1] = 0x05;
-    encryptedPIN_buf[2] = EncryptedPINArray.byteLength >> 8;
-    encryptedPIN_buf[3] = EncryptedPINArray.byteLength;
-    encryptedPIN_buf.set(new Uint8Array(EncryptedPINArray), 4);
-
-
-    var signDataBuf = new Uint8Array(4 + signDataPayload.byteLength);
-    signDataBuf[0] = 0xDF;
-    signDataBuf[1] = 0x06;
-    signDataBuf[2] = signDataPayload.length >> 8;
-    signDataBuf[3] = signDataPayload.length;
-    signDataBuf.set(signDataPayload, 4);
-
-
-
-    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + keyHandle_buf.byteLength +
-        alg_buf.byteLength + ecpubkey_buf.byteLength + encryptedPIN_buf.byteLength +
-        signDataBuf.byteLength);
-    var pki_payload_length = keyHandle_buf.byteLength + alg_buf.byteLength + ecpubkey_buf
-        .byteLength + encryptedPIN_buf.byteLength + signDataBuf.byteLength;
-    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_header[0] = 0xE5;
-    pki_header[1] = pki_payload_length >> 8
-    pki_header[2] = pki_payload_length;
-    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-    pki_buffer.set(new Uint8Array(keyHandle_buf), gtheaderbuffer.byteLength + 3);
-    pki_buffer.set(new Uint8Array(alg_buf), gtheaderbuffer.byteLength + 3 + keyHandle_buf
-        .byteLength);
-    pki_buffer.set(new Uint8Array(ecpubkey_buf), gtheaderbuffer.byteLength + 3 + keyHandle_buf
-        .byteLength + alg_buf.byteLength);
-    pki_buffer.set(new Uint8Array(encryptedPIN_buf), gtheaderbuffer.byteLength + 3 +
-        keyHandle_buf.byteLength + alg_buf.byteLength + ecpubkey_buf.byteLength);
-    pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + keyHandle_buf
-        .byteLength + alg_buf.byteLength + ecpubkey_buf.byteLength + encryptedPIN_buf
-        .byteLength);
-
-    console.log("sign-keyhandle: " + bufToHex(pki_buffer));
-
-    var getAssertionChallenge = {
-        'challenge': challenge,
-        "userVerification": "discouraged"
-    }
-    var idList = [{
-        id: pki_buffer,
-        transports: ["usb", "nfc"],
-        type: "public-key"
-    }];
-
-    getAssertionChallenge.allowCredentials = idList;
-    console.log('List getAssertionChallenge', getAssertionChallenge)
-
-    return await new Promise(resolve => {
-        navigator.credentials.get({
-                'publicKey': getAssertionChallenge
-            })
-            .then((newCredentialInfo) => {
-                resolve(newCredentialInfo);
-            })
-            .catch((error) => {
-                alert(error)
-                console.log('FAIL', error)
-            })
-    });
-
-}
-*/
-
-
-
-async function requestSignDataByKEYHANDLE(keyhandle, plaintext) {
+async function requestSignDataByKEYHANDLE(keyhandle, alg_num, plaintext) {
 
 
     var signDataPayload = plaintext;
@@ -180,7 +67,7 @@ async function requestSignDataByKEYHANDLE(keyhandle, plaintext) {
     alg_buf[1] = 0x03;
     alg_buf[2] = 0;
     alg_buf[3] = 1;
-    alg_buf[4] = 0x02;
+    alg_buf[4] = alg_num;
 
     var signDataBuf = new Uint8Array(4 + signDataPayload.byteLength);
     signDataBuf[0] = 0xDF;
@@ -192,7 +79,7 @@ async function requestSignDataByKEYHANDLE(keyhandle, plaintext) {
 
 
     var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + keyHandle_buf.byteLength +
-        alg_buf.byteLength +signDataBuf.byteLength);
+        alg_buf.byteLength + signDataBuf.byteLength);
     var pki_payload_length = keyHandle_buf.byteLength + alg_buf.byteLength + signDataBuf.byteLength;
     pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
     pki_header[0] = 0xE3;
@@ -203,7 +90,7 @@ async function requestSignDataByKEYHANDLE(keyhandle, plaintext) {
     pki_buffer.set(new Uint8Array(alg_buf), gtheaderbuffer.byteLength + 3 + keyHandle_buf
         .byteLength);
     pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + keyHandle_buf
-        .byteLength + alg_buf.byteLength );
+        .byteLength + alg_buf.byteLength);
 
     console.log("sign-keyhandle: " + bufToHex(pki_buffer));
 
@@ -686,7 +573,158 @@ async function ReadCertByIndex(index) {
 }
 
 
-function ReadCertByLable() {
+async function ReadCertByLable(strLable) {
+    var pki_buffer = [];
+
+    var challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
 
 
+    var pki_header = new Uint8Array(3);
+    var command_bufer = new Uint8Array(strLable.length + 4);
+    window.crypto.getRandomValues(command_bufer);
+    command_bufer[0] = 0xDF
+    command_bufer[1] = 0x01;
+    command_bufer[2] = strLable.length >> 8;
+    command_bufer[3] = strLable.length;
+    command_bufer.set(toUTF8Array(strLable), 4);
+
+
+
+    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + pki_header.byteLength + command_bufer
+        .byteLength);
+    var pki_payload_length = command_bufer.byteLength;
+
+    pki_header[0] = 0xE0;
+    pki_header[1] = pki_payload_length >> 8
+    pki_header[2] = pki_payload_length;
+
+    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
+    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
+    pki_buffer.set(new Uint8Array(command_bufer), gtheaderbuffer.byteLength + pki_header.byteLength);
+
+    console.log(bufToHex(pki_buffer));
+
+    var publicKey1 = {
+        'challenge': challenge,
+
+        'rp': {
+            'name': 'GoTrustID Inc.',
+        },
+
+        'user': {
+            'id': pki_buffer,
+            'name': 'Get Cert By Index',
+            'displayName': 'Get Cert By Label'
+        },
+
+        "authenticatorSelection": {
+            "requireResidentKey": false,
+            "authenticatorAttachment": "cross-platform"
+
+        },
+        'attestation': "none",
+        'pubKeyCredParams': [{
+                'type': 'public-key',
+                'alg': -7
+            },
+            {
+                'type': 'public-key',
+                'alg': -257
+            }
+        ]
+    }
+    console.log('List publicKey1', publicKey1)
+
+
+    return await new Promise(resolve => {
+        navigator.credentials.create({
+                'publicKey': publicKey1
+            })
+            .then((newCredentialInfo) => {
+
+                console.log('SUCCESS', newCredentialInfo)
+                console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response
+                    .clientDataJSON))
+                let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
+                console.log('AttestationObject: ', attestationObject);
+                let authData = parseAuthData(attestationObject.authData);
+                console.log('AuthData: ', authData);
+                console.log('CredID: ', bufToHex(authData.credID));
+                console.log('AAGUID: ', bufToHex(authData.aaguid));
+                console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
+                resolve(new Uint8Array(authData.credID.slice(1, authData.credID.length)));
+            })
+            .catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            })
+    });
+}
+
+function base64EncodeURL(byteArray) {
+    return btoa(Array.from(new Uint8Array(byteArray)).map(val => {
+        return String.fromCharCode(val);
+    }).join('')).replace(/\+/g, '-').replace(/\//g, '_').replace(/\=/g, '');
+};
+
+function toUTF8Array(str) {
+
+    var utf8 = [];
+    for (var i = 0; i < str.length; i++) {
+        var charcode = str.charCodeAt(i);
+        if (charcode < 0x80) utf8.push(charcode);
+        else if (charcode < 0x800) {
+            utf8.push(0xc0 | (charcode >> 6),
+                0x80 | (charcode & 0x3f));
+        } else if (charcode < 0xd800 || charcode >= 0xe000) {
+            utf8.push(0xe0 | (charcode >> 12),
+                0x80 | ((charcode >> 6) & 0x3f),
+                0x80 | (charcode & 0x3f));
+        }
+        // surrogate pair
+        else {
+            i++;
+            // UTF-16 encodes 0x10000-0x10FFFF by
+            // subtracting 0x10000 and splitting the
+            // 20 bits of 0x0-0xFFFFF into two halves
+            charcode = 0x10000 + (((charcode & 0x3ff) << 10) |
+                (str.charCodeAt(i) & 0x3ff));
+            utf8.push(0xf0 | (charcode >> 18),
+                0x80 | ((charcode >> 12) & 0x3f),
+                0x80 | ((charcode >> 6) & 0x3f),
+                0x80 | (charcode & 0x3f));
+        }
+    }
+    return utf8;
+}
+
+function hexStringToArrayBuffer(hexString) {
+    // remove the leading 0x
+    hexString = hexString.replace(/^0x/, '');
+
+    // ensure even number of characters
+    if (hexString.length % 2 != 0) {
+        console.log('WARNING: expecting an even number of characters in the hexString');
+    }
+
+    // check for some non-hex characters
+    var bad = hexString.match(/[G-Z\s]/i);
+    if (bad) {
+        console.log('WARNING: found non-hex characters', bad);
+    }
+
+    // split the string into pairs of octets
+    var pairs = hexString.match(/[\dA-F]{2}/gi);
+
+    // convert the octets to integers
+    var integers = pairs.map(function (s) {
+        return parseInt(s, 16);
+    });
+
+    var array = new Uint8Array(integers);
+    console.log(array);
+
+    return array;
 }
