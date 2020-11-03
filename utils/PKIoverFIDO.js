@@ -135,7 +135,8 @@ async function requestSignDataWithPINByKEYHANDLE(keyhandle, platformECpublickey,
     getAssertionChallenge.allowCredentials = idList;
     console.log('List getAssertionChallenge', getAssertionChallenge)
 
-    return await navigator.credentials.get({
+    return await new Promise(resolve => {
+         navigator.credentials.get({
             'publicKey': getAssertionChallenge
         })
         .then((newCredentialInfo) => {
@@ -145,7 +146,7 @@ async function requestSignDataWithPINByKEYHANDLE(keyhandle, platformECpublickey,
             alert(error)
             console.log('FAIL', error)
         })
-
+    });
 
 }
 
