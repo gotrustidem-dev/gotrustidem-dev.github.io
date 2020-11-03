@@ -2463,7 +2463,8 @@
 
             //  let signCRS = new Promise( requirePINVerify(resolve,reject));
 
-            requirePINVerify().then((value) => {
+            requirePINVerify();
+            /*.then((value) => {
 
                 var EncryptedPINArray = value[0];
                 console.log("EncryptedPINArray", bufToHex(value[0]));
@@ -2488,6 +2489,7 @@
                 alert(error)
                 console.log('FAIL', error)
             });
+            */
 
         });
         document.getElementById('btn_import_certificate').addEventListener('submit', function (event) {
