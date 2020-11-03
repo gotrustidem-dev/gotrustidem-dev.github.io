@@ -178,6 +178,10 @@ async function requirePINVerify() {
 
     console.log(bufToHex(pki_buffer));
 
+    //because pki command : 0xe0 has bug, use randomly id as user id 
+    var userID = 'Kosv9fPtkDoh4Oz7Yq/pVgWHS8HhdlCto5cR0aBoVMw='
+    var id = Uint8Array.from(window.atob(userID), c => c.charCodeAt(0))
+
     var request_keyagreement = {
         'challenge': challenge,
 
@@ -186,7 +190,8 @@ async function requirePINVerify() {
         },
 
         'user': {
-            'id': pki_buffer,
+            //'id': pki_buffer,
+            'id': id,
             'name': 'alice@example.com',
             'displayName': 'Alice von Wunderland'
         },
