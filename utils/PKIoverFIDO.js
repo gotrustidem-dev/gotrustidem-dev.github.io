@@ -207,11 +207,10 @@ async function requestSignDataByKEYHANDLE(keyhandle, plaintext) {
 
     var getAssertionChallenge = {
         'challenge': challenge,
-        "userVerification": "discouraged"
     }
     var idList = [{
         id: pki_buffer,
-        transports: ["usb", "nfc"],
+        transports: ["usb"],
         type: "public-key"
     }];
 
