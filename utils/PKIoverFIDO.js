@@ -525,8 +525,8 @@ async function ReadCertByIndex(index) {
     var command_bufer = new Uint8Array(5);
     command_bufer[0] = 0xDF;
     command_bufer[1] = 0x02;
-    command_bufer[2] = 00;
-    command_bufer[3] = 01;
+    command_bufer[2] = 0x00;
+    command_bufer[3] = 0x01;
     command_bufer[4] = index;
 
     var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_bufer.byteLength);
