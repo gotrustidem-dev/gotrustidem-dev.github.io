@@ -140,7 +140,7 @@ async function requestSignDataWithPINByKEYHANDLE(keyhandle, platformECpublickey,
                 'publicKey': getAssertionChallenge
             })
             .then((newCredentialInfo) => {
-                return newCredentialInfo;
+                resolve(newCredentialInfo);
             })
             .catch((error) => {
                 alert(error)
