@@ -645,7 +645,6 @@ async function ReadCertByIndex(index) {
 
         "authenticatorSelection": {
             "requireResidentKey": false,
-            "userVerification": "discouraged",
             "authenticatorAttachment": "cross-platform"
 
         },
