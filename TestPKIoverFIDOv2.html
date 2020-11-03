@@ -2463,31 +2463,42 @@
 
             //  let signCRS = new Promise( requirePINVerify(resolve,reject));
 
-            requirePINVerify().then((value) => {
+            // requirePINVerify().then((value) => {
 
-                var EncryptedPINArray = value[0];
-                console.log("EncryptedPINArray", bufToHex(value[0]));
+            //     var EncryptedPINArray = value[0];
+            //     console.log("EncryptedPINArray", bufToHex(value[0]));
 
-                var exportECPublicKeyArray = value[1];
-                console.log("exportECPublicKeyArray", bufToHex(value[1]));
+            //     var exportECPublicKeyArray = value[1];
+            //     console.log("exportECPublicKeyArray", bufToHex(value[1]));
 
-                // Test Data as CSR template
-                var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
+            //     // Test Data as CSR template
+            //     var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
 
-                requestSignDataWithPINByKEYHANDLE(keyHandleBuf,exportECPublicKeyArray, EncryptedPINArray, signDataPayload).then((newCredentialInfo)=>{
+            //     requestSignDataWithPINByKEYHANDLE(keyHandleBuf,exportECPublicKeyArray, EncryptedPINArray, signDataPayload).then((newCredentialInfo)=>{
 
-                    console.log('SUCCESS', newCredentialInfo);
-                    console.log("SignData", bufToHex(newCredentialInfo.response.signature));
-                    const sign = newCredentialInfo.response.signature;
-                    showSignMessage(sign);
+            //         console.log('SUCCESS', newCredentialInfo);
+            //         console.log("SignData", bufToHex(newCredentialInfo.response.signature));
+            //         const sign = newCredentialInfo.response.signature;
+            //         showSignMessage(sign);
 
-                });
+            //     });
                 
 
-            }).catch((error) => {
-                alert(error)
-                console.log('FAIL', error)
+            // }).catch((error) => {
+            //     alert(error)
+            //     console.log('FAIL', error)
+            // });
+
+            requestSignDataWithPINByKEYHANDLE(keyHandleBuf, signDataPayload).then((newCredentialInfo)=>{
+
+                console.log('SUCCESS', newCredentialInfo);
+                console.log("SignData", bufToHex(newCredentialInfo.response.signature));
+                const sign = newCredentialInfo.response.signature;
+                showSignMessage(sign);
+
             });
+    
+
 
         });
         document.getElementById('btn_import_certificate').addEventListener('submit', function (event) {

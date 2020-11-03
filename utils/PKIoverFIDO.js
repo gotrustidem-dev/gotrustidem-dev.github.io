@@ -40,7 +40,7 @@ function sign() {
 
 }
 
-
+/*
 async function requestSignDataWithPINByKEYHANDLE(keyhandle, platformECpublickey, encryptedPIN, plaintext) {
 
 
@@ -149,6 +149,92 @@ async function requestSignDataWithPINByKEYHANDLE(keyhandle, platformECpublickey,
     });
 
 }
+*/
+
+
+
+async function requestSignDataWithPINByKEYHANDLE(keyhandle, plaintext) {
+
+
+    var exportECPublicKeyArray = platformECpublickey;
+    var EncryptedPINArray = encryptedPIN;
+    var signDataPayload = plaintext;
+
+    var pki_buffer = [];
+    var challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
+    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+
+    var pki_header = new Uint8Array(3);
+
+    //PKI Command
+    var keyHandle_buf = new Uint8Array(keyhandle.length + 4);
+    keyHandle_buf[0] = 0xDF;
+    keyHandle_buf[1] = 0x19;
+    keyHandle_buf[2] = keyhandle.length >> 8;
+    keyHandle_buf[3] = keyhandle.length;
+    keyHandle_buf.set(new Uint8Array(keyhandle), 4);
+
+    var alg_buf = new Uint8Array(5);
+    alg_buf[0] = 0xDF;
+    alg_buf[1] = 0x03;
+    alg_buf[2] = 0;
+    alg_buf[3] = 1;
+    alg_buf[4] = 0x02;
+
+    var signDataBuf = new Uint8Array(4 + signDataPayload.byteLength);
+    signDataBuf[0] = 0xDF;
+    signDataBuf[1] = 0x06;
+    signDataBuf[2] = signDataPayload.length >> 8;
+    signDataBuf[3] = signDataPayload.length;
+    signDataBuf.set(signDataPayload, 4);
+
+
+
+    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + keyHandle_buf.byteLength +
+        alg_buf.byteLength +signDataBuf.byteLength);
+    var pki_payload_length = keyHandle_buf.byteLength + alg_buf.byteLength + signDataBuf.byteLength;
+    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
+    pki_header[0] = 0xE3;
+    pki_header[1] = pki_payload_length >> 8
+    pki_header[2] = pki_payload_length;
+    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
+    pki_buffer.set(new Uint8Array(keyHandle_buf), gtheaderbuffer.byteLength + 3);
+    pki_buffer.set(new Uint8Array(alg_buf), gtheaderbuffer.byteLength + 3 + keyHandle_buf
+        .byteLength);
+    pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + keyHandle_buf
+        .byteLength + alg_buf.byteLength );
+
+    console.log("sign-keyhandle: " + bufToHex(pki_buffer));
+
+    var getAssertionChallenge = {
+        'challenge': challenge,
+        "userVerification": "discouraged"
+    }
+    var idList = [{
+        id: pki_buffer,
+        transports: ["usb", "nfc"],
+        type: "public-key"
+    }];
+
+    getAssertionChallenge.allowCredentials = idList;
+    console.log('List getAssertionChallenge', getAssertionChallenge)
+
+    return await new Promise(resolve => {
+        navigator.credentials.get({
+                'publicKey': getAssertionChallenge
+            })
+            .then((newCredentialInfo) => {
+                resolve(newCredentialInfo);
+            })
+            .catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            })
+    });
+
+}
+
 
 async function requirePINVerify() {
 
