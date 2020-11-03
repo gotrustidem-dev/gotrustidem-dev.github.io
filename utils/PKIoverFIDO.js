@@ -768,8 +768,8 @@ async function SignDataByLabel(label, alg_number, plain) {
     var alg_buf = new Uint8Array(5);
     alg_buf[0] = 0xDF;
     alg_buf[1] = 0x03;
-    alg_buf[2] = 00;
-    alg_buf[3] = 01;
+    alg_buf[2] = 0x00;
+    alg_buf[3] = 0x01;
     alg_buf[4] = alg_number;
 
     var signDataBuf = new Uint8Array(4 + plain.byteLength);
