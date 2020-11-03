@@ -380,7 +380,7 @@ async function requireEncryptedPINandEncryptedNewPIN(oldpin, newpin) {
         ]
     }
     console.log('Get ECDH Key request', request_keyagreement);
-    return await new Promise(resolve => {
+    return await (new Promise(resolve => {
         navigator.credentials.create({
             'publicKey': request_keyagreement
         }).then((newCredentialInfo) => {
@@ -498,7 +498,7 @@ async function requireEncryptedPINandEncryptedNewPIN(oldpin, newpin) {
             resolve([EncryptedPINArray, EncryptedNewUserPINArray, exportECPublicKeyArray]);
         });
 
-    });
+    }));
 
 
 
