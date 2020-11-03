@@ -2,6 +2,8 @@
 
 
 
+var g_encryptedPIN;
+var g_platformECpublickey;
 
 
 /**
