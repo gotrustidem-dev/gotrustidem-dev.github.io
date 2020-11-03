@@ -136,21 +136,21 @@ async function requestSignDataWithPINByKEYHANDLE(keyhandle, platformECpublickey,
     console.log('List getAssertionChallenge', getAssertionChallenge)
 
     return await new Promise(resolve => {
-         navigator.credentials.get({
-            'publicKey': getAssertionChallenge
-        })
-        .then((newCredentialInfo) => {
-            return newCredentialInfo;
-        })
-        .catch((error) => {
-            alert(error)
-            console.log('FAIL', error)
-        })
+        navigator.credentials.get({
+                'publicKey': getAssertionChallenge
+            })
+            .then((newCredentialInfo) => {
+                return newCredentialInfo;
+            })
+            .catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            })
     });
 
 }
 
-async  function requirePINVerify(){
+async function requirePINVerify() {
 
     var userpin;
     var challenge = new Uint8Array(32);
@@ -319,7 +319,7 @@ async  function requirePINVerify(){
 
 
 
-function requireEncryptedPINandEncryptedNewPIN(oldpin, newpin) {
+async function requireEncryptedPINandEncryptedNewPIN(oldpin, newpin) {
 
 
 
@@ -511,7 +511,7 @@ async function ReadCertByIndex(index) {
 
 
     var pki_buffer = [];
-    
+
     var challenge = new Uint8Array(32);
     window.crypto.getRandomValues(challenge);
 
@@ -574,25 +574,25 @@ async function ReadCertByIndex(index) {
 
     return await new Promise(resolve => {
         navigator.credentials.create({
-            'publicKey': publicKey1
-        })
-        .then((newCredentialInfo) => {
+                'publicKey': publicKey1
+            })
+            .then((newCredentialInfo) => {
 
-            console.log('SUCCESS', newCredentialInfo)
-            console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response.clientDataJSON))
-            let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
-            console.log('AttestationObject: ', attestationObject)
-            let authData = parseAuthData(attestationObject.authData);
-            console.log('AuthData: ', authData);
-            console.log('CredID: ', bufToHex(authData.credID));
-            console.log('AAGUID: ', bufToHex(authData.aaguid));
-            console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
-            resolve(new Uint8Array(authData.credID.slice(1, authData.credID.length)));
-        })
-        .catch((error) => {
-            alert(error)
-            console.log('FAIL', error)
-        })
+                console.log('SUCCESS', newCredentialInfo)
+                console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response.clientDataJSON))
+                let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
+                console.log('AttestationObject: ', attestationObject)
+                let authData = parseAuthData(attestationObject.authData);
+                console.log('AuthData: ', authData);
+                console.log('CredID: ', bufToHex(authData.credID));
+                console.log('AAGUID: ', bufToHex(authData.aaguid));
+                console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
+                resolve(new Uint8Array(authData.credID.slice(1, authData.credID.length)));
+            })
+            .catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            })
     });
 }
 
