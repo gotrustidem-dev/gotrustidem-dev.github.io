@@ -461,103 +461,6 @@
 
         document.getElementById('find-index').addEventListener('submit', function (event) {
             event.preventDefault();
-            // var pki_buffer = [];
-            // let certIndex = document.getElementById('use-index').certIndex.value;
-
-            // var challenge = new Uint8Array(32);
-            // window.crypto.getRandomValues(challenge);
-
-            // //Prepare PKI commmand
-            // //Header
-            // var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-            // var pki_header = new Uint8Array(3);
-
-            // //PKI Command
-            // var command_bufer = new Uint8Array(5);
-            // command_bufer[0] = 0xDF;
-            // command_bufer[1] = 0x02;
-            // command_bufer[2] = 00;
-            // command_bufer[3] = 01;
-            // command_bufer[4] = certIndex;
-
-            // var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_bufer.byteLength);
-            // var pki_payload_length = command_bufer.byteLength;
-            // pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-            // pki_header[0] = 0xE1;
-            // pki_header[1] = pki_payload_length >> 8
-            // pki_header[2] = pki_payload_length;
-            // pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-            // pki_buffer.set(new Uint8Array(command_bufer), 3 + gtheaderbuffer.byteLength);
-
-            // console.log(bufToHex(pki_buffer));
-
-            // var publicKey1 = {
-            //     'challenge': challenge,
-
-            //     'rp': {
-            //         'name': 'GoTrustID Inc.',
-            //     },
-
-            //     'user': {
-            //         'id': pki_buffer,
-            //         'name': 'Get Cert By Index',
-            //         'displayName': 'Get Cert By Index'
-            //     },
-
-            //     "authenticatorSelection": {
-            //         "requireResidentKey": false,
-            //         "authenticatorAttachment": "cross-platform"
-
-            //     },
-            //     'attestation': "none",
-            //     'pubKeyCredParams': [{
-            //             'type': 'public-key',
-            //             'alg': -7
-            //         },
-            //         {
-            //             'type': 'public-key',
-            //             'alg': -257
-            //         }
-            //     ]
-            // }
-            // console.log('Search_by_Index:', publicKey1)
-
-
-            // navigator.credentials.create({
-            //         'publicKey': publicKey1
-            //     })
-            //     .then((newCredentialInfo) => {
-
-            //         console.log('SUCCESS', newCredentialInfo)
-            //         console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response
-            //             .clientDataJSON))
-            //         let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
-            //         console.log('AttestationObject: ', attestationObject)
-            //         let authData = parseAuthData(attestationObject.authData);
-            //         console.log('AuthData: ', authData);
-            //         console.log('CredID: ', bufToHex(authData.credID));
-            //         console.log('AAGUID: ', bufToHex(authData.aaguid));
-            //         console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
-
-            //         showCertificMessage(authData.credID);
-
-
-            //         const sliced = new Uint8Array(authData.credID.slice(1, authData.credID.length));
-            //         var strCert = "-----BEGIN CERTIFICATE-----\n" +
-            //             btoa(String.fromCharCode.apply(null, sliced)) +
-            //             "\n-----END CERTIFICATE-----"
-
-            //         console.log('Certificatie : \n', strCert)
-            //         displayCert(strCert)
-
-            //     })
-            //     .catch((error) => {
-            //         alert(error)
-            //         console.log('FAIL', error)
-            //     });
-
-
             let certIndex = document.getElementById('use-index').certIndex.value;
             ReadCertByIndex(certIndex).then((value)=>{
 
@@ -571,7 +474,6 @@
 
             });
         })
-
 
         document.getElementById('find-index-safari').addEventListener('submit', function (event) {
             event.preventDefault();
@@ -678,107 +580,118 @@
 
         document.getElementById('search-ckalabel').addEventListener('submit', function (event) {
             event.preventDefault();
-            var pki_buffer = [];
+            // var pki_buffer = [];
+            // let ckaLabel = document.getElementById('use-label').ckaLabel.value;
+
+            // var challenge = new Uint8Array(32);
+            // window.crypto.getRandomValues(challenge);
+
+
+            // var pki_header = new Uint8Array(3);
+            // var command_bufer = new Uint8Array(ckaLabel.length + 4);
+            // window.crypto.getRandomValues(command_bufer);
+            // command_bufer[0] = 0xDF
+            // command_bufer[1] = 0x01;
+            // command_bufer[2] = ckaLabel.length >> 8;
+            // command_bufer[3] = ckaLabel.length;
+            // command_bufer.set(toUTF8Array(ckaLabel), 4);
+
+
+
+            // var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+            // var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + pki_header.byteLength + command_bufer
+            //     .byteLength);
+            // var pki_payload_length = command_bufer.byteLength;
+
+            // pki_header[0] = 0xE0;
+            // pki_header[1] = pki_payload_length >> 8
+            // pki_header[2] = pki_payload_length;
+
+            // pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
+            // pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
+            // pki_buffer.set(new Uint8Array(command_bufer), gtheaderbuffer.byteLength + pki_header.byteLength);
+
+            // console.log(bufToHex(pki_buffer));
+
+            // var publicKey1 = {
+            //     'challenge': challenge,
+
+            //     'rp': {
+            //         'name': 'GoTrustID Inc.',
+            //     },
+
+            //     'user': {
+            //         'id': pki_buffer,
+            //         'name': 'Get Cert By Index',
+            //         'displayName': 'Get Cert By Label'
+            //     },
+
+            //     "authenticatorSelection": {
+            //         "requireResidentKey": false,
+            //         "authenticatorAttachment": "cross-platform"
+
+            //     },
+            //     'attestation': "none",
+            //     'pubKeyCredParams': [{
+            //             'type': 'public-key',
+            //             'alg': -7
+            //         },
+            //         {
+            //             'type': 'public-key',
+            //             'alg': -257
+            //         }
+            //     ]
+            // }
+            // console.log('List publicKey1', publicKey1)
+
+
+            // navigator.credentials.create({
+            //         'publicKey': publicKey1
+            //     })
+            //     .then((newCredentialInfo) => {
+
+            //         console.log('SUCCESS', newCredentialInfo)
+            //         console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response
+            //             .clientDataJSON))
+            //         let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
+            //         console.log('AttestationObject: ', attestationObject);
+            //         let authData = parseAuthData(attestationObject.authData);
+            //         console.log('AuthData: ', authData);
+            //         console.log('CredID: ', bufToHex(authData.credID));
+            //         console.log('AAGUID: ', bufToHex(authData.aaguid));
+            //         console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
+
+
+            //         var strCert = "-----BEGIN CERTIFICATE-----\n" +
+            //             btoa(String.fromCharCode.apply(null, new Uint8Array(authData.credID.slice(1,
+            //                 authData.credID.length)))) +
+            //             "\n-----END CERTIFICATE-----"
+
+            //         console.log('Certificatie : \n', strCert)
+
+
+
+            //         displayCert(strCert)
+
+
+
+
+            //     })
+            //     .catch((error) => {
+            //         alert(error)
+            //         console.log('FAIL', error)
+            //     })
+
             let ckaLabel = document.getElementById('use-label').ckaLabel.value;
+            ReadCertByLable(ckaLabel).then((value)=>{
 
-            var challenge = new Uint8Array(32);
-            window.crypto.getRandomValues(challenge);
+            var strCert = "-----BEGIN CERTIFICATE-----\n" +
+                    btoa(String.fromCharCode.apply(null, value)) +
+                    "\n-----END CERTIFICATE-----"
+                console.log('Certificatie : \n', strCert)
+                displayCert(strCert)
+            });
 
-
-            var pki_header = new Uint8Array(3);
-            var command_bufer = new Uint8Array(ckaLabel.length + 4);
-            window.crypto.getRandomValues(command_bufer);
-            command_bufer[0] = 0xDF
-            command_bufer[1] = 0x01;
-            command_bufer[2] = ckaLabel.length >> 8;
-            command_bufer[3] = ckaLabel.length;
-            command_bufer.set(toUTF8Array(ckaLabel), 4);
-
-
-
-            var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-            var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + pki_header.byteLength + command_bufer
-                .byteLength);
-            var pki_payload_length = command_bufer.byteLength;
-
-            pki_header[0] = 0xE0;
-            pki_header[1] = pki_payload_length >> 8
-            pki_header[2] = pki_payload_length;
-
-            pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-            pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-            pki_buffer.set(new Uint8Array(command_bufer), gtheaderbuffer.byteLength + pki_header.byteLength);
-
-            console.log(bufToHex(pki_buffer));
-
-            var publicKey1 = {
-                'challenge': challenge,
-
-                'rp': {
-                    'name': 'GoTrustID Inc.',
-                },
-
-                'user': {
-                    'id': pki_buffer,
-                    'name': 'Get Cert By Index',
-                    'displayName': 'Get Cert By Label'
-                },
-
-                "authenticatorSelection": {
-                    "requireResidentKey": false,
-                    "authenticatorAttachment": "cross-platform"
-
-                },
-                'attestation': "none",
-                'pubKeyCredParams': [{
-                        'type': 'public-key',
-                        'alg': -7
-                    },
-                    {
-                        'type': 'public-key',
-                        'alg': -257
-                    }
-                ]
-            }
-            console.log('List publicKey1', publicKey1)
-
-
-            navigator.credentials.create({
-                    'publicKey': publicKey1
-                })
-                .then((newCredentialInfo) => {
-
-                    console.log('SUCCESS', newCredentialInfo)
-                    console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response
-                        .clientDataJSON))
-                    let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
-                    console.log('AttestationObject: ', attestationObject);
-                    let authData = parseAuthData(attestationObject.authData);
-                    console.log('AuthData: ', authData);
-                    console.log('CredID: ', bufToHex(authData.credID));
-                    console.log('AAGUID: ', bufToHex(authData.aaguid));
-                    console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
-
-
-                    var strCert = "-----BEGIN CERTIFICATE-----\n" +
-                        btoa(String.fromCharCode.apply(null, new Uint8Array(authData.credID.slice(1,
-                            authData.credID.length)))) +
-                        "\n-----END CERTIFICATE-----"
-
-                    console.log('Certificatie : \n', strCert)
-
-
-
-                    displayCert(strCert)
-
-
-
-
-                })
-                .catch((error) => {
-                    alert(error)
-                    console.log('FAIL', error)
-                })
         })
 
         document.getElementById('search-ckalabel-safari').addEventListener('submit', function (event) {
@@ -969,7 +882,7 @@
                     console.log('FAIL', error)
                 })
         })
-
+        
         document.getElementById('android-ckalabel-getassertion').addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -1337,8 +1250,7 @@
 
             });
         })
-
-
+        
         document.getElementById('android-index-getassertion').addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -1717,10 +1629,7 @@
 
             });
         })
-
-
-
-
+        
         document.getElementById('sign-index-safari').addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -2012,45 +1921,7 @@
 
             });
         })
-
-
-        function base64EncodeURL(byteArray) {
-            return btoa(Array.from(new Uint8Array(byteArray)).map(val => {
-                return String.fromCharCode(val);
-            }).join('')).replace(/\+/g, '-').replace(/\//g, '_').replace(/\=/g, '');
-        };
-
-        function toUTF8Array(str) {
-
-            var utf8 = [];
-            for (var i = 0; i < str.length; i++) {
-                var charcode = str.charCodeAt(i);
-                if (charcode < 0x80) utf8.push(charcode);
-                else if (charcode < 0x800) {
-                    utf8.push(0xc0 | (charcode >> 6),
-                        0x80 | (charcode & 0x3f));
-                } else if (charcode < 0xd800 || charcode >= 0xe000) {
-                    utf8.push(0xe0 | (charcode >> 12),
-                        0x80 | ((charcode >> 6) & 0x3f),
-                        0x80 | (charcode & 0x3f));
-                }
-                // surrogate pair
-                else {
-                    i++;
-                    // UTF-16 encodes 0x10000-0x10FFFF by
-                    // subtracting 0x10000 and splitting the
-                    // 20 bits of 0x0-0xFFFFF into two halves
-                    charcode = 0x10000 + (((charcode & 0x3ff) << 10) |
-                        (str.charCodeAt(i) & 0x3ff));
-                    utf8.push(0xf0 | (charcode >> 18),
-                        0x80 | ((charcode >> 12) & 0x3f),
-                        0x80 | ((charcode >> 6) & 0x3f),
-                        0x80 | (charcode & 0x3f));
-                }
-            }
-            return utf8;
-        }
-
+        
         document.getElementById('sign-ckalabel-safari').addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -2350,8 +2221,7 @@
 
             });
         })
-
-
+        
         document.getElementById('btn_gen_rsakeypair').addEventListener('submit', function (event) {
 
             event.preventDefault();
@@ -2446,8 +2316,7 @@
                 })
 
         });
-
-
+        
         document.getElementById('btn_sign_csr').addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -2501,6 +2370,7 @@
 
 
         });
+        
         document.getElementById('btn_import_certificate').addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -2610,71 +2480,7 @@
         })
         
 
-        function base64EncodeURL(byteArray) {
-            return btoa(Array.from(new Uint8Array(byteArray)).map(val => {
-                return String.fromCharCode(val);
-            }).join('')).replace(/\+/g, '-').replace(/\//g, '_').replace(/\=/g, '');
-        };
-
-        function toUTF8Array(str) {
-
-            var utf8 = [];
-            for (var i = 0; i < str.length; i++) {
-                var charcode = str.charCodeAt(i);
-                if (charcode < 0x80) utf8.push(charcode);
-                else if (charcode < 0x800) {
-                    utf8.push(0xc0 | (charcode >> 6),
-                        0x80 | (charcode & 0x3f));
-                } else if (charcode < 0xd800 || charcode >= 0xe000) {
-                    utf8.push(0xe0 | (charcode >> 12),
-                        0x80 | ((charcode >> 6) & 0x3f),
-                        0x80 | (charcode & 0x3f));
-                }
-                // surrogate pair
-                else {
-                    i++;
-                    // UTF-16 encodes 0x10000-0x10FFFF by
-                    // subtracting 0x10000 and splitting the
-                    // 20 bits of 0x0-0xFFFFF into two halves
-                    charcode = 0x10000 + (((charcode & 0x3ff) << 10) |
-                        (str.charCodeAt(i) & 0x3ff));
-                    utf8.push(0xf0 | (charcode >> 18),
-                        0x80 | ((charcode >> 12) & 0x3f),
-                        0x80 | ((charcode >> 6) & 0x3f),
-                        0x80 | (charcode & 0x3f));
-                }
-            }
-            return utf8;
-        }
-
-        function hexStringToArrayBuffer(hexString) {
-            // remove the leading 0x
-            hexString = hexString.replace(/^0x/, '');
-
-            // ensure even number of characters
-            if (hexString.length % 2 != 0) {
-                console.log('WARNING: expecting an even number of characters in the hexString');
-            }
-
-            // check for some non-hex characters
-            var bad = hexString.match(/[G-Z\s]/i);
-            if (bad) {
-                console.log('WARNING: found non-hex characters', bad);
-            }
-
-            // split the string into pairs of octets
-            var pairs = hexString.match(/[\dA-F]{2}/gi);
-
-            // convert the octets to integers
-            var integers = pairs.map(function (s) {
-                return parseInt(s, 16);
-            });
-
-            var array = new Uint8Array(integers);
-            console.log(array);
-
-            return array;
-        }
+        
 
 
         
