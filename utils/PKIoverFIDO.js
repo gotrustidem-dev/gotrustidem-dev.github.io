@@ -156,8 +156,6 @@ async function requestSignDataWithPINByKEYHANDLE(keyhandle, platformECpublickey,
 async function requestSignDataByKEYHANDLE(keyhandle, plaintext) {
 
 
-    var exportECPublicKeyArray = platformECpublickey;
-    var EncryptedPINArray = encryptedPIN;
     var signDataPayload = plaintext;
 
     var pki_buffer = [];
