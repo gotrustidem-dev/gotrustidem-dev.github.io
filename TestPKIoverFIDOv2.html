@@ -2489,7 +2489,7 @@
             //     console.log('FAIL', error)
             // });
             var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
-            requestSignDataWithPINByKEYHANDLE(keyHandleBuf, signDataPayload).then((newCredentialInfo)=>{
+            requestSignDataByKEYHANDLE(keyHandleBuf, signDataPayload).then((newCredentialInfo)=>{
 
                 console.log('SUCCESS', newCredentialInfo);
                 console.log("SignData", bufToHex(newCredentialInfo.response.signature));
