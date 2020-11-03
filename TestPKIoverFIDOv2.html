@@ -562,7 +562,7 @@
             ReadCertByIndex(certIndex).then((value)=>{
 
                 var strCert = "-----BEGIN CERTIFICATE-----\n" +
-                        btoa(value) +
+                        btoa(String.fromCharCode.apply(null, value)) +
                         "\n-----END CERTIFICATE-----"
 
                     console.log('Certificatie : \n', strCert)
