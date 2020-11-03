@@ -662,7 +662,7 @@ async function ReadCertByLable(strLable) {
     });
 }
 
-async function SignDataByIndex(index,alg_number,plain){
+async function SignDataByIndex(index, alg_number, plain) {
 
     var pki_buffer = [];
     let certIndex = document.getElementById('use-index').certIndex.value;
@@ -723,30 +723,109 @@ async function SignDataByIndex(index,alg_number,plain){
     console.log('SignDataByIndex', getAssertionChallenge)
 
 
-    return await new Promise(resolve => { navigator.credentials.get({
-            'publicKey': getAssertionChallenge
-        })
-        .then((newCredentialInfo) => {
+    return await new Promise(resolve => {
+        navigator.credentials.get({
+                'publicKey': getAssertionChallenge
+            })
+            .then((newCredentialInfo) => {
 
-            console.log('SUCCESS', newCredentialInfo);
-            console.log("Sign", newCredentialInfo.response.signature);
+                console.log('SUCCESS', newCredentialInfo);
+                console.log("Sign", newCredentialInfo.response.signature);
 
-            const sign = newCredentialInfo.response.signature;
-            resolve(sign);
-            showSignMessage(sign);
-        })
-        .catch((error) => {
-            alert(error)
-            console.log('FAIL', error)
-        })
+                const sign = newCredentialInfo.response.signature;
+                resolve(sign);
+            })
+            .catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            })
 
     });
 
 
 }
 
-async function SignDataByLabel(label){
-    
+async function SignDataByLabel(label, alg_number, plain) {
+
+    var pki_buffer = [];
+
+    var challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
+    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+
+    var pki_header = new Uint8Array(3);
+
+    //PKI Command
+    var command_bufer = new Uint8Array(label.length + 4);
+    window.crypto.getRandomValues(command_bufer);
+    command_bufer[0] = 0xDF
+    command_bufer[1] = 0x01;
+    command_bufer[2] = label.length >> 8;
+    command_bufer[3] = label.length;
+    command_bufer.set(toUTF8Array(label), 4);
+
+
+    var alg_buf = new Uint8Array(5);
+    alg_buf[0] = 0xDF;
+    alg_buf[1] = 0x03;
+    alg_buf[2] = 00;
+    alg_buf[3] = 01;
+    alg_buf[4] = alg_number;
+
+    var signDataBuf = new Uint8Array(4 + plain.byteLength);
+    signDataBuf[0] = 0xDF;
+    signDataBuf[1] = 0x06;
+    signDataBuf[2] = plain.length >> 8;
+    signDataBuf[3] = plain.length;
+    signDataBuf.set(plain, 4);
+
+
+    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_bufer.byteLength + alg_buf
+        .byteLength + signDataBuf.byteLength);
+    var pki_payload_length = command_bufer.byteLength + alg_buf.byteLength + signDataBuf.byteLength;
+    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
+    pki_header[0] = 0xE3;
+    pki_header[1] = pki_payload_length >> 8
+    pki_header[2] = pki_payload_length;
+    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
+    pki_buffer.set(new Uint8Array(command_bufer), gtheaderbuffer.byteLength + 3);
+    pki_buffer.set(new Uint8Array(alg_buf), gtheaderbuffer.byteLength + 3 + command_bufer.byteLength);
+    pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + command_bufer
+        .byteLength + alg_buf.byteLength);
+
+    console.log("SignDataByLabel", bufToHex(pki_buffer));
+
+
+    var getAssertionChallenge = {
+        'challenge': challenge,
+    }
+    var idList = [{
+        id: pki_buffer,
+        transports: ["usb", "nfc"],
+        type: "public-key"
+    }];
+
+    getAssertionChallenge.allowCredentials = idList;
+    console.log('SignDataByLabel', getAssertionChallenge)
+
+
+    return await new Promise(resolve => {
+        navigator.credentials.get({
+                'publicKey': getAssertionChallenge
+            })
+            .then((newCredentialInfo) => {
+
+                console.log('SUCCESS', newCredentialInfo)
+                console.log("Sign", newCredentialInfo.response.signature)
+                const sign = newCredentialInfo.response.signature;
+                resolve(sign);
+
+            })
+            .catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            })
+    });
 }
 
 
