@@ -153,7 +153,7 @@ async function requestSignDataWithPINByKEYHANDLE(keyhandle, platformECpublickey,
 
 
 
-async function requestSignDataWByKEYHANDLE(keyhandle, plaintext) {
+async function requestSignDataByKEYHANDLE(keyhandle, plaintext) {
 
 
     var exportECPublicKeyArray = platformECpublickey;
