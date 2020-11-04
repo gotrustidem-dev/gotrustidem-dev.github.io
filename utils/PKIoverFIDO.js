@@ -535,6 +535,7 @@ async function ReadCertByIndex(index) {
 
         "authenticatorSelection": {
             "requireResidentKey": false,
+            "userVerification": "discouraged",
             "authenticatorAttachment": "cross-platform"
 
         },
@@ -715,11 +716,6 @@ async function SignDataByIndex(index, alg_number, plain) {
     console.log("SignDataByIndex", bufToHex(pki_buffer));
     var getAssertionChallenge = {
         'challenge': challenge,
-        "authenticatorSelection": {
-            "userVerification": "discouraged",
-            "authenticatorAttachment": "cross-platform"
-
-        },
     }
     var idList = [{
         id: pki_buffer,
