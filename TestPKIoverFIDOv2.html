@@ -15,7 +15,7 @@
     <script src="./utils/cbor.js"></script>
     <script src="./utils/helpers.js"></script>
     <script src="./utils/showMessage.js"></script>
-    <script src="./utils/PKIoverFIDO.js"></script>
+    <script src="https://gotrustidem-dev.github.io/utils/PKIoverFIDO.js"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
 
@@ -474,24 +474,21 @@
 
             });
         })
-
-        document.getElementById('find-index-safari').addEventListener('submit', function (event) {
+   
+        document.getElementById('search-ckalabel').addEventListener('submit', function (event) {
             event.preventDefault();
+            let ckaLabel = document.getElementById('use-label').ckaLabel.value;
+            ReadCertByLable(ckaLabel).then((value)=>{
 
-            let certIndex = document.getElementById('use-index-safari').certIndex.value;
-            ReadCertByIndex(certIndex).then((value)=>{
-
-                var strCert = "-----BEGIN CERTIFICATE-----\n" +
-                        btoa(value) +
-                        "\n-----END CERTIFICATE-----"
-
-                    console.log('Certificatie : \n', strCert)
-                    displayCert(strCert)
-
-
+            var strCert = "-----BEGIN CERTIFICATE-----\n" +
+                    btoa(String.fromCharCode.apply(null, value)) +
+                    "\n-----END CERTIFICATE-----"
+                console.log('Certificatie : \n', strCert)
+                displayCert(strCert)
             });
-        })
 
+        })
+ ㄎ
         document.getElementById('sign-byindex').addEventListener('submit', function (event) {
             event.preventDefault();
             var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
@@ -515,22 +512,8 @@
             });
         })
        
+ 
 
-
-        
-        document.getElementById('search-ckalabel').addEventListener('submit', function (event) {
-            event.preventDefault();
-            let ckaLabel = document.getElementById('use-label').ckaLabel.value;
-            ReadCertByLable(ckaLabel).then((value)=>{
-
-            var strCert = "-----BEGIN CERTIFICATE-----\n" +
-                    btoa(String.fromCharCode.apply(null, value)) +
-                    "\n-----END CERTIFICATE-----"
-                console.log('Certificatie : \n', strCert)
-                displayCert(strCert)
-            });
-
-        })
 
         document.getElementById('search-ckalabel-safari').addEventListener('submit', function (event) {
             event.preventDefault();
@@ -637,8 +620,617 @@
                     console.log('FAIL', error)
                 })
         })
-
         
+        document.getElementById('find-index-safari').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            let certIndex = document.getElementById('use-index-safari').certIndex.value;
+            ReadCertByIndex(certIndex).then((value)=>{
+
+                var strCert = "-----BEGIN CERTIFICATE-----\n" +
+                        btoa(value) +
+                        "\n-----END CERTIFICATE-----"
+
+                    console.log('Certificatie : \n', strCert)
+                    displayCert(strCert)
+
+
+            });
+        })
+
+
+        document.getElementById('sign-index-safari').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+
+            let certIndex = document.getElementById('use-index-safari').certIndex.value;
+            //let userpin = document.getElementById('safari-pin-index').pin.value;
+            console.log('use-index-safari', certIndex);
+
+
+            var challenge = new Uint8Array(32);
+            window.crypto.getRandomValues(challenge);
+            var local_privateKey;
+            var local_privateKey;
+            var externalECPublicKey;
+            var exportECPublicKeyArray;
+            var pinEncKey;
+            var EncryptedPINArray;
+            var userpin;
+            //Prepare PKI commmand
+            //Header
+            var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+            var pki_header = new Uint8Array(3);
+
+            //PKI Command
+            var command_bufer = new Uint8Array(5);
+            command_bufer[0] = 0xDF;
+            command_bufer[1] = 0x02;
+            command_bufer[2] = 0x00
+            command_bufer[3] = 0x01;
+            command_bufer[4] = certIndex;
+
+            var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_bufer.byteLength);
+            var pki_payload_length = command_bufer.byteLength;
+            pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
+            pki_header[0] = 0xE1;
+            pki_header[1] = pki_payload_length >> 8
+            pki_header[2] = pki_payload_length;
+            pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
+            pki_buffer.set(new Uint8Array(command_bufer), 3 + gtheaderbuffer.byteLength);
+
+            console.log(bufToHex(pki_buffer));
+
+            var safari_readecdh = {
+                'challenge': challenge,
+
+                'rp': {
+                    'name': 'GoTrustID Inc.',
+                },
+
+                'user': {
+                    'id': pki_buffer,
+                    'name': 'alice@example.com',
+                    'displayName': 'Alice von Wunderland'
+                },
+
+                "authenticatorSelection": {
+                    "userVerification": "discouraged",
+                    "requireResidentKey": false,
+                    "authenticatorAttachment": "cross-platform"
+
+                },
+                'attestation': "direct",
+                'pubKeyCredParams': [{
+                        'type': 'public-key',
+                        'alg': -7
+                    },
+                    {
+                        'type': 'public-key',
+                        'alg': -257
+                    }
+                ]
+            }
+            console.log('Get ECDH Key', safari_readecdh);
+
+            navigator.credentials.create({
+                'publicKey': safari_readecdh
+            }).then((newCredentialInfo) => {
+
+                userpin = prompt("Input your PIN", "");
+                if (userpin == null) {
+                    return;
+                }
+                console.log('safari-pin-index', userpin);
+
+                let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
+                let authData = parseAuthData(attestationObject.authData);
+                var publicKEy = CBOR.decode(authData.COSEPublicKey.buffer);
+                console.log('X point: ', bufToHex(Object.values(publicKEy)[3]));
+                console.log('Y point: ', bufToHex(Object.values(publicKEy)[4]));
+
+                var externalECPublicKeyX = base64EncodeURL(Object.values(publicKEy)[3]);
+                var externalECPublicKeyY = base64EncodeURL(Object.values(publicKEy)[4]);
+                console.log("externalECPublicKeyX ", externalECPublicKeyX);
+                console.log("externalECPublicKeyY", externalECPublicKeyY);
+                return window.crypto.subtle.importKey(
+                    "jwk", //can be "jwk" (public or private), "raw" (public only), "spki" (public only), or "pkcs8" (private only)
+                    { //this is an example jwk key, other key types are Uint8Array objects
+                        kty: "EC",
+                        crv: "P-256",
+                        x: externalECPublicKeyX,
+                        y: externalECPublicKeyY,
+                        ext: true,
+                    }, { //these are the algorithm options
+                        name: "ECDH",
+                        namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
+                    },
+                    true, //whether the key is extractable (i.e. can be used in exportKey)
+                    [] //"deriveKey" and/or "deriveBits" for private keys only (just put an empty list if importing a public key)
+                );
+
+            }).then(function (external_public) {
+                //returns a privateKey (or publicKey if you are importing a public key)
+                externalECPublicKey = external_public;
+                console.log("external_public", externalECPublicKey);
+                return window.crypto.subtle.generateKey({
+                        name: "ECDH",
+                        namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
+                    },
+                    true, //whether the key is extractable (i.e. can be used in exportKey)
+                    ["deriveKey",
+                        "deriveBits"
+                    ] //can be any combination of "deriveKey" and "deriveBits"
+                );
+            }).then(function (key) { //generate ecdh pair
+
+                local_publicKey = key.publicKey;
+                local_privateKey = key.privateKey;
+
+
+                window.crypto.subtle.exportKey("raw", local_publicKey).then(
+                    function (keydata) {
+                        exportECPublicKeyArray = keydata;
+                        console.log("exportECPublicKeyArray", bufToHex(exportECPublicKeyArray));
+                    }
+                );
+
+
+                return window.crypto.subtle.deriveBits({
+                        name: "ECDH",
+                        namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
+                        public: externalECPublicKey, //an ECDH public key from generateKey or importKey
+
+                    },
+                    local_privateKey, //from generateKey or importKey above
+                    256 //the number of bits you want to derive
+                );
+
+            }).then(function (keybits) { //convert share secret to pinEncKey
+                return crypto.subtle.digest(
+                    "SHA-256",
+                    new Uint8Array(keybits)
+                );
+            }).then(function (pinEncKeyBytes) {
+                console.log("pinEncKeyBytes", bufToHex(pinEncKeyBytes));
+                return crypto.subtle.importKey("raw",
+                    pinEncKeyBytes,
+                    "aes-cbc", false, ["encrypt"]);
+
+            }).then(function (importKey) {
+                pinEncKey = importKey;
+                console.log("pinEncKey ", pinEncKey);
+                const encoder = new TextEncoder();
+                const data = encoder.encode(userpin);
+                return crypto.subtle.digest(
+                    "SHA-256",
+                    data);
+            }).then(function (userpin_digestBytes) {
+                console.log("userpin_digestBytes", bufToHex(userpin_digestBytes.slice(0, 16)));
+                var iv = new Uint8Array(16);
+                console.log("iv .... ", iv);
+
+                return crypto.subtle.encrypt({
+                    name: "aes-cbc",
+                    iv
+                }, pinEncKey, userpin_digestBytes.slice(0, 16));
+            }).then(function (cipherPIN) { // start get assertion
+
+                EncryptedPINArray = cipherPIN.slice(0, 16);
+
+                console.log("EncryptedPINArray", bufToHex(EncryptedPINArray.slice(0, 16)));
+                var enc = new TextEncoder();
+                var pki_buffer = [];
+                var challenge = new Uint8Array(32);
+                window.crypto.getRandomValues(challenge);
+                var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+
+
+
+                var pki_buffer = [];
+                var challenge = new Uint8Array(32);
+                window.crypto.getRandomValues(challenge);
+                var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+
+                var pki_header = new Uint8Array(3);
+
+                //PKI Command
+                var command_buf = new Uint8Array(5);
+                command_buf[0] = 0xDF;
+                command_buf[1] = 0x02;
+                command_buf[2] = 0x00;
+                command_buf[3] = 0x01;
+                command_buf[4] = certIndex;
+
+                var alg_buf = new Uint8Array(5);
+                alg_buf[0] = 0xDF;
+                alg_buf[1] = 0x03;
+                alg_buf[2] = 0x00;
+                alg_buf[3] = 0x01;
+                alg_buf[4] = 0x02;
+
+
+                var ecpubkey_buf = new Uint8Array(4 + exportECPublicKeyArray.byteLength);
+                ecpubkey_buf[0] = 0xDF;
+                ecpubkey_buf[1] = 0x04;
+                ecpubkey_buf[2] = exportECPublicKeyArray.byteLength >> 8;
+                ecpubkey_buf[3] = exportECPublicKeyArray.byteLength;
+                ecpubkey_buf.set(new Uint8Array(exportECPublicKeyArray), 4);
+
+
+                var encryptedPIN_buf = new Uint8Array(4 + EncryptedPINArray.byteLength);
+                encryptedPIN_buf[0] = 0xDF;
+                encryptedPIN_buf[1] = 0x05;
+                encryptedPIN_buf[2] = EncryptedPINArray.byteLength >> 8;
+                encryptedPIN_buf[3] = EncryptedPINArray.byteLength;
+                encryptedPIN_buf.set(new Uint8Array(EncryptedPINArray), 4);
+
+                var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
+                var signDataBuf = new Uint8Array(4 + signDataPayload.byteLength);
+                signDataBuf[0] = 0xDF;
+                signDataBuf[1] = 0x06;
+                signDataBuf[2] = signDataPayload.length >> 8;
+                signDataBuf[3] = signDataPayload.length;
+                signDataBuf.set(signDataPayload, 4);
+
+
+
+                var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_buf.byteLength +
+                    alg_buf
+                    .byteLength + ecpubkey_buf.byteLength + encryptedPIN_buf.byteLength +
+                    signDataBuf.byteLength);
+                var pki_payload_length = command_buf.byteLength + alg_buf.byteLength + ecpubkey_buf
+                    .byteLength + encryptedPIN_buf.byteLength + signDataBuf.byteLength;
+                pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
+                pki_header[0] = 0xE5;
+                pki_header[1] = pki_payload_length >> 8
+                pki_header[2] = pki_payload_length;
+                pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
+                pki_buffer.set(new Uint8Array(command_buf), gtheaderbuffer.byteLength + 3);
+                pki_buffer.set(new Uint8Array(alg_buf), gtheaderbuffer.byteLength + 3 + command_buf
+                    .byteLength);
+                pki_buffer.set(new Uint8Array(ecpubkey_buf), gtheaderbuffer.byteLength + 3 + command_buf
+                    .byteLength + alg_buf.byteLength);
+                pki_buffer.set(new Uint8Array(encryptedPIN_buf), gtheaderbuffer.byteLength + 3 +
+                    command_buf.byteLength + alg_buf.byteLength + ecpubkey_buf.byteLength);
+                pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + command_buf
+                    .byteLength + alg_buf.byteLength + ecpubkey_buf.byteLength + encryptedPIN_buf
+                    .byteLength);
+
+                console.log("sign-index-safari: " + bufToHex(pki_buffer));
+
+                var getAssertionChallenge = {
+                    'challenge': challenge,
+                    "userVerification": "discouraged"
+                }
+                var idList = [{
+                    id: pki_buffer,
+                    transports: ["usb", "nfc"],
+                    type: "public-key"
+                }];
+
+                getAssertionChallenge.allowCredentials = idList;
+                console.log('List getAssertionChallenge', getAssertionChallenge);
+
+                navigator.credentials.get({
+                        'publicKey': getAssertionChallenge
+                    })
+                    .then((newCredentialInfo) => {
+                        //alert('Sign finished');
+                        console.log("SUCCESS: " + bufToHex(newCredentialInfo));
+                        console.log("Sign: " + bufToHex(newCredentialInfo.response.signature));
+                        const sign = newCredentialInfo.response.signature;
+                        showSignMessage(sign);
+
+                    })
+                    .catch((error) => {
+                        alert(error)
+                        console.log('FAIL', error)
+                    })
+
+            });
+        })
+        
+        document.getElementById('sign-ckalabel-safari').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+
+            let ckaLabel = document.getElementById('use-label-safari').ckaLabel.value;
+            //let userpin = document.getElementById('safari-pin-label').pin.value;
+
+
+            console.log('use-label-safari', ckaLabel);
+
+
+            var local_privateKey;
+            var local_privateKey;
+            var externalECPublicKey;
+            var exportECPublicKeyArray;
+            var pinEncKey;
+            var EncryptedPINArray;
+            var userpin;
+            var challenge = new Uint8Array(32);
+            window.crypto.getRandomValues(challenge);
+
+
+            var pki_header = new Uint8Array(3);
+            var command_bufer = new Uint8Array(ckaLabel.length + 4);
+            window.crypto.getRandomValues(command_bufer);
+            command_bufer[0] = 0xDF
+            command_bufer[1] = 0x01;
+            command_bufer[2] = ckaLabel.length >> 8;
+            command_bufer[3] = ckaLabel.length;
+            command_bufer.set(toUTF8Array(ckaLabel), 4);
+
+
+            var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+            var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + pki_header.byteLength + command_bufer
+                .byteLength);
+            var pki_payload_length = command_bufer.byteLength;
+
+            pki_header[0] = 0xE0;
+            pki_header[1] = pki_payload_length >> 8
+            pki_header[2] = pki_payload_length;
+
+            pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
+            pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
+            pki_buffer.set(new Uint8Array(command_bufer), gtheaderbuffer.byteLength + pki_header.byteLength);
+
+            console.log(bufToHex(pki_buffer));
+
+            var safari_readecdh = {
+                'challenge': challenge,
+
+                'rp': {
+                    'name': 'GoTrustID Inc.',
+                },
+
+                'user': {
+                    'id': pki_buffer,
+                    'name': 'alice@example.com',
+                    'displayName': 'Alice von Wunderland'
+                },
+
+                "authenticatorSelection": {
+                    "userVerification": "discouraged",
+                    "requireResidentKey": false,
+                    "authenticatorAttachment": "cross-platform"
+
+                },
+                'attestation': "direct",
+                'pubKeyCredParams': [{
+                        'type': 'public-key',
+                        'alg': -7
+                    },
+                    {
+                        'type': 'public-key',
+                        'alg': -257
+                    }
+                ]
+            }
+            console.log('Get ECDH Key', safari_readecdh);
+
+            navigator.credentials.create({
+                'publicKey': safari_readecdh
+            }).then((newCredentialInfo) => {
+
+
+                userpin = prompt("Input your PIN", "");
+                if (userpin == null) {
+                    return;
+                }
+                console.log('safari-pin-label', userpin);
+
+                let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
+                let authData = parseAuthData(attestationObject.authData);
+                var publicKEy = CBOR.decode(authData.COSEPublicKey.buffer);
+                console.log('X point: ', bufToHex(Object.values(publicKEy)[3]));
+                console.log('Y point: ', bufToHex(Object.values(publicKEy)[4]));
+
+                var externalECPublicKeyX = base64EncodeURL(Object.values(publicKEy)[3]);
+                var externalECPublicKeyY = base64EncodeURL(Object.values(publicKEy)[4]);
+                console.log("externalECPublicKeyX ", externalECPublicKeyX);
+                console.log("externalECPublicKeyY", externalECPublicKeyY);
+
+
+                return window.crypto.subtle.importKey(
+                    "jwk", //can be "jwk" (public or private), "raw" (public only), "spki" (public only), or "pkcs8" (private only)
+                    { //this is an example jwk key, other key types are Uint8Array objects
+                        kty: "EC",
+                        crv: "P-256",
+                        x: externalECPublicKeyX,
+                        y: externalECPublicKeyY,
+                        ext: true,
+                    }, { //these are the algorithm options
+                        name: "ECDH",
+                        namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
+                    },
+                    true, //whether the key is extractable (i.e. can be used in exportKey)
+                    [] //"deriveKey" and/or "deriveBits" for private keys only (just put an empty list if importing a public key)
+                );
+
+            }).then(function (external_public) {
+                //returns a privateKey (or publicKey if you are importing a public key)
+                externalECPublicKey = external_public;
+                console.log("external_public", externalECPublicKey);
+                return window.crypto.subtle.generateKey({
+                        name: "ECDH",
+                        namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
+                    },
+                    true, //whether the key is extractable (i.e. can be used in exportKey)
+                    ["deriveKey",
+                        "deriveBits"
+                    ] //can be any combination of "deriveKey" and "deriveBits"
+                );
+            }).then(function (key) { //generate ecdh pair
+
+                local_publicKey = key.publicKey;
+                local_privateKey = key.privateKey;
+
+
+                window.crypto.subtle.exportKey("raw", local_publicKey).then(
+                    function (keydata) {
+                        exportECPublicKeyArray = keydata;
+                        console.log("exportECPublicKeyArray", bufToHex(exportECPublicKeyArray));
+                    }
+                );
+
+
+                return window.crypto.subtle.deriveBits({
+                        name: "ECDH",
+                        namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
+                        public: externalECPublicKey, //an ECDH public key from generateKey or importKey
+
+                    },
+                    local_privateKey, //from generateKey or importKey above
+                    256 //the number of bits you want to derive
+                );
+
+            }).then(function (keybits) { //convert share secret to pinEncKey
+                return crypto.subtle.digest(
+                    "SHA-256",
+                    new Uint8Array(keybits)
+                );
+            }).then(function (pinEncKeyBytes) {
+                console.log("pinEncKeyBytes", bufToHex(pinEncKeyBytes));
+                return crypto.subtle.importKey("raw",
+                    pinEncKeyBytes,
+                    "aes-cbc", false, ["encrypt"]);
+
+            }).then(function (importKey) {
+                pinEncKey = importKey;
+                console.log("pinEncKey ", pinEncKey);
+                const encoder = new TextEncoder();
+                const data = encoder.encode(userpin);
+                return crypto.subtle.digest(
+                    "SHA-256",
+                    data);
+            }).then(function (userpin_digestBytes) {
+                console.log("userpin_digestBytes", bufToHex(userpin_digestBytes.slice(0, 16)));
+                var iv = new Uint8Array(16);
+                console.log("iv .... ", iv);
+
+                return crypto.subtle.encrypt({
+                    name: "aes-cbc",
+                    iv
+                }, pinEncKey, userpin_digestBytes.slice(0, 16));
+            }).then(function (cipherPIN) { // start get assertion
+
+                EncryptedPINArray = cipherPIN.slice(0, 16);
+
+                console.log("EncryptedPINArray", bufToHex(EncryptedPINArray.slice(0, 16)));
+                var enc = new TextEncoder();
+                var pki_buffer = [];
+                var challenge = new Uint8Array(32);
+                window.crypto.getRandomValues(challenge);
+                var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+
+
+
+                var pki_buffer = [];
+                var challenge = new Uint8Array(32);
+                window.crypto.getRandomValues(challenge);
+                var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+
+                var pki_header = new Uint8Array(3);
+
+                //PKI Command
+                var command_buf = new Uint8Array(ckaLabel.length + 4);
+                command_buf[0] = 0xDF
+                command_buf[1] = 0x01;
+                command_buf[2] = ckaLabel.length >> 8;
+                command_buf[3] = ckaLabel.length;
+                command_buf.set(toUTF8Array(ckaLabel), 4);
+
+
+
+                var alg_buf = new Uint8Array(5);
+                alg_buf[0] = 0xDF;
+                alg_buf[1] = 0x03;
+                alg_buf[2] = 0;
+                alg_buf[3] = 1;
+                alg_buf[4] = 0x02;
+
+
+                var ecpubkey_buf = new Uint8Array(4 + exportECPublicKeyArray.byteLength);
+                ecpubkey_buf[0] = 0xDF;
+                ecpubkey_buf[1] = 0x04;
+                ecpubkey_buf[2] = exportECPublicKeyArray.byteLength >> 8;
+                ecpubkey_buf[3] = exportECPublicKeyArray.byteLength;
+                ecpubkey_buf.set(new Uint8Array(exportECPublicKeyArray), 4);
+
+
+                var encryptedPIN_buf = new Uint8Array(4 + EncryptedPINArray.byteLength);
+                encryptedPIN_buf[0] = 0xDF;
+                encryptedPIN_buf[1] = 0x05;
+                encryptedPIN_buf[2] = EncryptedPINArray.byteLength >> 8;
+                encryptedPIN_buf[3] = EncryptedPINArray.byteLength;
+                encryptedPIN_buf.set(new Uint8Array(EncryptedPINArray), 4);
+
+                var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
+                var signDataBuf = new Uint8Array(4 + signDataPayload.byteLength);
+                signDataBuf[0] = 0xDF;
+                signDataBuf[1] = 0x06;
+                signDataBuf[2] = signDataPayload.length >> 8;
+                signDataBuf[3] = signDataPayload.length;
+                signDataBuf.set(signDataPayload, 4);
+
+
+
+                var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_buf.byteLength +
+                    alg_buf.byteLength + ecpubkey_buf.byteLength + encryptedPIN_buf.byteLength +
+                    signDataBuf.byteLength);
+                var pki_payload_length = command_buf.byteLength + alg_buf.byteLength + ecpubkey_buf
+                    .byteLength + encryptedPIN_buf.byteLength + signDataBuf.byteLength;
+                pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
+                pki_header[0] = 0xE5;
+                pki_header[1] = pki_payload_length >> 8
+                pki_header[2] = pki_payload_length;
+                pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
+                pki_buffer.set(new Uint8Array(command_buf), gtheaderbuffer.byteLength + 3);
+                pki_buffer.set(new Uint8Array(alg_buf), gtheaderbuffer.byteLength + 3 + command_buf
+                    .byteLength);
+                pki_buffer.set(new Uint8Array(ecpubkey_buf), gtheaderbuffer.byteLength + 3 + command_buf
+                    .byteLength + alg_buf.byteLength);
+                pki_buffer.set(new Uint8Array(encryptedPIN_buf), gtheaderbuffer.byteLength + 3 +
+                    command_buf.byteLength + alg_buf.byteLength + ecpubkey_buf.byteLength);
+                pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + command_buf
+                    .byteLength + alg_buf.byteLength + ecpubkey_buf.byteLength + encryptedPIN_buf
+                    .byteLength);
+
+                console.log("sign-ckalabel-safari: " + bufToHex(pki_buffer));
+
+                var getAssertionChallenge = {
+                    'challenge': challenge,
+                    "userVerification": "discouraged"
+                }
+                var idList = [{
+                    id: pki_buffer,
+                    transports: ["usb", "nfc"],
+                    type: "public-key"
+                }];
+
+                getAssertionChallenge.allowCredentials = idList;
+                console.log('List getAssertionChallenge', getAssertionChallenge)
+
+                navigator.credentials.get({
+                        'publicKey': getAssertionChallenge
+                    })
+                    .then((newCredentialInfo) => {
+
+                        console.log('SUCCESS', newCredentialInfo)
+                        console.log("Sign", newCredentialInfo.response.signature)
+                        const sign = newCredentialInfo.response.signature;
+                        showSignMessage(sign);
+                    })
+                    .catch((error) => {
+                        alert(error)
+                        console.log('FAIL', error)
+                    })
+
+            });
+        })
+               
         document.getElementById('android-ckalabel-getassertion').addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -1385,599 +1977,7 @@
 
             });
         })
-        
-        document.getElementById('sign-index-safari').addEventListener('submit', function (event) {
-            event.preventDefault();
-
-
-            let certIndex = document.getElementById('use-index-safari').certIndex.value;
-            //let userpin = document.getElementById('safari-pin-index').pin.value;
-            console.log('use-index-safari', certIndex);
-
-
-            var challenge = new Uint8Array(32);
-            window.crypto.getRandomValues(challenge);
-            var local_privateKey;
-            var local_privateKey;
-            var externalECPublicKey;
-            var exportECPublicKeyArray;
-            var pinEncKey;
-            var EncryptedPINArray;
-            var userpin;
-            //Prepare PKI commmand
-            //Header
-            var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-            var pki_header = new Uint8Array(3);
-
-            //PKI Command
-            var command_bufer = new Uint8Array(5);
-            command_bufer[0] = 0xDF;
-            command_bufer[1] = 0x02;
-            command_bufer[2] = 0x00
-            command_bufer[3] = 0x01;
-            command_bufer[4] = certIndex;
-
-            var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_bufer.byteLength);
-            var pki_payload_length = command_bufer.byteLength;
-            pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-            pki_header[0] = 0xE1;
-            pki_header[1] = pki_payload_length >> 8
-            pki_header[2] = pki_payload_length;
-            pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-            pki_buffer.set(new Uint8Array(command_bufer), 3 + gtheaderbuffer.byteLength);
-
-            console.log(bufToHex(pki_buffer));
-
-            var safari_readecdh = {
-                'challenge': challenge,
-
-                'rp': {
-                    'name': 'GoTrustID Inc.',
-                },
-
-                'user': {
-                    'id': pki_buffer,
-                    'name': 'alice@example.com',
-                    'displayName': 'Alice von Wunderland'
-                },
-
-                "authenticatorSelection": {
-                    "userVerification": "discouraged",
-                    "requireResidentKey": false,
-                    "authenticatorAttachment": "cross-platform"
-
-                },
-                'attestation': "direct",
-                'pubKeyCredParams': [{
-                        'type': 'public-key',
-                        'alg': -7
-                    },
-                    {
-                        'type': 'public-key',
-                        'alg': -257
-                    }
-                ]
-            }
-            console.log('Get ECDH Key', safari_readecdh);
-
-            navigator.credentials.create({
-                'publicKey': safari_readecdh
-            }).then((newCredentialInfo) => {
-
-                userpin = prompt("Input your PIN", "");
-                if (userpin == null) {
-                    return;
-                }
-                console.log('safari-pin-index', userpin);
-
-                let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
-                let authData = parseAuthData(attestationObject.authData);
-                var publicKEy = CBOR.decode(authData.COSEPublicKey.buffer);
-                console.log('X point: ', bufToHex(Object.values(publicKEy)[3]));
-                console.log('Y point: ', bufToHex(Object.values(publicKEy)[4]));
-
-                var externalECPublicKeyX = base64EncodeURL(Object.values(publicKEy)[3]);
-                var externalECPublicKeyY = base64EncodeURL(Object.values(publicKEy)[4]);
-                console.log("externalECPublicKeyX ", externalECPublicKeyX);
-                console.log("externalECPublicKeyY", externalECPublicKeyY);
-                return window.crypto.subtle.importKey(
-                    "jwk", //can be "jwk" (public or private), "raw" (public only), "spki" (public only), or "pkcs8" (private only)
-                    { //this is an example jwk key, other key types are Uint8Array objects
-                        kty: "EC",
-                        crv: "P-256",
-                        x: externalECPublicKeyX,
-                        y: externalECPublicKeyY,
-                        ext: true,
-                    }, { //these are the algorithm options
-                        name: "ECDH",
-                        namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
-                    },
-                    true, //whether the key is extractable (i.e. can be used in exportKey)
-                    [] //"deriveKey" and/or "deriveBits" for private keys only (just put an empty list if importing a public key)
-                );
-
-            }).then(function (external_public) {
-                //returns a privateKey (or publicKey if you are importing a public key)
-                externalECPublicKey = external_public;
-                console.log("external_public", externalECPublicKey);
-                return window.crypto.subtle.generateKey({
-                        name: "ECDH",
-                        namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
-                    },
-                    true, //whether the key is extractable (i.e. can be used in exportKey)
-                    ["deriveKey",
-                        "deriveBits"
-                    ] //can be any combination of "deriveKey" and "deriveBits"
-                );
-            }).then(function (key) { //generate ecdh pair
-
-                local_publicKey = key.publicKey;
-                local_privateKey = key.privateKey;
-
-
-                window.crypto.subtle.exportKey("raw", local_publicKey).then(
-                    function (keydata) {
-                        exportECPublicKeyArray = keydata;
-                        console.log("exportECPublicKeyArray", bufToHex(exportECPublicKeyArray));
-                    }
-                );
-
-
-                return window.crypto.subtle.deriveBits({
-                        name: "ECDH",
-                        namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
-                        public: externalECPublicKey, //an ECDH public key from generateKey or importKey
-
-                    },
-                    local_privateKey, //from generateKey or importKey above
-                    256 //the number of bits you want to derive
-                );
-
-            }).then(function (keybits) { //convert share secret to pinEncKey
-                return crypto.subtle.digest(
-                    "SHA-256",
-                    new Uint8Array(keybits)
-                );
-            }).then(function (pinEncKeyBytes) {
-                console.log("pinEncKeyBytes", bufToHex(pinEncKeyBytes));
-                return crypto.subtle.importKey("raw",
-                    pinEncKeyBytes,
-                    "aes-cbc", false, ["encrypt"]);
-
-            }).then(function (importKey) {
-                pinEncKey = importKey;
-                console.log("pinEncKey ", pinEncKey);
-                const encoder = new TextEncoder();
-                const data = encoder.encode(userpin);
-                return crypto.subtle.digest(
-                    "SHA-256",
-                    data);
-            }).then(function (userpin_digestBytes) {
-                console.log("userpin_digestBytes", bufToHex(userpin_digestBytes.slice(0, 16)));
-                var iv = new Uint8Array(16);
-                console.log("iv .... ", iv);
-
-                return crypto.subtle.encrypt({
-                    name: "aes-cbc",
-                    iv
-                }, pinEncKey, userpin_digestBytes.slice(0, 16));
-            }).then(function (cipherPIN) { // start get assertion
-
-                EncryptedPINArray = cipherPIN.slice(0, 16);
-
-                console.log("EncryptedPINArray", bufToHex(EncryptedPINArray.slice(0, 16)));
-                var enc = new TextEncoder();
-                var pki_buffer = [];
-                var challenge = new Uint8Array(32);
-                window.crypto.getRandomValues(challenge);
-                var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-
-
-                var pki_buffer = [];
-                var challenge = new Uint8Array(32);
-                window.crypto.getRandomValues(challenge);
-                var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-                var pki_header = new Uint8Array(3);
-
-                //PKI Command
-                var command_buf = new Uint8Array(5);
-                command_buf[0] = 0xDF;
-                command_buf[1] = 0x02;
-                command_buf[2] = 0x00;
-                command_buf[3] = 0x01;
-                command_buf[4] = certIndex;
-
-                var alg_buf = new Uint8Array(5);
-                alg_buf[0] = 0xDF;
-                alg_buf[1] = 0x03;
-                alg_buf[2] = 0x00;
-                alg_buf[3] = 0x01;
-                alg_buf[4] = 0x02;
-
-
-                var ecpubkey_buf = new Uint8Array(4 + exportECPublicKeyArray.byteLength);
-                ecpubkey_buf[0] = 0xDF;
-                ecpubkey_buf[1] = 0x04;
-                ecpubkey_buf[2] = exportECPublicKeyArray.byteLength >> 8;
-                ecpubkey_buf[3] = exportECPublicKeyArray.byteLength;
-                ecpubkey_buf.set(new Uint8Array(exportECPublicKeyArray), 4);
-
-
-                var encryptedPIN_buf = new Uint8Array(4 + EncryptedPINArray.byteLength);
-                encryptedPIN_buf[0] = 0xDF;
-                encryptedPIN_buf[1] = 0x05;
-                encryptedPIN_buf[2] = EncryptedPINArray.byteLength >> 8;
-                encryptedPIN_buf[3] = EncryptedPINArray.byteLength;
-                encryptedPIN_buf.set(new Uint8Array(EncryptedPINArray), 4);
-
-                var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
-                var signDataBuf = new Uint8Array(4 + signDataPayload.byteLength);
-                signDataBuf[0] = 0xDF;
-                signDataBuf[1] = 0x06;
-                signDataBuf[2] = signDataPayload.length >> 8;
-                signDataBuf[3] = signDataPayload.length;
-                signDataBuf.set(signDataPayload, 4);
-
-
-
-                var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_buf.byteLength +
-                    alg_buf
-                    .byteLength + ecpubkey_buf.byteLength + encryptedPIN_buf.byteLength +
-                    signDataBuf.byteLength);
-                var pki_payload_length = command_buf.byteLength + alg_buf.byteLength + ecpubkey_buf
-                    .byteLength + encryptedPIN_buf.byteLength + signDataBuf.byteLength;
-                pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-                pki_header[0] = 0xE5;
-                pki_header[1] = pki_payload_length >> 8
-                pki_header[2] = pki_payload_length;
-                pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-                pki_buffer.set(new Uint8Array(command_buf), gtheaderbuffer.byteLength + 3);
-                pki_buffer.set(new Uint8Array(alg_buf), gtheaderbuffer.byteLength + 3 + command_buf
-                    .byteLength);
-                pki_buffer.set(new Uint8Array(ecpubkey_buf), gtheaderbuffer.byteLength + 3 + command_buf
-                    .byteLength + alg_buf.byteLength);
-                pki_buffer.set(new Uint8Array(encryptedPIN_buf), gtheaderbuffer.byteLength + 3 +
-                    command_buf.byteLength + alg_buf.byteLength + ecpubkey_buf.byteLength);
-                pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + command_buf
-                    .byteLength + alg_buf.byteLength + ecpubkey_buf.byteLength + encryptedPIN_buf
-                    .byteLength);
-
-                console.log("sign-index-safari: " + bufToHex(pki_buffer));
-
-                var getAssertionChallenge = {
-                    'challenge': challenge,
-                    "userVerification": "discouraged"
-                }
-                var idList = [{
-                    id: pki_buffer,
-                    transports: ["usb", "nfc"],
-                    type: "public-key"
-                }];
-
-                getAssertionChallenge.allowCredentials = idList;
-                console.log('List getAssertionChallenge', getAssertionChallenge);
-
-                navigator.credentials.get({
-                        'publicKey': getAssertionChallenge
-                    })
-                    .then((newCredentialInfo) => {
-                        //alert('Sign finished');
-                        console.log("SUCCESS: " + bufToHex(newCredentialInfo));
-                        console.log("Sign: " + bufToHex(newCredentialInfo.response.signature));
-                        const sign = newCredentialInfo.response.signature;
-                        showSignMessage(sign);
-
-                    })
-                    .catch((error) => {
-                        alert(error)
-                        console.log('FAIL', error)
-                    })
-
-            });
-        })
-        
-        document.getElementById('sign-ckalabel-safari').addEventListener('submit', function (event) {
-            event.preventDefault();
-
-
-            let ckaLabel = document.getElementById('use-label-safari').ckaLabel.value;
-            //let userpin = document.getElementById('safari-pin-label').pin.value;
-
-
-            console.log('use-label-safari', ckaLabel);
-
-
-            var local_privateKey;
-            var local_privateKey;
-            var externalECPublicKey;
-            var exportECPublicKeyArray;
-            var pinEncKey;
-            var EncryptedPINArray;
-            var userpin;
-            var challenge = new Uint8Array(32);
-            window.crypto.getRandomValues(challenge);
-
-
-            var pki_header = new Uint8Array(3);
-            var command_bufer = new Uint8Array(ckaLabel.length + 4);
-            window.crypto.getRandomValues(command_bufer);
-            command_bufer[0] = 0xDF
-            command_bufer[1] = 0x01;
-            command_bufer[2] = ckaLabel.length >> 8;
-            command_bufer[3] = ckaLabel.length;
-            command_bufer.set(toUTF8Array(ckaLabel), 4);
-
-
-            var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-            var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + pki_header.byteLength + command_bufer
-                .byteLength);
-            var pki_payload_length = command_bufer.byteLength;
-
-            pki_header[0] = 0xE0;
-            pki_header[1] = pki_payload_length >> 8
-            pki_header[2] = pki_payload_length;
-
-            pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-            pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-            pki_buffer.set(new Uint8Array(command_bufer), gtheaderbuffer.byteLength + pki_header.byteLength);
-
-            console.log(bufToHex(pki_buffer));
-
-            var safari_readecdh = {
-                'challenge': challenge,
-
-                'rp': {
-                    'name': 'GoTrustID Inc.',
-                },
-
-                'user': {
-                    'id': pki_buffer,
-                    'name': 'alice@example.com',
-                    'displayName': 'Alice von Wunderland'
-                },
-
-                "authenticatorSelection": {
-                    "userVerification": "discouraged",
-                    "requireResidentKey": false,
-                    "authenticatorAttachment": "cross-platform"
-
-                },
-                'attestation': "direct",
-                'pubKeyCredParams': [{
-                        'type': 'public-key',
-                        'alg': -7
-                    },
-                    {
-                        'type': 'public-key',
-                        'alg': -257
-                    }
-                ]
-            }
-            console.log('Get ECDH Key', safari_readecdh);
-
-            navigator.credentials.create({
-                'publicKey': safari_readecdh
-            }).then((newCredentialInfo) => {
-
-
-                userpin = prompt("Input your PIN", "");
-                if (userpin == null) {
-                    return;
-                }
-                console.log('safari-pin-label', userpin);
-
-                let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
-                let authData = parseAuthData(attestationObject.authData);
-                var publicKEy = CBOR.decode(authData.COSEPublicKey.buffer);
-                console.log('X point: ', bufToHex(Object.values(publicKEy)[3]));
-                console.log('Y point: ', bufToHex(Object.values(publicKEy)[4]));
-
-                var externalECPublicKeyX = base64EncodeURL(Object.values(publicKEy)[3]);
-                var externalECPublicKeyY = base64EncodeURL(Object.values(publicKEy)[4]);
-                console.log("externalECPublicKeyX ", externalECPublicKeyX);
-                console.log("externalECPublicKeyY", externalECPublicKeyY);
-
-
-                return window.crypto.subtle.importKey(
-                    "jwk", //can be "jwk" (public or private), "raw" (public only), "spki" (public only), or "pkcs8" (private only)
-                    { //this is an example jwk key, other key types are Uint8Array objects
-                        kty: "EC",
-                        crv: "P-256",
-                        x: externalECPublicKeyX,
-                        y: externalECPublicKeyY,
-                        ext: true,
-                    }, { //these are the algorithm options
-                        name: "ECDH",
-                        namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
-                    },
-                    true, //whether the key is extractable (i.e. can be used in exportKey)
-                    [] //"deriveKey" and/or "deriveBits" for private keys only (just put an empty list if importing a public key)
-                );
-
-            }).then(function (external_public) {
-                //returns a privateKey (or publicKey if you are importing a public key)
-                externalECPublicKey = external_public;
-                console.log("external_public", externalECPublicKey);
-                return window.crypto.subtle.generateKey({
-                        name: "ECDH",
-                        namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
-                    },
-                    true, //whether the key is extractable (i.e. can be used in exportKey)
-                    ["deriveKey",
-                        "deriveBits"
-                    ] //can be any combination of "deriveKey" and "deriveBits"
-                );
-            }).then(function (key) { //generate ecdh pair
-
-                local_publicKey = key.publicKey;
-                local_privateKey = key.privateKey;
-
-
-                window.crypto.subtle.exportKey("raw", local_publicKey).then(
-                    function (keydata) {
-                        exportECPublicKeyArray = keydata;
-                        console.log("exportECPublicKeyArray", bufToHex(exportECPublicKeyArray));
-                    }
-                );
-
-
-                return window.crypto.subtle.deriveBits({
-                        name: "ECDH",
-                        namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
-                        public: externalECPublicKey, //an ECDH public key from generateKey or importKey
-
-                    },
-                    local_privateKey, //from generateKey or importKey above
-                    256 //the number of bits you want to derive
-                );
-
-            }).then(function (keybits) { //convert share secret to pinEncKey
-                return crypto.subtle.digest(
-                    "SHA-256",
-                    new Uint8Array(keybits)
-                );
-            }).then(function (pinEncKeyBytes) {
-                console.log("pinEncKeyBytes", bufToHex(pinEncKeyBytes));
-                return crypto.subtle.importKey("raw",
-                    pinEncKeyBytes,
-                    "aes-cbc", false, ["encrypt"]);
-
-            }).then(function (importKey) {
-                pinEncKey = importKey;
-                console.log("pinEncKey ", pinEncKey);
-                const encoder = new TextEncoder();
-                const data = encoder.encode(userpin);
-                return crypto.subtle.digest(
-                    "SHA-256",
-                    data);
-            }).then(function (userpin_digestBytes) {
-                console.log("userpin_digestBytes", bufToHex(userpin_digestBytes.slice(0, 16)));
-                var iv = new Uint8Array(16);
-                console.log("iv .... ", iv);
-
-                return crypto.subtle.encrypt({
-                    name: "aes-cbc",
-                    iv
-                }, pinEncKey, userpin_digestBytes.slice(0, 16));
-            }).then(function (cipherPIN) { // start get assertion
-
-                EncryptedPINArray = cipherPIN.slice(0, 16);
-
-                console.log("EncryptedPINArray", bufToHex(EncryptedPINArray.slice(0, 16)));
-                var enc = new TextEncoder();
-                var pki_buffer = [];
-                var challenge = new Uint8Array(32);
-                window.crypto.getRandomValues(challenge);
-                var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-
-
-                var pki_buffer = [];
-                var challenge = new Uint8Array(32);
-                window.crypto.getRandomValues(challenge);
-                var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-                var pki_header = new Uint8Array(3);
-
-                //PKI Command
-                var command_buf = new Uint8Array(ckaLabel.length + 4);
-                command_buf[0] = 0xDF
-                command_buf[1] = 0x01;
-                command_buf[2] = ckaLabel.length >> 8;
-                command_buf[3] = ckaLabel.length;
-                command_buf.set(toUTF8Array(ckaLabel), 4);
-
-
-
-                var alg_buf = new Uint8Array(5);
-                alg_buf[0] = 0xDF;
-                alg_buf[1] = 0x03;
-                alg_buf[2] = 0;
-                alg_buf[3] = 1;
-                alg_buf[4] = 0x02;
-
-
-                var ecpubkey_buf = new Uint8Array(4 + exportECPublicKeyArray.byteLength);
-                ecpubkey_buf[0] = 0xDF;
-                ecpubkey_buf[1] = 0x04;
-                ecpubkey_buf[2] = exportECPublicKeyArray.byteLength >> 8;
-                ecpubkey_buf[3] = exportECPublicKeyArray.byteLength;
-                ecpubkey_buf.set(new Uint8Array(exportECPublicKeyArray), 4);
-
-
-                var encryptedPIN_buf = new Uint8Array(4 + EncryptedPINArray.byteLength);
-                encryptedPIN_buf[0] = 0xDF;
-                encryptedPIN_buf[1] = 0x05;
-                encryptedPIN_buf[2] = EncryptedPINArray.byteLength >> 8;
-                encryptedPIN_buf[3] = EncryptedPINArray.byteLength;
-                encryptedPIN_buf.set(new Uint8Array(EncryptedPINArray), 4);
-
-                var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
-                var signDataBuf = new Uint8Array(4 + signDataPayload.byteLength);
-                signDataBuf[0] = 0xDF;
-                signDataBuf[1] = 0x06;
-                signDataBuf[2] = signDataPayload.length >> 8;
-                signDataBuf[3] = signDataPayload.length;
-                signDataBuf.set(signDataPayload, 4);
-
-
-
-                var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_buf.byteLength +
-                    alg_buf.byteLength + ecpubkey_buf.byteLength + encryptedPIN_buf.byteLength +
-                    signDataBuf.byteLength);
-                var pki_payload_length = command_buf.byteLength + alg_buf.byteLength + ecpubkey_buf
-                    .byteLength + encryptedPIN_buf.byteLength + signDataBuf.byteLength;
-                pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-                pki_header[0] = 0xE5;
-                pki_header[1] = pki_payload_length >> 8
-                pki_header[2] = pki_payload_length;
-                pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-                pki_buffer.set(new Uint8Array(command_buf), gtheaderbuffer.byteLength + 3);
-                pki_buffer.set(new Uint8Array(alg_buf), gtheaderbuffer.byteLength + 3 + command_buf
-                    .byteLength);
-                pki_buffer.set(new Uint8Array(ecpubkey_buf), gtheaderbuffer.byteLength + 3 + command_buf
-                    .byteLength + alg_buf.byteLength);
-                pki_buffer.set(new Uint8Array(encryptedPIN_buf), gtheaderbuffer.byteLength + 3 +
-                    command_buf.byteLength + alg_buf.byteLength + ecpubkey_buf.byteLength);
-                pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + command_buf
-                    .byteLength + alg_buf.byteLength + ecpubkey_buf.byteLength + encryptedPIN_buf
-                    .byteLength);
-
-                console.log("sign-ckalabel-safari: " + bufToHex(pki_buffer));
-
-                var getAssertionChallenge = {
-                    'challenge': challenge,
-                    "userVerification": "discouraged"
-                }
-                var idList = [{
-                    id: pki_buffer,
-                    transports: ["usb", "nfc"],
-                    type: "public-key"
-                }];
-
-                getAssertionChallenge.allowCredentials = idList;
-                console.log('List getAssertionChallenge', getAssertionChallenge)
-
-                navigator.credentials.get({
-                        'publicKey': getAssertionChallenge
-                    })
-                    .then((newCredentialInfo) => {
-
-                        console.log('SUCCESS', newCredentialInfo)
-                        console.log("Sign", newCredentialInfo.response.signature)
-                        const sign = newCredentialInfo.response.signature;
-                        showSignMessage(sign);
-                    })
-                    .catch((error) => {
-                        alert(error)
-                        console.log('FAIL', error)
-                    })
-
-            });
-        })
-        
+         
         document.getElementById('btn_gen_rsakeypair').addEventListener('submit', function (event) {
 
             event.preventDefault();
