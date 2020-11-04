@@ -5,9 +5,9 @@
 var g_encryptedPIN;
 var g_platformECpublickey;
 
-const ALG_RSA2048SHA256;
-const ALG_RSA2048SHA256_PreHash;
-const ALG_RSA2048
+// const ALG_RSA2048SHA256;
+// const ALG_RSA2048SHA256_PreHash;
+// const ALG_RSA2048
 
 /**
  *  Return  a list of certificate that stored on token
