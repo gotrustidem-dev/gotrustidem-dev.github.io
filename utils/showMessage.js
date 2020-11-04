@@ -46,6 +46,7 @@ const CTAP2_ERR_VENDOR_FIRST            = 0xF0;    //Vendor specific error.
 const CTAP2_ERR_VENDOR_LAST             = 0xFF;//Vendor specific error.
 
 
+const ErrorMsg_OK   = "No ERROR";
 const ErrorMsg_PIN_INVALID   = "PIN invalid.";
 const ErrorMsg_PIN_BLOCKED   = "PIN blocked.";
 const ErrorMsg_PIN_REQUIRED  = "The request has to verify PIN.";
@@ -153,6 +154,10 @@ var showSignMessage = (buffer) => {
                  
                 errorMsg = "Command error!";
                 break;
+            case CTAP1_ERR_SUCCESS:
+                 
+                errorMsg = ErrorMsg_OK;
+                break;    
             default:
                 errorMsg = ErrorMsg_UNKNOW+ status;
         }

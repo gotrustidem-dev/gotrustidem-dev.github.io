@@ -5,6 +5,9 @@
 var g_encryptedPIN;
 var g_platformECpublickey;
 
+const ALG_RSA2048SHA256;
+const ALG_RSA2048SHA256_PreHash;
+const ALG_RSA2048
 
 /**
  *  Return  a list of certificate that stored on token
@@ -712,6 +715,11 @@ async function SignDataByIndex(index, alg_number, plain) {
     console.log("SignDataByIndex", bufToHex(pki_buffer));
     var getAssertionChallenge = {
         'challenge': challenge,
+        "authenticatorSelection": {
+            "userVerification": "discouraged",
+            "authenticatorAttachment": "cross-platform"
+
+        },
     }
     var idList = [{
         id: pki_buffer,
