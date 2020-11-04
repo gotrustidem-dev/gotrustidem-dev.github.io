@@ -69,11 +69,11 @@ async function requestSignDataByKEYHANDLE(keyhandle, alg_num, plaintext) {
     alg_buf[3] = 1;
     alg_buf[4] = alg_num;
 
-    var signDataBuf = new Uint8Array(4 + signDataPayload.length);
+    var signDataBuf = new Uint8Array(4 + signDataPayload.byteLength);
     signDataBuf[0] = 0xDF;
     signDataBuf[1] = 0x06;
-    signDataBuf[2] = signDataPayload.length >> 8;
-    signDataBuf[3] = signDataPayload.length;
+    signDataBuf[2] = signDataPayload.byteLength >> 8;
+    signDataBuf[3] = signDataPayload.byteLength;
     signDataBuf.set(signDataPayload, 4);
 
 
