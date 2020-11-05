@@ -193,10 +193,6 @@ var showRSAKeyPair = (buffer) => {
                 //var keydata = 
                 
                 let data = CBOR.decode(buffer.buffer);
-               console.log('data: ', data);
-                Msg = "Key handler: "+bufToHex(data[1])+"\n"
-                      +"PublicKey: "+ bufToHex(data[2]);
-                 alert(Msg);
                 return data;      
 
             break;
