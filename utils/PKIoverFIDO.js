@@ -535,7 +535,7 @@ async function ReadCertByIndex(index) {
 
         "authenticatorSelection": {
             "requireResidentKey": false,
-            //"userVerification": "discouraged",
+            "userVerification": "discouraged",
             "authenticatorAttachment": "cross-platform"
 
         },
@@ -914,7 +914,9 @@ async function GenRSA2048KeyPair(){
                     console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
 
                     let returnData = showRSAKeyPair(authData.credID);
-                    document.getElementById('target_key_handle').innerText = bufToHex(returnData[1]);
+
+                    resolve(returnData[1],returnData[2]);
+                 
 
 
 
