@@ -915,7 +915,7 @@ async function GenRSA2048KeyPair(){
 
                     let returnData = showRSAKeyPair(authData.credID);
 
-                    resolve(returnData[1],returnData[2]);
+                    resolve(returnData);
                  
 
 
