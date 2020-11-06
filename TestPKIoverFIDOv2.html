@@ -2070,13 +2070,13 @@
             //         alert(error)
             //         console.log('FAIL', error)
             //     })
-            GenRSA2048KeyPair().then((keyHandle, publickey)=>{
+            GenRSA2048KeyPair().then((value)=>{
 
 
-            Msg = "Key handler: "+bufToHex(keyHandle)+"\n"
-                  +"PublicKey: "+ bufToHex(publickey);
+            Msg = "Key handler: "+bufToHex(value[1])+"\n"
+                  +"PublicKey: "+ bufToHex(value[2]);
             alert(Msg);
-            document.getElementById('target_key_handle').innerText = bufToHex(keyHandle);
+            document.getElementById('target_key_handle').innerText = bufToHex(value[1]);
 
             });
         });
