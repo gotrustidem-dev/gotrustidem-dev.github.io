@@ -914,7 +914,7 @@ async function GenRSA2048KeyPair(){
 async function ImportCertificate(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf){
 
     console.log('key_handle', bufToHex(keyHandleBuf));
-    console.log('key_id', bufToHex(KeyID));
+    console.log('key_id', bufToHex(KeyIDBuf));
     console.log('hexCert', bufToHex(ImportedHexCertBuf));
 
     var pki_buffer = [];
