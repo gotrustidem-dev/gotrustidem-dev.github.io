@@ -35,8 +35,8 @@
         })(document);
     </script>
     <script src="https://gotrustidem-dev.github.io/library/jquery.min.js"></script>
-    <script src="https://gotrustidem-dev.github.io/library/bootstrap.min.js" integrity="sha256-Tz+u7EaSlLYQ9sqCqhzCszaP1WYRsxxVHC7iJP6ttBE="
-        crossorigin="anonymous"></script>
+    <script src="https://gotrustidem-dev.github.io/library/bootstrap.min.js"
+        integrity="sha256-Tz+u7EaSlLYQ9sqCqhzCszaP1WYRsxxVHC7iJP6ttBE=" crossorigin="anonymous"></script>
     <script async="" src="https://gotrustidem-dev.github.io/library/bundle.js"></script>
     <script>
         function displayCert(strCertificate) {
@@ -199,7 +199,8 @@
                                                 onsubmit="return false">
                                                 <p>
                                                     <label id="key_id_value">Key ID:</label><br>
-                                                    <input type="text" id="target_key_id" style="width: 342px; height:41px">
+                                                    <input type="text" id="target_key_id"
+                                                        style="width: 342px; height:41px">
                                                     <!--<label id="target_key_id">ffbbccddeeaa99887766554433221100</label>-->
                                                 </p>
                                                 <button class="btn btn-primary" action="submit"
@@ -459,28 +460,31 @@
         var testCertificate =
             'MIIDHjCCAgagAwIBAgIEG0BT9zANBgkqhkiG9w0BAQsFADAuMSwwKgYDVQQDEyNZdWJpY28gVTJGIFJvb3QgQ0EgU2VyaWFsIDQ1NzIwMDYzMTAgFw0xNDA4MDEwMDAwMDBaGA8yMDUwMDkwNDAwMDAwMFowLjEsMCoGA1UEAxMjWXViaWNvIFUyRiBSb290IENBIFNlcmlhbCA0NTcyMDA2MzEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC/jwYuhBVlqaiYWEMsrWFisgJ+PtM91eSrpI4TK7U53mwCIawSDHy8vUmk5N2KAj9abvT9NP5SMS1hQi3usxoYGonXQgfO6ZXyUA9a+KAkqdFnBnlyugSeCOep8EdZFfsaRFtMjkwz5Gcz2Py4vIYvCdMHPtwaz0bVuzneueIEz6TnQjE63Rdt2zbwnebwTG5ZybeWSwbzy+BJ34ZHcUhPAY89yJQXuE0IzMZFcEBbPNRbWECRKgjq//qT9nmDOFVlSRCt2wiqPSzluwn+v+suQEBsUjTGMEd25tKXXTkNW21wIWbxeSyUoTXwLvGS6xlwQSgNpk2qXYwf8iXg7VWZAgMBAAGjQjBAMB0GA1UdDgQWBBQgIvz0bNGJhjgpToksyKpP9xv9oDAPBgNVHRMECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjANBgkqhkiG9w0BAQsFAAOCAQEAjvjuOMDSa+JXFCLyBKsycXtBVZsJ4Ue3LbaEsPY4MYN/hIQ5ZM5p7EjfcnMG4CtYkNsfNHc0AhBLdq45rnT87q/6O3vUEtNMafbhU6kthX7Y+9XFN9NpmYxr+ekVY5xOxi8h9JDIgoMP4VB1uS0aunL1IGqrNooL9mmFnL2kLVVee6/VR6C5+KSTCMCWppMuJIZII2v9o4dkoZ8Y7QRjQlLfYzd3qGtKbw7xaF1UsG/5xUb/Btwb2X2g4InpiB/yt/3CpQXpiWX/K4mBvUKiGn05ZsqeY1gx4g0xLBqcU9psmyPzK+Vsgw2jeRQ5JlKDyqE0hebfC1tvFu0CCrJFcw==';
 
+        var testBigCertificate =
+            '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';
+
         document.getElementById('find-index').addEventListener('submit', function (event) {
             event.preventDefault();
             let certIndex = document.getElementById('use-index').certIndex.value;
-            ReadCertByIndex(certIndex).then((value)=>{
+            ReadCertByIndex(certIndex).then((value) => {
 
                 var strCert = "-----BEGIN CERTIFICATE-----\n" +
-                        btoa(String.fromCharCode.apply(null, value)) +
-                        "\n-----END CERTIFICATE-----"
+                    btoa(String.fromCharCode.apply(null, value)) +
+                    "\n-----END CERTIFICATE-----"
 
-                    console.log('Certificatie : \n', strCert)
-                    displayCert(strCert)
+                console.log('Certificatie : \n', strCert)
+                displayCert(strCert)
 
 
             });
         })
-   
+
         document.getElementById('search-ckalabel').addEventListener('submit', function (event) {
             event.preventDefault();
             let ckaLabel = document.getElementById('use-label').ckaLabel.value;
-            ReadCertByLable(ckaLabel).then((value)=>{
+            ReadCertByLable(ckaLabel).then((value) => {
 
-            var strCert = "-----BEGIN CERTIFICATE-----\n" +
+                var strCert = "-----BEGIN CERTIFICATE-----\n" +
                     btoa(String.fromCharCode.apply(null, value)) +
                     "\n-----END CERTIFICATE-----"
                 console.log('Certificatie : \n', strCert)
@@ -488,12 +492,12 @@
             });
 
         })
- 
+
         document.getElementById('sign-byindex').addEventListener('submit', function (event) {
             event.preventDefault();
             var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
             let certIndex = document.getElementById('use-index').certIndex.value;
-            SignDataByIndex(certIndex,0x02,signDataPayload).then((value)=>{
+            SignDataByIndex(certIndex, 0x02, signDataPayload).then((value) => {
 
                 showSignMessage(value);
 
@@ -507,13 +511,10 @@
             event.preventDefault();
             var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
             let ckaLabel = document.getElementById('use-label').ckaLabel.value;
-            SignDataByLabel(ckaLabel,0x02,signDataPayload).then((value)=>{
+            SignDataByLabel(ckaLabel, 0x02, signDataPayload).then((value) => {
                 showSignMessage(value);
             });
         })
-       
- 
-
 
         document.getElementById('search-ckalabel-safari').addEventListener('submit', function (event) {
             event.preventDefault();
@@ -620,24 +621,23 @@
                     console.log('FAIL', error)
                 })
         })
-        
+
         document.getElementById('find-index-safari').addEventListener('submit', function (event) {
             event.preventDefault();
 
             let certIndex = document.getElementById('use-index-safari').certIndex.value;
-            ReadCertByIndex(certIndex).then((value)=>{
+            ReadCertByIndex(certIndex).then((value) => {
 
                 var strCert = "-----BEGIN CERTIFICATE-----\n" +
-                        btoa(value) +
-                        "\n-----END CERTIFICATE-----"
+                    btoa(value) +
+                    "\n-----END CERTIFICATE-----"
 
-                    console.log('Certificatie : \n', strCert)
-                    displayCert(strCert)
+                console.log('Certificatie : \n', strCert)
+                displayCert(strCert)
 
 
             });
         })
-
 
         document.getElementById('sign-index-safari').addEventListener('submit', function (event) {
             event.preventDefault();
@@ -930,7 +930,7 @@
 
             });
         })
-        
+
         document.getElementById('sign-ckalabel-safari').addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -1230,7 +1230,7 @@
 
             });
         })
-               
+
         document.getElementById('android-ckalabel-getassertion').addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -1598,7 +1598,7 @@
 
             });
         })
-        
+
         document.getElementById('android-index-getassertion').addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -1977,110 +1977,19 @@
 
             });
         })
-         
+
         document.getElementById('btn_gen_rsakeypair').addEventListener('submit', function (event) {
 
             event.preventDefault();
-            // var pki_buffer = [];
-            // let certIndex = document.getElementById('use-index').certIndex.value;
-
-            // var challenge = new Uint8Array(32);
-            // window.crypto.getRandomValues(challenge);
-
-            // //Prepare PKI commmand
-            // //Header
-            // var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-            // var pki_header = new Uint8Array(3);
-
-            // //PKI Command
-            // var command_bufer = new Uint8Array(5);
-            // command_bufer[0] = 0xDF;
-            // command_bufer[1] = 0x16;
-            // command_bufer[2] = 0x0;
-            // command_bufer[3] = 0x01;
-            // command_bufer[4] = 0x02;
-
-            // var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_bufer.byteLength);
-            // var pki_payload_length = command_bufer.byteLength;
-            // pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-            // pki_header[0] = 0xE6;
-            // pki_header[1] = pki_payload_length >> 8
-            // pki_header[2] = pki_payload_length;
-            // pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-            // pki_buffer.set(new Uint8Array(command_bufer), 3 + gtheaderbuffer.byteLength);
-
-            // console.log(bufToHex(pki_buffer));
-
-            // var publicKey1 = {
-            //     'challenge': challenge,
-
-            //     'rp': {
-            //         'name': 'GoTrustID Inc.',
-            //     },
-
-            //     'user': {
-            //         'id': pki_buffer,
-            //         'name': 'Get Cert By Index',
-            //         'displayName': 'Get Cert By Index'
-            //     },
-
-            //     "authenticatorSelection": {
-            //         "requireResidentKey": false,
-            //         "authenticatorAttachment": "cross-platform"
-
-            //     },
-            //     'attestation': "none",
-            //     'pubKeyCredParams': [{
-            //             'type': 'public-key',
-            //             'alg': -7
-            //         },
-            //         {
-            //             'type': 'public-key',
-            //             'alg': -257
-            //         }
-            //     ]
-            // }
-            // console.log('Gen RSA Key Pair:', publicKey1)
-
-
-            // navigator.credentials.create({
-            //         'publicKey': publicKey1
-            //     })
-            //     .then((newCredentialInfo) => {
-
-            //         console.log('SUCCESS', newCredentialInfo)
-            //         console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response
-            //             .clientDataJSON))
-            //         let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
-            //         console.log('AttestationObject: ', attestationObject)
-            //         let authData = parseAuthData(attestationObject.authData);
-            //         console.log('AuthData: ', authData);
-            //         console.log('CredID: ', bufToHex(authData.credID));
-            //         console.log('AAGUID: ', bufToHex(authData.aaguid));
-            //         console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
-
-            //         let returnData = showRSAKeyPair(authData.credID);
-            //         document.getElementById('target_key_handle').innerText = bufToHex(returnData[1]);
-
-
-
-            //     })
-            //     .catch((error) => {
-            //         alert(error)
-            //         console.log('FAIL', error)
-            //     })
-            GenRSA2048KeyPair().then((value)=>{
-
-
-            Msg = "Key handler: "+bufToHex(value[1])+"\n"
-                  +"PublicKey: "+ bufToHex(value[2]);
-            alert(Msg);
-            document.getElementById('target_key_handle').innerText = bufToHex(value[1]);
+            GenRSA2048KeyPair().then((value) => {
+                Msg = "Key handler: " + bufToHex(value[1]) + "\n" +
+                    "PublicKey: " + bufToHex(value[2]);
+                alert(Msg);
+                document.getElementById('target_key_handle').innerText = bufToHex(value[1]);
 
             });
         });
-        
+
         document.getElementById('btn_sign_csr').addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -2091,38 +2000,8 @@
 
             let testSignCSR = Uint8Array.from(window.atob(signShortData), c => c.charCodeAt(0));
             console.log('testSignCSR', testSignCSR);
-
-
-
-            //  let signCRS = new Promise( requirePINVerify(resolve,reject));
-
-            // requirePINVerify().then((value) => {
-
-            //     var EncryptedPINArray = value[0];
-            //     console.log("EncryptedPINArray", bufToHex(value[0]));
-
-            //     var exportECPublicKeyArray = value[1];
-            //     console.log("exportECPublicKeyArray", bufToHex(value[1]));
-
-            //     // Test Data as CSR template
-            //     var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
-
-            //     requestSignDataWithPINByKEYHANDLE(keyHandleBuf,exportECPublicKeyArray, EncryptedPINArray, signDataPayload).then((newCredentialInfo)=>{
-
-            //         console.log('SUCCESS', newCredentialInfo);
-            //         console.log("SignData", bufToHex(newCredentialInfo.response.signature));
-            //         const sign = newCredentialInfo.response.signature;
-            //         showSignMessage(sign);
-
-            //     });
-                
-
-            // }).catch((error) => {
-            //     alert(error)
-            //     console.log('FAIL', error)
-            // });
             var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
-            requestSignDataByKEYHANDLE(keyHandleBuf,0x02, signDataPayload).then((newCredentialInfo)=>{
+            requestSignDataByKEYHANDLE(keyHandleBuf, 0x02, signDataPayload).then((newCredentialInfo) => {
 
                 console.log('SUCCESS', newCredentialInfo);
                 console.log("SignData", bufToHex(newCredentialInfo.response.signature));
@@ -2130,124 +2009,119 @@
                 showSignMessage(sign);
 
             });
-    
+
 
 
         });
-        
+
         document.getElementById('btn_import_certificate').addEventListener('submit', function (event) {
             event.preventDefault();
 
 
             let keyHandle = document.getElementById('target_key_handle').textContent;
-       
+
             let keyId = document.getElementById('target_key_id').value;
-            if(keyId.value=""){
+            if (keyId.value = "") {
                 alert("The KEY_ID cannot empty.");
                 return;
             }
             console.log('key_handle', keyHandle);
             console.log('key_id', keyId);
-
-
-            //let userpin = document.getElementById('safari-pin-label').pin.value;
-      
             var keyHandleBuf = hexStringToArrayBuffer(keyHandle);
-       
-
-
             let hexCert = Uint8Array.from(window.atob(testCertificate), c => c.charCodeAt(0));
             console.log('hexCert', hexCert);
 
-            var pki_buffer = [];
-            var challenge = new Uint8Array(32);
-            window.crypto.getRandomValues(challenge);
-            var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
 
-            var pki_header = new Uint8Array(3);
+            ImportCertificate(keyHandleBuf, keyId, hexCert).then((responseData) => {
 
-            //PKI Command
-            var cert_buf = new Uint8Array(hexCert.length + 4);
-            cert_buf[0] = 0xDF
-            cert_buf[1] = 0x17;
-            cert_buf[2] = hexCert.length >> 8;
-            cert_buf[3] = hexCert.length;
-            cert_buf.set(hexCert, 4);
+                console.log('SUCCESS', responseData);
+                showSignMessage(responseData);
+            });
+            // var pki_buffer = [];
+            // var challenge = new Uint8Array(32);
+            // window.crypto.getRandomValues(challenge);
+            // var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
 
+            // var pki_header = new Uint8Array(3);
 
-            var keyHandle_buf = new Uint8Array(keyHandleBuf.length + 4);
-            keyHandle_buf[0] = 0xDF;
-            keyHandle_buf[1] = 0x19;
-            keyHandle_buf[2] = keyHandleBuf.length >> 8;
-            keyHandle_buf[3] = keyHandleBuf.length;
-            keyHandle_buf.set(new Uint8Array(keyHandleBuf), 4);
+            // //PKI Command
+            // var cert_buf = new Uint8Array(hexCert.length + 4);
+            // cert_buf[0] = 0xDF
+            // cert_buf[1] = 0x17;
+            // cert_buf[2] = hexCert.length >> 8;
+            // cert_buf[3] = hexCert.length;
+            // cert_buf.set(hexCert, 4);
 
 
-            var keyId_buf = new Uint8Array(keyId.length + 4);
-            keyId_buf[0] = 0xDF;
-            keyId_buf[1] = 0x18;
-            keyId_buf[2] = keyId.length >> 8;
-            keyId_buf[3] = keyId.length;
-            keyId_buf.set(toUTF8Array(keyId), 4);
+            // var keyHandle_buf = new Uint8Array(keyHandleBuf.length + 4);
+            // keyHandle_buf[0] = 0xDF;
+            // keyHandle_buf[1] = 0x19;
+            // keyHandle_buf[2] = keyHandleBuf.length >> 8;
+            // keyHandle_buf[3] = keyHandleBuf.length;
+            // keyHandle_buf.set(new Uint8Array(keyHandleBuf), 4);
 
-         
 
-            var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + cert_buf.byteLength +
-                keyHandle_buf
-                .byteLength + keyId_buf.byteLength);
+            // var keyId_buf = new Uint8Array(keyId.length + 4);
+            // keyId_buf[0] = 0xDF;
+            // keyId_buf[1] = 0x18;
+            // keyId_buf[2] = keyId.length >> 8;
+            // keyId_buf[3] = keyId.length;
+            // keyId_buf.set(toUTF8Array(keyId), 4);
 
-            var pki_payload_length = cert_buf.byteLength + keyHandle_buf.byteLength + keyId_buf
-                .byteLength;
-            pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-            pki_header[0] = 0xE7;
-            pki_header[1] = pki_payload_length >> 8
-            pki_header[2] = pki_payload_length;
 
-            pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-            pki_buffer.set(new Uint8Array(cert_buf), gtheaderbuffer.byteLength + 3);
-            pki_buffer.set(new Uint8Array(keyId_buf), gtheaderbuffer.byteLength + 3 + cert_buf
-                .byteLength);
-            pki_buffer.set(new Uint8Array(keyHandle_buf), gtheaderbuffer.byteLength + 3 + cert_buf
-                .byteLength +
-                keyId_buf.byteLength);
 
-            console.log("Import cert command: " + bufToHex(pki_buffer));
+            // var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + cert_buf.byteLength +
+            //     keyHandle_buf
+            //     .byteLength + keyId_buf.byteLength);
 
-            var getAssertionChallenge = {
-                'challenge': challenge,
-                "userVerification": "discouraged"
-            }
-            var idList = [{
-                id: pki_buffer,
-                transports: ["usb"],
-                type: "public-key"
-            }];
+            // var pki_payload_length = cert_buf.byteLength + keyHandle_buf.byteLength + keyId_buf
+            //     .byteLength;
+            // pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
+            // pki_header[0] = 0xE7;
+            // pki_header[1] = pki_payload_length >> 8
+            // pki_header[2] = pki_payload_length;
 
-            getAssertionChallenge.allowCredentials = idList;
-            console.log('Import cert command getAssertionChallenge', getAssertionChallenge);
+            // pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
+            // pki_buffer.set(new Uint8Array(cert_buf), gtheaderbuffer.byteLength + 3);
+            // pki_buffer.set(new Uint8Array(keyId_buf), gtheaderbuffer.byteLength + 3 + cert_buf
+            //     .byteLength);
+            // pki_buffer.set(new Uint8Array(keyHandle_buf), gtheaderbuffer.byteLength + 3 + cert_buf
+            //     .byteLength +
+            //     keyId_buf.byteLength);
 
-            navigator.credentials.get({
-                    'publicKey': getAssertionChallenge
-                })
-                .then((newCredentialInfo) => {
+            // console.log("Import cert command: " + bufToHex(pki_buffer));
 
-                    console.log('SUCCESS', newCredentialInfo)
-                    console.log("Sign", newCredentialInfo.response.signature)
-                    const sign = newCredentialInfo.response.signature;
-                    showSignMessage(sign);
-                })
-                .catch((error) => {
-                    alert(error)
-                    console.log('FAIL', error)
-                })
+            // var getAssertionChallenge = {
+            //     'challenge': challenge,
+            //     "userVerification": "discouraged"
+            // }
+            // var idList = [{
+            //     id: pki_buffer,
+            //     transports: ["usb"],
+            //     type: "public-key"
+            // }];
+
+            // getAssertionChallenge.allowCredentials = idList;
+            // console.log('Import cert command getAssertionChallenge', getAssertionChallenge);
+
+            // navigator.credentials.get({
+            //         'publicKey': getAssertionChallenge
+            //     })
+            //     .then((newCredentialInfo) => {
+
+            //         console.log('SUCCESS', newCredentialInfo)
+            //         console.log("Sign", newCredentialInfo.response.signature)
+            //         const sign = newCredentialInfo.response.signature;
+            //         showSignMessage(sign);
+            //     })
+            //     .catch((error) => {
+            //         alert(error)
+            //         console.log('FAIL', error)
+            //     })
+
+
 
         })
-        
-
-        
-
-
-        
     </script>
 
 </body>
