@@ -913,7 +913,7 @@ async function GenRSA2048KeyPair(){
 
 async function ImportCertificate(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf){
 
-    console.log('key_handle', bufToHex(KeyHandle));
+    console.log('key_handle', bufToHex(keyHandleBuf));
     console.log('key_id', bufToHex(KeyID));
     console.log('hexCert', bufToHex(ImportedHexCertBuf));
 
