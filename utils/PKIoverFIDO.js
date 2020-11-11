@@ -32,19 +32,6 @@ function readCert() {
 }
 
 
-/**
- * 
- *  Return the value of Signature of input data 
- *  @returns
- *      The value of Signature 
- */
-
-
-function sign() {
-
-
-}
-
 async function requestSignDataByKEYHANDLE(keyhandle, alg_num, plaintext) {
 
 
@@ -296,9 +283,6 @@ async function requirePINVerify() {
     });
 }
 
-
-
-
 async function requireEncryptedPINandEncryptedNewPIN(oldpin, newpin) {
 
 
@@ -485,7 +469,6 @@ async function requireEncryptedPINandEncryptedNewPIN(oldpin, newpin) {
 
 
 }
-
 
 async function ReadCertByIndex(index) {
 
@@ -928,6 +911,97 @@ async function GenRSA2048KeyPair(){
             });
 }
 
+async function ImportCertificate(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf){
+
+    console.log('key_handle', bufToHex(KeyHandle));
+    console.log('key_id', bufToHex(KeyID));
+    console.log('hexCert', bufToHex(ImportedHexCertBuf));
+
+    var pki_buffer = [];
+    var challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
+    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+
+    var pki_header = new Uint8Array(3);
+
+    //PKI Command
+    var cert_buf = new Uint8Array(ImportedHexCertBuf.length + 4);
+    cert_buf[0] = 0xDF
+    cert_buf[1] = 0x17;
+    cert_buf[2] = ImportedHexCertBuf.length >> 8;
+    cert_buf[3] = ImportedHexCertBuf.length;
+    cert_buf.set(ImportedHexCertBuf, 4);
+
+
+    var keyHandle_buf = new Uint8Array(keyHandleBuf.length + 4);
+    keyHandle_buf[0] = 0xDF;
+    keyHandle_buf[1] = 0x19;
+    keyHandle_buf[2] = keyHandleBuf.length >> 8;
+    keyHandle_buf[3] = keyHandleBuf.length;
+    keyHandle_buf.set(new Uint8Array(keyHandleBuf), 4);
+
+
+    var keyId_buf = new Uint8Array(KeyIDBuf.length + 4);
+    keyId_buf[0] = 0xDF;
+    keyId_buf[1] = 0x18;
+    keyId_buf[2] = KeyIDBuf.length >> 8;
+    keyId_buf[3] = KeyIDBuf.length;
+    keyId_buf.set(toUTF8Array(KeyIDBuf), 4);
+
+ 
+
+    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + cert_buf.byteLength +
+        keyHandle_buf
+        .byteLength + keyId_buf.byteLength);
+
+    var pki_payload_length = cert_buf.byteLength + keyHandle_buf.byteLength + keyId_buf
+        .byteLength;
+    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
+    pki_header[0] = 0xE7;
+    pki_header[1] = pki_payload_length >> 8
+    pki_header[2] = pki_payload_length;
+
+    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
+    pki_buffer.set(new Uint8Array(cert_buf), gtheaderbuffer.byteLength + 3);
+    pki_buffer.set(new Uint8Array(keyId_buf), gtheaderbuffer.byteLength + 3 + cert_buf
+        .byteLength);
+    pki_buffer.set(new Uint8Array(keyHandle_buf), gtheaderbuffer.byteLength + 3 + cert_buf
+        .byteLength +
+        keyId_buf.byteLength);
+
+    console.log("Import cert command: " + bufToHex(pki_buffer));
+
+    var getAssertionChallenge = {
+        'challenge': challenge,
+        "userVerification": "discouraged"
+    }
+    var idList = [{
+        id: pki_buffer,
+        transports: ["usb"],
+        type: "public-key"
+    }];
+
+    getAssertionChallenge.allowCredentials = idList;
+    console.log('Import cert command getAssertionChallenge', getAssertionChallenge);
+
+    return await new Promise(resolve => {navigator.credentials.get({
+            'publicKey': getAssertionChallenge
+        })
+        .then((newCredentialInfo) => {
+
+            console.log('SUCCESS', newCredentialInfo)
+            console.log("Sign", newCredentialInfo.response.signature)
+            const sign = newCredentialInfo.response.signature;
+            resolve(sign);
+        })
+        .catch((error) => {
+            alert(error)
+            console.log('FAIL', error)
+        })
+
+    });
+
+}
 
 function base64EncodeURL(byteArray) {
     return btoa(Array.from(new Uint8Array(byteArray)).map(val => {
@@ -994,3 +1068,4 @@ function hexStringToArrayBuffer(hexString) {
 
     return array;
 }
+
