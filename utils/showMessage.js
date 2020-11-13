@@ -38,10 +38,13 @@ const CTAP2_ERR_PIN_REQUIRED            = 0x36;        //PIN is required for the
 const CTAP2_ERR_PIN_POLICY_VIOLATION    = 0x37;            //PIN policy violation. Currently only enforces minimum length.
 const CTAP2_ERR_PIN_TOKEN_EXPIRED       = 0x38;        //pinToken expired on authenticator.
 const CTAP2_ERR_REQUEST_TOO_LARGE       = 0x39;        //Authenticator cannot handle this request due to memory constraints.
+const CTAP2_ERR_ACTION_TIMEOUT          = 0x3a;        //The current operation has timed out.
+const CTAP2_ERR_UP_REQUIRED             = 0x3b;        //User presence is required for the requested operation.
 const CTAP1_ERR_OTHER                   = 0x7F;  //Other unspecified error.
 const CTAP2_ERR_SPEC_LAST               = 0xDF;  //CTAP 2 spec last error.
 const CTAP2_ERR_EXTENSION_FIRST         = 0xE0;      //Extension specific error.
 const CTAP2_ERR_EXTENSION_LAST          = 0xEF;      //Extension specific error.
+const CTAP2_ERR_VENDOR_FIRST            = 0xF0;    //Vendor specific error.
 const CTAP2_ERR_VENDOR_FIRST            = 0xF0;    //Vendor specific error.
 const CTAP2_ERR_VENDOR_LAST             = 0xFF;//Vendor specific error.
 
@@ -51,20 +54,12 @@ const ErrorMsg_PIN_INVALID   = "PIN invalid.";
 const ErrorMsg_PIN_BLOCKED   = "PIN blocked.";
 const ErrorMsg_PIN_REQUIRED  = "The request has to verify PIN.";
 const ErrorMsg_NO_CREDENTIALS   = "Not found the credential.";
-
 const ErrorMsg_UNKNOW  = "Unknow error. ";
-
 const Msg_PIN_Trial_Counter  = "The retries counter is ";
 
 
 // Command Header GoTrust-Idem-PKI
 var GTheaderStr = "GoTrust-Idem-PKI"; 
-
-
-
-
-
-
 
 var showCertificMessage = (buffer) => {
 
