@@ -1088,10 +1088,12 @@ var parsePKIoverFIDOResponse = (buffer)=>{
         //return error
         return;
     }
+
+    let signature =undefined;
     buffer = buffer.slice(1);
     let responseDataBuf = buffer.slice(0, (totalLen-1));
     let responseData = CBOR.decode(responseDataBuf);
-    let signature = responseData;
+    signature = responseData;
     return {signature};
 }
 
