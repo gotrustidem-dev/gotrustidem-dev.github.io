@@ -45,7 +45,6 @@ const CTAP2_ERR_SPEC_LAST               = 0xDF;  //CTAP 2 spec last error.
 const CTAP2_ERR_EXTENSION_FIRST         = 0xE0;      //Extension specific error.
 const CTAP2_ERR_EXTENSION_LAST          = 0xEF;      //Extension specific error.
 const CTAP2_ERR_VENDOR_FIRST            = 0xF0;    //Vendor specific error.
-const CTAP2_ERR_VENDOR_FIRST            = 0xF0;    //Vendor specific error.
 const CTAP2_ERR_VENDOR_LAST             = 0xFF;//Vendor specific error.
 
 
