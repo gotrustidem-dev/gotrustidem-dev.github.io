@@ -1097,12 +1097,3 @@ function parsePKIoverFIDOResponse(buffer){
     return {signature};
 }
 
-
-function 
-
-parsePKIoverFIDOResponseData(buffer){
-
-
-
-}
-
