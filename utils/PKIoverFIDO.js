@@ -870,10 +870,6 @@ async function GenRSA2048KeyPair(){
                 'pubKeyCredParams': [{
                         'type': 'public-key',
                         'alg': -7
-                    },
-                    {
-                        'type': 'public-key',
-                        'alg': -257
                     }
                 ]
             }
@@ -1084,8 +1080,7 @@ function parsePKIoverFIDOResponse(buffer){
 
     let totalLenBuf =  buffer.slice(0, 2); 
 
-    console.log(typeof totalLenBuf);
-    let totalLen = readBE16(totalLenBuf);
+    let totalLen = readBE16(new Uint8Array(totalLenBuf));
     buffer = buffer.slice(2);
 
     let statusCode = buffer.slice(0, 1); 
