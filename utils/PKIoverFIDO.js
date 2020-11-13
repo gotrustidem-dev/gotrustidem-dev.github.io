@@ -1066,13 +1066,13 @@ function hexStringToArrayBuffer(hexString) {
 }
 
 
-var parsePKIoverFIDOResponse = (inputBuffer)=>{
+var parsePKIoverFIDOResponse = (buffer)=>{
 
 
 
-    if(inputBuffer.byteLength===256){//This is older version
+    if(buffer.byteLength===256){//This is older version
 
-        return new Uint8Array(inputBuffer);
+        return new Uint8Array(buffer);
     }
 
     let GTheader = buffer.slice(0, 16);
