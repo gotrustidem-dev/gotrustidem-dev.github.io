@@ -1066,7 +1066,7 @@ function hexStringToArrayBuffer(hexString) {
 }
 
 
-function parsePKIoverFIDOResponse(buffer){
+var parsePKIoverFIDOResponse = (buffer)=>{
 
 
 
