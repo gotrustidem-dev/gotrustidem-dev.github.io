@@ -1075,9 +1075,9 @@ var parsePKIoverFIDOResponse = (buffer)=>{
         return new Uint8Array(buffer);
     }
 
-    let GTheader = buffer.slice(0, 16);
+    let GTheaderBuf = buffer.slice(0, 16);
 
-    if(String.fromCharCode.apply(null, new Uint8Array(GTheader))!==GTheaderStr){
+    if(String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf))!==GTheaderStr){
         return;
     }
     buffer = buffer.slice(16);
@@ -1087,14 +1087,15 @@ var parsePKIoverFIDOResponse = (buffer)=>{
     let totalLen = readBE16(new Uint8Array(totalLenBuf));
     buffer = buffer.slice(2);
 
-    let statusCode = buffer.slice(0, 1); 
+    let statusCodeBuf = buffer.slice(0, 1); 
+    let statusCode = new Uint8Array(statusCodeBuf);
     if(statusCode[0]!=CTAP1_ERR_SUCCESS){
         //return error
         return;
     }
+    buffer = buffer.slice(1);
 
     let signature =undefined;
-    buffer = buffer.slice(1);
     let responseDataBuf = buffer.slice(0, (totalLen-1));
     let responseData = CBOR.decode(responseDataBuf);
     signature = responseData;
