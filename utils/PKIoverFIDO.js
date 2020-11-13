@@ -1069,3 +1069,40 @@ function hexStringToArrayBuffer(hexString) {
     return array;
 }
 
+
+function parsePKIoverFIDOResponse(buffer){
+
+
+
+    
+    let GTheader = buffer.slice(0, 16);
+
+    if(String.fromCharCode.apply(null, new Uint8Array(GTheader))!=GTheaderStr){
+        return;
+    }
+    buffer = buffer.slice(16);
+    let totalLenBuf =  buffer.slice(0, 2); 
+    let totalLen = readBE16(totalLenBuf);
+
+    buffer = buffer.slice(2);
+    let statusCode = buffer.slice(0, 1); 
+    if(statusCode[0]!=CTAP1_ERR_SUCCESS){
+        //return error
+        return;
+    }
+    buffer = buffer.slice(1);
+    let responseDataBuf = buffer.slice(0, (totalLen-1));
+    let responseData = CBOR.decode(responseDataBuf);
+    let signature = responseData;
+    return {signature};
+}
+
+
+function 
+
+parsePKIoverFIDOResponseData(buffer){
+
+
+
+}
+
