@@ -2006,6 +2006,10 @@
                 console.log('SUCCESS', newCredentialInfo);
                 let responseData = parsePKIoverFIDOResponse(newCredentialInfo.response.signature);
                 console.log('PKIoverFIDO signature',  responseData.signature);
+                var str = String.fromCharCode.apply(null, responseData.signature));
+                alert("Signature:" + "\n" + btoa(str));
+
+        
             
             });
         });
