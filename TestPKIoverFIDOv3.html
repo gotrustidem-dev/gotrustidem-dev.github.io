@@ -2006,11 +2006,8 @@
                 console.log('SUCCESS', newCredentialInfo);
                 let responseData = parsePKIoverFIDOResponse(newCredentialInfo.response.signature);
                 console.log('PKIoverFIDO signature',  responseData.signature);
-                var str = String.fromCharCode.apply(null, responseData.signature));
-                alert("Signature:" + "\n" + btoa(str));
-
-        
-            
+                var str = String.fromCharCode.apply(null, responseData.signature);
+                alert("Signature:" + "\n" + btoa(str));    
             });
         });
 
@@ -2033,7 +2030,6 @@
             var keyHandleBuf = hexStringToArrayBuffer(keyHandle);
             let hexCert = Uint8Array.from(window.atob(testBigCertificate), c => c.charCodeAt(0));
             console.log('hexCert', hexCert);
-
 
             ImportCertificate(keyHandleBuf, keyId, hexCert).then((responseData) => {
                 console.log('SUCCESS', responseData);
