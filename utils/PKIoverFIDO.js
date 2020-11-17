@@ -1074,13 +1074,51 @@ var parsePKIoverFIDOResponse = (buffer)=>{
 
 
     // check directly return 256 bytes which doesn't  include header and status code; 
-    let testData = CBOR.decode(buffer);
-    console.log("check point1",testData)    
-
+    //let testData = CBOR.decode(buffer);
+    //console.log("check point1",testData)    
+    let status = undefined;
+    let signature = undefined;
+    let retries = undefined;
 
     let GTheaderBuf = buffer.slice(0, 16);
 
+    
+    if(String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf))===GTheaderStr){
+
+        buffer = buffer.slice(16);
+
+        let totalLenBuf =  buffer.slice(0, 2); 
+    
+        let totalLen = readBE16(new Uint8Array(totalLenBuf));
+        buffer = buffer.slice(2);
+    
+        let statusCodeBuf = buffer.slice(0, 1); 
+        let statusCode = new Uint8Array(statusCodeBuf); buffer = buffer.slice(1);
+        status= statusCode;
+
+        if(status === CTAP1_ERR_SUCCESS){
+            let responseDataBuf = buffer.slice(0, (totalLen-1));
+            let responseData = CBOR.decode(responseDataBuf);
+            signature = responseData;
+            
+
+        }
+      
+    }else{
+
+        signature = new Uint8Array(buffer);
+        status = CTAP1_ERR_SUCCESS;
+
+
+    }
+    return {signature,status};
+
+
+    
+    
     if(String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf))!==GTheaderStr){
+
+
         return;
     }
     buffer = buffer.slice(16);
@@ -1098,10 +1136,11 @@ var parsePKIoverFIDOResponse = (buffer)=>{
     }
     buffer = buffer.slice(1);
 
-    let signature =undefined;
     let responseDataBuf = buffer.slice(0, (totalLen-1));
     let responseData = CBOR.decode(responseDataBuf);
     signature = responseData;
+
+
     return {signature};
 }
 
