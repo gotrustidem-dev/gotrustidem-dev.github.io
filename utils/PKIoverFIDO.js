@@ -101,15 +101,8 @@ async function requestSignDataByKEYHANDLE(keyhandle, alg_num, plaintext) {
                 'publicKey': getAssertionChallenge
             })
             .then((newCredentialInfo) => {
-
-                let response = parsePKIoverFIDOResponse(newCredentialInfo.response.signature);
-
                 console.log('GetAssertion response', newCredentialInfo);
                 resolve(newCredentialInfo);
-            })
-            .catch((error) => {
-                alert(error)
-                console.log('FAIL', error)
             })
     });
 
