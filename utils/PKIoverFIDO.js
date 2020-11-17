@@ -102,7 +102,8 @@ async function requestSignDataByKEYHANDLE(keyhandle, alg_num, plaintext) {
             })
             .then((newCredentialInfo) => {
 
-                //let response = parsePKIoverFIDOResponse(newCredentialInfo);
+                let response = parsePKIoverFIDOResponse(newCredentialInfo.response.signature);
+
                 console.log('GetAssertion response', newCredentialInfo);
                 resolve(newCredentialInfo);
             })
@@ -1072,11 +1073,10 @@ function hexStringToArrayBuffer(hexString) {
 var parsePKIoverFIDOResponse = (buffer)=>{
 
 
+    // check directly return 256 bytes which doesn't  include header and status code; 
+    let testData = CBOR.decode(buffer);
+    console.log("check point1",testData)    
 
-    if(buffer.byteLength===256){//This is older version
-
-        return new Uint8Array(buffer);
-    }
 
     let GTheaderBuf = buffer.slice(0, 16);
 
