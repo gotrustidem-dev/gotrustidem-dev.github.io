@@ -102,7 +102,7 @@ async function requestSignDataByKEYHANDLE(keyhandle, alg_num, plaintext) {
             })
             .then((newCredentialInfo) => {
 
-                let response = parsePKIoverFIDOResponse(newCredentialInfo);
+                //let response = parsePKIoverFIDOResponse(newCredentialInfo);
                 console.log('GetAssertion response', newCredentialInfo);
                 resolve(newCredentialInfo);
             })
