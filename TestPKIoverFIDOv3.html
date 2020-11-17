@@ -2008,6 +2008,9 @@
                 console.log('PKIoverFIDO signature',  responseData.signature);
                 var str = String.fromCharCode.apply(null, responseData.signature);
                 alert("Signature:" + "\n" + btoa(str));    
+            }) .catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
             });
         });
 
