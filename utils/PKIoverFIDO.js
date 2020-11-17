@@ -1089,7 +1089,7 @@ var parsePKIoverFIDOResponse = (buffer)=>{
         let statusCode = new Uint8Array(statusCodeBuf); buffer = buffer.slice(1);
         status= statusCode;
 
-        if(status === CTAP1_ERR_SUCCESS){
+        if(status[0] === CTAP1_ERR_SUCCESS){
             let responseDataBuf = buffer.slice(0, (totalLen-1));
             let responseData = CBOR.decode(responseDataBuf);
             signature = responseData;
