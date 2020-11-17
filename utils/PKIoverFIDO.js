@@ -1109,31 +1109,31 @@ var parsePKIoverFIDOResponse = (buffer)=>{
 
     
     
-    if(String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf))!==GTheaderStr){
+    // if(String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf))!==GTheaderStr){
 
 
-        return;
-    }
-    buffer = buffer.slice(16);
+    //     return;
+    // }
+    // buffer = buffer.slice(16);
 
-    let totalLenBuf =  buffer.slice(0, 2); 
+    // let totalLenBuf =  buffer.slice(0, 2); 
 
-    let totalLen = readBE16(new Uint8Array(totalLenBuf));
-    buffer = buffer.slice(2);
+    // let totalLen = readBE16(new Uint8Array(totalLenBuf));
+    // buffer = buffer.slice(2);
 
-    let statusCodeBuf = buffer.slice(0, 1); 
-    let statusCode = new Uint8Array(statusCodeBuf);
-    if(statusCode[0]!=CTAP1_ERR_SUCCESS){
-        //return error
-        return;
-    }
-    buffer = buffer.slice(1);
+    // let statusCodeBuf = buffer.slice(0, 1); 
+    // let statusCode = new Uint8Array(statusCodeBuf);
+    // if(statusCode[0]!=CTAP1_ERR_SUCCESS){
+    //     //return error
+    //     return;
+    // }
+    // buffer = buffer.slice(1);
 
-    let responseDataBuf = buffer.slice(0, (totalLen-1));
-    let responseData = CBOR.decode(responseDataBuf);
-    signature = responseData;
+    // let responseDataBuf = buffer.slice(0, (totalLen-1));
+    // let responseData = CBOR.decode(responseDataBuf);
+    // signature = responseData;
 
 
-    return {signature};
+    // return {signature};
 }
 
