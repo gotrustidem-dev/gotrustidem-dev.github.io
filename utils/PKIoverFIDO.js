@@ -1329,8 +1329,8 @@ async function TestExtendsToReadSign(index, plain) {
         'extensions': {
             // An "entry key" identifying the "webauthnExample_foobar" extension, 
             // whose value is a map with two input parameters:
-            "rk": "true",
-            },
+            "rk": "true"
+            }
         }
 
     }
