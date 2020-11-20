@@ -812,99 +812,99 @@ async function SignDataByLabel(label, alg_number, plain) {
     });
 }
 
-async function GenRSA2048KeyPair(){
+async function GenRSA2048KeyPair() {
 
     var pki_buffer = [];
-      
-
-            var challenge = new Uint8Array(32);
-            window.crypto.getRandomValues(challenge);
-
-            //Prepare PKI commmand
-            //Header
-            var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-            var pki_header = new Uint8Array(3);
-
-            //PKI Command
-            var command_bufer = new Uint8Array(5);
-            command_bufer[0] = 0xDF;
-            command_bufer[1] = 0x16;
-            command_bufer[2] = 0x0;
-            command_bufer[3] = 0x01;
-            command_bufer[4] = 0x02;
-
-            var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_bufer.byteLength);
-            var pki_payload_length = command_bufer.byteLength;
-            pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-            pki_header[0] = 0xE6;
-            pki_header[1] = pki_payload_length >> 8
-            pki_header[2] = pki_payload_length;
-            pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-            pki_buffer.set(new Uint8Array(command_bufer), 3 + gtheaderbuffer.byteLength);
-
-            console.log(bufToHex(pki_buffer));
-
-            var publicKey1 = {
-                'challenge': challenge,
-
-                'rp': {
-                    'name': 'GoTrustID Inc.',
-                },
-
-                'user': {
-                    'id': pki_buffer,
-                    'name': 'Get Cert By Index',
-                    'displayName': 'Get Cert By Index'
-                },
-
-                "authenticatorSelection": {
-                    "requireResidentKey": false,
-                    "authenticatorAttachment": "cross-platform"
-
-                },
-                'attestation': "none",
-                'pubKeyCredParams': [{
-                        'type': 'public-key',
-                        'alg': -7
-                    }
-                ]
-            }
-            console.log('Gen RSA Key Pair:', publicKey1)
 
 
-            return await new Promise(resolve => {navigator.credentials.create({
-                    'publicKey': publicKey1
-                })
-                .then((newCredentialInfo) => {
+    var challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
 
-                    console.log('SUCCESS', newCredentialInfo)
-                    console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response
-                        .clientDataJSON))
-                    let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
-                    console.log('AttestationObject: ', attestationObject)
-                    let authData = parseAuthData(attestationObject.authData);
-                    console.log('AuthData: ', authData);
-                    console.log('CredID: ', bufToHex(authData.credID));
-                    console.log('AAGUID: ', bufToHex(authData.aaguid));
-                    console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
+    //Prepare PKI commmand
+    //Header
+    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
 
-                    let returnData = showRSAKeyPair(authData.credID);
+    var pki_header = new Uint8Array(3);
 
-                    resolve(returnData);
-                 
+    //PKI Command
+    var command_bufer = new Uint8Array(5);
+    command_bufer[0] = 0xDF;
+    command_bufer[1] = 0x16;
+    command_bufer[2] = 0x0;
+    command_bufer[3] = 0x01;
+    command_bufer[4] = 0x02;
+
+    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_bufer.byteLength);
+    var pki_payload_length = command_bufer.byteLength;
+    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
+    pki_header[0] = 0xE6;
+    pki_header[1] = pki_payload_length >> 8
+    pki_header[2] = pki_payload_length;
+    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
+    pki_buffer.set(new Uint8Array(command_bufer), 3 + gtheaderbuffer.byteLength);
+
+    console.log(bufToHex(pki_buffer));
+
+    var publicKey1 = {
+        'challenge': challenge,
+
+        'rp': {
+            'name': 'GoTrustID Inc.',
+        },
+
+        'user': {
+            'id': pki_buffer,
+            'name': 'Get Cert By Index',
+            'displayName': 'Get Cert By Index'
+        },
+
+        "authenticatorSelection": {
+            "requireResidentKey": false,
+            "authenticatorAttachment": "cross-platform"
+
+        },
+        'attestation': "none",
+        'pubKeyCredParams': [{
+            'type': 'public-key',
+            'alg': -7
+        }]
+    }
+    console.log('Gen RSA Key Pair:', publicKey1)
+
+
+    return await new Promise(resolve => {
+        navigator.credentials.create({
+                'publicKey': publicKey1
+            })
+            .then((newCredentialInfo) => {
+
+                console.log('SUCCESS', newCredentialInfo)
+                console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response
+                    .clientDataJSON))
+                let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
+                console.log('AttestationObject: ', attestationObject)
+                let authData = parseAuthData(attestationObject.authData);
+                console.log('AuthData: ', authData);
+                console.log('CredID: ', bufToHex(authData.credID));
+                console.log('AAGUID: ', bufToHex(authData.aaguid));
+                console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
+
+                let returnData = showRSAKeyPair(authData.credID);
+
+                resolve(returnData);
 
 
 
-                })
-                .catch((error) => {
-                    alert(error)
-                    console.log('FAIL', error)
-                })
-            });
+
+            })
+            .catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            })
+    });
 }
 
-async function ImportCertificate(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf){
+async function ImportCertificate(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf) {
 
     console.log('key_handle', bufToHex(keyHandleBuf));
     console.log('key_id', bufToHex(KeyIDBuf));
@@ -941,7 +941,7 @@ async function ImportCertificate(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf){
     keyId_buf[3] = KeyIDBuf.length;
     keyId_buf.set(toUTF8Array(KeyIDBuf), 4);
 
- 
+
 
     var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + cert_buf.byteLength +
         keyHandle_buf
@@ -977,20 +977,21 @@ async function ImportCertificate(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf){
     getAssertionChallenge.allowCredentials = idList;
     console.log('Import cert command getAssertionChallenge', getAssertionChallenge);
 
-    return await new Promise(resolve => {navigator.credentials.get({
-            'publicKey': getAssertionChallenge
-        })
-        .then((newCredentialInfo) => {
+    return await new Promise(resolve => {
+        navigator.credentials.get({
+                'publicKey': getAssertionChallenge
+            })
+            .then((newCredentialInfo) => {
 
-            console.log('SUCCESS', newCredentialInfo)
-            console.log("Sign", newCredentialInfo.response.signature)
-            const sign = newCredentialInfo.response.signature;
-            resolve(sign);
-        })
-        .catch((error) => {
-            alert(error)
-            console.log('FAIL', error)
-        })
+                console.log('SUCCESS', newCredentialInfo)
+                console.log("Sign", newCredentialInfo.response.signature)
+                const sign = newCredentialInfo.response.signature;
+                resolve(sign);
+            })
+            .catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            })
 
     });
 
@@ -1063,7 +1064,7 @@ function hexStringToArrayBuffer(hexString) {
 }
 
 
-var parsePKIoverFIDOResponse = (buffer)=>{
+var parsePKIoverFIDOResponse = (buffer) => {
 
 
     // check directly return 256 bytes which doesn't  include header and status code; 
@@ -1075,65 +1076,201 @@ var parsePKIoverFIDOResponse = (buffer)=>{
 
     let GTheaderBuf = buffer.slice(0, 16);
 
-    
-    if(String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf))===GTheaderStr){
+
+    if (String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf)) === GTheaderStr) {
 
         buffer = buffer.slice(16);
 
-        let totalLenBuf =  buffer.slice(0, 2); 
-    
+        let totalLenBuf = buffer.slice(0, 2);
+
         let totalLen = readBE16(new Uint8Array(totalLenBuf));
         buffer = buffer.slice(2);
-    
-        let statusCodeBuf = buffer.slice(0, 1); 
-        let statusCode = new Uint8Array(statusCodeBuf); buffer = buffer.slice(1);
-        status= statusCode;
 
-        if(status[0] === CTAP1_ERR_SUCCESS){
-            let responseDataBuf = buffer.slice(0, (totalLen-1));
+        let statusCodeBuf = buffer.slice(0, 1);
+        let statusCode = new Uint8Array(statusCodeBuf);
+        buffer = buffer.slice(1);
+        status = statusCode;
+
+        if (status[0] === CTAP1_ERR_SUCCESS) {
+            let responseDataBuf = buffer.slice(0, (totalLen - 1));
             let responseData = CBOR.decode(responseDataBuf);
             signature = responseData;
-            
+
 
         }
-      
-    }else{
+
+    } else {
 
         signature = new Uint8Array(buffer);
         status = CTAP1_ERR_SUCCESS;
 
 
     }
-    return {signature,status};
-
-
-    
-    
-    // if(String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf))!==GTheaderStr){
-
-
-    //     return;
-    // }
-    // buffer = buffer.slice(16);
-
-    // let totalLenBuf =  buffer.slice(0, 2); 
-
-    // let totalLen = readBE16(new Uint8Array(totalLenBuf));
-    // buffer = buffer.slice(2);
-
-    // let statusCodeBuf = buffer.slice(0, 1); 
-    // let statusCode = new Uint8Array(statusCodeBuf);
-    // if(statusCode[0]!=CTAP1_ERR_SUCCESS){
-    //     //return error
-    //     return;
-    // }
-    // buffer = buffer.slice(1);
-
-    // let responseDataBuf = buffer.slice(0, (totalLen-1));
-    // let responseData = CBOR.decode(responseDataBuf);
-    // signature = responseData;
-
-
-    // return {signature};
+    return {
+        signature,
+        status
+    };
 }
 
+
+async function TestReadDataMutli(index, plain) {
+
+    var pki_buffer = [];
+    let certIndex = document.getElementById('use-index').certIndex.value;
+
+    var challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
+    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+
+    var pki_header = new Uint8Array(3);
+
+    //PKI Command
+    var command_buf = new Uint8Array(5);
+    command_buf[0] = 0xDF;
+    command_buf[1] = 0x02;
+    command_buf[2] = 0x00;
+    command_buf[3] = 0x01;
+    command_buf[4] = index;
+
+    var alg_buf = new Uint8Array(5);
+    alg_buf[0] = 0xDF;
+    alg_buf[1] = 0x03;
+    alg_buf[2] = 0x00;
+    alg_buf[3] = 0x01;
+    alg_buf[4] = 2;
+
+    var signDataBuf = new Uint8Array(4 + plain.byteLength);
+    signDataBuf[0] = 0xDF;
+    signDataBuf[1] = 0x06;
+    signDataBuf[2] = plain.length >> 8;
+    signDataBuf[3] = plain.length;
+    signDataBuf.set(plain, 4);
+
+
+    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_buf.byteLength + alg_buf
+        .byteLength + signDataBuf.byteLength);
+    var pki_payload_length = command_buf.byteLength + alg_buf.byteLength + signDataBuf.byteLength;
+    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
+    pki_header[0] = 0xE3;
+    pki_header[1] = pki_payload_length >> 8
+    pki_header[2] = pki_payload_length;
+    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
+    pki_buffer.set(new Uint8Array(command_buf), gtheaderbuffer.byteLength + 3);
+    pki_buffer.set(new Uint8Array(alg_buf), gtheaderbuffer.byteLength + 3 + command_buf.byteLength);
+    pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + command_buf
+        .byteLength + alg_buf.byteLength);
+
+    console.log("SignDataByIndex", bufToHex(pki_buffer));
+    var getAssertionChallenge = {
+        'challenge': challenge,
+        "authenticatorSelection": {
+            "userVerification": "discouraged",
+            "authenticatorAttachment": "cross-platform"
+        },
+
+    }
+    var idList = [{
+        id: pki_buffer,
+        transports: ["usb", "nfc"],
+        type: "public-key"
+    }];
+
+    getAssertionChallenge.allowCredentials = idList;
+    console.log('SignDataByIndex', getAssertionChallenge)
+
+
+    return await new Promise(resolve => {
+        navigator.credentials.get({
+                'publicKey': getAssertionChallenge
+            })
+            .then((newCredentialInfo) => {
+
+                navigator.credentials.get({
+                        'publicKey': getAssertionChallenge
+                    })
+                    .then((newCredentialInfo) => {
+
+
+
+                        navigator.credentials.get({
+                                'publicKey': getAssertionChallenge
+                            })
+                            .then((newCredentialInfo) => {
+
+
+
+                                navigator.credentials.get({
+                                        'publicKey': getAssertionChallenge
+                                    })
+                                    .then((newCredentialInfo) => {
+
+
+
+                                        navigator.credentials.get({
+                                                'publicKey': getAssertionChallenge
+                                            })
+                                            .then((newCredentialInfo) => {
+
+
+                                                navigator.credentials.get({
+                                                        'publicKey': getAssertionChallenge
+                                                    })
+                                                    .then((newCredentialInfo) => {
+
+
+
+                                                        navigator.credentials.get({
+                                                                'publicKey': getAssertionChallenge
+                                                            })
+                                                            .then((newCredentialInfo) => {
+
+
+                                                                navigator.credentials.get({
+                                                                        'publicKey': getAssertionChallenge
+                                                                    })
+                                                                    .then((newCredentialInfo) => {
+                                                                        console.log('SUCCESS', newCredentialInfo);
+                                                                        console.log("Sign", newCredentialInfo.response.signature);
+                                                                        const sign = newCredentialInfo.response.signature;
+                                                                        resolve(sign);
+                                                                    })
+
+                                                                //resolve(sign);
+                                                            })
+
+
+
+                                                        //resolve(sign);
+                                                    })
+
+
+
+                                                // resolve(sign);
+                                            })
+
+
+
+                                        //resolve(sign);
+                                    })
+
+
+                                //resolve(sign);
+                            })
+
+
+                        //resolve(sign);
+                    })
+
+
+
+                //resolve(sign);
+            })
+            .catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            })
+
+    });
+
+
+}
