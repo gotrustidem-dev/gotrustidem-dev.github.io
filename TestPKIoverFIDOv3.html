@@ -2003,7 +2003,9 @@
             console.log('testSignCSR', testSignCSR);
             var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
            // requestSignDataByKEYHANDLE(keyHandleBuf, 0x02, signDataPayload).then((newCredentialInfo) => {
-            TestReadDataMutli(1, signDataPayload).then((newCredentialInfo) => {
+           // TestReadDataMutli(1, signDataPayload).then((newCredentialInfo) => {
+
+            TestExtendsToReadSign(1, signDataPayload).then((newCredentialInfo)=> {
                 console.log('SUCCESS', newCredentialInfo);
                 let responseData = parsePKIoverFIDOResponse(newCredentialInfo.response.signature);
                 console.log('PKIoverFIDO signature',  responseData.signature);
