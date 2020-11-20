@@ -1329,9 +1329,11 @@ async function TestExtendsToReadSign(index, plain) {
         'extensions': {
             // An "entry key" identifying the "webauthnExample_foobar" extension, 
             // whose value is a map with two input parameters:
-            "readpom": {
-              foo: 42,
-            }
+            "hmac-secret":
+                {
+                    'foo': 42,
+                    'bar': "barfoo"
+                }
         }
 
     }
