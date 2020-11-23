@@ -1074,42 +1074,53 @@ var parsePKIoverFIDOResponse = (buffer) => {
     let signature = undefined;
     let retries = undefined;
 
-    let GTheaderBuf = buffer.slice(0, 16);
 
+    //meaning this is directly return signature
+    if(buffer.byteLength==256){
 
-    if (String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf)) === GTheaderStr) {
-
-        buffer = buffer.slice(16);
-
-        let totalLenBuf = buffer.slice(0, 2);
-
-        let totalLen = readBE16(new Uint8Array(totalLenBuf));
-        buffer = buffer.slice(2);
-
-        let statusCodeBuf = buffer.slice(0, 1);
-        let statusCode = new Uint8Array(statusCodeBuf);
-        buffer = buffer.slice(1);
-        status = statusCode;
-
-        if (status[0] === CTAP1_ERR_SUCCESS) {
-            let responseDataBuf = buffer.slice(0, (totalLen - 1));
-            let responseData = CBOR.decode(responseDataBuf);
-            signature = responseData;
-
-
-        }
-
-    } else {
 
         signature = new Uint8Array(buffer);
         status = CTAP1_ERR_SUCCESS;
 
+    }else{
+        let GTheaderBuf = buffer.slice(0, 16);
 
+
+        if (String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf)) === GTheaderStr) {
+    
+            buffer = buffer.slice(16);
+    
+            let totalLenBuf = buffer.slice(0, 2);
+    
+            let totalLen = readBE16(new Uint8Array(totalLenBuf));
+            buffer = buffer.slice(2);
+    
+            let statusCodeBuf = buffer.slice(0, 1);
+            let statusCode = new Uint8Array(statusCodeBuf);
+            buffer = buffer.slice(1);
+            status = statusCode;
+    
+            if (status[0] === CTAP1_ERR_SUCCESS) {
+                let responseDataBuf = buffer.slice(0, (totalLen - 1));
+                let responseData = CBOR.decode(responseDataBuf);
+                signature = responseData;
+            }else{
+                status = status[0];
+
+            }
+    
+        } else {
+    
+            signature = new Uint8Array(buffer);
+            status = CTAP1_ERR_SUCCESS;
+    
+    
+        }
     }
-    return {
-        signature,
-        status
-    };
+
+    
+
+    return {signature,status};
 }
 
 
