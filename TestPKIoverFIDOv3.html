@@ -195,6 +195,14 @@
                                                     style="width: 162px; height:34px;background-color: #008CBA;">Sign a
                                                     CSR</button>
                                             </form>
+
+                                            <form style="text-align: center;" id="btn_test_mutliread" onsubmit="return false">
+                                                <button class="btn btn-primary" action="submit"
+                                                    style="width: 162px; height:34px;background-color: #008CBA;">Sign a
+                                                    CSR</button>
+                                            </form>
+
+                                            
                                             <form style="text-align: center;" id="btn_import_certificate"
                                                 onsubmit="return false">
                                                 <p>
@@ -1994,6 +2002,31 @@
         document.getElementById('btn_sign_csr').addEventListener('submit', function (event) {
             event.preventDefault();
 
+            let keyHandle = document.getElementById('target_key_handle').textContent;
+            console.log('key_handle', keyHandle);
+
+            var keyHandleBuf = hexStringToArrayBuffer(keyHandle);
+
+            let testSignCSR = Uint8Array.from(window.atob(signShortData), c => c.charCodeAt(0));
+            console.log('testSignCSR', testSignCSR);
+
+            var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
+            requestSignDataByKEYHANDLE(keyHandleBuf, 0x02, signDataPayload).then((newCredentialInfo) => {
+                console.log('SUCCESS', newCredentialInfo);
+                let responseData = parsePKIoverFIDOResponse(newCredentialInfo.response.signature);
+                console.log('PKIoverFIDO signature',  responseData.signature);
+                var str = String.fromCharCode.apply(null, responseData.signature);
+                alert("Signature:" + "\n" + btoa(str));    
+            }) .catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            });
+        });
+
+
+        document.getElementById('btn_test_mutliread').addEventListener('submit', function (event) {
+            event.preventDefault();
+
             // let keyHandle = document.getElementById('target_key_handle').textContent;
             // console.log('key_handle', keyHandle);
 
@@ -2017,6 +2050,7 @@
                 console.log('FAIL', error)
             });
         });
+
 
 
 
