@@ -1077,24 +1077,15 @@ var parsePKIoverFIDOResponse = (buffer) => {
 
     //meaning this is directly return signature
     if(buffer.byteLength==256){
-
-
         signature = new Uint8Array(buffer);
         status = CTAP1_ERR_SUCCESS;
-
     }else{
         let GTheaderBuf = buffer.slice(0, 16);
-
-
         if (String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf)) === GTheaderStr) {
-    
             buffer = buffer.slice(16);
-    
             let totalLenBuf = buffer.slice(0, 2);
-    
             let totalLen = readBE16(new Uint8Array(totalLenBuf));
             buffer = buffer.slice(2);
-    
             let statusCodeBuf = buffer.slice(0, 1);
             let statusCode = new Uint8Array(statusCodeBuf);
             buffer = buffer.slice(1);
@@ -1108,7 +1099,6 @@ var parsePKIoverFIDOResponse = (buffer) => {
                 status = status[0];
 
             }
-    
         } else {
     
             signature = new Uint8Array(buffer);
