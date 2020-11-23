@@ -1164,11 +1164,7 @@ async function TestReadDataMutli(index, plain) {
     console.log("SignDataByIndex", bufToHex(pki_buffer));
     var getAssertionChallenge = {
         'challenge': challenge,
-        "authenticatorSelection": {
-            "userVerification": "discouraged",
-            "authenticatorAttachment": "cross-platform"
-        },
-
+        "userVerification": "discouraged",
     }
     var idList = [{
         id: pki_buffer,
