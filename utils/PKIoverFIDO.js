@@ -1144,7 +1144,7 @@ async function TestReadDataMutli(index, plain) {
     pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
     pki_buffer.set(new Uint8Array(command_buf), gtheaderbuffer.byteLength + 3);
     pki_buffer.set(new Uint8Array(alg_buf), gtheaderbuffer.byteLength + 3 + command_buf.byteLength);
-);
+   
 
     console.log("SignDataByIndex", bufToHex(pki_buffer));
     var getAssertionChallenge = {
