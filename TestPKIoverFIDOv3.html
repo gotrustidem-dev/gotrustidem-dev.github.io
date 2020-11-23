@@ -198,8 +198,7 @@
 
                                             <form style="text-align: center;" id="btn_test_mutliread" onsubmit="return false">
                                                 <button class="btn btn-primary" action="submit"
-                                                    style="width: 162px; height:34px;background-color: #008CBA;">Sign a
-                                                    CSR</button>
+                                                    style="width: 162px; height:34px;background-color: #008CBA;">Test Read cert by sign</button>
                                             </form>
 
                                             
@@ -2017,6 +2016,7 @@
                 console.log('PKIoverFIDO signature',  responseData.signature);
                 var str = String.fromCharCode.apply(null, responseData.signature);
                 alert("Signature:" + "\n" + btoa(str));    
+
             }) .catch((error) => {
                 alert(error)
                 console.log('FAIL', error)
