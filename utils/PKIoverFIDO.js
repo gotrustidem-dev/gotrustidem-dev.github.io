@@ -1165,7 +1165,7 @@ async function TestReadDataMutli(index, plain) {
     return await new Promise(resolve => {
         navigator.credentials.get({
             'publicKey': getAssertionChallenge
-        }).then((response) => {
+        }).then((read_cert_response) => {
 
             // console.log('SUCCESS', newCredentialInfo)
             // console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response.clientDataJSON))
@@ -1176,7 +1176,7 @@ async function TestReadDataMutli(index, plain) {
             //     console.log('CredID: ', bufToHex(authData.credID));
             //     console.log('AAGUID: ', bufToHex(authData.aaguid));
             //     console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
-            resolve(newCredentialInfo.response.signature);
+            resolve(read_cert_response.response.signature);
 
         })
     });
