@@ -1076,10 +1076,10 @@ var parsePKIoverFIDOResponse = (buffer) => {
 
 
     //meaning this is directly return signature
-    if(buffer.byteLength==256){
+    if (buffer.byteLength == 256) {
         signature = new Uint8Array(buffer);
         status = CTAP1_ERR_SUCCESS;
-    }else{
+    } else {
         let GTheaderBuf = buffer.slice(0, 16);
         if (String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf)) === GTheaderStr) {
             buffer = buffer.slice(16);
@@ -1090,27 +1090,30 @@ var parsePKIoverFIDOResponse = (buffer) => {
             let statusCode = new Uint8Array(statusCodeBuf);
             buffer = buffer.slice(1);
             status = statusCode;
-    
+
             if (status[0] === CTAP1_ERR_SUCCESS) {
                 let responseDataBuf = buffer.slice(0, (totalLen - 1));
                 let responseData = CBOR.decode(responseDataBuf);
                 signature = responseData;
-            }else{
+            } else {
                 status = status[0];
 
             }
         } else {
-    
+
             signature = new Uint8Array(buffer);
             status = CTAP1_ERR_SUCCESS;
-    
-    
+
+
         }
     }
 
-    
 
-    return {signature,status};
+
+    return {
+        signature,
+        status
+    };
 }
 
 
@@ -1135,7 +1138,7 @@ async function TestReadDataMutli(index, plain) {
 
 
 
-    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_buf.byteLength );
+    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_buf.byteLength);
     var pki_payload_length = command_buf.byteLength;
     pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
     pki_header[0] = 0xE1;
@@ -1143,7 +1146,7 @@ async function TestReadDataMutli(index, plain) {
     pki_header[2] = pki_payload_length;
     pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
     pki_buffer.set(new Uint8Array(command_buf), gtheaderbuffer.byteLength + 3);
-   
+
 
     console.log("SignDataByIndex", bufToHex(pki_buffer));
     var getAssertionChallenge = {
@@ -1159,99 +1162,118 @@ async function TestReadDataMutli(index, plain) {
     getAssertionChallenge.allowCredentials = idList;
     console.log('SignDataByIndex', getAssertionChallenge)
 
-
     return await new Promise(resolve => {
         navigator.credentials.get({
-                'publicKey': getAssertionChallenge
-            })
-            .then((newCredentialInfo) => {
+            'publicKey': getAssertionChallenge
+        }).then((response) => {
 
-                navigator.credentials.get({
-                        'publicKey': getAssertionChallenge
-                    })
-                    .then((newCredentialInfo) => {
+            // console.log('SUCCESS', newCredentialInfo)
+            // console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response.clientDataJSON))
+            //     let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
+            //     console.log('AttestationObject: ', attestationObject)
+            //     let authData = parseAuthData(attestationObject.authData);
+            //     console.log('AuthData: ', authData);
+            //     console.log('CredID: ', bufToHex(authData.credID));
+            //     console.log('AAGUID: ', bufToHex(authData.aaguid));
+            //     console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
+            resolve(newCredentialInfo.response.signature);
 
-
-
-                        navigator.credentials.get({
-                                'publicKey': getAssertionChallenge
-                            })
-                            .then((newCredentialInfo) => {
-
-
-
-                                navigator.credentials.get({
-                                        'publicKey': getAssertionChallenge
-                                    })
-                                    .then((newCredentialInfo) => {
-
-
-
-                                        navigator.credentials.get({
-                                                'publicKey': getAssertionChallenge
-                                            })
-                                            .then((newCredentialInfo) => {
-
-
-                                                navigator.credentials.get({
-                                                        'publicKey': getAssertionChallenge
-                                                    })
-                                                    .then((newCredentialInfo) => {
-
-
-
-                                                        navigator.credentials.get({
-                                                                'publicKey': getAssertionChallenge
-                                                            })
-                                                            .then((newCredentialInfo) => {
-
-
-                                                                navigator.credentials.get({
-                                                                        'publicKey': getAssertionChallenge
-                                                                    })
-                                                                    .then((newCredentialInfo) => {
-                                                                        console.log('SUCCESS', newCredentialInfo);
-                                                                        console.log("Sign", newCredentialInfo.response.signature);
-                                                                        const sign = newCredentialInfo.response.signature;
-                                                                        resolve(sign);
-                                                                    })
-
-                                                                //resolve(sign);
-                                                            })
-
-
-
-                                                        //resolve(sign);
-                                                    })
-
-
-
-                                                // resolve(sign);
-                                            })
-
-
-
-                                        //resolve(sign);
-                                    })
-
-
-                                //resolve(sign);
-                            })
-
-
-                        //resolve(sign);
-                    })
-
-
-
-                //resolve(sign);
-            })
-            .catch((error) => {
-                alert(error)
-                console.log('FAIL', error)
-            })
-
+        })
     });
+
+
+    // return await new Promise(resolve => {
+    //     navigator.credentials.get({
+    //             'publicKey': getAssertionChallenge
+    //         })
+    //         .then((newCredentialInfo) => {
+
+    //             navigator.credentials.get({
+    //                     'publicKey': getAssertionChallenge
+    //                 })
+    //                 .then((newCredentialInfo) => {
+
+
+
+    //                     navigator.credentials.get({
+    //                             'publicKey': getAssertionChallenge
+    //                         })
+    //                         .then((newCredentialInfo) => {
+
+
+
+    //                             navigator.credentials.get({
+    //                                     'publicKey': getAssertionChallenge
+    //                                 })
+    //                                 .then((newCredentialInfo) => {
+
+
+
+    //                                     navigator.credentials.get({
+    //                                             'publicKey': getAssertionChallenge
+    //                                         })
+    //                                         .then((newCredentialInfo) => {
+
+
+    //                                             navigator.credentials.get({
+    //                                                     'publicKey': getAssertionChallenge
+    //                                                 })
+    //                                                 .then((newCredentialInfo) => {
+
+
+
+    //                                                     navigator.credentials.get({
+    //                                                             'publicKey': getAssertionChallenge
+    //                                                         })
+    //                                                         .then((newCredentialInfo) => {
+
+
+    //                                                             navigator.credentials.get({
+    //                                                                     'publicKey': getAssertionChallenge
+    //                                                                 })
+    //                                                                 .then((newCredentialInfo) => {
+    //                                                                     console.log('SUCCESS', newCredentialInfo);
+    //                                                                     console.log("Sign", newCredentialInfo.response.signature);
+    //                                                                     const sign = newCredentialInfo.response.signature;
+    //                                                                     resolve(sign);
+    //                                                                 })
+
+    //                                                             //resolve(sign);
+    //                                                         })
+
+
+
+    //                                                     //resolve(sign);
+    //                                                 })
+
+
+
+    //                                             // resolve(sign);
+    //                                         })
+
+
+
+    //                                     //resolve(sign);
+    //                                 })
+
+
+    //                             //resolve(sign);
+    //                         })
+
+
+    //                     //resolve(sign);
+    //                 })
+
+
+
+    //             //resolve(sign);
+    //         })
+    //         .catch((error) => {
+    //             alert(error)
+    //             console.log('FAIL', error)
+    //         })
+
+    // });
 
 
 }
@@ -1310,11 +1332,10 @@ async function TestExtendsToReadSign(index, plain) {
         'extensions': {
             // An "entry key" identifying the "webauthnExample_foobar" extension, 
             // whose value is a map with two input parameters:
-            "hmac-secret":
-                {
-                    'foo': 42,
-                    'bar': "barfoo"
-                }
+            "hmac-secret": {
+                'foo': 42,
+                'bar': "barfoo"
+            }
         }
 
     }

@@ -2041,10 +2041,14 @@
 
             TestReadDataMutli(1, signDataPayload).then((newCredentialInfo)=> {
                 console.log('SUCCESS', newCredentialInfo);
-                let responseData = parsePKIoverFIDOResponse(newCredentialInfo.response.signature);
-                console.log('PKIoverFIDO signature',  responseData.signature);
-                var str = String.fromCharCode.apply(null, responseData.signature);
-                alert("Signature:" + "\n" + btoa(str));    
+
+                let responseData = parsePKIoverFIDOResponse(newCredentialInfo);
+
+                var strCert = "-----BEGIN CERTIFICATE-----\n" +
+                    btoa(String.fromCharCode.apply(null, responseData.signature)) +
+                    "\n-----END CERTIFICATE-----"
+                console.log('Certificatie : \n', strCert)
+                displayCert(strCert);
             }) .catch((error) => {
                 alert(error)
                 console.log('FAIL', error)
