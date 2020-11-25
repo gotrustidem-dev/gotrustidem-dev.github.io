@@ -1117,10 +1117,9 @@ var parsePKIoverFIDOResponse = (buffer) => {
 }
 
 
-async function TestReadDataMutli(index, plain) {
+async function ReadCertByIndexFunction2(index) {
 
     var pki_buffer = [];
-    let certIndex = document.getElementById('use-index').certIndex.value;
 
     var challenge = new Uint8Array(32);
     window.crypto.getRandomValues(challenge);
@@ -1166,16 +1165,6 @@ async function TestReadDataMutli(index, plain) {
         navigator.credentials.get({
             'publicKey': getAssertionChallenge
         }).then((read_cert_response) => {
-
-            // console.log('SUCCESS', newCredentialInfo)
-            // console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response.clientDataJSON))
-            //     let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
-            //     console.log('AttestationObject: ', attestationObject)
-            //     let authData = parseAuthData(attestationObject.authData);
-            //     console.log('AuthData: ', authData);
-            //     console.log('CredID: ', bufToHex(authData.credID));
-            //     console.log('AAGUID: ', bufToHex(authData.aaguid));
-            //     console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
             resolve(read_cert_response.response.signature);
 
         })
@@ -1274,6 +1263,50 @@ async function TestReadDataMutli(index, plain) {
     //         })
 
     // });
+
+
+}
+
+async function GetTokenInfo() {
+
+    var pki_buffer = [];
+
+    var challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
+    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+
+    var pki_header = new Uint8Array(3);
+    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 );
+    var pki_payload_length = command_buf.byteLength;
+    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
+    pki_header[0] = 0xE2;
+    pki_header[1] = pki_payload_length >> 8
+    pki_header[2] = pki_payload_length;
+    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
+
+
+    console.log("SignDataByIndex", bufToHex(pki_buffer));
+    var getAssertionChallenge = {
+        'challenge': challenge,
+        "userVerification": "discouraged",
+    }
+    var idList = [{
+        id: pki_buffer,
+        transports: ["usb", "nfc"],
+        type: "public-key"
+    }];
+
+    getAssertionChallenge.allowCredentials = idList;
+    console.log('SignDataByIndex', getAssertionChallenge)
+
+    return await new Promise(resolve => {
+        navigator.credentials.get({
+            'publicKey': getAssertionChallenge
+        }).then((read_cert_response) => {
+            resolve(read_cert_response.response.signature);
+
+        })
+    });
 
 
 }

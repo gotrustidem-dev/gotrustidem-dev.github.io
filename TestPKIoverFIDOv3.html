@@ -201,6 +201,11 @@
                                                     style="width: 162px; height:34px;background-color: #008CBA;">Test Read cert by sign</button>
                                             </form>
 
+                                            <form style="text-align: center;" id="btn_test_tokeninfo" onsubmit="return false">
+                                                <button class="btn btn-primary" action="submit"
+                                                    style="width: 162px; height:34px;background-color: #008CBA;">Test Get Token Info</button>
+                                            </form>
+
                                             
                                             <form style="text-align: center;" id="btn_import_certificate"
                                                 onsubmit="return false">
@@ -2039,7 +2044,7 @@
            // requestSignDataByKEYHANDLE(keyHandleBuf, 0x02, signDataPayload).then((newCredentialInfo) => {
            // TestReadDataMutli(1, signDataPayload).then((newCredentialInfo) => {
 
-            TestReadDataMutli(1, signDataPayload).then((newCredentialInfo)=> {
+            ReadCertByIndexFunction2(1, signDataPayload).then((newCredentialInfo)=> {
                 console.log('SUCCESS', newCredentialInfo);
 
                 let responseData = parsePKIoverFIDOResponse(newCredentialInfo);
@@ -2054,6 +2059,35 @@
                 console.log('FAIL', error)
             });
         });
+
+
+        document.getElementById('btn_test_tokeninfo').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            // let keyHandle = document.getElementById('target_key_handle').textContent;
+            // console.log('key_handle', keyHandle);
+
+            // var keyHandleBuf = hexStringToArrayBuffer(keyHandle);
+
+            // let testSignCSR = Uint8Array.from(window.atob(signShortData), c => c.charCodeAt(0));
+            // console.log('testSignCSR', testSignCSR);
+
+            var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
+           // requestSignDataByKEYHANDLE(keyHandleBuf, 0x02, signDataPayload).then((newCredentialInfo) => {
+           // TestReadDataMutli(1, signDataPayload).then((newCredentialInfo) => {
+
+            GetTokenInfo(1, signDataPayload).then((newCredentialInfo)=> {
+                console.log('SUCCESS', newCredentialInfo);
+
+                let responseData = parsePKIoverFIDOResponse(newCredentialInfo);
+                console.log('Response : \n', responseData)
+
+            }) .catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            });
+        });
+
 
 
 
