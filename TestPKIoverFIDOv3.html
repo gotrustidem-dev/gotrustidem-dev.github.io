@@ -213,11 +213,23 @@
                                                     <label id="key_id_value">Key ID:</label><br>
                                                     <input type="text" id="target_key_id"
                                                         style="width: 342px; height:41px">
-                                                    <!--<label id="target_key_id">ffbbccddeeaa99887766554433221100</label>-->
-                                                </p>
+                                              </p>
                                                 <button class="btn btn-primary" action="submit"
                                                     style="width: 162px; height:34px;background-color: #008CBA;">Import
                                                     Cert. to Key</button>
+
+                                            </form>
+
+                                            <form style="text-align: center;" id="btn_import_certificate2"
+                                            onsubmit="return false">
+                                            <p>
+                                                <label id="key_id_value">Key ID:</label><br>
+                                                <input type="text" id="target_key_id"
+                                                    style="width: 342px; height:41px">
+                                            </p>
+                                            <button class="btn btn-primary" action="submit"
+                                                style="width: 162px; height:34px;background-color: #008CBA;">Case 2 _Import
+                                                Cert. to Key </button>
 
                                             </form>
                                         </p>
@@ -2115,7 +2127,32 @@
                 
                 showSignMessage(responseData);
             });
+        });
+
+        document.getElementById('btn_import_certificate2').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+
+            let keyHandle = document.getElementById('target_key_handle').textContent;
+
+            let keyId = document.getElementById('target_key_id').value;
+            if (keyId.value = "") {
+                alert("The KEY_ID cannot empty.");
+                return;
+            }
+            console.log('key_handle', keyHandle);
+            console.log('key_id', keyId);
+            var keyHandleBuf = hexStringToArrayBuffer(keyHandle);
+            let hexCert = Uint8Array.from(window.atob(testBigCertificate), c => c.charCodeAt(0));
+            console.log('hexCert', hexCert);
+
+            ImportCertificate2(keyHandleBuf, keyId, hexCert).then((responseData) => {
+                console.log('SUCCESS', responseData);
+                
+                showSignMessage(responseData);
+            });
         })
+
     </script>
 
 </body>
