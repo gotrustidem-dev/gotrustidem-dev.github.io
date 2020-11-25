@@ -1277,7 +1277,7 @@ async function GetTokenInfo() {
 
     var pki_header = new Uint8Array(3);
     var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 );
-    var pki_payload_length = command_buf.byteLength;
+    var pki_payload_length = 0;
     pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
     pki_header[0] = 0xE2;
     pki_header[1] = pki_payload_length >> 8
