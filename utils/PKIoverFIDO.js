@@ -1065,8 +1065,8 @@ async function ImportCertificate2(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf) {
         type: "public-key"
     }];
 
-    getAssertionChallenge.excludeCredentials = idList;
-    console.log('Import cert command getAssertionChallenge', getAssertionChallenge);
+    createCredentialOptions.excludeCredentials = idList;
+    console.log('Import cert command createCredentialOptions', createCredentialOptions);
 
     return await new Promise(resolve => {
         navigator.credentials.create({
@@ -1260,102 +1260,6 @@ async function ReadCertByIndexFunction2(index) {
 
         })
     });
-
-
-    // return await new Promise(resolve => {
-    //     navigator.credentials.get({
-    //             'publicKey': getAssertionChallenge
-    //         })
-    //         .then((newCredentialInfo) => {
-
-    //             navigator.credentials.get({
-    //                     'publicKey': getAssertionChallenge
-    //                 })
-    //                 .then((newCredentialInfo) => {
-
-
-
-    //                     navigator.credentials.get({
-    //                             'publicKey': getAssertionChallenge
-    //                         })
-    //                         .then((newCredentialInfo) => {
-
-
-
-    //                             navigator.credentials.get({
-    //                                     'publicKey': getAssertionChallenge
-    //                                 })
-    //                                 .then((newCredentialInfo) => {
-
-
-
-    //                                     navigator.credentials.get({
-    //                                             'publicKey': getAssertionChallenge
-    //                                         })
-    //                                         .then((newCredentialInfo) => {
-
-
-    //                                             navigator.credentials.get({
-    //                                                     'publicKey': getAssertionChallenge
-    //                                                 })
-    //                                                 .then((newCredentialInfo) => {
-
-
-
-    //                                                     navigator.credentials.get({
-    //                                                             'publicKey': getAssertionChallenge
-    //                                                         })
-    //                                                         .then((newCredentialInfo) => {
-
-
-    //                                                             navigator.credentials.get({
-    //                                                                     'publicKey': getAssertionChallenge
-    //                                                                 })
-    //                                                                 .then((newCredentialInfo) => {
-    //                                                                     console.log('SUCCESS', newCredentialInfo);
-    //                                                                     console.log("Sign", newCredentialInfo.response.signature);
-    //                                                                     const sign = newCredentialInfo.response.signature;
-    //                                                                     resolve(sign);
-    //                                                                 })
-
-    //                                                             //resolve(sign);
-    //                                                         })
-
-
-
-    //                                                     //resolve(sign);
-    //                                                 })
-
-
-
-    //                                             // resolve(sign);
-    //                                         })
-
-
-
-    //                                     //resolve(sign);
-    //                                 })
-
-
-    //                             //resolve(sign);
-    //                         })
-
-
-    //                     //resolve(sign);
-    //                 })
-
-
-
-    //             //resolve(sign);
-    //         })
-    //         .catch((error) => {
-    //             alert(error)
-    //             console.log('FAIL', error)
-    //         })
-
-    // });
-
-
 }
 
 async function GetTokenInfo() {
