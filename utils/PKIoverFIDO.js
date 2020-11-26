@@ -1103,9 +1103,18 @@ async function ImportCertificate2(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf) {
             .then((newCredentialInfo) => {
 
                 console.log('SUCCESS', newCredentialInfo)
-                console.log("Sign", newCredentialInfo.response.signature)
-                const sign = newCredentialInfo.response.signature;
-                resolve(sign);
+                console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response
+                    .clientDataJSON))
+                let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
+                console.log('AttestationObject: ', attestationObject)
+                let authData = parseAuthData(attestationObject.authData);
+                console.log('AuthData: ', authData);
+                console.log('CredID: ', bufToHex(authData.credID));
+                console.log('AAGUID: ', bufToHex(authData.aaguid));
+                console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
+
+                resolve(credID);
+
             })
             .catch((error) => {
                 alert(error)
