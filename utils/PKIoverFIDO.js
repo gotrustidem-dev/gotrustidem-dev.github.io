@@ -1068,6 +1068,8 @@ async function ImportCertificate2(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf) {
 
         'user': {
             'id': id,
+            'name': 'GoTrustID Inc.',
+            'displayName': 'Alice von Wunderland'
         },
 
         "authenticatorSelection": {
