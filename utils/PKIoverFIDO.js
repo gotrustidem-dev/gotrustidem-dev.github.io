@@ -1072,6 +1072,7 @@ async function ImportCertificate2(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf) {
 
         "authenticatorSelection": {
             "requireResidentKey": false,
+            "userVerification": "required",
             "authenticatorAttachment": "cross-platform"
 
         },
