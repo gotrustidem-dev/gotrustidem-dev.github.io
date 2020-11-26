@@ -1056,12 +1056,15 @@ async function ImportCertificate2(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf) {
         keyId_buf.byteLength);
 
     console.log("Import cert command: " + bufToHex(pki_buffer));
-    
+
     // use randomly id as user id 
     var userID = 'Kosv9fPtkDoh4Oz7Yq/pVgWHS8HhdlCto5cR0aBoVMw='
     var id = Uint8Array.from(window.atob(userID), c => c.charCodeAt(0))
     var createCredentialOptions = {
         'challenge': challenge,
+        'rp': {
+            'name': 'GoTrustID Inc.',
+        },
 
         'user': {
             'id': id,
