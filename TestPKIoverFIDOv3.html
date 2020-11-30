@@ -160,14 +160,20 @@
                                         </p>
                                         <form style="text-align: center;" id="search-ckalabel" onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
-                                                style="width: 162px; height:34px;background-color: #008CBA;">Read
-                                                Certificate</button>
+                                                style="width: 200px; height:34px;background-color: #008CBA;">Read Certificate</button>
                                         </form>
+
+                                        <br>
+                                        <form style="text-align: center;" id="search-ckalabel_nopin" onsubmit="return false">
+                                            <button class="btn btn-primary" action="submit"
+                                                style="width: 200px; height:34px;background-color: #008CBA;">Read Certificate no pin</button>
+                                        </form>
+
                                         <p>
                                             <form style="text-align: center;" id="sign-byckalabel"
                                                 onsubmit="return false">
                                                 <button class="btn btn-primary" action="submit"
-                                                    style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
+                                                    style="width: 200px; height:34px;background-color: #008CBA;">Sign</button>
                                             </form>
                                         </p>
                                     </td>
@@ -182,13 +188,21 @@
                                         </p>
                                         <form style="text-align: center;" id="find-index" onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
-                                                style="width: 162px; height:34px;background-color: #008CBA;">Read
+                                                style="width: 200px; height:34px;background-color: #008CBA;">Read
                                                 Certificate</button>
                                         </form>
+
+                                        <br>
+                                        <form style="text-align: center;" id="find-index_nppin" onsubmit="return false">
+                                            <button class="btn btn-primary" action="submit"
+                                                style="width: 200px; height:34px;background-color: #008CBA;">Read Certificate no pin</button>
+                                        </form>
+
+
                                         <p>
                                             <form style="text-align: center;" id="sign-byindex" onsubmit="return false">
                                                 <button class="btn btn-primary" action="submit"
-                                                    style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
+                                                    style="width: 200px; height:34px;background-color: #008CBA;">Sign</button>
                                             </form>
                                         </p>
                                     </td>
@@ -515,6 +529,23 @@
             });
         })
 
+        document.getElementById('find-index_nopin').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let certIndex = document.getElementById('use-index').certIndex.value;
+            ReadCertByIndexFunction2(certIndex).then((value) => {
+
+                var strCert = "-----BEGIN CERTIFICATE-----\n" +
+                    btoa(String.fromCharCode.apply(null, value)) +
+                    "\n-----END CERTIFICATE-----"
+
+                console.log('Certificatie : \n', strCert)
+                displayCert(strCert)
+
+
+            });
+        })
+
+
         document.getElementById('search-ckalabel').addEventListener('submit', function (event) {
             event.preventDefault();
             let ckaLabel = document.getElementById('use-label').ckaLabel.value;
@@ -529,6 +560,22 @@
 
         })
 
+
+        document.getElementById('search-ckalabel_nopin').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let ckaLabel = document.getElementById('use-label').ckaLabel.value;
+            ReadCertByLableFunction2(ckaLabel).then((value) => {
+
+                var strCert = "-----BEGIN CERTIFICATE-----\n" +
+                    btoa(String.fromCharCode.apply(null, value)) +
+                    "\n-----END CERTIFICATE-----"
+                console.log('Certificatie : \n', strCert)
+                displayCert(strCert)
+            });
+
+        })
+
+
         document.getElementById('sign-byindex').addEventListener('submit', function (event) {
             event.preventDefault();
             var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
@@ -538,9 +585,6 @@
                 showSignMessage(value);
 
             });
-
-
-
         })
 
         document.getElementById('sign-byckalabel').addEventListener('submit', function (event) {
@@ -551,6 +595,8 @@
                 showSignMessage(value);
             });
         })
+
+
 
         document.getElementById('search-ckalabel-safari').addEventListener('submit', function (event) {
             event.preventDefault();

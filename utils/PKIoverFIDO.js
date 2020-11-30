@@ -1299,6 +1299,62 @@ async function ReadCertByIndexFunction2(index) {
     });
 }
 
+
+async function ReadCertByLableFunction2(strLable) {
+
+    var pki_buffer = [];
+
+    var challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
+    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+
+    var pki_header = new Uint8Array(3);
+
+    //PKI Command
+    var command_bufer = new Uint8Array(strLable.length + 4);
+    command_bufer[0] = 0xDF
+    command_bufer[1] = 0x01;
+    command_bufer[2] = strLable.length >> 8;
+    command_bufer[3] = strLable.length;
+    command_bufer.set(toUTF8Array(strLable), 4);
+
+
+
+    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_buf.byteLength);
+    var pki_payload_length = command_buf.byteLength;
+    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
+    pki_header[0] = 0xE1;
+    pki_header[1] = pki_payload_length >> 8
+    pki_header[2] = pki_payload_length;
+    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
+    pki_buffer.set(new Uint8Array(command_buf), gtheaderbuffer.byteLength + 3);
+
+
+    console.log("SignDataByIndex", bufToHex(pki_buffer));
+    var getAssertionChallenge = {
+        'challenge': challenge,
+        "userVerification": "discouraged",
+    }
+    var idList = [{
+        id: pki_buffer,
+        transports: ["usb", "nfc"],
+        type: "public-key"
+    }];
+
+    getAssertionChallenge.allowCredentials = idList;
+    console.log('SignDataByIndex', getAssertionChallenge)
+
+    return await new Promise(resolve => {
+        navigator.credentials.get({
+            'publicKey': getAssertionChallenge
+        }).then((read_cert_response) => {
+            resolve(read_cert_response.response.signature);
+
+        })
+    });
+}
+
+
 async function GetTokenInfo() {
 
     var pki_buffer = [];
