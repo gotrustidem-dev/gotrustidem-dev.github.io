@@ -164,7 +164,7 @@
                                         </form>
 
                                         <br>
-                                        <form style="text-align: center;" id="search-ckalabel_nopin" onsubmit="return false">
+                                        <form style="text-align: center;" id="search-ckalabel-nopin" onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
                                                 style="width: 200px; height:34px;background-color: #008CBA;">Read Certificate no pin</button>
                                         </form>
@@ -193,7 +193,7 @@
                                         </form>
 
                                         <br>
-                                        <form style="text-align: center;" id="find-index_nppin" onsubmit="return false">
+                                        <form style="text-align: center;" id="find-index-nppin" onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
                                                 style="width: 200px; height:34px;background-color: #008CBA;">Read Certificate no pin</button>
                                         </form>
@@ -529,7 +529,7 @@
             });
         })
 
-        document.getElementById('find-index_nopin').addEventListener('submit', function (event) {
+        document.getElementById('find-index-nopin').addEventListener('submit', function (event) {
             event.preventDefault();
             let certIndex = document.getElementById('use-index').certIndex.value;
             ReadCertByIndexFunction2(certIndex).then((value) => {
@@ -561,7 +561,7 @@
         })
 
 
-        document.getElementById('search-ckalabel_nopin').addEventListener('submit', function (event) {
+        document.getElementById('search-ckalabel-nopin').addEventListener('submit', function (event) {
             event.preventDefault();
             let ckaLabel = document.getElementById('use-label').ckaLabel.value;
             ReadCertByLableFunction2(ckaLabel).then((value) => {
