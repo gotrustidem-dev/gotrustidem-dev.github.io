@@ -129,13 +129,13 @@
                 <tr>
                     <td style="width: 100% ;">
                         
-                        <form style="text-align: left;" id="btn_token_info" onsubmit="return false">
+                        <form style="text-align: center;" id="btn_token_info" onsubmit="return false">
                             <button class="btn btn-primary" action="submit"
-                                style="width: 162px; height:34px;background-color: #008CBA;">Token Information</button>                  
-                            <label id="label_token_fw">FW verison:</label><br> 
-                            <label id="label_token_sw">SW version:</label><br>   
-                            <label id="label_pin_retries">PIN retries times:</label><br> 
-                            <label id="label_credentials">Credentials:</label><br>     
+                                style="width: 162px; height:34px;background-color: #008CBA;">Token Information</button> <br>                  
+                            <label id="label_token_fw"></label><br> 
+                            <label id="label_token_sw"></label><br>   
+                            <label id="label_pin_retries"></label><br> 
+                            <label id="label_credentials"></label><br>     
                         </form>
 
 
@@ -213,18 +213,18 @@
                                                     CSR</button>
                                             </form>
 
-                                            <form style="text-align: center;" id="btn_test_mutliread" onsubmit="return false">
+                                            <!-- <form style="text-align: center;" id="btn_test_mutliread" onsubmit="return false">
                                                 <button class="btn btn-primary" action="submit"
                                                     style="width: 162px; height:34px;background-color: #008CBA;">Test Read cert by sign</button>
-                                            </form>
+                                            </form> -->
 
-                                            <form style="text-align: center;" id="btn_test_tokeninfo" onsubmit="return false">
+                                            <!-- <form style="text-align: center;" id="btn_test_tokeninfo" onsubmit="return false">
                                                 <button class="btn btn-primary" action="submit"
                                                     style="width: 162px; height:34px;background-color: #008CBA;">Test Get Token Info</button>
-                                            </form>
+                                            </form> -->
 
                                             
-                                            <form style="text-align: center;" id="btn_import_certificate"
+                                            <!-- <form style="text-align: center;" id="btn_import_certificate"
                                                 onsubmit="return false">
                                                 <p>
                                                     <label id="key_id_value">Key ID:</label><br>
@@ -235,7 +235,7 @@
                                                     style="width: 162px; height:34px;background-color: #008CBA;">Import
                                                     Cert. to Key</button>
 
-                                            </form>
+                                            </form> -->
 
                                             <form style="text-align: center;" id="btn_import_certificate2"
                                             onsubmit="return false">
@@ -2105,10 +2105,10 @@
 
                 let responseData = parsePKIoverFIDOResponse(newCredentialInfo);
 
-                document.getElementById('label_token_fw').innerText+= responseData[1];
-                document.getElementById('label_token_sw').innerText+= responseData[2];
-                document.getElementById('label_pin_retries').innerText+= responseData[3];
-                document.getElementById('label_credentials').innerText+= responseData[4];
+                document.getElementById('label_token_fw').innerText= "FW vesion: "+responseData[1];
+                document.getElementById('label_token_sw').innerText= "SW vesion: "+responseData[2];
+                document.getElementById('label_pin_retries').innerText= "PIN retryies: "+responseData[3];
+                document.getElementById('label_credentials').innerText= "Credentials: "+responseData[4];
 
                 console.log('Response : \n', responseData);
 
