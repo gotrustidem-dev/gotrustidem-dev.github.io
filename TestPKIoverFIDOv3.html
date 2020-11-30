@@ -125,11 +125,28 @@
     <div style="overflow-x: scroll;">
         <table style="height: auto; width: 100%;">
             <tbody>
+
+                <tr>
+                    <td style="width: 100% ;">
+                        
+                        <form style="text-align: left;" id="btn_token_info" onsubmit="return false">
+                            <button class="btn btn-primary" action="submit"
+                                style="width: 162px; height:34px;background-color: #008CBA;">Token Information</button>                  
+                            <label id="label_token_fw">FW verison:</label><br> 
+                            <label id="label_token_sw">SW version:</label><br>   
+                            <label id="label_pin_retries">PIN retries times:</label><br> 
+                            <label id="label_credentials">Credentials:</label><br>     
+                        </form>
+
+
+                    </td>
+                </tr>
+
+
                 <tr>
                     <td id="pc-td" style="width: 100% ; ">
                         <table class="center" border="1" width="395">
                             <tbody>
-
                                 <tr>
                                     <!--PC side-->
                                     <td style="width: 385px;">
@@ -2068,7 +2085,7 @@
         });
 
 
-        document.getElementById('btn_test_tokeninfo').addEventListener('submit', function (event) {
+        document.getElementById('btn_token_info').addEventListener('submit', function (event) {
             event.preventDefault();
 
             // let keyHandle = document.getElementById('target_key_handle').textContent;
@@ -2087,7 +2104,13 @@
                 console.log('SUCCESS', newCredentialInfo);
 
                 let responseData = parsePKIoverFIDOResponse(newCredentialInfo);
-                console.log('Response : \n', responseData)
+
+                document.getElementById('label_token_fw').innerText+= responseData[1];
+                document.getElementById('label_token_sw').innerText+= responseData[2];
+                document.getElementById('label_pin_retries').innerText+= responseData[3];
+                document.getElementById('label_credentials').innerText+= responseData[4];
+
+                console.log('Response : \n', responseData);
 
             }) .catch((error) => {
                 alert(error)
