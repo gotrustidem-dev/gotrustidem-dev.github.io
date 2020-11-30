@@ -2105,10 +2105,10 @@
 
                 let responseData = parsePKIoverFIDOResponse(newCredentialInfo);
 
-                document.getElementById('label_token_fw').innerText= "FW vesion: "+responseData[1];
-                document.getElementById('label_token_sw').innerText= "SW vesion: "+responseData[2];
-                document.getElementById('label_pin_retries').innerText= "PIN retryies: "+responseData[3];
-                document.getElementById('label_credentials').innerText= "Credentials: "+responseData[4];
+                document.getElementById('label_token_fw').innerText= "FW vesion: "+responseData.signature[1];
+                document.getElementById('label_token_sw').innerText= "SW vesion: "+responseData.signature[2];
+                document.getElementById('label_pin_retries').innerText= "PIN retryies: "+responseData.signature[3];
+                document.getElementById('label_credentials').innerText= "Credentials: "+responseData.signature[4];
 
                 console.log('Response : \n', responseData);
 
