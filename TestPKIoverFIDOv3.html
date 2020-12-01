@@ -542,15 +542,20 @@
             let certIndex = document.getElementById('use-index').certIndex.value;
             ReadCertByIndexFunction2(certIndex).then((value) => {
 
-                var strCert = "-----BEGIN CERTIFICATE-----\n" +
-                    btoa(String.fromCharCode.apply(null, value)) +
+
+            let responseData = parsePKIoverFIDOResponse(value);
+
+            var strCert = "-----BEGIN CERTIFICATE-----\n" +
+                btoa(String.fromCharCode.apply(null, responseData.signature)) +
                     "\n-----END CERTIFICATE-----"
-
                 console.log('Certificatie : \n', strCert)
-                displayCert(strCert)
-
-
+                displayCert(strCert);
+            }) .catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
             });
+
+              
         })
 
 
@@ -574,13 +579,17 @@
             let ckaLabel = document.getElementById('use-label').ckaLabel.value;
             ReadCertByLableFunction2(ckaLabel).then((value) => {
 
-                var strCert = "-----BEGIN CERTIFICATE-----\n" +
-                    btoa(String.fromCharCode.apply(null, value)) +
-                    "\n-----END CERTIFICATE-----"
-                console.log('Certificatie : \n', strCert)
-                displayCert(strCert)
-            });
+                let responseData = parsePKIoverFIDOResponse(value);
 
+                var strCert = "-----BEGIN CERTIFICATE-----\n" +
+                    btoa(String.fromCharCode.apply(null, responseData.signature)) +
+                        "\n-----END CERTIFICATE-----"
+                    console.log('Certificatie : \n', strCert)
+                    displayCert(strCert);
+            }).catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            });
         })
 
 
