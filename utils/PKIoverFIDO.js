@@ -2,6 +2,17 @@
 
 
 
+
+const CMD_KeyAgreement = 0xE0;
+const CMD_ReadCertificate = 0xE1;
+const CMD_TokenInfo= 0xE2;
+const CMD_Sign= 0xE3;
+const CMD_SignWithPIN= 0xE4;
+const CMD_GenRsaKeyPair= 0xE5;
+const CMD_ImportCertificate= 0xE6;
+
+
+
 var g_encryptedPIN;
 var g_platformECpublickey;
 
@@ -1192,7 +1203,7 @@ function hexStringToArrayBuffer(hexString) {
 }
 
 
-var parsePKIoverFIDOResponse = (buffer) => {
+var parsePKIoverFIDOResponse = (buffer,cmd) => {
 
 
     // check directly return 256 bytes which doesn't  include header and status code; 
@@ -1201,7 +1212,6 @@ var parsePKIoverFIDOResponse = (buffer) => {
     let status = undefined;
     let signature = undefined;
     let retries = undefined;
-
 
     //meaning this is directly return signature
     if (buffer.byteLength == 256) {
@@ -1490,4 +1500,115 @@ async function TestExtendsToReadSign(index, plain) {
     });
 
 
+}
+
+
+var parsePKIoverFIDOResponse2 = (buffer,cmd) => {
+
+
+    // check directly return 256 bytes which doesn't  include header and status code; 
+    //let testData = CBOR.decode(buffer);
+    //console.log("check point1",testData)    
+    let status = undefined;
+    let signature = undefined;
+    let retries = undefined;
+
+    if (buffer.byteLength == 256) {
+        signature = new Uint8Array(buffer);
+        status = CTAP1_ERR_SUCCESS;
+        return {signature,status };
+    }else{
+
+        let GTheaderBuf = buffer.slice(0, 16);
+        if (String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf)) === GTheaderStr) {
+            buffer = buffer.slice(16);
+            let totalLenBuf = buffer.slice(0, 2);
+            let totalLen = readBE16(new Uint8Array(totalLenBuf));
+            buffer = buffer.slice(2);
+            let statusCodeBuf = buffer.slice(0, 1);
+            let statusCode = new Uint8Array(statusCodeBuf);
+            buffer = buffer.slice(1);
+            status = statusCode;
+
+            if (status[0] === CTAP1_ERR_SUCCESS) {
+                let responseDataBuf = buffer.slice(0, (totalLen - 1));
+                let responseData = CBOR.decode(responseDataBuf);
+                signature = responseData;
+            } else {
+                status = status[0];
+
+            }
+        }
+
+        switch(cmd){
+
+            case CMD_KeyAgreement:
+    
+                break;
+            case CMD_ReadCertificate:
+    
+                break;
+            case CMD_TokenInfo:
+    
+                break;
+            case CMD_Sign:
+    
+                break;
+            case CMD_SignWithPIN:
+    
+                break;
+            case CMD_GenRsaKeyPair:
+    
+                break;
+            case CMD_ImportCertificate:
+    
+            default:
+    
+        }
+
+    }
+
+
+
+    
+
+    //meaning this is directly return signature
+    if (buffer.byteLength == 256) {
+        signature = new Uint8Array(buffer);
+        status = CTAP1_ERR_SUCCESS;
+    } else {
+        let GTheaderBuf = buffer.slice(0, 16);
+        if (String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf)) === GTheaderStr) {
+            buffer = buffer.slice(16);
+            let totalLenBuf = buffer.slice(0, 2);
+            let totalLen = readBE16(new Uint8Array(totalLenBuf));
+            buffer = buffer.slice(2);
+            let statusCodeBuf = buffer.slice(0, 1);
+            let statusCode = new Uint8Array(statusCodeBuf);
+            buffer = buffer.slice(1);
+            status = statusCode;
+
+            if (status[0] === CTAP1_ERR_SUCCESS) {
+                let responseDataBuf = buffer.slice(0, (totalLen - 1));
+                let responseData = CBOR.decode(responseDataBuf);
+                signature = responseData;
+            } else {
+                status = status[0];
+
+            }
+        } else {
+
+            signature = new Uint8Array(buffer);
+            status = CTAP1_ERR_SUCCESS;
+
+
+        }
+    }
+
+
+
+    return {
+        signature,
+        status
+    };
 }
