@@ -1503,112 +1503,112 @@ async function TestExtendsToReadSign(index, plain) {
 }
 
 
-var parsePKIoverFIDOResponse2 = (buffer,cmd) => {
+// var parsePKIoverFIDOResponse2 = (buffer,cmd) => {
 
 
-    // check directly return 256 bytes which doesn't  include header and status code; 
-    //let testData = CBOR.decode(buffer);
-    //console.log("check point1",testData)    
-    let status = undefined;
-    let signature = undefined;
-    let retries = undefined;
+//     // check directly return 256 bytes which doesn't  include header and status code; 
+//     //let testData = CBOR.decode(buffer);
+//     //console.log("check point1",testData)    
+//     let status = undefined;
+//     let signature = undefined;
+//     let retries = undefined;
 
-    if (buffer.byteLength == 256) {
-        signature = new Uint8Array(buffer);
-        status = CTAP1_ERR_SUCCESS;
-        return {signature,status };
-    }else{
+//     if (buffer.byteLength == 256) {
+//         signature = new Uint8Array(buffer);
+//         status = CTAP1_ERR_SUCCESS;
+//         return {signature,status };
+//     }else{
 
-        let GTheaderBuf = buffer.slice(0, 16);
-        if (String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf)) === GTheaderStr) {
-            buffer = buffer.slice(16);
-            let totalLenBuf = buffer.slice(0, 2);
-            let totalLen = readBE16(new Uint8Array(totalLenBuf));
-            buffer = buffer.slice(2);
-            let statusCodeBuf = buffer.slice(0, 1);
-            let statusCode = new Uint8Array(statusCodeBuf);
-            buffer = buffer.slice(1);
-            status = statusCode;
+//         let GTheaderBuf = buffer.slice(0, 16);
+//         if (String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf)) === GTheaderStr) {
+//             buffer = buffer.slice(16);
+//             let totalLenBuf = buffer.slice(0, 2);
+//             let totalLen = readBE16(new Uint8Array(totalLenBuf));
+//             buffer = buffer.slice(2);
+//             let statusCodeBuf = buffer.slice(0, 1);
+//             let statusCode = new Uint8Array(statusCodeBuf);
+//             buffer = buffer.slice(1);
+//             status = statusCode;
 
-            if (status[0] === CTAP1_ERR_SUCCESS) {
-                let responseDataBuf = buffer.slice(0, (totalLen - 1));
-                let responseData = CBOR.decode(responseDataBuf);
-                signature = responseData;
-            } else {
-                status = status[0];
+//             if (status[0] === CTAP1_ERR_SUCCESS) {
+//                 let responseDataBuf = buffer.slice(0, (totalLen - 1));
+//                 let responseData = CBOR.decode(responseDataBuf);
+//                 signature = responseData;
+//             } else {
+//                 status = status[0];
 
-            }
-        }
+//             }
+//         }
 
-        switch(cmd){
+//         switch(cmd){
 
-            case CMD_KeyAgreement:
+//             case CMD_KeyAgreement:
     
-                break;
-            case CMD_ReadCertificate:
+//                 break;
+//             case CMD_ReadCertificate:
     
-                break;
-            case CMD_TokenInfo:
+//                 break;
+//             case CMD_TokenInfo:
     
-                break;
-            case CMD_Sign:
+//                 break;
+//             case CMD_Sign:
     
-                break;
-            case CMD_SignWithPIN:
+//                 break;
+//             case CMD_SignWithPIN:
     
-                break;
-            case CMD_GenRsaKeyPair:
+//                 break;
+//             case CMD_GenRsaKeyPair:
     
-                break;
-            case CMD_ImportCertificate:
+//                 break;
+//             case CMD_ImportCertificate:
     
-            default:
+//             default:
     
-        }
+//         }
 
-    }
+//     }
 
 
 
     
 
-    //meaning this is directly return signature
-    if (buffer.byteLength == 256) {
-        signature = new Uint8Array(buffer);
-        status = CTAP1_ERR_SUCCESS;
-    } else {
-        let GTheaderBuf = buffer.slice(0, 16);
-        if (String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf)) === GTheaderStr) {
-            buffer = buffer.slice(16);
-            let totalLenBuf = buffer.slice(0, 2);
-            let totalLen = readBE16(new Uint8Array(totalLenBuf));
-            buffer = buffer.slice(2);
-            let statusCodeBuf = buffer.slice(0, 1);
-            let statusCode = new Uint8Array(statusCodeBuf);
-            buffer = buffer.slice(1);
-            status = statusCode;
+//     //meaning this is directly return signature
+//     if (buffer.byteLength == 256) {
+//         signature = new Uint8Array(buffer);
+//         status = CTAP1_ERR_SUCCESS;
+//     } else {
+//         let GTheaderBuf = buffer.slice(0, 16);
+//         if (String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf)) === GTheaderStr) {
+//             buffer = buffer.slice(16);
+//             let totalLenBuf = buffer.slice(0, 2);
+//             let totalLen = readBE16(new Uint8Array(totalLenBuf));
+//             buffer = buffer.slice(2);
+//             let statusCodeBuf = buffer.slice(0, 1);
+//             let statusCode = new Uint8Array(statusCodeBuf);
+//             buffer = buffer.slice(1);
+//             status = statusCode;
 
-            if (status[0] === CTAP1_ERR_SUCCESS) {
-                let responseDataBuf = buffer.slice(0, (totalLen - 1));
-                let responseData = CBOR.decode(responseDataBuf);
-                signature = responseData;
-            } else {
-                status = status[0];
+//             if (status[0] === CTAP1_ERR_SUCCESS) {
+//                 let responseDataBuf = buffer.slice(0, (totalLen - 1));
+//                 let responseData = CBOR.decode(responseDataBuf);
+//                 signature = responseData;
+//             } else {
+//                 status = status[0];
 
-            }
-        } else {
+//             }
+//         } else {
 
-            signature = new Uint8Array(buffer);
-            status = CTAP1_ERR_SUCCESS;
-
-
-        }
-    }
+//             signature = new Uint8Array(buffer);
+//             status = CTAP1_ERR_SUCCESS;
 
 
+//         }
+//     }
 
-    return {
-        signature,
-        status
-    };
-}
+
+
+//     return {
+//         signature,
+//         status
+//     };
+// }
