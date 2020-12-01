@@ -135,7 +135,8 @@
                             <label id="label_token_fw"></label><br> 
                             <label id="label_token_sw"></label><br>   
                             <label id="label_pin_retries"></label><br> 
-                            <label id="label_credentials"></label><br>     
+                            <label id="label_credentials"></label><br>   
+                            <label id="label_serial_number"></label><br>    
                         </form>
 
 
@@ -193,7 +194,7 @@
                                         </form>
 
                                         <br>
-                                        <form style="text-align: center;" id="find-index-nppin" onsubmit="return false">
+                                        <form style="text-align: center;" id="find-index-nopin" onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
                                                 style="width: 200px; height:34px;background-color: #008CBA;">Read Certificate no pin</button>
                                         </form>
@@ -2155,7 +2156,8 @@
                 document.getElementById('label_token_sw').innerText= "SW vesion: "+responseData.signature[2];
                 document.getElementById('label_pin_retries').innerText= "PIN retryies: "+responseData.signature[3];
                 document.getElementById('label_credentials').innerText= "Credentials: "+responseData.signature[4];
-
+                document.getElementById('label_serial_number').innerText= "Serial number: "+responseData.signature[5];
+                
                 console.log('Response : \n', responseData);
 
             }) .catch((error) => {
