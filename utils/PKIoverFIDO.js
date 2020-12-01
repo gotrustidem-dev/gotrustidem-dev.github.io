@@ -1331,7 +1331,7 @@ async function ReadCertByLableFunction2(strLable) {
 
 
     var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_bufer.byteLength);
-    var pki_payload_length = command_buf.byteLength;
+    var pki_payload_length = command_bufer.byteLength;
     pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
     pki_header[0] = 0xE1;
     pki_header[1] = pki_payload_length >> 8
