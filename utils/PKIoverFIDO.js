@@ -1337,7 +1337,7 @@ async function ReadCertByLableFunction2(strLable) {
     pki_header[1] = pki_payload_length >> 8
     pki_header[2] = pki_payload_length;
     pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-    pki_buffer.set(new Uint8Array(command_buf), gtheaderbuffer.byteLength + 3);
+    pki_buffer.set(new Uint8Array(command_bufer), gtheaderbuffer.byteLength + 3);
 
 
     console.log("SignDataByIndex", bufToHex(pki_buffer));
