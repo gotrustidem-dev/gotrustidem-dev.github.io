@@ -2166,7 +2166,7 @@
                 console.log('SUCCESS', newCredentialInfo);
 
                 //let responseData = parsePKIoverFIDOResponse(newCredentialInfo);
-                let responseData = parsePKIoverFIDOResponse2(newCredentialInfo);
+                let responseData = parsePKIoverFIDOResponse2(newCredentialInfo, CMD_TokenInfo);
                 document.getElementById('label_token_fw').innerText= "FW vesion: "+responseData.FW;
                 document.getElementById('label_token_sw').innerText= "SW vesion: "+responseData.SW;
                 document.getElementById('label_pin_retries').innerText= "PIN retryies: "+responseData.PINRetries;
