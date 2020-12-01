@@ -1533,7 +1533,7 @@ var parsePKIoverFIDOResponse2 = (buffer,cmd) => {
             if(status[0] === CTAP1_ERR_SUCCESS){
                 let responseDataBuf = buffer.slice(0, (totalLen - 1));
                 let responseData = CBOR.decode(responseDataBuf);
-            }
+           
             switch(cmd){
 
                 case CMD_KeyAgreement:
@@ -1566,6 +1566,7 @@ var parsePKIoverFIDOResponse2 = (buffer,cmd) => {
                 default:
         
             }
+        }
         }
     }
 }
