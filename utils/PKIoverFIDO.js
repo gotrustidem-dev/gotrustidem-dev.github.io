@@ -1578,6 +1578,7 @@ var ConverVersionFormat = (buffer)=>{
     for (var i = 0; i < buffer.length; i++) {
         result+= buffer[i].toString(16);
         result+= ".";
+    }
     return result;
 
 }
