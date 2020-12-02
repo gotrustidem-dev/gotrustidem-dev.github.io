@@ -2167,8 +2167,8 @@
 
                 //let responseData = parsePKIoverFIDOResponse(newCredentialInfo);
                 let responseData = parsePKIoverFIDOResponse2(newCredentialInfo, CMD_TokenInfo);
-                document.getElementById('label_token_fw').innerText= "FW vesion: "+responseData.FW;
-                document.getElementById('label_token_sw').innerText= "SW vesion: "+responseData.SW;
+                document.getElementById('label_token_fw').innerText= "FW version: "+responseData.FW;
+                document.getElementById('label_token_sw').innerText= "SW version: "+responseData.SW;
                 document.getElementById('label_pin_retries').innerText= "PIN retryies: "+responseData.PINRetries;
                 document.getElementById('label_credentials').innerText= "Credentials: "+responseData.NumOfCredential;
                 document.getElementById('label_serial_number').innerText= "Serial number: "+responseData.SN;
