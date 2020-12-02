@@ -1549,7 +1549,7 @@ var parsePKIoverFIDOResponse2 = (buffer,cmd) => {
                         let SW        = ConverVersionFormat(responseData[2]);
                         let PINRetries = responseData[3];
                         let NumOfCredential = responseData[4];
-                        let SN = undefined;
+                        let SN = ConverSNFormat(responseData[5]);
                         return {status,FW,SW,PINRetries,NumOfCredential,SN };
                     break;
                 case CMD_Sign:
@@ -1579,6 +1579,22 @@ var ConverVersionFormat = (buffer)=>{
     for (var i = 0; i < buffer.length; i++) {
         result+= buffer[i].toString(16);
         result+= ".";
+    }
+    return result;
+
+}
+
+
+
+var ConverSNFormat = (buffer)=>{
+
+    var result = "";
+
+    for (var i = 0; i < buffer.length; i++) {
+        if(buffer[i]<16){
+            result+='0';
+        }
+        result+= buffer[i].toString(16);
     }
     return result;
 
