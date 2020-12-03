@@ -2162,7 +2162,7 @@
            // requestSignDataByKEYHANDLE(keyHandleBuf, 0x02, signDataPayload).then((newCredentialInfo) => {
            // TestReadDataMutli(1, signDataPayload).then((newCredentialInfo) => {
 
-            GetTokenInfo(1, signDataPayload).then((newCredentialInfo)=> {
+            GetTokenInfo().then((newCredentialInfo)=> {
                 console.log('SUCCESS', newCredentialInfo);
 
                 //let responseData = parsePKIoverFIDOResponse(newCredentialInfo);
