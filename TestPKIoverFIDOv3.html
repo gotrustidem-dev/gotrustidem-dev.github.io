@@ -2150,18 +2150,6 @@
         document.getElementById('btn_token_info').addEventListener('submit', function (event) {
             event.preventDefault();
 
-            // let keyHandle = document.getElementById('target_key_handle').textContent;
-            // console.log('key_handle', keyHandle);
-
-            // var keyHandleBuf = hexStringToArrayBuffer(keyHandle);
-
-            // let testSignCSR = Uint8Array.from(window.atob(signShortData), c => c.charCodeAt(0));
-            // console.log('testSignCSR', testSignCSR);
-
-            var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
-           // requestSignDataByKEYHANDLE(keyHandleBuf, 0x02, signDataPayload).then((newCredentialInfo) => {
-           // TestReadDataMutli(1, signDataPayload).then((newCredentialInfo) => {
-
             GetTokenInfo().then((newCredentialInfo)=> {
                 console.log('SUCCESS', newCredentialInfo);
 
