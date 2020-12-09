@@ -544,15 +544,19 @@
 
             let responseData = parsePKIoverFIDOResponse(value);
 
-            var strCert = "-----BEGIN CERTIFICATE-----\n" +
-                btoa(String.fromCharCode.apply(null, responseData.signature)) +
-                    "\n-----END CERTIFICATE-----"
-                console.log('Certificatie : \n', strCert)
-                displayCert(strCert);
-            }) .catch((error) => {
-                alert(error)
-                console.log('FAIL', error)
-            });
+            if(responseData.status===CTAP1_ERR_SUCCESS){
+                    var strCert = "-----BEGIN CERTIFICATE-----\n" +
+                    btoa(String.fromCharCode.apply(null, responseData.signature)) +
+                        "\n-----END CERTIFICATE-----"
+                    console.log('Certificatie : \n', strCert)
+                    displayCert(strCert);
+                }else if(responseData.status===CTAP2_ERR_NO_CREDENTIALS){
+
+                    alert("No valid credentials provided");
+                }else{
+                    alert("Error ocured. Status code: "+responseData.status);
+
+                };
 
               
         })
@@ -579,12 +583,21 @@
             ReadCertByLableFunction2(ckaLabel).then((value) => {
 
                 let responseData = parsePKIoverFIDOResponse(value);
-
-                var strCert = "-----BEGIN CERTIFICATE-----\n" +
+                if(responseData.status===CTAP1_ERR_SUCCESS){
+                    var strCert = "-----BEGIN CERTIFICATE-----\n" +
                     btoa(String.fromCharCode.apply(null, responseData.signature)) +
                         "\n-----END CERTIFICATE-----"
                     console.log('Certificatie : \n', strCert)
                     displayCert(strCert);
+                }else if(responseData.status===CTAP2_ERR_NO_CREDENTIALS){
+
+                    alert("No valid credentials provided");
+                }else{
+                    alert("Error ocured. Status code: "+responseData.status);
+
+                }
+
+                
             }).catch((error) => {
                 alert(error)
                 console.log('FAIL', error)
