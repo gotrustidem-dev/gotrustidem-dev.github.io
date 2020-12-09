@@ -128,15 +128,16 @@
 
                 <tr>
                     <td style="width: 100% ;">
-                        
+
                         <form style="text-align: center;" id="btn_token_info" onsubmit="return false">
                             <button class="btn btn-primary" action="submit"
-                                style="width: 162px; height:34px;background-color: #008CBA;">Token Information</button> <br>                  
-                            <label id="label_token_fw"></label><br> 
-                            <label id="label_token_sw"></label><br>   
-                            <label id="label_pin_retries"></label><br> 
-                            <label id="label_credentials"></label><br>   
-                            <label id="label_serial_number"></label><br>    
+                                style="width: 162px; height:34px;background-color: #008CBA;">Token Information</button>
+                            <br>
+                            <label id="label_token_fw"></label><br>
+                            <label id="label_token_sw"></label><br>
+                            <label id="label_pin_retries"></label><br>
+                            <label id="label_credentials"></label><br>
+                            <label id="label_serial_number"></label><br>
                         </form>
 
 
@@ -161,13 +162,16 @@
                                         </p>
                                         <form style="text-align: center;" id="search-ckalabel" onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
-                                                style="width: 200px; height:34px;background-color: #008CBA;">Read Certificate</button>
+                                                style="width: 200px; height:34px;background-color: #008CBA;">Read
+                                                Certificate</button>
                                         </form>
 
                                         <br>
-                                        <form style="text-align: center;" id="search-ckalabel-nopin" onsubmit="return false">
+                                        <form style="text-align: center;" id="search-ckalabel-nopin"
+                                            onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
-                                                style="width: 200px; height:34px;background-color: #008CBA;">Read Certificate no pin</button>
+                                                style="width: 200px; height:34px;background-color: #008CBA;">Read
+                                                Certificate no pin</button>
                                         </form>
 
                                         <p>
@@ -196,7 +200,8 @@
                                         <br>
                                         <form style="text-align: center;" id="find-index-nopin" onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
-                                                style="width: 200px; height:34px;background-color: #008CBA;">Read Certificate no pin</button>
+                                                style="width: 200px; height:34px;background-color: #008CBA;">Read
+                                                Certificate no pin</button>
                                         </form>
 
 
@@ -238,8 +243,8 @@
                                                     style="width: 162px; height:34px;background-color: #008CBA;">Test Get Token Info</button>
                                             </form> -->
 
-                                            
-                                          <!-- <form style="text-align: center;" id="btn_import_certificate"
+
+                                            <!-- <form style="text-align: center;" id="btn_import_certificate"
                                                 onsubmit="return false">
                                                 <p>
                                                     <label id="key_id_value">Key ID:</label><br>
@@ -253,16 +258,17 @@
                                             </form>  -->
 
                                             <form style="text-align: center;" id="btn_import_certificate2"
-                                            onsubmit="return false">
+                                                onsubmit="return false">
 
-                                            <p>
-                                                <label id="key_id_value">Key ID:</label><br>
-                                                <input type="text" id="target_key_id"
-                                                    style="width: 342px; height:41px">
-                                          </p>
+                                                <p>
+                                                    <label id="key_id_value">Key ID:</label><br>
+                                                    <input type="text" id="target_key_id"
+                                                        style="width: 342px; height:41px">
+                                                </p>
 
-                                            <button class="btn btn-primary" action="submit"
-                                                style="width: 162px; height:34px;background-color: #008CBA;">Import Certificate</button>
+                                                <button class="btn btn-primary" action="submit"
+                                                    style="width: 162px; height:34px;background-color: #008CBA;">Import
+                                                    Certificate</button>
 
                                             </form>
                                         </p>
@@ -542,23 +548,25 @@
             ReadCertByIndexFunction2(certIndex).then((value) => {
 
 
-            let responseData = parsePKIoverFIDOResponse(value);
-
-            if(responseData.status===CTAP1_ERR_SUCCESS){
+                if (responseData.status === CTAP1_ERR_SUCCESS) {
                     var strCert = "-----BEGIN CERTIFICATE-----\n" +
-                    btoa(String.fromCharCode.apply(null, responseData.signature)) +
+                        btoa(String.fromCharCode.apply(null, responseData.signature)) +
                         "\n-----END CERTIFICATE-----"
                     console.log('Certificatie : \n', strCert)
                     displayCert(strCert);
-                }else if(responseData.status===CTAP2_ERR_NO_CREDENTIALS){
+                } else if (responseData.status === CTAP2_ERR_NO_CREDENTIALS) {
 
                     alert("No valid credentials provided");
-                }else{
-                    alert("Error ocured. Status code: "+responseData.status);
+                } else {
+                    alert("Error ocured. Status code: " + responseData.status);
 
-                };
+                }
+            }).catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            });
 
-              
+
         })
 
 
@@ -583,21 +591,23 @@
             ReadCertByLableFunction2(ckaLabel).then((value) => {
 
                 let responseData = parsePKIoverFIDOResponse(value);
-                if(responseData.status===CTAP1_ERR_SUCCESS){
+
+
+                if (responseData.status === CTAP1_ERR_SUCCESS) {
                     var strCert = "-----BEGIN CERTIFICATE-----\n" +
-                    btoa(String.fromCharCode.apply(null, responseData.signature)) +
+                        btoa(String.fromCharCode.apply(null, responseData.signature)) +
                         "\n-----END CERTIFICATE-----"
                     console.log('Certificatie : \n', strCert)
                     displayCert(strCert);
-                }else if(responseData.status===CTAP2_ERR_NO_CREDENTIALS){
+                } else if (responseData.status === CTAP2_ERR_NO_CREDENTIALS) {
 
                     alert("No valid credentials provided");
-                }else{
-                    alert("Error ocured. Status code: "+responseData.status);
+                } else {
+                    alert("Error ocured. Status code: " + responseData.status);
 
                 }
 
-                
+
             }).catch((error) => {
                 alert(error)
                 console.log('FAIL', error)
@@ -2101,7 +2111,7 @@
             });
         });
 
-        
+
         document.getElementById('btn_sign_csr').addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -2117,11 +2127,11 @@
             requestSignDataByKEYHANDLE(keyHandleBuf, 0x02, signDataPayload).then((newCredentialInfo) => {
                 console.log('SUCCESS', newCredentialInfo);
                 let responseData = parsePKIoverFIDOResponse(newCredentialInfo.response.signature);
-                console.log('PKIoverFIDO signature',  responseData.signature);
+                console.log('PKIoverFIDO signature', responseData.signature);
                 var str = String.fromCharCode.apply(null, responseData.signature);
-                alert("Signature:" + "\n" + btoa(str));    
+                alert("Signature:" + "\n" + btoa(str));
 
-            }) .catch((error) => {
+            }).catch((error) => {
                 alert(error)
                 console.log('FAIL', error)
             });
@@ -2163,20 +2173,23 @@
         document.getElementById('btn_token_info').addEventListener('submit', function (event) {
             event.preventDefault();
 
-            GetTokenInfo().then((newCredentialInfo)=> {
+            GetTokenInfo().then((newCredentialInfo) => {
                 console.log('SUCCESS', newCredentialInfo);
 
                 //let responseData = parsePKIoverFIDOResponse(newCredentialInfo);
                 let responseData = parsePKIoverFIDOResponse2(newCredentialInfo, CMD_TokenInfo);
-                document.getElementById('label_token_fw').innerText= "FW version: "+responseData.FW;
-                document.getElementById('label_token_sw').innerText= "SW version: "+responseData.SW;
-                document.getElementById('label_pin_retries').innerText= "PIN retryies: "+responseData.PINRetries;
-                document.getElementById('label_credentials').innerText= "Credentials: "+responseData.NumOfCredential;
-                document.getElementById('label_serial_number').innerText= "Serial number: "+responseData.SN;
-                
+                document.getElementById('label_token_fw').innerText = "FW version: " + responseData.FW;
+                document.getElementById('label_token_sw').innerText = "SW version: " + responseData.SW;
+                document.getElementById('label_pin_retries').innerText = "PIN retryies: " + responseData
+                    .PINRetries;
+                document.getElementById('label_credentials').innerText = "Credentials: " + responseData
+                    .NumOfCredential;
+                document.getElementById('label_serial_number').innerText = "Serial number: " +
+                    responseData.SN;
+
                 console.log('Response : \n', responseData);
 
-            }) .catch((error) => {
+            }).catch((error) => {
                 alert(error)
                 console.log('FAIL', error)
             });
@@ -2206,7 +2219,7 @@
 
         //     ImportCertificate(keyHandleBuf, keyId, hexCert).then((responseData) => {
         //         console.log('SUCCESS', responseData);
-                
+
         //         showSignMessage(responseData);
         //     });
         // });
@@ -2230,11 +2243,10 @@
 
             ImportCertificate2(keyHandleBuf, keyId, hexCert).then((responseData) => {
                 console.log('SUCCESS', responseData);
-                
+
                 showSignMessage(responseData);
             });
         })
-
     </script>
 
 </body>
