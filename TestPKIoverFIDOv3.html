@@ -548,6 +548,8 @@
             ReadCertByIndexFunction2(certIndex).then((value) => {
 
 
+                let responseData = parsePKIoverFIDOResponse(value);
+
                 if (responseData.status === CTAP1_ERR_SUCCESS) {
                     var strCert = "-----BEGIN CERTIFICATE-----\n" +
                         btoa(String.fromCharCode.apply(null, responseData.signature)) +
