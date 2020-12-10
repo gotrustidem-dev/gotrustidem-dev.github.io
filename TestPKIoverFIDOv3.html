@@ -2110,6 +2110,9 @@
                 alert(Msg);
                 document.getElementById('target_key_handle').innerText = bufToHex(value[1]);
 
+            }).catch((error) => {
+                alert("Test")
+                console.log('FAIL', error)
             });
         });
 
