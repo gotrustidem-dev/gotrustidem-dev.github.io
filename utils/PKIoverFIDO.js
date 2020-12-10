@@ -908,10 +908,10 @@ async function GenRSA2048KeyPair() {
 
 
             })
-            .catch((error) => {
-                alert(error)
-                console.log('FAIL', error)
-            })
+            // .catch((error) => {
+            //     alert(error)
+            //     console.log('FAIL', error)
+            // })
     });
 }
 
