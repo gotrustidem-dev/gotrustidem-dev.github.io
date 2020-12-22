@@ -1,7 +1,8 @@
 'use strict';
 
 
-
+// Command Header GoTrust-Idem-PKI
+const GTheader = 'R29UcnVzdC1JZGVtLVBLSQ==';
 
 const CMD_KeyAgreement = 0xE0;
 const CMD_ReadCertificate = 0xE1;
