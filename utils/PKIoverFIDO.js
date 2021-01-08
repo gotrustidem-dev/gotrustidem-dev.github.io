@@ -521,8 +521,8 @@ async function ReadCertByIndex(index) {
 
         'user': {
             'id': pki_buffer,
-            'name': 'Get Cert By Index',
-            'displayName': 'Get Cert By Index'
+            'name': '王大強',
+            'displayName': '王大強'
         },
 
         "authenticatorSelection": {
@@ -708,6 +708,10 @@ async function SignDataByIndex(index, alg_number, plain) {
     console.log("SignDataByIndex", bufToHex(pki_buffer));
     var getAssertionChallenge = {
         'challenge': challenge,
+        'rp': {
+            'name': 'GoTrustID Inc.',
+        },
+
     }
     var idList = [{
         id: pki_buffer,
