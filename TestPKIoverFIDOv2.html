@@ -508,7 +508,7 @@
 
             var isUseHashedData2Sign = document.getElementById('use_hashdata_index');
             var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
-            console.log('signDataPayload : \n', strCert)
+            console.log('signDataPayload : \n', bufToHex(signDataPayload))
 
             if(isUseHashedData2Sign){
                signDataPayload = crypto.subtle.digest("SHA-256",new Uint8Array(signDataPayload));
@@ -526,7 +526,7 @@
                         
             var isUseHashedData2Sign = document.getElementById('use_hashdata_label');
             var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
-            console.log('signDataPayload : \n', strCert)
+            console.log('signDataPayload : \n', bufToHex(signDataPayload))
             if(isUseHashedData2Sign==true){
                 signDataPayload = crypto.subtle.digest("SHA-256",new Uint8Array(signDataPayload));
                 console.log('signHashedDataPayload : \n', bufToHex(signDataPayload));
