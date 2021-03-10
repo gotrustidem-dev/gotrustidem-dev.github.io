@@ -515,7 +515,7 @@
                 then(function (signHashedDataPayload) {
                     console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
                 
-                    SignDataByIndex(certIndex, 0x12, signHashedDataPayload).then((value) => {
+                    SignDataByIndex(certIndex, 0x12, new Uint8Array(signHashedDataPayload)).then((value) => {
                         showSignMessage(value);
                     });
                 });
@@ -540,7 +540,7 @@
                 crypto.subtle.digest("SHA-256",new Uint8Array(signDataPayload)).
                 then(function (signHashedDataPayload) {
                     console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
-                    SignDataByLabel(ckaLabel, 0x12, signHashedDataPayload).then((value) => {
+                    SignDataByLabel(ckaLabel, 0x12, new Uint8Array(signHashedDataPayload)).then((value) => {
                         showSignMessage(value);
                     });
                 });
