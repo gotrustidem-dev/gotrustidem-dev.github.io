@@ -149,9 +149,11 @@
                                         <p>
                                             <form style="text-align: center;" id="sign-byckalabel"
                                                 onsubmit="return false">
-                                                <input type="checkbox" id="use_hashdata_label" name="vehicle1" value="Use Hashed Data">
+                                                
                                                 <button class="btn btn-primary" action="submit"
                                                     style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
+                                                <input type="checkbox" id="use_hashdata_label" name="vehicle1" value="Use Hashed Data">
+                                                <label >Use Hashed Data</label> 
                                             </form>
                                         </p>
                                     </td>
@@ -171,9 +173,11 @@
                                         </form>
                                         <p>
                                             <form style="text-align: center;" id="sign-byindex" onsubmit="return false">
-                                                <input type="checkbox" id="use_hashdata_index" name="vehicle1" value="Use Hashed Data">
+                                               
                                                 <button class="btn btn-primary" action="submit"
                                                     style="width: 162px; height:34px;background-color: #008CBA;">Sign</button>
+                                                <input type="checkbox" id="use_hashdata_index" name="vehicle1" value="Use Hashed Data"> 
+                                                <label >Use Hashed Data</label>   
                                             </form>
                                         </p>
                                     </td>
@@ -497,6 +501,9 @@
 
         document.getElementById('sign-byindex').addEventListener('submit', function (event) {
             event.preventDefault();
+
+            document.getElementById('use_hashdata_index');
+
             var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
             let certIndex = document.getElementById('use-index').certIndex.value;
             SignDataByIndex(certIndex, 0x02, signDataPayload).then((value) => {
@@ -506,6 +513,10 @@
 
         document.getElementById('sign-byckalabel').addEventListener('submit', function (event) {
             event.preventDefault();
+                        
+            document.getElementById('use_hashdata_label');
+
+
             var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
             let ckaLabel = document.getElementById('use-label').ckaLabel.value;
             SignDataByLabel(ckaLabel, 0x02, signDataPayload).then((value) => {
