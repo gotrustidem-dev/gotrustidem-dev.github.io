@@ -505,37 +505,55 @@
 
         document.getElementById('sign-byindex').addEventListener('submit', function (event) {
             event.preventDefault();
-
+            let certIndex = document.getElementById('use-index').certIndex.value;
             var isUseHashedData2Sign = document.getElementById('use_hashdata_index');
             var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
             console.log('signDataPayload : \n', bufToHex(signDataPayload))
 
             if(isUseHashedData2Sign.checked){
-               signDataPayload = crypto.subtle.digest("SHA-256",new Uint8Array(signDataPayload));
-               console.log('signHashedDataPayload : \n', bufToHex(signDataPayload));
+               crypto.subtle.digest("SHA-256",new Uint8Array(signDataPayload)).
+                then(function (signHashedDataPayload) {
+                    console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
+                
+                    SignDataByIndex(certIndex, 0x12, signHashedDataPayload).then((value) => {
+                        showSignMessage(value);
+                    });
+                });
+              
+            }else{
+
+                SignDataByIndex(certIndex, 0x02, signDataPayload).then((value) => {
+                    showSignMessage(value);
+                });
             }
 
-            let certIndex = document.getElementById('use-index').certIndex.value;
-            SignDataByIndex(certIndex, 0x02, signDataPayload).then((value) => {
-                showSignMessage(value);
-            });
+           
         })
 
         document.getElementById('sign-byckalabel').addEventListener('submit', function (event) {
             event.preventDefault();
-                        
+            let ckaLabel = document.getElementById('use-label').ckaLabel.value;
             var isUseHashedData2Sign = document.getElementById('use_hashdata_label');
             var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
             console.log('signDataPayload : \n', bufToHex(signDataPayload))
             if(isUseHashedData2Sign.checked){
-                signDataPayload = crypto.subtle.digest("SHA-256",new Uint8Array(signDataPayload));
-                console.log('signHashedDataPayload : \n', bufToHex(signDataPayload));
+                crypto.subtle.digest("SHA-256",new Uint8Array(signDataPayload)).
+                then(function (signHashedDataPayload) {
+                    console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
+                    SignDataByLabel(ckaLabel, 0x12, signHashedDataPayload).then((value) => {
+                        showSignMessage(value);
+                    });
+                });
+                    
+                    
+            }else{
+        
+                SignDataByLabel(ckaLabel, 0x02, signDataPayload).then((value) => {
+                    showSignMessage(value);
+                });
             }
            
-            let ckaLabel = document.getElementById('use-label').ckaLabel.value;
-            SignDataByLabel(ckaLabel, 0x02, signDataPayload).then((value) => {
-                showSignMessage(value);
-            });
+          
         })
 
 
