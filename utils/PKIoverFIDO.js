@@ -8,9 +8,9 @@ const CMD_KeyAgreement = 0xE0;
 const CMD_ReadCertificate = 0xE1;
 const CMD_TokenInfo= 0xE2;
 const CMD_Sign= 0xE3;
-const CMD_SignWithPIN= 0xE4;
-const CMD_GenRsaKeyPair= 0xE5;
-const CMD_ImportCertificate= 0xE6;
+const CMD_SignWithPIN= 0xE5;
+const CMD_GenRsaKeyPair= 0xE6;
+const CMD_ImportCertificate= 0xE7;
 
 
 
@@ -84,7 +84,7 @@ async function requestSignDataByKEYHANDLE(keyhandle, alg_num, plaintext) {
         alg_buf.byteLength + signDataBuf.byteLength);
     var pki_payload_length = keyHandle_buf.byteLength + alg_buf.byteLength + signDataBuf.byteLength;
     pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_header[0] = 0xE3;
+    pki_header[0] = CMD_Sign;
     pki_header[1] = pki_payload_length >> 8
     pki_header[2] = pki_payload_length;
     pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
@@ -137,7 +137,7 @@ async function requirePINVerify() {
     //Header
     var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
     var pki_header = new Uint8Array(3);
-    pki_header[0] = 0xE1;
+    pki_header[0] = CMD_ReadCertificate;
     pki_header[1] = 0x00
     pki_header[2] = 0x00;
     //PKI Command
@@ -310,7 +310,7 @@ async function requireEncryptedPINandEncryptedNewPIN(oldpin, newpin) {
     //Header
     var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
     var pki_header = new Uint8Array(3);
-    pki_header[0] = 0xE1;
+    pki_header[0] = CMD_ReadCertificate;
     pki_header[1] = 0x00
     pki_header[2] = 0x00;
     //PKI Command
@@ -504,7 +504,7 @@ async function ReadCertByIndex(index) {
     var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_bufer.byteLength);
     var pki_payload_length = command_bufer.byteLength;
     pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_header[0] = 0xE1;
+    pki_header[0] = CMD_ReadCertificate;
     pki_header[1] = pki_payload_length >> 8
     pki_header[2] = pki_payload_length;
     pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
@@ -591,7 +591,7 @@ async function ReadCertByLable(strLable) {
         .byteLength);
     var pki_payload_length = command_bufer.byteLength;
 
-    pki_header[0] = 0xE1;
+    pki_header[0] = CMD_ReadCertificate;
     pki_header[1] = pki_payload_length >> 8
     pki_header[2] = pki_payload_length;
 
@@ -696,7 +696,7 @@ async function SignDataByIndex(index, alg_number, plain) {
         .byteLength + signDataBuf.byteLength);
     var pki_payload_length = command_buf.byteLength + alg_buf.byteLength + signDataBuf.byteLength;
     pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_header[0] = 0xE3;
+    pki_header[0] = CMD_Sign;
     pki_header[1] = pki_payload_length >> 8
     pki_header[2] = pki_payload_length;
     pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
@@ -784,7 +784,7 @@ async function SignDataByLabel(label, alg_number, plain) {
         .byteLength + signDataBuf.byteLength);
     var pki_payload_length = command_bufer.byteLength + alg_buf.byteLength + signDataBuf.byteLength;
     pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_header[0] = 0xE3;
+    pki_header[0] = CMD_Sign;
     pki_header[1] = pki_payload_length >> 8
     pki_header[2] = pki_payload_length;
     pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
@@ -1283,7 +1283,7 @@ async function ReadCertByIndexFunction2(index) {
     var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_buf.byteLength);
     var pki_payload_length = command_buf.byteLength;
     pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_header[0] = 0xE1;
+    pki_header[0] = CMD_ReadCertificate;
     pki_header[1] = pki_payload_length >> 8
     pki_header[2] = pki_payload_length;
     pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
@@ -1338,7 +1338,7 @@ async function ReadCertByLableFunction2(strLable) {
     var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_bufer.byteLength);
     var pki_payload_length = command_bufer.byteLength;
     pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_header[0] = 0xE1;
+    pki_header[0] = CMD_ReadCertificate;
     pki_header[1] = pki_payload_length >> 8
     pki_header[2] = pki_payload_length;
     pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
@@ -1382,7 +1382,7 @@ async function GetTokenInfo() {
     var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 );
     var pki_payload_length = 0;
     pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_header[0] = 0xE2;
+    pki_header[0] = CMD_TokenInfo;
     pki_header[1] = pki_payload_length >> 8
     pki_header[2] = pki_payload_length;
     pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
@@ -1453,7 +1453,7 @@ async function TestExtendsToReadSign(index, plain) {
         .byteLength + signDataBuf.byteLength);
     var pki_payload_length = command_buf.byteLength + alg_buf.byteLength + signDataBuf.byteLength;
     pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_header[0] = 0xE3;
+    pki_header[0] = CMD_Sign;
     pki_header[1] = pki_payload_length >> 8
     pki_header[2] = pki_payload_length;
     pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
