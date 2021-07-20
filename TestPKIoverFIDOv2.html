@@ -541,6 +541,7 @@
                 then(function (signHashedDataPayload) {
                     console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
                     SignDataByLabel(ckaLabel, 0x12, new Uint8Array(signHashedDataPayload)).then((value) => {
+                        
                         showSignMessage(value);
                     });
                 });
