@@ -6,11 +6,11 @@ const GTheader = 'R29UcnVzdC1JZGVtLVBLSQ==';
 
 const CMD_KeyAgreement = 0xE0;
 const CMD_ReadCertificate = 0xE1;
-const CMD_TokenInfo= 0xE2;
-const CMD_Sign= 0xE3;
-const CMD_SignWithPIN= 0xE5;
-const CMD_GenRsaKeyPair= 0xE6;
-const CMD_ImportCertificate= 0xE7;
+const CMD_TokenInfo = 0xE2;
+const CMD_Sign = 0xE3;
+const CMD_SignWithPIN = 0xE5;
+const CMD_GenRsaKeyPair = 0xE6;
+const CMD_ImportCertificate = 0xE7;
 
 
 
@@ -913,10 +913,10 @@ async function GenRSA2048KeyPair() {
 
 
             })
-            // .catch((error) => {
-            //     alert(error)
-            //     console.log('FAIL', error)
-            // })
+        // .catch((error) => {
+        //     alert(error)
+        //     console.log('FAIL', error)
+        // })
     });
 }
 
@@ -1208,7 +1208,7 @@ function hexStringToArrayBuffer(hexString) {
 }
 
 
-var parsePKIoverFIDOResponse = (buffer,cmd) => {
+var parsePKIoverFIDOResponse = (buffer, cmd) => {
 
 
     // check directly return 256 bytes which doesn't  include header and status code; 
@@ -1379,7 +1379,7 @@ async function GetTokenInfo() {
     var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
 
     var pki_header = new Uint8Array(3);
-    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 );
+    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3);
     var pki_payload_length = 0;
     pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
     pki_header[0] = CMD_TokenInfo;
@@ -1509,80 +1509,87 @@ async function TestExtendsToReadSign(index, plain) {
 }
 
 
-var parsePKIoverFIDOResponse2 = (buffer,cmd) => {
+var parsePKIoverFIDOResponse2 = (buffer, cmd) => {
 
 
-  
+
     let status = undefined;
     let signature = undefined;
     let retries = undefined;
 
-    if (buffer.byteLength == 256) {
-        signature = new Uint8Array(buffer);
-        status = CTAP1_ERR_SUCCESS;
-        return {signature,status };
-    }else{
 
-        let GTheaderBuf = buffer.slice(0, 16);
 
-        if (String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf)) === GTheaderStr) {
+    let GTheaderBuf = buffer.slice(0, 16);
 
-            buffer = buffer.slice(16);
-            let totalLenBuf = buffer.slice(0, 2);
-            let totalLen = readBE16(new Uint8Array(totalLenBuf));
-            buffer = buffer.slice(2);
-            let statusCodeBuf = buffer.slice(0, 1);
-            let statusCode = new Uint8Array(statusCodeBuf);
-            buffer = buffer.slice(1);
-            status = statusCode;
+    if (String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf)) === GTheaderStr) {
 
-            if(status[0] === CTAP1_ERR_SUCCESS){
-                let responseDataBuf = buffer.slice(0, (totalLen - 1));
-                let responseData = CBOR.decode(responseDataBuf);
-           
-            switch(cmd){
+        buffer = buffer.slice(16);
+        let totalLenBuf = buffer.slice(0, 2);
+        let totalLen = readBE16(new Uint8Array(totalLenBuf));
+        buffer = buffer.slice(2);
+        let statusCodeBuf = buffer.slice(0, 1);
+        let statusCode = new Uint8Array(statusCodeBuf);
+        buffer = buffer.slice(1);
+        status = statusCode;
+
+        if (status[0] === CTAP1_ERR_SUCCESS) {
+            let responseDataBuf = buffer.slice(0, (totalLen - 1));
+            let responseData = CBOR.decode(responseDataBuf);
+
+            switch (cmd) {
 
                 case CMD_KeyAgreement:
-        
+
                     break;
                 case CMD_ReadCertificate:
-        
+
                     break;
                 case CMD_TokenInfo:
-                        let FW  = ConverVersionFormat(responseData[1]);
-                        let SW  = ConverVersionFormat(responseData[2].slice(1,5));
-                        let PINRetries = responseData[3];
-                        let NumOfCredential = responseData[4];
-                        let SN = ConverSNFormat(responseData[5].slice(1, 9));
-                        return {status,FW,SW,PINRetries,NumOfCredential,SN };
+                    let FW = ConverVersionFormat(responseData[1]);
+                    let SW = ConverVersionFormat(responseData[2].slice(1, 5));
+                    let PINRetries = responseData[3];
+                    let NumOfCredential = responseData[4];
+                    let SN = ConverSNFormat(responseData[5].slice(1, 9));
+                    let RN = ConverSNFormat(responseData[6].slice(1, 32));
+                    let ECPublic = ConverSNFormat(responseData[7].slice(1, 65));
+                    return {
+                        status, FW, SW, PINRetries, NumOfCredential, SN,RN,ECPublic
+                    };
                     break;
                 case CMD_Sign:
-        
+
                     break;
                 case CMD_SignWithPIN:
-        
+
                     break;
                 case CMD_GenRsaKeyPair:
-        
+
                     break;
                 case CMD_ImportCertificate:
-        
+
                 default:
-        
+
             }
         }
-        }
+    } else if (buffer.byteLength == 256) {
+        signature = new Uint8Array(buffer);
+        status = CTAP1_ERR_SUCCESS;
+        return {
+            signature,
+            status
+        };
     }
+
 }
 
 
-var ConverVersionFormat = (buffer)=>{
+var ConverVersionFormat = (buffer) => {
 
     var result = "";
 
     for (var i = 0; i < buffer.length; i++) {
-        result+= buffer[i].toString(16);
-        result+= ".";
+        result += buffer[i].toString(16);
+        result += ".";
     }
     return result;
 
@@ -1590,15 +1597,15 @@ var ConverVersionFormat = (buffer)=>{
 
 
 
-var ConverSNFormat = (buffer)=>{
+var ConverSNFormat = (buffer) => {
 
     var result = "";
 
     for (var i = 0; i < buffer.length; i++) {
-        if(buffer[i]<16){
-            result+='0';
+        if (buffer[i] < 16) {
+            result += '0';
         }
-        result+= buffer[i].toString(16);
+        result += buffer[i].toString(16);
     }
     return result;
 
