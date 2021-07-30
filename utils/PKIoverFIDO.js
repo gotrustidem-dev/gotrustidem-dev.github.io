@@ -1388,7 +1388,7 @@ async function GetTokenInfo() {
     pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
 
 
-    console.log("SignDataByIndex", bufToHex(pki_buffer));
+    console.log("GetTokenInfo", bufToHex(pki_buffer));
     var getAssertionChallenge = {
         'challenge': challenge,
         "userVerification": "discouraged",
@@ -1400,7 +1400,7 @@ async function GetTokenInfo() {
     }];
 
     getAssertionChallenge.allowCredentials = idList;
-    console.log('SignDataByIndex', getAssertionChallenge)
+    console.log('GetTokenInfo', getAssertionChallenge)
 
     return await new Promise(resolve => {
         navigator.credentials.get({
@@ -1413,6 +1413,7 @@ async function GetTokenInfo() {
 
 
 }
+
 
 
 async function TestExtendsToReadSign(index, plain) {
@@ -1548,10 +1549,8 @@ var parsePKIoverFIDOResponse2 = (buffer,cmd) => {
         
                     break;
                 case CMD_TokenInfo:
-
-                 
-                        let FW        = ConverVersionFormat(responseData[1]);
-                        let SW        = ConverVersionFormat(responseData[2].slice(1,5));
+                        let FW  = ConverVersionFormat(responseData[1]);
+                        let SW  = ConverVersionFormat(responseData[2].slice(1,5));
                         let PINRetries = responseData[3];
                         let NumOfCredential = responseData[4];
                         let SN = ConverSNFormat(responseData[5].slice(1, 9));

@@ -138,6 +138,8 @@
                             <label id="label_pin_retries"></label><br>
                             <label id="label_credentials"></label><br>
                             <label id="label_serial_number"></label><br>
+                            <label id="label_random_number"></label><br>
+                            <label id="label_ecPublic_key"></label><br>
                         </form>
 
 
@@ -2155,12 +2157,11 @@
                 let responseData = parsePKIoverFIDOResponse2(newCredentialInfo, CMD_TokenInfo);
                 document.getElementById('label_token_fw').innerText = "FW version: " + responseData.FW;
                 document.getElementById('label_token_sw').innerText = "SW version: " + responseData.SW;
-                document.getElementById('label_pin_retries').innerText = "PIN retryies: " + responseData
-                    .PINRetries;
-                document.getElementById('label_credentials').innerText = "Credentials: " + responseData
-                    .NumOfCredential;
-                document.getElementById('label_serial_number').innerText = "Serial number: " +
-                    responseData.SN;
+                document.getElementById('label_pin_retries').innerText = "PIN retryies: " + responseData.PINRetries;
+                document.getElementById('label_credentials').innerText = "Credentials: " + responseData.NumOfCredential;
+                document.getElementById('label_serial_number').innerText = "Serial number: " +responseData.SN;
+                document.getElementById('label_random_number').innerText = "Serial number: " +responseData.SN;
+                document.getElementById('label_ecPublic_key').innerText = "Serial number: " +responseData.SN;
 
                 console.log('Response : \n', responseData);
 
