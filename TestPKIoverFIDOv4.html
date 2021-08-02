@@ -146,26 +146,19 @@
                     </td>
                 </tr>
 
-
+                <tr>
+                    <form style="text-align: center;" id="form_token_sn" onsubmit="return false">
+                        <p>
+                            <label id="label_token_sn">Token Serial number:</label><br>
+                            <input type="text" id="target_token_sn" style="width: 342px; height:41px">
+                        </p>
+                    </form>
+                </tr>
                 <tr>
                     <td id="pc-td" style="width: 100% ; ">
                         <table class="center" border="1" width="395">
                             <tbody>
-                                <tr>
-                                    <form style="text-align: center;" id="form_token_sn"
-                                    onsubmit="return false">
 
-                                    <p>
-                                        <label id="label_token_sn">Token Serial number:</label><br>
-                                        <input type="text" id="target_token_sn"
-                                            style="width: 342px; height:41px">
-                                    </p>
-
-                            
-                                </form>
-
-
-                                </tr>
                                 <tr>
                                     <!--PC side-->
                                     <td style="width: 385px;">
@@ -2171,11 +2164,17 @@
                 let responseData = parsePKIoverFIDOResponse2(newCredentialInfo, CMD_TokenInfo);
                 document.getElementById('label_token_fw').innerText = "FW version: " + responseData.FW;
                 document.getElementById('label_token_sw').innerText = "SW version: " + responseData.SW;
-                document.getElementById('label_pin_retries').innerText = "PIN retryies: " + responseData.PINRetries;
-                document.getElementById('label_credentials').innerText = "Credentials: " + responseData.NumOfCredential;
-                document.getElementById('label_serial_number').innerText = "Serial number: " +responseData.SN;
-                document.getElementById('label_random_number').innerText = "Random number: " +responseData.RN;
-                document.getElementById('label_ecPublic_key').innerText = "EC public point: " +responseData.ECPublic;
+                document.getElementById('label_pin_retries').innerText = "PIN retryies: " + responseData
+                    .PINRetries;
+                document.getElementById('label_credentials').innerText = "Credentials: " + responseData
+                    .NumOfCredential;
+                document.getElementById('label_serial_number').innerText = "Serial number: " +
+                    responseData.SN;
+                document.getElementById('target_token_sn').value = responseData.SN;
+                document.getElementById('label_random_number').innerText = "Random number: " +
+                    responseData.RN;
+                document.getElementById('label_ecPublic_key').innerText = "EC public point: " +
+                    responseData.ECPublic;
 
                 console.log('Response : \n', responseData);
 
