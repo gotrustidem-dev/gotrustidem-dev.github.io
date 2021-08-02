@@ -691,7 +691,6 @@ async function SignDataByIndex(index, alg_number, plain) {
     signDataBuf[3] = plain.length;
     signDataBuf.set(plain, 4);
 
-
     var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_buf.byteLength + alg_buf
         .byteLength + signDataBuf.byteLength);
     var pki_payload_length = command_buf.byteLength + alg_buf.byteLength + signDataBuf.byteLength;
@@ -744,6 +743,104 @@ async function SignDataByIndex(index, alg_number, plain) {
 
 
 }
+
+
+async function SignDataByIndex2(index, alg_number, plain, serial_number) {
+
+    var pki_buffer = [];
+    let certIndex = document.getElementById('use-index').certIndex.value;
+
+    var challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
+    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+
+    var pki_header = new Uint8Array(3);
+
+    //PKI Command
+    var command_buf = new Uint8Array(5);
+    command_buf[0] = 0xDF;
+    command_buf[1] = 0x02;
+    command_buf[2] = 0x00;
+    command_buf[3] = 0x01;
+    command_buf[4] = index;
+
+    var alg_buf = new Uint8Array(5);
+    alg_buf[0] = 0xDF;
+    alg_buf[1] = 0x03;
+    alg_buf[2] = 0x00;
+    alg_buf[3] = 0x01;
+    alg_buf[4] = alg_number;
+
+    var signDataBuf = new Uint8Array(4 + plain.byteLength);
+    signDataBuf[0] = 0xDF;
+    signDataBuf[1] = 0x06;
+    signDataBuf[2] = plain.length >> 8;
+    signDataBuf[3] = plain.length;
+    signDataBuf.set(plain, 4);
+
+    var sn_Buf = new Uint8Array(4 + serial_number.byteLength);
+    sn_Buf[0] = 0xDF;
+    sn_Buf[1] = 0x20;
+    sn_Buf[2] = 0x00;
+    sn_Buf[3] = 0x09;
+    sn_Buf.set(serial_number, 4);
+
+
+
+    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_buf.byteLength + alg_buf
+        .byteLength + signDataBuf.byteLength+sn_Buf.byteLength);
+    var pki_payload_length = command_buf.byteLength + alg_buf.byteLength + signDataBuf.byteLength+sn_Buf.byteLength;
+    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
+    pki_header[0] = CMD_Sign;
+    pki_header[1] = pki_payload_length >> 8
+    pki_header[2] = pki_payload_length;
+    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
+    pki_buffer.set(new Uint8Array(command_buf), gtheaderbuffer.byteLength + 3);
+    pki_buffer.set(new Uint8Array(alg_buf), gtheaderbuffer.byteLength + 3 + command_buf.byteLength);
+    pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + command_buf.byteLength + alg_buf.byteLength);
+    pki_buffer.set(new Uint8Array(sn_Buf), gtheaderbuffer.byteLength + 3 + command_buf.byteLength + alg_buf.byteLength+signDataBuf.byteLength);
+    
+
+    console.log("SignDataByIndex", bufToHex(pki_buffer));
+    var getAssertionChallenge = {
+        'challenge': challenge,
+        'rp': {
+            'name': 'GoTrustID Inc.',
+        },
+
+    }
+    var idList = [{
+        id: pki_buffer,
+        transports: ["usb", "nfc"],
+        type: "public-key"
+    }];
+
+    getAssertionChallenge.allowCredentials = idList;
+    console.log('SignDataByIndex', getAssertionChallenge)
+
+
+    return await new Promise(resolve => {
+        navigator.credentials.get({
+                'publicKey': getAssertionChallenge
+            })
+            .then((newCredentialInfo) => {
+
+                console.log('SUCCESS', newCredentialInfo);
+                console.log("Sign", newCredentialInfo.response.signature);
+
+                const sign = newCredentialInfo.response.signature;
+                resolve(sign);
+            })
+            .catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            })
+
+    });
+
+
+}
+
 
 async function SignDataByLabel(label, alg_number, plain) {
 
