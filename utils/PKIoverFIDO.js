@@ -1643,12 +1643,12 @@ var parsePKIoverFIDOResponse2 = (buffer, cmd) => {
                     break;
                 case CMD_TokenInfo:
                     let FW = ConverVersionFormat(responseData[1]);
-                    let SW = ConverVersionFormat(responseData[2].slice(1, 5));
+                    let SW = ConverVersionFormat(responseData[2]);
                     let PINRetries = responseData[3];
                     let NumOfCredential = responseData[4];
-                    let SN = ConverSNFormat(responseData[5].slice(1, 19));
-                    let RN = ConverSNFormat(responseData[6].slice(1, 33));
-                    let ECPublic = ConverSNFormat(responseData[7].slice(1, 66));
+                    let SN = ConverSNFormat(responseData[5]);
+                    let RN = ConverSNFormat(responseData[6]);
+                    let ECPublic = ConverSNFormat(responseData[7]);
                     return {
                         status, FW, SW, PINRetries, NumOfCredential, SN,RN,ECPublic
                     };
