@@ -1646,9 +1646,9 @@ var parsePKIoverFIDOResponse2 = (buffer, cmd) => {
                     let SW = ConverVersionFormat(responseData[2].slice(1, 5));
                     let PINRetries = responseData[3];
                     let NumOfCredential = responseData[4];
-                    let SN = ConverSNFormat(responseData[5].slice(1, 9));
-                    let RN = ConverSNFormat(responseData[6].slice(1, 32));
-                    let ECPublic = ConverSNFormat(responseData[7].slice(1, 65));
+                    let SN = ConverSNFormat(responseData[5].slice(1, 19));
+                    let RN = ConverSNFormat(responseData[6].slice(1, 33));
+                    let ECPublic = ConverSNFormat(responseData[7].slice(1, 66));
                     return {
                         status, FW, SW, PINRetries, NumOfCredential, SN,RN,ECPublic
                     };
