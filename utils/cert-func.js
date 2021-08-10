@@ -1,5 +1,5 @@
 (() => {                
-  GTheader = 'R29UcnVzdC1JZGVtLVBLSQ==';
+  
   async function GetCertInfo(certIndex) {
       let responseData = await ReadCertByIndexFunction2(certIndex);    
   }
