@@ -1751,9 +1751,10 @@ var computingSessionKey = (oldPIN, newPIN, ecpointXY) => {
     var ECPublicKey;
     var EncryptOlDPIN;
 
+    let ecpoint = readBE16(new Uint8Array(ecpointXY));
 
-    var externalECPublicKeyX = ecpointXY.slice(1, 32);
-    var externalECPublicKeyY = ecpointXY.slice(33, 65);
+    var externalECPublicKeyX = ecpoint.slice(1, 32);
+    var externalECPublicKeyY = ecpoint.slice(33, 65);
     var exportECPublicKeyArray;
     window.crypto.subtle.importKey(
             "jwk", //can be "jwk" (public or private), "raw" (public only), "spki" (public only), or "pkcs8" (private only)
