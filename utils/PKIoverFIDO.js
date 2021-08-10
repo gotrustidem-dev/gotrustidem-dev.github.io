@@ -1761,8 +1761,8 @@ var computingSessionKey = (oldPIN, newPIN, ecpointXY) => {
             { //this is an example jwk key, other key types are Uint8Array objects
                 kty: "EC",
                 crv: "P-256",
-                x: externalECPublicKeyX,
-                y: externalECPublicKeyY,
+                x: new Uint8Array(externalECPublicKeyX),
+                y: new Uint8Array(externalECPublicKeyY),
                 ext: true,
             }, { //these are the algorithm options
                 name: "ECDH",
