@@ -1714,9 +1714,12 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
 
     var bOldPin = new Uint8Array(oldPIN);
     var bNewPin = new Uint8Array(newPIN);
+
     var bSerialNumber = new Uint8Array(serialNumber);
+
+
     //Get device insered PC, and compare serial number if it is exist.
-    GetTokenInfo().then((newCredentialInfo) => {
+    await GetTokenInfo().then((newCredentialInfo) => {
         console.log('GTIDEM_ChangeUserPIN start');
 
         let responseData = parsePKIoverFIDOResponse2(newCredentialInfo, CMD_TokenInfo);
@@ -1728,7 +1731,7 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
 
         //Get EC point
         var bECPointFromToken = responseData.ECPublic;
-        computingSessionKey("123456", "123456", bECPointFromToken);
+        await computingSessionKey("123456", "88888888", bECPointFromToken);
 
 
     }).catch((error) => {
@@ -1745,8 +1748,28 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
     //run change PIN
 }
 
-var computingSessionKey = (oldPIN, newPIN, ecpointXY) => {
+async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
 
+
+
+    //Convert oldPIN to sha256 value
+
+    var oldPINHash =  crypto.subtle.digest("SHA-256",data);
+    console.log("oldPINHash  ", oldPINHash);
+
+    //During encryption, newPin is padded with trailing 0x00 bytes and is of minimum 64 bytes length. 
+    var newPINBuffer= new Uint8Array(64);
+    newPINBuffer.fill(0);
+    let bNewPIN = hexStringToArrayBuffer(newPIN);
+    for (const obj of bNewPIN) {
+        newPINBuffer.push(copy(obj));
+    }
+
+
+    
+
+    
+    var newPINHash ;
 
     var ECPublicKey;
     var EncryptOlDPIN;
@@ -1757,6 +1780,28 @@ var computingSessionKey = (oldPIN, newPIN, ecpointXY) => {
     var externalECPublicKeyY = base64EncodeURL(ecpoint.slice(33, 65));
     var exportECPublicKeyArray;
     var externalECPublicKey;
+
+
+    var importedECKey = await window.crypto.subtle.importKey(
+        "jwk", //can be "jwk" (public or private), "raw" (public only), "spki" (public only), or "pkcs8" (private only)
+        { //this is an example jwk key, other key types are Uint8Array objects
+            kty: "EC",
+            crv: "P-256",
+            x: externalECPublicKeyX,
+            y: externalECPublicKeyY,
+            ext: true,
+        }, { //these are the algorithm options
+            name: "ECDH",
+            namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
+        },
+        true, //whether the key is extractable (i.e. can be used in exportKey)
+        [] //"deriveKey" and/or "deriveBits" for private keys only (just put an empty list if importing a public key)
+    );
+
+
+    var encryptedOldPIN;
+    var encryptedNEWPIN;
+
     window.crypto.subtle.importKey(
             "jwk", //can be "jwk" (public or private), "raw" (public only), "spki" (public only), or "pkcs8" (private only)
             { //this is an example jwk key, other key types are Uint8Array objects
@@ -1813,10 +1858,10 @@ var computingSessionKey = (oldPIN, newPIN, ecpointXY) => {
                 "SHA-256",
                 new Uint8Array(keybits)
             );
-        }).then(function (pinEncKeyBytes) {
-            console.log("pinEncKeyBytes", bufToHex(pinEncKeyBytes));
+        }).then(function (sessionKeyBytes) {
+            console.log("pinEncKeyBytes", bufToHex(sessionKeyBytes));
             return crypto.subtle.importKey("raw",
-                pinEncKeyBytes,
+            sessionKeyBytes,
                 "aes-cbc", false, ["encrypt"]);
 
         }).then(function (importKey) {
@@ -1836,7 +1881,7 @@ var computingSessionKey = (oldPIN, newPIN, ecpointXY) => {
                 name: "aes-cbc",
                 iv
             }, pinEncKey, userpin_digestBytes.slice(0, 16));
-        }).then(function (cipherPIN) {
+ //       }).then(function (cipherPIN) {
 
 
         })
