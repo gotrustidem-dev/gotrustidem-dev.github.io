@@ -1757,7 +1757,7 @@ var computingSessionKey = (oldPIN, newPIN, ecpointXY) => {
     var externalECPublicKeyY = ecpoint.slice(33, 65);
     var exportECPublicKeyArray;
     window.crypto.subtle.importKey(
-            "jwk", //can be "jwk" (public or private), "raw" (public only), "spki" (public only), or "pkcs8" (private only)
+            "raw", //can be "jwk" (public or private), "raw" (public only), "spki" (public only), or "pkcs8" (private only)
             { //this is an example jwk key, other key types are Uint8Array objects
                 kty: "EC",
                 crv: "P-256",
