@@ -1755,13 +1755,14 @@ async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
 
     //Convert oldPIN to sha256 value
 
-    var oldPINHash =  await crypto.subtle.digest("SHA-256",new Uint8Array(oldPIN));
+    var oldPINHash =  await crypto.subtle.digest("SHA-256",toUTF8Array(oldPIN) );
     console.log("oldPINHash  ", oldPINHash);
 
     //During encryption, newPin is padded with trailing 0x00 bytes and is of minimum 64 bytes length. 
     var newPINBuffer= new Uint8Array(64);
     newPINBuffer.fill(0);
-    let bNewPIN = hexStringToArrayBuffer(newPIN);
+    let bNewPIN = toUTF8Array(newPIN);
+
     for (const obj of bNewPIN) {
         newPINBuffer.push(copy(obj));
     }
