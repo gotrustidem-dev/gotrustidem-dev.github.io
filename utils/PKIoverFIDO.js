@@ -1751,7 +1751,7 @@ var computingSessionKey = (oldPIN, newPIN, ecpointXY) => {
     var ECPublicKey;
     var EncryptOlDPIN;
 
-    let ecpoint = readBE16(new Uint8Array(ecpointXY));
+    let ecpoint = hexStringToArrayBuffer(ecpointXY);
 
     var externalECPublicKeyX = ecpoint.slice(1, 32);
     var externalECPublicKeyY = ecpoint.slice(33, 65);
