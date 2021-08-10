@@ -1755,7 +1755,7 @@ async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
 
     //Convert oldPIN to sha256 value
 
-    var oldPINHash =  await crypto.subtle.digest("SHA-256",oldPIN);
+    var oldPINHash =  await crypto.subtle.digest("SHA-256",new Uint8Array(oldPIN));
     console.log("oldPINHash  ", oldPINHash);
 
     //During encryption, newPin is padded with trailing 0x00 bytes and is of minimum 64 bytes length. 
