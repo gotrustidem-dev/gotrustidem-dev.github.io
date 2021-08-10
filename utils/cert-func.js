@@ -4,7 +4,7 @@
       let responseData = await ReadCertByIndexFunction2(certIndex);    
   }
     
-  window.addEventListener('load', () => {   
+  window.addEventListener('submit', () => {   
     document.getElementById('get_Cert_ByIndex_button').addEventListener("click", () => {
       console.log("1");
       let certIndex = document.getElementById('target_cert_index').value;
