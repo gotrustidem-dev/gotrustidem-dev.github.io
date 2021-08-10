@@ -1716,10 +1716,10 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
     var bNewPin = new Uint8Array(newPIN);
 
     var bSerialNumber = new Uint8Array(serialNumber);
-
+    var bECPointFromToken;
 
     //Get device insered PC, and compare serial number if it is exist.
-    await GetTokenInfo().then((newCredentialInfo) => {
+    bECPointFromToken = await GetTokenInfo().then((newCredentialInfo) => {
         console.log('GTIDEM_ChangeUserPIN start');
 
         let responseData = parsePKIoverFIDOResponse2(newCredentialInfo, CMD_TokenInfo);
@@ -1729,9 +1729,10 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
             console.log('Serial number different.');
         }
 
+
         //Get EC point
-        var bECPointFromToken = responseData.ECPublic;
-        await computingSessionKey("123456", "88888888", bECPointFromToken);
+        //var bECPointFromToken = responseData.ECPublic;
+       return responseData.ECPublic;
 
 
     }).catch((error) => {
@@ -1739,7 +1740,7 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
         console.log('FAIL', error)
     });
 
-
+    await computingSessionKey("123456", "88888888", bECPointFromToken);
 
     //Compution session Key and encrypt oldPIN and new pin.
 
