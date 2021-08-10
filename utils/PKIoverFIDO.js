@@ -1728,7 +1728,7 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
 
         //Get EC point
         var bECPointFromToken = responseData.ECPublic;
-        computingSessionKey = ("123456", "123456", bECPointFromToken);
+        computingSessionKey("123456", "123456", bECPointFromToken);
 
 
     }).catch((error) => {
