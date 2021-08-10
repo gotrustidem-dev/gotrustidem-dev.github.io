@@ -1825,6 +1825,7 @@ async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
             "SHA-256",
             new Uint8Array(keybits)
         );
+        });
     
 
 
