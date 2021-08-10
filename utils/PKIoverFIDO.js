@@ -1784,10 +1784,8 @@ async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
     var externalECPublicKeyX = base64EncodeURL(ecpoint.slice(1, 33));
     var externalECPublicKeyY = base64EncodeURL(ecpoint.slice(33, 65));
     var exportECPublicKeyArray;
-    var externalECPublicKey;
-
-
-    var importedECKey = await window.crypto.subtle.importKey(
+  
+    var importedECPublicKey = await window.crypto.subtle.importKey(
         "jwk", //can be "jwk" (public or private), "raw" (public only), "spki" (public only), or "pkcs8" (private only)
         { //this is an example jwk key, other key types are Uint8Array objects
             kty: "EC",
@@ -1802,6 +1800,33 @@ async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
         true, //whether the key is extractable (i.e. can be used in exportKey)
         [] //"deriveKey" and/or "deriveBits" for private keys only (just put an empty list if importing a public key)
     );
+
+    var localECKeyPair = await window.crypto.subtle.generateKey({
+            name: "ECDH",
+            namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
+        },
+        true, //whether the key is extractable (i.e. can be used in exportKey)
+        ["deriveKey","deriveBits"] //can be any combination of "deriveKey" and "deriveBits"
+    );
+
+    exportECPublicKeyArray  = localECKeyPair.publicKey;
+
+    //Computing session Key
+     var sessionKey  = await window.crypto.subtle.deriveBits({
+            name: "ECDH",
+            namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
+            public: importedECPublicKey, //an ECDH public key from generateKey or importKey
+
+        },
+        localECKeyPair.privateKey, //from generateKey or importKey above
+        256 //the number of bits you want to derive
+        ).then(function (keybits) { //convert share secret to pinEncKey
+        return crypto.subtle.digest(
+            "SHA-256",
+            new Uint8Array(keybits)
+        );
+    
+
 
 
     var encryptedOldPIN;
