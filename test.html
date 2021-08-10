@@ -13,7 +13,7 @@
 <script async="" src="lib/bundle.js"></script>
 
 <script src="lib/PKIoverFIDO.js"></script>
-
+<script src="lib/cert-func.js"></script>
 
 
 </head>
@@ -24,20 +24,7 @@ Read Cert By Index (1~8)
 <BR><input type = "button" value = "尋找憑證" id='get_Cert_ByIndex_button'>載具是否有該憑證(Search by Index)<BR>
 
 </body>
-<script>
 
-    async function GetCertInfo(certIndex) {
-        let responseData = await ReadCertByIndexFunction2(certIndex);    
-    }
-      
-   
-      document.getElementById('get_Cert_ByIndex_button').addEventListener("click", () => {
-        console.log("1");
-        let certIndex = document.getElementById('target_cert_index').value;
-        GetCertInfo(certIndex);       
-      });                         
-    
-</script>
 
     
 </html>
