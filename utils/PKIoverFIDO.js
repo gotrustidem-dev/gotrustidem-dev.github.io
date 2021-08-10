@@ -1753,16 +1753,16 @@ var computingSessionKey = (oldPIN, newPIN, ecpointXY) => {
 
     let ecpoint = hexStringToArrayBuffer(ecpointXY);
 
-    var externalECPublicKeyX = ecpoint.slice(1, 33);
-    var externalECPublicKeyY = ecpoint.slice(33, 65);
+    var externalECPublicKeyX = base64EncodeURL(ecpoint.slice(1, 33));
+    var externalECPublicKeyY = base64EncodeURL(ecpoint.slice(33, 65));
     var exportECPublicKeyArray;
     window.crypto.subtle.importKey(
-            "raw", //can be "jwk" (public or private), "raw" (public only), "spki" (public only), or "pkcs8" (private only)
+            "jwk", //can be "jwk" (public or private), "raw" (public only), "spki" (public only), or "pkcs8" (private only)
             { //this is an example jwk key, other key types are Uint8Array objects
                 kty: "EC",
                 crv: "P-256",
-                x: new Uint8Array(externalECPublicKeyX),
-                y: new Uint8Array(externalECPublicKeyY),
+                x: externalECPublicKeyX,
+                y: externalECPublicKeyY,
                 ext: true,
             }, { //these are the algorithm options
                 name: "ECDH",
