@@ -1705,5 +1705,98 @@ var ConverSNFormat = (buffer) => {
         result += buffer[i].toString(16);
     }
     return result;
+}
 
+
+async function GTIDEM_ChangeUserPIN (oldPIN, newPIN, serialNumber){
+
+    //Convert string to byte array
+
+    var bOldPin = new Uint8Array(oldPIN);
+    var bNewPin = new Uint8Array(newPIN);
+    var bSerialNumber = new Uint8Array(serialNumber);
+    //Get device insered PC, and compare serial number if it is exist.
+    GetTokenInfo().then((newCredentialInfo) => {
+        console.log('GTIDEM_ChangeUserPIN start');
+
+        let responseData = parsePKIoverFIDOResponse2(newCredentialInfo, CMD_TokenInfo);
+
+        //compare serial number 
+        if(responseData.SN !==bSerialNumber){
+            console.log('Serial number different.');
+        }
+
+        //Get EC point
+        var bECPointFromToken = responseData.ECPublic;
+        
+
+
+    }).catch((error) => {
+        alert(error)
+        console.log('FAIL', error)
+    });
+    
+
+
+    //Compution session Key and encrypt oldPIN and new pin.
+
+
+
+    //run change PIN
+}
+
+var computingSessionKey = (oldPIN, newPIN,ecpointXY)=>{
+
+
+    var ECPublicKey ;
+    var EncryptOlDPIN ;
+
+    window.crypto.subtle.generateKey(
+        {
+            name: "ECDH",
+            namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
+        },
+        false, //whether the key is extractable (i.e. can be used in exportKey)
+        ["deriveKey", "deriveBits"] //can be any combination of "deriveKey" and "deriveBits"
+    )
+    .then(function(key){
+        //returns a keypair object
+        console.log(key);
+        console.log(key.publicKey);
+        console.log(key.privateKey);
+    })
+    .catch(function(err){
+        console.error(err);
+    });
+
+
+
+    var tokenECPublicKeyX =  buffer.slice(1, 32);
+    var tokenlECPublicKeyY = buffer.slice(33, 65);
+
+    window.crypto.subtle.importKey(
+        "raw", //can be "jwk" (public or private), "raw" (public only), "spki" (public only), or "pkcs8" (private only)
+        {   //this is an example jwk key, other key types are Uint8Array objects
+            kty: "EC",
+            crv: "P-256",
+            x: tokenECPublicKeyX,
+            y: tokenlECPublicKeyY,
+            ext: true,
+        },
+        {   //these are the algorithm options
+            name: "ECDH",
+            namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
+        },
+        false, //whether the key is extractable (i.e. can be used in exportKey)
+        [] //"deriveKey" and/or "deriveBits" for private keys only (just put an empty list if importing a public key)
+    )
+    .then(function(tokenPublicKey){
+        //returns a privateKey (or publicKey if you are importing a public key)
+        console.log(tokenPublicKey);
+
+
+    })
+    .catch(function(err){
+        console.error(err);
+    });
 }
