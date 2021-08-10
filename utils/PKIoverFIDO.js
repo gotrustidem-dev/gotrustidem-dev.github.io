@@ -1753,7 +1753,7 @@ var computingSessionKey = (oldPIN, newPIN, ecpointXY) => {
 
     let ecpoint = hexStringToArrayBuffer(ecpointXY);
 
-    var externalECPublicKeyX = ecpoint.slice(1, 32);
+    var externalECPublicKeyX = ecpoint.slice(1, 33);
     var externalECPublicKeyY = ecpoint.slice(33, 65);
     var exportECPublicKeyArray;
     window.crypto.subtle.importKey(
