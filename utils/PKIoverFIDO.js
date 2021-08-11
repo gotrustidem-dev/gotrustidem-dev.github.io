@@ -1823,9 +1823,7 @@ async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
     //During encryption, newPin is padded with trailing 0x00 bytes and is of minimum 64 bytes length. 
     var newPINBuffer = new Uint8Array(64);
     newPINBuffer.fill(0);
-
-    var bNewPINArray = new Uint8Array(newPIN.length);
-    bNewPINArray.set(toUTF8Array(newPIN), 0);
+    newPINBuffer.set(toUTF8Array(newPIN), 0);
 
     var iv = new Uint8Array(16);
     iv.fill(0);
