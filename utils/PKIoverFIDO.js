@@ -1894,7 +1894,7 @@ async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
     encryptedOldPINHash = await crypto.subtle.encrypt({
         name: "aes-cbc",
         iv
-    }, CryptoSessionKey, Uint8Array(oldPINHash));
+    }, CryptoSessionKey, new Uint8Array(oldPINHash));
 
 
     encryptedNEWPIN = await crypto.subtle.encrypt({
