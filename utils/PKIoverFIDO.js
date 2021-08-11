@@ -1792,14 +1792,14 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
    pki_buffer.push(encryptedOldPINHash_buf);
    pki_buffer.push(encryptedNewPIN_buf);
 
-   console.log("Change_pin_command: " + bufToHex(pki_buffer));
+   console.log("Change_pin_command: " + pki_buffer.join(''));
 
    var getAssertionChallenge = {
        'challenge': challenge,
        "userVerification": "discouraged"
    }
    var idList = [{
-       id: pki_buffer,
+       id: pki_buffer.join(''),
        transports: ["usb"],
        type: "public-key"
    }];
