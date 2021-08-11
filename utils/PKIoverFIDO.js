@@ -1904,7 +1904,7 @@ async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
 
     var bExportECPublicKeyArray = new Uint8Array(exportECPublicKeyArray);
     var bEcryptedOldPINHash = new Uint8Array(encryptedOldPINHash.slice(0,16));
-    var bEncryptedNEWPIN = new Uint8Array(encryptedNEWPIN);
+    var bEncryptedNEWPIN = new Uint8Array(encryptedNEWPIN).slice(0,64);
     return {bExportECPublicKeyArray, bEcryptedOldPINHash, bEncryptedNEWPIN};
 }
 
