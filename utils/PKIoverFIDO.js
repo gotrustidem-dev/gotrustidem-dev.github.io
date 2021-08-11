@@ -1752,7 +1752,7 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
    
 
 
-   var pki_buffer = [];
+
  
    var ecpubkey_buf = new Uint8Array(4 + prepareUpdate.exportECPublicKeyArray.byteLength);
    ecpubkey_buf[0] = 0xDF;
@@ -1785,21 +1785,21 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
    pki_header[1] = payloadLen>>8
    pki_header[2] = payloadLen;
 
-   pki_buffer.push(gtheaderbuffer);
-   pki_buffer.push(pki_header);
-   pki_buffer.push(gtheaderbuffer);
-   pki_buffer.push(ecpubkey_buf);
-   pki_buffer.push(encryptedOldPINHash_buf);
-   pki_buffer.push(encryptedNewPIN_buf);
+   var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
+   pki_buffer = _appendBuffer(pki_buffer,ecpubkey_buf);
+   pki_buffer = _appendBuffer(pki_buffer,encryptedOldPINHash_buf);
+   pki_buffer = _appendBuffer(pki_buffer,encryptedNewPIN_buf);
 
-   console.log("Change_pin_command: " + pki_buffer.join(''));
+
+
+   console.log("Change_pin_command: " + bufToHex(pki_buffer));
 
    var getAssertionChallenge = {
        'challenge': challenge,
        "userVerification": "discouraged"
    }
    var idList = [{
-       id: pki_buffer.join(''),
+       id: pki_buffer,
        transports: ["usb"],
        type: "public-key"
    }];
@@ -1907,3 +1907,19 @@ async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
 
     return {exportECPublicKeyArray,encryptedOldPINHash,encryptedNEWPIN};
 }
+
+
+/**
+ * Creates a new Uint8Array based on two different ArrayBuffers
+ *
+ * @private
+ * @param {ArrayBuffers} buffer1 The first buffer.
+ * @param {ArrayBuffers} buffer2 The second buffer.
+ * @return {ArrayBuffers} The new ArrayBuffer created out of the two.
+ */
+ var _appendBuffer = function(buffer1, buffer2) {
+    var tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
+    tmp.set(new Uint8Array(buffer1), 0);
+    tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
+    return tmp.buffer;
+  };
