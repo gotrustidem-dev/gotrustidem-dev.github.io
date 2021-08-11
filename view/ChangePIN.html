@@ -61,24 +61,24 @@
                                     <td style="width: 385px;">
                                         <p>
                                             <label style="text-align: center;">Current PIN</label><br>
-                                            <form style="text-align: center;" id="id_oldpin_input" onsubmit="return false">
+                                            <form style="text-align: center;" id="form_oldpin_input" onsubmit="return false">
                                                 <input type="text" name="currentpin" style="width: 342px; height:41px">
                                             </form>
                                         </p>
                                      
                                         <p>
                                             <label style="text-align: center;">New PIN</label><br>
-                                            <form style="text-align: center;" id="id_newpin_input" onsubmit="return false">
+                                            <form style="text-align: center;" id="form_newpin_input" onsubmit="return false">
                                                 <input type="text" name="newpin" style="width: 342px; height:41px">
                                             </form>
                                         </p>
                                         <p>
                                             <label style="text-align: center;">Confirm PIN</label><br>
-                                            <form style="text-align: center;" id="id_newpin_confirm_input" onsubmit="return false">
+                                            <form style="text-align: center;" id="form_newpin_confirm_input" onsubmit="return false">
                                                 <input type="text" name="confirm_newpin" style="width: 342px; height:41px">
                                             </form>
                                         </p>
-                                        <form style="text-align: center;" id="id_changepin_btn" onsubmit="return false">
+                                        <form style="text-align: center;" id="form_changepin_btn" onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
                                                 style="width: 200px; height:34px;background-color: #008CBA;">Change PIN</button>
                                         </form>
@@ -93,12 +93,12 @@
     </div>
     <script>
         
-        document.getElementById('id_changepin_btn').addEventListener('submit', function (event) {
+        document.getElementById('form_changepin_btn').addEventListener('submit', function (event) {
             event.preventDefault();
-            let token_sn = document.getElementById('id_token_sn').token_sn.value;
-            let oldpin = document.getElementById('id_oldpin_input').currentpin.value;
-            let newpin = document.getElementById('id_newpin_input').newpin.value;
-            let confirm_newpin = document.getElementById('id_newpin_confirm_input').confirm_newpin.value;
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            let oldpin = document.getElementById('form_oldpin_input').currentpin.value;
+            let newpin = document.getElementById('form_newpin_input').newpin.value;
+            let confirm_newpin = document.getElementById('form_newpin_confirm_input').confirm_newpin.value;
             
             console.log(token_sn);
             console.log(oldpin);
