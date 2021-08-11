@@ -1716,10 +1716,12 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
     var bNewPin = new Uint8Array(newPIN);
 
     var bSerialNumber = new Uint8Array(serialNumber);
-    var bECPointFromToken;
+    
+    
+
 
     //Get device insered PC, and compare serial number if it is exist.
-    bECPointFromToken = await GetTokenInfo().then((newCredentialInfo) => {
+    var bECPointFromToken = await GetTokenInfo().then((newCredentialInfo) => {
         console.log('GTIDEM_ChangeUserPIN start');
 
         let responseData = parsePKIoverFIDOResponse2(newCredentialInfo, CMD_TokenInfo);
@@ -1728,54 +1730,144 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
         if (responseData.SN !== bSerialNumber) {
             console.log('Serial number different.');
         }
-
-
-        //Get EC point
-        //var bECPointFromToken = responseData.ECPublic;
-       return responseData.ECPublic;
+        return responseData.ECPublic;
 
 
     }).catch((error) => {
         alert(error)
         console.log('FAIL', error)
-    });
-
-    await computingSessionKey("123456", "88888888", bECPointFromToken);
+    }); 
 
     //Compution session Key and encrypt oldPIN and new pin.
+   var prepareUpdate = await computingSessionKey("123456", "88888888", bECPointFromToken);
+
+   console.log("exportECPublicKeyArray",bufToHex(prepareUpdate.exportECPublicKeyArray));
+   console.log("encryptedOldPINHash",bufToHex(prepareUpdate.encryptedOldPINHash));
+   console.log("encryptedNEWPIN",bufToHex(prepareUpdate.encryptedNEWPIN));
+
+   /*
+   var pki_buffer = [];
+   var challenge = new Uint8Array(32);
+   window.crypto.getRandomValues(challenge);
+   var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
 
 
 
-    //run change PIN
+   var pki_buffer = [];
+   var challenge = new Uint8Array(32);
+   window.crypto.getRandomValues(challenge);
+   var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+
+   var pki_header = new Uint8Array(3);
+
+   //PKI Command
+   var command_buf = new Uint8Array(ckaLabel.length + 4);
+   command_buf[0] = 0xDF
+   command_buf[1] = 0x01;
+   command_buf[2] = ckaLabel.length >> 8;
+   command_buf[3] = ckaLabel.length;
+   command_buf.set(toUTF8Array(ckaLabel), 4);
+
+
+
+   var alg_buf = new Uint8Array(5);
+   alg_buf[0] = 0xDF;
+   alg_buf[1] = 0x03;
+   alg_buf[2] = 00;
+   alg_buf[3] = 01;
+   alg_buf[4] = 0x02;
+
+
+   var ecpubkey_buf = new Uint8Array(4 + exportECPublicKeyArray.byteLength);
+   ecpubkey_buf[0] = 0xDF;
+   ecpubkey_buf[1] = 0x04;
+   ecpubkey_buf[2] = exportECPublicKeyArray.byteLength >> 8;
+   ecpubkey_buf[3] = exportECPublicKeyArray.byteLength;
+   ecpubkey_buf.set(new Uint8Array(exportECPublicKeyArray), 4);
+
+
+   var encryptedPIN_buf = new Uint8Array(4 + EncryptedPINArray.byteLength);
+   encryptedPIN_buf[0] = 0xDF;
+   encryptedPIN_buf[1] = 0x05;
+   encryptedPIN_buf[2] = EncryptedPINArray.byteLength >> 8;
+   encryptedPIN_buf[3] = EncryptedPINArray.byteLength;
+   encryptedPIN_buf.set(new Uint8Array(EncryptedPINArray), 4);
+
+   var signDataPayload = Uint8Array.from(window.atob(signShortData), c => c.charCodeAt(0));
+   var signDataBuf = new Uint8Array(4 + signDataPayload.byteLength);
+   signDataBuf[0] = 0xDF;
+   signDataBuf[1] = 0x06;
+   signDataBuf[2] = signDataPayload.length >> 8;
+   signDataBuf[3] = signDataPayload.length;
+   signDataBuf.set(signDataPayload, 4);
+
+
+
+   var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_buf.byteLength +
+       alg_buf.byteLength + ecpubkey_buf.byteLength + encryptedPIN_buf.byteLength +
+       signDataBuf.byteLength);
+   var pki_payload_length = command_buf.byteLength + alg_buf.byteLength + ecpubkey_buf
+       .byteLength + encryptedPIN_buf.byteLength + signDataBuf.byteLength;
+   pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
+   pki_header[0] = 0xE4;
+   pki_header[1] = pki_payload_length >> 8
+   pki_header[2] = pki_payload_length;
+   pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
+   pki_buffer.set(new Uint8Array(command_buf), gtheaderbuffer.byteLength + 3);
+   pki_buffer.set(new Uint8Array(alg_buf), gtheaderbuffer.byteLength + 3 + command_buf
+       .byteLength);
+   pki_buffer.set(new Uint8Array(ecpubkey_buf), gtheaderbuffer.byteLength + 3 + command_buf
+       .byteLength + alg_buf.byteLength);
+   pki_buffer.set(new Uint8Array(encryptedPIN_buf), gtheaderbuffer.byteLength + 3 +
+       command_buf.byteLength + alg_buf.byteLength + ecpubkey_buf.byteLength);
+   pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + command_buf
+       .byteLength + alg_buf.byteLength + ecpubkey_buf.byteLength + encryptedPIN_buf
+       .byteLength);
+
+   console.log("sign-ckalabel-android: " + bufToHex(pki_buffer));
+
+   var getAssertionChallenge = {
+       'challenge': challenge,
+       "userVerification": "discouraged"
+   }
+   var idList = [{
+       id: pki_buffer,
+       transports: ["usb", "nfc"],
+       type: "public-key"
+   }];
+
+   getAssertionChallenge.allowCredentials = idList;
+   console.log('List getAssertionChallenge', getAssertionChallenge)
+
+   navigator.credentials.get({
+       'publicKey': getAssertionChallenge
+   });
+
+
+*/
+   
 }
 
 async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
 
-
-
     //Convert oldPIN to sha256 value
     var bOldPINArray = new Uint8Array(oldPIN.length);
     bOldPINArray.set(toUTF8Array(oldPIN), 0);
-    var oldPINHash =  await crypto.subtle.digest("SHA-256",bOldPINArray );
+    var oldPINHash = await crypto.subtle.digest("SHA-256", bOldPINArray);
     console.log("oldPINHash  ", oldPINHash);
 
     //During encryption, newPin is padded with trailing 0x00 bytes and is of minimum 64 bytes length. 
-    var newPINBuffer= new Uint8Array(64);
+    var newPINBuffer = new Uint8Array(64);
     newPINBuffer.fill(0);
 
     var bNewPINArray = new Uint8Array(newPIN.length);
     bNewPINArray.set(toUTF8Array(newPIN), 0);
 
+    var iv = new Uint8Array(16);
+    iv.fill(0);
 
-    newPINBuffer.set(bNewPINArray, 0);
 
-
-  
-    
-
-    
-    var newPINHash ;
-
+    var newPINHash;
     var ECPublicKey;
     var EncryptOlDPIN;
 
@@ -1783,8 +1875,12 @@ async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
 
     var externalECPublicKeyX = base64EncodeURL(ecpoint.slice(1, 33));
     var externalECPublicKeyY = base64EncodeURL(ecpoint.slice(33, 65));
+   
     var exportECPublicKeyArray;
-  
+    var encryptedOldPINHash;
+    var encryptedNEWPIN;
+
+
     var importedECPublicKey = await window.crypto.subtle.importKey(
         "jwk", //can be "jwk" (public or private), "raw" (public only), "spki" (public only), or "pkcs8" (private only)
         { //this is an example jwk key, other key types are Uint8Array objects
@@ -1801,122 +1897,49 @@ async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
         [] //"deriveKey" and/or "deriveBits" for private keys only (just put an empty list if importing a public key)
     );
 
-    var localECKeyPair = await window.crypto.subtle.generateKey({
+    var CryptoECKeyPair = await window.crypto.subtle.generateKey({
             name: "ECDH",
             namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
         },
         true, //whether the key is extractable (i.e. can be used in exportKey)
-        ["deriveKey","deriveBits"] //can be any combination of "deriveKey" and "deriveBits"
+        ["deriveKey", "deriveBits"] //can be any combination of "deriveKey" and "deriveBits"
     );
 
-    exportECPublicKeyArray  = localECKeyPair.publicKey;
+    exportECPublicKeyArray = await window.crypto.subtle.exportKey("raw", CryptoECKeyPair.publicKey);
 
     //Computing session Key
-     var sessionKey  = await window.crypto.subtle.deriveBits({
+    var CryptoSessionKey = await window.crypto.subtle.deriveBits({
             name: "ECDH",
             namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
             public: importedECPublicKey, //an ECDH public key from generateKey or importKey
 
         },
-        localECKeyPair.privateKey, //from generateKey or importKey above
+        CryptoECKeyPair.privateKey, //from generateKey or importKey above
         256 //the number of bits you want to derive
-        ).then(function (keybits) { //convert share secret to pinEncKey
+    ).then(function (keybits) { //convert share secret to pinEncKey
         return crypto.subtle.digest(
             "SHA-256",
             new Uint8Array(keybits)
         );
-        });
-    
-
-
-
-    var encryptedOldPIN;
-    var encryptedNEWPIN;
-
-    window.crypto.subtle.importKey(
-            "jwk", //can be "jwk" (public or private), "raw" (public only), "spki" (public only), or "pkcs8" (private only)
-            { //this is an example jwk key, other key types are Uint8Array objects
-                kty: "EC",
-                crv: "P-256",
-                x: externalECPublicKeyX,
-                y: externalECPublicKeyY,
-                ext: true,
-            }, { //these are the algorithm options
-                name: "ECDH",
-                namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
-            },
-            true, //whether the key is extractable (i.e. can be used in exportKey)
-            [] //"deriveKey" and/or "deriveBits" for private keys only (just put an empty list if importing a public key)
-        ).then(function (external_public) {
-            //returns a privateKey (or publicKey if you are importing a public key)
-            externalECPublicKey = external_public;
-            console.log("external_public", externalECPublicKey);
-            return window.crypto.subtle.generateKey({
-                    name: "ECDH",
-                    namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
-                },
-                true, //whether the key is extractable (i.e. can be used in exportKey)
-                ["deriveKey",
-                    "deriveBits"
-                ] //can be any combination of "deriveKey" and "deriveBits"
-            );
-        }).then(function (key) { //generate ecdh pair
-
-            var local_publicKey = key.publicKey;
-            var local_privateKey = key.privateKey;
-
-
-            window.crypto.subtle.exportKey("raw", local_publicKey).then(
-                function (keydata) {
-                    exportECPublicKeyArray = keydata;
-                    console.log("exportECPublicKeyArray", bufToHex(exportECPublicKeyArray));
-                }
-            );
-
-
-            return window.crypto.subtle.deriveBits({
-                    name: "ECDH",
-                    namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
-                    public: externalECPublicKey, //an ECDH public key from generateKey or importKey
-
-                },
-                local_privateKey, //from generateKey or importKey above
-                256 //the number of bits you want to derive
-            );
-
-        }).then(function (keybits) { //convert share secret to pinEncKey
-            return crypto.subtle.digest(
-                "SHA-256",
-                new Uint8Array(keybits)
-            );
-        }).then(function (sessionKeyBytes) {
-            console.log("pinEncKeyBytes", bufToHex(sessionKeyBytes));
-            return crypto.subtle.importKey("raw",
+    }).then(function (sessionKeyBytes) {
+        console.log("pinEncKeyBytes", bufToHex(sessionKeyBytes));
+        return crypto.subtle.importKey("raw",
             sessionKeyBytes,
-                "aes-cbc", false, ["encrypt"]);
-
-        }).then(function (importKey) {
-            pinEncKey = importKey;
-            console.log("pinEncKey ", pinEncKey);
-            const encoder = new TextEncoder();
-            const data = encoder.encode(userpin);
-            return crypto.subtle.digest(
-                "SHA-256",
-                data);
-        }).then(function (userpin_digestBytes) {
-            console.log("userpin_digestBytes", bufToHex(userpin_digestBytes.slice(0, 16)));
-            var iv = new Uint8Array(16);
-            console.log("iv .... ", iv);
-
-            return crypto.subtle.encrypt({
-                name: "aes-cbc",
-                iv
-            }, pinEncKey, userpin_digestBytes.slice(0, 16));
- //       }).then(function (cipherPIN) {
+            "aes-cbc", false, ["encrypt"]);
+    });
 
 
-        })
-        .catch(function (err) {
-            console.error(err);
-        });
+    encryptedOldPINHash = await crypto.subtle.encrypt({
+        name: "aes-cbc",
+        iv
+    }, CryptoSessionKey, oldPINHash.slice(0, 16));
+
+
+    encryptedNEWPIN = await crypto.subtle.encrypt({
+        name: "aes-cbc",
+        iv
+    }, CryptoSessionKey, bNewPINArray);
+
+
+    return {exportECPublicKeyArray,encryptedOldPINHash,encryptedNEWPIN};
 }
