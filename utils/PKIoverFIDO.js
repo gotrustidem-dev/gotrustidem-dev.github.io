@@ -11,6 +11,9 @@ const CMD_Sign = 0xE3;
 const CMD_SignWithPIN = 0xE5;
 const CMD_GenRsaKeyPair = 0xE6;
 const CMD_ImportCertificate = 0xE7;
+const CMD_CHANGE_PIN = 0xE8;
+const CMD_UNLOCK_PIN = 0xE9;
+const CMD_REQUESTCSR = 0xEA;
 
 
 
@@ -1717,9 +1720,6 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
 
     var bSerialNumber = new Uint8Array(serialNumber);
     
-    
-
-
     //Get device insered PC, and compare serial number if it is exist.
     var bECPointFromToken = await GetTokenInfo().then((newCredentialInfo) => {
         console.log('GTIDEM_ChangeUserPIN start');
@@ -1745,86 +1745,54 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
    console.log("encryptedOldPINHash",bufToHex(prepareUpdate.encryptedOldPINHash));
    console.log("encryptedNEWPIN",bufToHex(prepareUpdate.encryptedNEWPIN));
 
-   /*
-   var pki_buffer = [];
+
    var challenge = new Uint8Array(32);
    window.crypto.getRandomValues(challenge);
-   var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
 
+   
 
 
    var pki_buffer = [];
-   var challenge = new Uint8Array(32);
-   window.crypto.getRandomValues(challenge);
-   var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-   var pki_header = new Uint8Array(3);
-
-   //PKI Command
-   var command_buf = new Uint8Array(ckaLabel.length + 4);
-   command_buf[0] = 0xDF
-   command_buf[1] = 0x01;
-   command_buf[2] = ckaLabel.length >> 8;
-   command_buf[3] = ckaLabel.length;
-   command_buf.set(toUTF8Array(ckaLabel), 4);
-
-
-
-   var alg_buf = new Uint8Array(5);
-   alg_buf[0] = 0xDF;
-   alg_buf[1] = 0x03;
-   alg_buf[2] = 00;
-   alg_buf[3] = 01;
-   alg_buf[4] = 0x02;
-
-
-   var ecpubkey_buf = new Uint8Array(4 + exportECPublicKeyArray.byteLength);
+ 
+   var ecpubkey_buf = new Uint8Array(4 + prepareUpdate.exportECPublicKeyArray.byteLength);
    ecpubkey_buf[0] = 0xDF;
    ecpubkey_buf[1] = 0x04;
-   ecpubkey_buf[2] = exportECPublicKeyArray.byteLength >> 8;
-   ecpubkey_buf[3] = exportECPublicKeyArray.byteLength;
-   ecpubkey_buf.set(new Uint8Array(exportECPublicKeyArray), 4);
+   ecpubkey_buf[2] = prepareUpdate.exportECPublicKeyArray.byteLength >> 8;
+   ecpubkey_buf[3] = prepareUpdate.exportECPublicKeyArray.byteLength;
+   ecpubkey_buf.set(new Uint8Array(prepareUpdate.exportECPublicKeyArray), 4);
+
+   var encryptedOldPINHash_buf = new Uint8Array(4 + prepareUpdate.encryptedOldPINHash.byteLength);
+   encryptedOldPINHash_buf[0] = 0xDF;
+   encryptedOldPINHash_buf[1] = 0x05;
+   encryptedOldPINHash_buf[2] = prepareUpdate.encryptedOldPINHash.byteLength >> 8;
+   encryptedOldPINHash_buf[3] = prepareUpdate.encryptedOldPINHash.byteLength;
+   encryptedOldPINHash_buf.set(new Uint8Array(prepareUpdate.encryptedOldPINHash), 4);
+  
+   var encryptedNewPIN_buf = new Uint8Array(4 + prepareUpdate.encryptedNEWPIN.byteLength);
+   encryptedNewPIN_buf[0] = 0xDF;
+   encryptedNewPIN_buf[1] = 0x07;
+   encryptedNewPIN_buf[2] = prepareUpdate.encryptedNEWPIN.byteLength >> 8;
+   encryptedNewPIN_buf[3] = prepareUpdate.encryptedNEWPIN.byteLength;
+   encryptedNewPIN_buf.set(new Uint8Array(prepareUpdate.encryptedNEWPIN), 4);
 
 
-   var encryptedPIN_buf = new Uint8Array(4 + EncryptedPINArray.byteLength);
-   encryptedPIN_buf[0] = 0xDF;
-   encryptedPIN_buf[1] = 0x05;
-   encryptedPIN_buf[2] = EncryptedPINArray.byteLength >> 8;
-   encryptedPIN_buf[3] = EncryptedPINArray.byteLength;
-   encryptedPIN_buf.set(new Uint8Array(EncryptedPINArray), 4);
+    var payloadLen = ecpubkey_buf.byteLength+encryptedOldPINHash_buf.byteLength+encryptedNewPIN_buf.byteLength;
 
-   var signDataPayload = Uint8Array.from(window.atob(signShortData), c => c.charCodeAt(0));
-   var signDataBuf = new Uint8Array(4 + signDataPayload.byteLength);
-   signDataBuf[0] = 0xDF;
-   signDataBuf[1] = 0x06;
-   signDataBuf[2] = signDataPayload.length >> 8;
-   signDataBuf[3] = signDataPayload.length;
-   signDataBuf.set(signDataPayload, 4);
+   var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+ 
+   var pki_header = new Uint8Array(3);
+   pki_header[0] = CMD_CHANGE_PIN;
+   pki_header[1] = payloadLen>>8
+   pki_header[2] = payloadLen;
 
+   pki_buffer.push(gtheaderbuffer);
+   pki_buffer.push(pki_header);
+   pki_buffer.push(gtheaderbuffer);
+   pki_buffer.push(ecpubkey_buf);
+   pki_buffer.push(encryptedOldPINHash_buf);
+   pki_buffer.push(encryptedNewPIN_buf);
 
-
-   var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_buf.byteLength +
-       alg_buf.byteLength + ecpubkey_buf.byteLength + encryptedPIN_buf.byteLength +
-       signDataBuf.byteLength);
-   var pki_payload_length = command_buf.byteLength + alg_buf.byteLength + ecpubkey_buf
-       .byteLength + encryptedPIN_buf.byteLength + signDataBuf.byteLength;
-   pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-   pki_header[0] = 0xE4;
-   pki_header[1] = pki_payload_length >> 8
-   pki_header[2] = pki_payload_length;
-   pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-   pki_buffer.set(new Uint8Array(command_buf), gtheaderbuffer.byteLength + 3);
-   pki_buffer.set(new Uint8Array(alg_buf), gtheaderbuffer.byteLength + 3 + command_buf
-       .byteLength);
-   pki_buffer.set(new Uint8Array(ecpubkey_buf), gtheaderbuffer.byteLength + 3 + command_buf
-       .byteLength + alg_buf.byteLength);
-   pki_buffer.set(new Uint8Array(encryptedPIN_buf), gtheaderbuffer.byteLength + 3 +
-       command_buf.byteLength + alg_buf.byteLength + ecpubkey_buf.byteLength);
-   pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + command_buf
-       .byteLength + alg_buf.byteLength + ecpubkey_buf.byteLength + encryptedPIN_buf
-       .byteLength);
-
-   console.log("sign-ckalabel-android: " + bufToHex(pki_buffer));
+   console.log("Change_pin_command: " + bufToHex(pki_buffer));
 
    var getAssertionChallenge = {
        'challenge': challenge,
@@ -1832,7 +1800,7 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
    }
    var idList = [{
        id: pki_buffer,
-       transports: ["usb", "nfc"],
+       transports: ["usb"],
        type: "public-key"
    }];
 
@@ -1842,10 +1810,6 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
    navigator.credentials.get({
        'publicKey': getAssertionChallenge
    });
-
-
-*/
-   
 }
 
 async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
@@ -1922,7 +1886,7 @@ async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
             new Uint8Array(keybits)
         );
     }).then(function (sessionKeyBytes) {
-        console.log("pinEncKeyBytes", bufToHex(sessionKeyBytes));
+        console.log("sessionKeyBytes", bufToHex(sessionKeyBytes));
         return crypto.subtle.importKey("raw",
             sessionKeyBytes,
             "aes-cbc", false, ["encrypt"]);
