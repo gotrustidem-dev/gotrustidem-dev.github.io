@@ -1726,15 +1726,21 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
 
         let responseData = parsePKIoverFIDOResponse2(newCredentialInfo, CMD_TokenInfo);
 
-        //compare serial number 
-        if (responseData.SN !== bSerialNumber) {
-            console.log('Serial number different.');
+        if(bSerialNumber.byteLength!=0){
+            if (responseData.SN !== bSerialNumber) {
+                console.log('Serial number different.');
+                throw new error("Serial number different.");
+            }
         }
+
+        //compare serial number 
+       
         return responseData.ECPublic;
 
 
     }).catch((error) => {
         alert(error)
+        throw new error("Serial number different.");
         console.log('FAIL', error)
     }); 
 
