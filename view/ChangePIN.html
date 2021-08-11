@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>MakeCredential Example</title>
+    <title>GoTrustIdem TestPKI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Ensure use of most common Unicode characters -->
     <meta charset="utf-8">
@@ -9,209 +10,107 @@
     <!-- Considered an "experimental" feature -->
     <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css" />
     <!-- Spectre.css icons are used -->
-    <link rel="stylesheet"href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css"> 
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+
+    <script src="https://gotrustidem-dev.github.io/utils/cbor.js"></script>
+    <script src="https://gotrustidem-dev.github.io/utils/helpers.js"></script>
+    <script src="https://gotrustidem-dev.github.io/utils/showMessage.js"></script>
+    <script src="https://gotrustidem-dev.github.io/utils/PKIoverFIDO.js"></script>
+    <style>
+        table.center {
+            margin-left: auto;
+            margin-right: auto;
+            height: 160px;
+        }
+
+        table td,
+        table td * {
+            vertical-align: top;
+        }
+
+        h3 {
+            text-align: center;
+        }
+    </style>
 </head>
+
 <body>
-    <div class="container centered">
-        <div class="columns" style="margin-left: 15%; margin-right: 15%; margin-top: 10%;">
-            <div class="column col-4 text-center">            
-            </div>
+    <img style=" width: 100%; height: 100%;" src="./IdemHeader.png" alt="Idem Key icon " height="476" />
+    <div style="overflow-x: scroll;">
+        <table style="height: auto; width: 100%;">
+            <tbody>
 
-            <div class="column col-4 text-center">
-                <div class="card">
-                    <div class="card-body1">              
-                        <button class="btn btn-primary" onclick="makeCredsSample()">Make Credentials</button>
-                        <p>
-                        <button class="btn btn-primary" onclick="makeCredsSample1()">Make Credentials with attestion</button>
-                    </div><!-- .card-body -->         
-                    <div class="card-body2">            
-                        <div class="input-rpname">       
-                           
-                           <h5>Make Credentials with differnet rpname</h3>
-                           <button class="btn btn-primary" onclick="makeCredsSample2()">Make Credentials with rpname</button>   
-                           <input type="text" id="rpname" placeholder="Rp Name...">
-                        </div>
-                            
-                    </div><!-- .card-body --> 
-                </div><!-- .card -->
-                
-             
-            </div>
+                <tr>
+                    <td style="width: 100% ;">
 
-            <div class="column col-4 text-center">            
-            </div>
-        </div>
+
+                        <form style="text-align: center;" id="form_token_sn" onsubmit="return false">
+                            <p>
+                                <label id="label_token_sn">Token Serial number:</label><br>
+                                <input type="text" name="token_sn"  style="width: 342px; height:41px">
+                            </p>
+                        </form>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td id="pc-td" style="width: 100% ; ">
+                        <table class="center" border="1" width="395">
+                            <tbody>
+                                <tr>
+                                    <!--PC side-->
+                                    <td style="width: 385px;">
+                                        <p>
+                                            <label style="text-align: center;">Current PIN</label><br>
+                                            <form style="text-align: center;" id="id_oldpin_input" onsubmit="return false">
+                                                <input type="text" name="currentpin" style="width: 342px; height:41px">
+                                            </form>
+                                        </p>
+                                     
+                                        <p>
+                                            <label style="text-align: center;">New PIN</label><br>
+                                            <form style="text-align: center;" id="id_newpin_input" onsubmit="return false">
+                                                <input type="text" name="newpin" style="width: 342px; height:41px">
+                                            </form>
+                                        </p>
+                                        <p>
+                                            <label style="text-align: center;">Confirm PIN</label><br>
+                                            <form style="text-align: center;" id="id_newpin_confirm_input" onsubmit="return false">
+                                                <input type="text" name="confirm_newpin" style="width: 342px; height:41px">
+                                            </form>
+                                        </p>
+                                        <form style="text-align: center;" id="id_changepin_btn" onsubmit="return false">
+                                            <button class="btn btn-primary" action="submit"
+                                                style="width: 200px; height:34px;background-color: #008CBA;">Change PIN</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-
     <script>
-        var makeCredsSample = () => {
-            var challenge = new Uint8Array(32);
-            window.crypto.getRandomValues(challenge);
-
-            var userID = 'Kosv9fPtkDoh4Oz7Yq/pVgWHS8HhdlCto5cR0aBoVMw='
-            var id = Uint8Array.from(window.atob(userID), c=>c.charCodeAt(0))
-
-            var publicKey = {
-                'challenge': challenge,
-
-                'rp': {
-                    'name': 'PKI-id1'
-                },
-                
-                'user': {
-                    'id': id,
-                    'name': 'alice@example.com',
-                    'displayName': 'Alice von Wunderland'
-                },
-                'attestation':'none',
-                "authenticatorSelection": {
-                    "userVerification": "discouraged"
-                },
-
-                'pubKeyCredParams': [
-                    { 'type': 'public-key', 'alg': -7  },
-                    { 'type': 'public-key', 'alg': -257 }
-                ]
-            }
-            console.log('List publicKey', publicKey)
-
-            navigator.credentials.create({ 'publicKey': publicKey })
-                .then((newCredentialInfo) => {
-                    
-                    console.log('SUCCESS', newCredentialInfo)
-                    console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response.clientDataJSON))
-                    let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
-                    console.log('AttestationObject: ', attestationObject)
-                    let authData = parseAuthData(attestationObject.authData);
-                    console.log('AuthData: ', authData);
-                    console.log('CredID: ', bufToHex(authData.credID));
-                    console.log('AAGUID: ', bufToHex(authData.aaguid));
-                    console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
-                    alert('Test DONE!!!')
-    
-                
-                })
-                .catch((error) => {
-                    alert(error)
-                    console.log('FAIL', error)
-                })
+        
+        document.getElementById('id_changepin_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('id_token_sn').token_sn.value;
+            let oldpin = document.getElementById('id_oldpin_input').token_sn.value;
+            let newpin = document.getElementById('id_newpin_input').token_sn.value;
+            let confirm_newpin = document.getElementById('id_newpin_confirm_input').token_sn.value;
             
-                
-        }
-    var makeCredsSample1 = () => {
-            var challenge = new Uint8Array(32);
-            window.crypto.getRandomValues(challenge);
+            console.log(token_sn);
+            console.log(oldpin);
+            console.log(newpin);
+            console.log(confirm_newpin);
 
-            var userID = 'Kosv9fPtkDoh4Oz7Yq/pVgWHS8HhdlCto5cR0aBoVMw='
-            var id = Uint8Array.from(window.atob(userID), c=>c.charCodeAt(0))
 
-            var publicKey1 = {
-                'challenge': challenge,
 
-                'rp': {
-                    'name': 'GoTrustID Inc.'
-                },
-                
-                'user': {
-                    'id': id,
-                    'name': 'alice@example.com',
-                    'displayName': 'Alice von Wunderland'
-                },
-                
-                "authenticatorSelection": {
-                    "userVerification": "discouraged",
-                    "requireResidentKey": false,
-                    "authenticatorAttachment": "cross-platform"
-                    
-                },
-                'attestation':'direct',
-                
-                'pubKeyCredParams': [
-                    { 'type': 'public-key', 'alg': -7  },
-                    { 'type': 'public-key', 'alg': -257 }
-                ]
-            }
-            console.log('List publicKey1', publicKey1)
-
-            navigator.credentials.create({ 'publicKey': publicKey1 })
-                .then((newCredentialInfo) => {
-                    
-                    console.log('SUCCESS', newCredentialInfo)
-                    console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response.clientDataJSON))
-                    let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
-                    console.log('AttestationObject: ', attestationObject)
-                    let authData = parseAuthData(attestationObject.authData);
-                    console.log('AuthData: ', authData);
-                    console.log('CredID: ', bufToHex(authData.credID));
-                    console.log('AAGUID: ', bufToHex(authData.aaguid));
-                    console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
-                    alert('Test DONE!!!')
-    
-                
-                })
-                .catch((error) => {
-                    alert(error)
-                    console.log('FAIL', error)
-                })
-            
-                
-        }   
-    var makeCredsSample2 = () => {
-            var challenge = new Uint8Array(32);
-            window.crypto.getRandomValues(challenge);
-
-            var userID = 'Kosv9fPtkDoh4Oz7Yq/pVgWHS8HhdlCto5cR0aBoVMw='
-            var id = Uint8Array.from(window.atob(userID), c=>c.charCodeAt(0))
-            var x = document.getElementById("rpname").value;
-            var publicKey2 = {
-                'challenge': challenge,
-
-                'rp': {
-                    'name': x
-                },
-                
-                'user': {
-                    'id': id,
-                    'name': 'alice@example.com',
-                    'displayName': 'Alice von Wunderland'
-                },
-                'attestation':'none',
-                "authenticatorSelection": {
-                    "userVerification": "discouraged"
-                },
-
-                'pubKeyCredParams': [
-                    { 'type': 'public-key', 'alg': -7  },
-                    { 'type': 'public-key', 'alg': -257 }
-                ]
-            }
-            console.log('Your rpname', x)
-            console.log('List publicKey2', publicKey2)
-            navigator.credentials.create({ 'publicKey': publicKey2 })
-                .then((newCredentialInfo) => {
-                    
-                    console.log('SUCCESS', newCredentialInfo)
-                    console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response.clientDataJSON))
-                    let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
-                    console.log('AttestationObject: ', attestationObject)
-                    let authData = parseAuthData(attestationObject.authData);
-                    console.log('AuthData: ', authData);
-                    console.log('CredID: ', bufToHex(authData.credID));
-                    console.log('AAGUID: ', bufToHex(authData.aaguid));
-                    console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
-                    alert('Test DONE!!!')
-    
-                
-                })
-                .catch((error) => {
-                    alert(error)
-                    console.log('FAIL', error)
-                })
-            
-                
-        }
+        })
     </script>
-    <script src="./MakeCredential Example_files/cbor.js"></script>
-    <script src="./MakeCredential Example_files/helpers.js"></script>
 
-</body></html>
+</body>
+
+</html>
