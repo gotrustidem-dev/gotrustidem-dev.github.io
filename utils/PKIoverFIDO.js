@@ -1900,7 +1900,7 @@ async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
     encryptedNEWPIN = await crypto.subtle.encrypt({
         name: "aes-cbc",
         iv
-    }, CryptoSessionKey, new Uint8Array(bNewPINArray));
+    }, CryptoSessionKey, new Uint8Array(newPINBuffer));
 
     var bExportECPublicKeyArray = new Uint8Array(exportECPublicKeyArray);
     var bEcryptedOldPINHash = new Uint8Array(encryptedOldPINHash.slice(0,16));
