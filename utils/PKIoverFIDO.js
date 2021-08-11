@@ -1753,12 +1753,6 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
 
    var challenge = new Uint8Array(32);
    window.crypto.getRandomValues(challenge);
-
-   
-
-
-
- 
    var ecpubkey_buf = new Uint8Array(4 + prepareUpdate.bExportECPublicKeyArray.byteLength);
    ecpubkey_buf[0] = 0xDF;
    ecpubkey_buf[1] = 0x04;
@@ -1812,7 +1806,7 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
    getAssertionChallenge.allowCredentials = idList;
    console.log('List getAssertionChallenge', getAssertionChallenge)
 
-   navigator.credentials.get({
+   await navigator.credentials.get({
        'publicKey': getAssertionChallenge
    });
 }
