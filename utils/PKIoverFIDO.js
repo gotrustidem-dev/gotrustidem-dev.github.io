@@ -1740,10 +1740,9 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
 
     //Compution session Key and encrypt oldPIN and new pin.
    var prepareUpdate = await computingSessionKey("123456", "88888888", bECPointFromToken);
-
-   console.log("exportECPublicKeyArray",bufToHex(prepareUpdate.exportECPublicKeyArray));
-   console.log("encryptedOldPINHash",bufToHex(prepareUpdate.encryptedOldPINHash));
-   console.log("encryptedNEWPIN",bufToHex(prepareUpdate.encryptedNEWPIN));
+   console.log("exportECPublicKeyArray",bufToHex(prepareUpdate.bExportECPublicKeyArray));
+   console.log("encryptedOldPINHash",bufToHex(prepareUpdate.bEcryptedOldPINHash));
+   console.log("encryptedNEWPIN",bufToHex(prepareUpdate.bEncryptedNEWPIN));
 
 
    var challenge = new Uint8Array(32);
@@ -1754,26 +1753,26 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
 
 
  
-   var ecpubkey_buf = new Uint8Array(4 + prepareUpdate.exportECPublicKeyArray.byteLength);
+   var ecpubkey_buf = new Uint8Array(4 + prepareUpdate.bExportECPublicKeyArray.byteLength);
    ecpubkey_buf[0] = 0xDF;
    ecpubkey_buf[1] = 0x04;
-   ecpubkey_buf[2] = prepareUpdate.exportECPublicKeyArray.byteLength >> 8;
-   ecpubkey_buf[3] = prepareUpdate.exportECPublicKeyArray.byteLength;
-   ecpubkey_buf.set(new Uint8Array(prepareUpdate.exportECPublicKeyArray), 4);
+   ecpubkey_buf[2] = prepareUpdate.bExportECPublicKeyArray.byteLength >> 8;
+   ecpubkey_buf[3] = prepareUpdate.bExportECPublicKeyArray.byteLength;
+   ecpubkey_buf.set(new Uint8Array(prepareUpdate.bExportECPublicKeyArray), 4);
 
-   var encryptedOldPINHash_buf = new Uint8Array(4 + prepareUpdate.encryptedOldPINHash.byteLength);
+   var encryptedOldPINHash_buf = new Uint8Array(4 + prepareUpdate.bEcryptedOldPINHash.byteLength);
    encryptedOldPINHash_buf[0] = 0xDF;
    encryptedOldPINHash_buf[1] = 0x05;
-   encryptedOldPINHash_buf[2] = prepareUpdate.encryptedOldPINHash.byteLength >> 8;
-   encryptedOldPINHash_buf[3] = prepareUpdate.encryptedOldPINHash.byteLength;
-   encryptedOldPINHash_buf.set(new Uint8Array(prepareUpdate.encryptedOldPINHash), 4);
+   encryptedOldPINHash_buf[2] = prepareUpdate.bEcryptedOldPINHash.byteLength >> 8;
+   encryptedOldPINHash_buf[3] = prepareUpdate.bEcryptedOldPINHash.byteLength;
+   encryptedOldPINHash_buf.set(new Uint8Array(prepareUpdate.bEcryptedOldPINHash), 4);
   
-   var encryptedNewPIN_buf = new Uint8Array(4 + prepareUpdate.encryptedNEWPIN.byteLength);
+   var encryptedNewPIN_buf = new Uint8Array(4 + prepareUpdate.bEncryptedNEWPIN.byteLength);
    encryptedNewPIN_buf[0] = 0xDF;
    encryptedNewPIN_buf[1] = 0x07;
-   encryptedNewPIN_buf[2] = prepareUpdate.encryptedNEWPIN.byteLength >> 8;
-   encryptedNewPIN_buf[3] = prepareUpdate.encryptedNEWPIN.byteLength;
-   encryptedNewPIN_buf.set(new Uint8Array(prepareUpdate.encryptedNEWPIN), 4);
+   encryptedNewPIN_buf[2] = prepareUpdate.bEncryptedNEWPIN.byteLength >> 8;
+   encryptedNewPIN_buf[3] = prepareUpdate.bEncryptedNEWPIN.byteLength;
+   encryptedNewPIN_buf.set(new Uint8Array(prepareUpdate.bEncryptedNEWPIN), 4);
 
 
     var payloadLen = ecpubkey_buf.byteLength+encryptedOldPINHash_buf.byteLength+encryptedNewPIN_buf.byteLength;
