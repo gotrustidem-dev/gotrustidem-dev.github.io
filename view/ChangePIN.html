@@ -35,7 +35,6 @@
 </head>
 
 <body>
-    <img style=" width: 100%; height: 100%;" src="./IdemHeader.png" alt="Idem Key icon " height="476" />
     <div style="overflow-x: scroll;">
         <table style="height: auto; width: 100%;">
             <tbody>
@@ -97,9 +96,9 @@
         document.getElementById('id_changepin_btn').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('id_token_sn').token_sn.value;
-            let oldpin = document.getElementById('id_oldpin_input').token_sn.value;
-            let newpin = document.getElementById('id_newpin_input').token_sn.value;
-            let confirm_newpin = document.getElementById('id_newpin_confirm_input').token_sn.value;
+            let oldpin = document.getElementById('id_oldpin_input').currentpin.value;
+            let newpin = document.getElementById('id_newpin_input').newpin.value;
+            let confirm_newpin = document.getElementById('id_newpin_confirm_input').confirm_newpin.value;
             
             console.log(token_sn);
             console.log(oldpin);
