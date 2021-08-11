@@ -1745,7 +1745,7 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
     }); 
 
     //Compution session Key and encrypt oldPIN and new pin.
-   var prepareUpdate = await computingSessionKey("123456", "88888888", bECPointFromToken);
+   var prepareUpdate = await computingSessionKey(oldPIN, newPIN, bECPointFromToken);
    console.log("exportECPublicKeyArray",bufToHex(prepareUpdate.bExportECPublicKeyArray));
    console.log("encryptedOldPINHash",bufToHex(prepareUpdate.bEcryptedOldPINHash));
    console.log("encryptedNEWPIN",bufToHex(prepareUpdate.bEncryptedNEWPIN));
