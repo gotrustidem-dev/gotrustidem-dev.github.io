@@ -105,7 +105,13 @@
             console.log(newpin);
             console.log(confirm_newpin);
 
+            GTIDEM_ChangeUserPIN(oldpin, newpin, token_sn).then((value) => {
 
+                alert("YES");
+            }).catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            })
 
         })
     </script>
