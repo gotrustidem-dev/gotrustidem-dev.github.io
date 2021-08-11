@@ -1896,16 +1896,18 @@ async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
     encryptedOldPINHash = await crypto.subtle.encrypt({
         name: "aes-cbc",
         iv
-    }, CryptoSessionKey, oldPINHash.slice(0, 16));
+    }, CryptoSessionKey, Uint8Array(oldPINHash));
 
 
     encryptedNEWPIN = await crypto.subtle.encrypt({
         name: "aes-cbc",
         iv
-    }, CryptoSessionKey, bNewPINArray);
+    }, CryptoSessionKey, new Uint8Array(bNewPINArray));
 
-
-    return {exportECPublicKeyArray,encryptedOldPINHash,encryptedNEWPIN};
+    var bExportECPublicKeyArray = new Uint8Array(exportECPublicKeyArray);
+    var bEcryptedOldPINHash = new Uint8Array(encryptedOldPINHash.slice(0,16));
+    var bEncryptedNEWPIN = new Uint8Array(encryptedNEWPIN);
+    return {bExportECPublicKeyArray, bEcryptedOldPINHash, bEncryptedNEWPIN};
 }
 
 
