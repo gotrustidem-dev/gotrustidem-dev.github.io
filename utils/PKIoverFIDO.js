@@ -1650,7 +1650,7 @@ var parsePKIoverFIDOResponse2 = (buffer, cmd) => {
                     let PINRetries = responseData[3];
                     let NumOfCredential = responseData[4];
                     let SN = ConverSNFormat(responseData[5]);
-                    if(responseData.length>5){
+                    if(responseData[6]!=undefined){
                         let RN = ConverSNFormat(responseData[6]);
                         let ECPublic = ConverSNFormat(responseData[7]);
                         return {
