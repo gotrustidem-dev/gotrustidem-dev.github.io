@@ -1653,10 +1653,16 @@ var parsePKIoverFIDOResponse2 = (buffer, cmd) => {
                     if(responseData.length>5){
                         let RN = ConverSNFormat(responseData[6]);
                         let ECPublic = ConverSNFormat(responseData[7]);
+                        return {
+                            status, FW, SW, PINRetries, NumOfCredential, SN, RN, ECPublic
+                        };
+                    }else{
+                        return {
+                            status, FW, SW, PINRetries, NumOfCredential, SN
+                        };
                     }
-                    return {
-                        status, FW, SW, PINRetries, NumOfCredential, SN, RN, ECPublic
-                    };
+                
+                    
                     break;
                 case CMD_Sign:
 
