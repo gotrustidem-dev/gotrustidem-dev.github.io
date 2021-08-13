@@ -1275,7 +1275,7 @@ function toUTF8Array(str) {
                 0x80 | (charcode & 0x3f));
         }
     }
-    return utf8;
+    return new Uint8Array(utf8);
 }
 
 function hexStringToArrayBuffer(hexString) {
