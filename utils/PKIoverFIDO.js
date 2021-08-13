@@ -1911,24 +1911,27 @@ async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
 async function GTIDEM_GenRSA2048CSR(serialNumber,keyID) {
 
    
+    var bSerialNumber = hexStringToArrayBuffer(serialNumber);
+    var bKeyID = toUTF8Array(keyID);
+
    var challenge = new Uint8Array(32);
    window.crypto.getRandomValues(challenge);
 
-   var keyid_buf = new Uint8Array(4 + keyID.length);
+   var keyid_buf = new Uint8Array(4 + bKeyID.length);
    keyid_buf[0] = 0xDF;
    keyid_buf[1] = 0x18;
    keyid_buf[2] = keyid_buf.byteLength >> 8;
    keyid_buf[3] = keyid_buf.byteLength;
-   keyid_buf.set(new Uint8Array(prepareUpdate.bExportECPublicKeyArray), 4);
+   keyid_buf.set(bKeyID, 4);
 
-   var sn_buf = new Uint8Array(4 + serialNumber.byteLength);
-   if(serialNumber.length!=0){
+   var sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+   if(bSerialNumber.length!=0){
         
         sn_buf[0] = 0xDF;
         sn_buf[1] = 0x20;
         sn_buf[2] = serialNumber.byteLength >> 8;
         sn_buf[3] = serialNumber.byteLength;
-        sn_buf.set(new Uint8Array(serialNumber), 4);
+        sn_buf.set(bSerialNumber, 4);
    }
    
   
