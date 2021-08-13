@@ -70,7 +70,7 @@
 
                                         <form style="text-align: center;" id="form_requestcsr_btn" onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
-                                                style="width: 200px; height:34px;background-color: #008CBA;">Change PIN</button>
+                                                style="width: 200px; height:34px;background-color: #008CBA;">REquest CSR</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -90,7 +90,7 @@
             console.log(token_sn);
             console.log(key_id);
 
-            GTIDEM_GenRSA2048CSR(serialNumber,keyID).then((value) => {
+            GTIDEM_GenRSA2048CSR(token_sn,key_id).then((value) => {
 
                 alert("YES");
             }).catch((error) => {
