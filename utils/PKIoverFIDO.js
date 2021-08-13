@@ -1650,8 +1650,10 @@ var parsePKIoverFIDOResponse2 = (buffer, cmd) => {
                     let PINRetries = responseData[3];
                     let NumOfCredential = responseData[4];
                     let SN = ConverSNFormat(responseData[5]);
-                    let RN = ConverSNFormat(responseData[6]);
-                    let ECPublic = ConverSNFormat(responseData[7]);
+                    if(responseData.length>5){
+                        let RN = ConverSNFormat(responseData[6]);
+                        let ECPublic = ConverSNFormat(responseData[7]);
+                    }
                     return {
                         status, FW, SW, PINRetries, NumOfCredential, SN, RN, ECPublic
                     };
@@ -1732,12 +1734,7 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
                 throw new error("Serial number different.");
             }
         }
-
-        //compare serial number 
-       
         return responseData.ECPublic;
-
-
     }).catch((error) => {
         alert(error)
         throw new error("Serial number different.");
@@ -1809,6 +1806,179 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
    await navigator.credentials.get({
        'publicKey': getAssertionChallenge
    });
+}
+async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
+
+    //Convert oldPIN to sha256 value
+    var bOldPINArray = new Uint8Array(oldPIN.length);
+    bOldPINArray.set(toUTF8Array(oldPIN), 0);
+    var oldPINHash = await crypto.subtle.digest("SHA-256", bOldPINArray);
+    console.log("oldPINHash  ", oldPINHash);
+
+    //During encryption, newPin is padded with trailing 0x00 bytes and is of minimum 64 bytes length. 
+    var newPINBuffer = new Uint8Array(64);
+    newPINBuffer.fill(0);
+    newPINBuffer.set(toUTF8Array(newPIN), 0);
+
+    var iv = new Uint8Array(16);
+    iv.fill(0);
+
+
+    var newPINHash;
+    var ECPublicKey;
+    var EncryptOlDPIN;
+
+    let ecpoint = hexStringToArrayBuffer(ecpointXY);
+
+    var externalECPublicKeyX = base64EncodeURL(ecpoint.slice(1, 33));
+    var externalECPublicKeyY = base64EncodeURL(ecpoint.slice(33, 65));
+   
+    var exportECPublicKeyArray;
+    var encryptedOldPINHash;
+    var encryptedNEWPIN;
+
+
+    var importedECPublicKey = await window.crypto.subtle.importKey(
+        "jwk", //can be "jwk" (public or private), "raw" (public only), "spki" (public only), or "pkcs8" (private only)
+        { //this is an example jwk key, other key types are Uint8Array objects
+            kty: "EC",
+            crv: "P-256",
+            x: externalECPublicKeyX,
+            y: externalECPublicKeyY,
+            ext: true,
+        }, { //these are the algorithm options
+            name: "ECDH",
+            namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
+        },
+        true, //whether the key is extractable (i.e. can be used in exportKey)
+        [] //"deriveKey" and/or "deriveBits" for private keys only (just put an empty list if importing a public key)
+    );
+
+    var CryptoECKeyPair = await window.crypto.subtle.generateKey({
+            name: "ECDH",
+            namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
+        },
+        true, //whether the key is extractable (i.e. can be used in exportKey)
+        ["deriveKey", "deriveBits"] //can be any combination of "deriveKey" and "deriveBits"
+    );
+
+    exportECPublicKeyArray = await window.crypto.subtle.exportKey("raw", CryptoECKeyPair.publicKey);
+
+    //Computing session Key
+    var CryptoSessionKey = await window.crypto.subtle.deriveBits({
+            name: "ECDH",
+            namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
+            public: importedECPublicKey, //an ECDH public key from generateKey or importKey
+
+        },
+        CryptoECKeyPair.privateKey, //from generateKey or importKey above
+        256 //the number of bits you want to derive
+    ).then(function (keybits) { //convert share secret to pinEncKey
+        return crypto.subtle.digest(
+            "SHA-256",
+            new Uint8Array(keybits)
+        );
+    }).then(function (sessionKeyBytes) {
+        console.log("sessionKeyBytes", bufToHex(sessionKeyBytes));
+        return crypto.subtle.importKey("raw",
+            sessionKeyBytes,
+            "aes-cbc", false, ["encrypt"]);
+    });
+
+
+    encryptedOldPINHash = await crypto.subtle.encrypt({
+        name: "aes-cbc",
+        iv
+    }, CryptoSessionKey, new Uint8Array(oldPINHash));
+
+
+    encryptedNEWPIN = await crypto.subtle.encrypt({
+        name: "aes-cbc",
+        iv
+    }, CryptoSessionKey, new Uint8Array(newPINBuffer));
+
+    var bExportECPublicKeyArray = new Uint8Array(exportECPublicKeyArray);
+    var bEcryptedOldPINHash = new Uint8Array(encryptedOldPINHash.slice(0,16));
+    var bEncryptedNEWPIN = new Uint8Array(encryptedNEWPIN).slice(0,64);
+    return {bExportECPublicKeyArray, bEcryptedOldPINHash, bEncryptedNEWPIN};
+}
+async function GTIDEM_GenRSA2048CSR(serialNumber,keyID) {
+
+   
+   var challenge = new Uint8Array(32);
+   window.crypto.getRandomValues(challenge);
+
+   var keyid_buf = new Uint8Array(4 + keyID.length);
+   keyid_buf[0] = 0xDF;
+   keyid_buf[1] = 0x18;
+   keyid_buf[2] = keyid_buf.byteLength >> 8;
+   keyid_buf[3] = keyid_buf.byteLength;
+   keyid_buf.set(new Uint8Array(prepareUpdate.bExportECPublicKeyArray), 4);
+
+   var sn_buf = new Uint8Array(4 + serialNumber.byteLength);
+   if(serialNumber.length!=0){
+        
+        sn_buf[0] = 0xDF;
+        sn_buf[1] = 0x20;
+        sn_buf[2] = serialNumber.byteLength >> 8;
+        sn_buf[3] = serialNumber.byteLength;
+        sn_buf.set(new Uint8Array(serialNumber), 4);
+   }
+   
+  
+
+   var payloadLen = keyid_buf.byteLength+sn_buf.byteLength
+
+   var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+ 
+   var pki_header = new Uint8Array(3);
+   pki_header[0] = CMD_REQUESTCSR;
+   pki_header[1] = payloadLen>>8
+   pki_header[2] = payloadLen;
+
+   var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
+   pki_buffer = _appendBuffer(pki_buffer,keyid_buf);
+   pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+
+
+
+   console.log("Request_command: " + bufToHex(pki_buffer));
+
+   var webauth_request = {
+    'challenge': challenge,
+
+    'rp': {
+        'name': 'GoTrustID Inc.',
+    },
+
+    'user': {
+        'id': pki_buffer,
+        'name': 'alice@example.com',
+        'displayName': 'Alice von Wunderland'
+    },
+
+    "authenticatorSelection": {
+        "userVerification": "required",
+        "requireResidentKey": false,
+        "authenticatorAttachment": "cross-platform"
+
+    },
+    'attestation': "direct",
+    'pubKeyCredParams': [{
+            'type': 'public-key',
+            'alg': -7
+        },
+        {
+            'type': 'public-key',
+            'alg': -257
+        }
+    ]
+}
+   console.log('webauth_request', webauth_request)
+
+   await navigator.credentials.create({
+        'publicKey': webauth_request
+    });
 }
 
 async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
