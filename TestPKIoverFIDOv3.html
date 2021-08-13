@@ -138,8 +138,8 @@
                             <label id="label_pin_retries"></label><br>
                             <label id="label_credentials"></label><br>
                             <label id="label_serial_number"></label><br>
-                            <label id="label_random_number"></label><br>
-                            <label id="label_ecPublic_key"></label><br>
+                            <!-- <label id="label_random_number"></label><br> -->
+                            <!-- <label id="label_ecPublic_key"></label><br> -->
                         </form>
 
 
@@ -2160,8 +2160,8 @@
                 document.getElementById('label_pin_retries').innerText = "PIN retryies: " + responseData.PINRetries;
                 document.getElementById('label_credentials').innerText = "Credentials: " + responseData.NumOfCredential;
                 document.getElementById('label_serial_number').innerText = "Serial number: " +responseData.SN;
-                document.getElementById('label_random_number').innerText = "Random number: " +responseData.RN;
-                document.getElementById('label_ecPublic_key').innerText = "EC public point: " +responseData.ECPublic;
+                //document.getElementById('label_random_number').innerText = "Random number: " +responseData.RN;
+                //document.getElementById('label_ecPublic_key').innerText = "EC public point: " +responseData.ECPublic;
 
                 console.log('Response : \n', responseData);
 
