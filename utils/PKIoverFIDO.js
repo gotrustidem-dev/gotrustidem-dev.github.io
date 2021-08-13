@@ -1920,8 +1920,8 @@ async function GTIDEM_GenRSA2048CSR(serialNumber,keyID) {
    var keyid_buf = new Uint8Array(4 + bKeyID.length);
    keyid_buf[0] = 0xDF;
    keyid_buf[1] = 0x18;
-   keyid_buf[2] = keyid_buf.byteLength >> 8;
-   keyid_buf[3] = keyid_buf.byteLength;
+   keyid_buf[2] = bKeyID.byteLength >> 8;
+   keyid_buf[3] = bKeyID.byteLength;
    keyid_buf.set(bKeyID, 4);
 
    var sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
@@ -1929,8 +1929,8 @@ async function GTIDEM_GenRSA2048CSR(serialNumber,keyID) {
         
         sn_buf[0] = 0xDF;
         sn_buf[1] = 0x20;
-        sn_buf[2] = serialNumber.byteLength >> 8;
-        sn_buf[3] = serialNumber.byteLength;
+        sn_buf[2] = bSerialNumber.byteLength >> 8;
+        sn_buf[3] = bSerialNumber.byteLength;
         sn_buf.set(bSerialNumber, 4);
    }
    
