@@ -2145,7 +2145,7 @@ async function GTIDEM_ImportCertificate(serialNumber,keyID,Base64Cert) {
 
    var getAssertionChallenge = {
     'challenge': challenge,
-    "userVerification": "discouraged"
+    "userVerification": "required"
     }
     var idList = [{
         id: pki_buffer,
