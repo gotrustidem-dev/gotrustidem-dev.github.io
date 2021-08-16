@@ -72,11 +72,12 @@
                                             <button class="btn btn-primary" action="submit"
                                                 style="width: 200px; height:34px;background-color: #008CBA;">Request CSR</button>
                                         </form>
-
+                                        <p>
                                         <form style="text-align: center;" id="form_importcert_btn" onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
                                                 style="width: 200px; height:34px;background-color: #008CBA;">Import Cert</button>
                                         </form>
+                                        </p>
 
                                     </td>
                                 </tr>
@@ -111,7 +112,7 @@
 
         });
 
-        document.getElementById('form_import_btn').addEventListener('submit', function (event) {
+        document.getElementById('form_importcert_btn').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             let key_id = document.getElementById('form_key_id').key_id.value;
