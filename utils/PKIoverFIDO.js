@@ -2092,7 +2092,7 @@ async function GTIDEM_ImportCertificate(serialNumber,keyID,Base64Cert) {
     var bSerialNumber = hexStringToArrayBuffer(serialNumber);
     var bKeyID = toUTF8Array(keyID);
     var bHexCert = Uint8Array.from(window.atob(Base64Cert), c => c.charCodeAt(0));
-    var bPlainText = toUTF8Array(plaintext);
+    //var bPlainText = toUTF8Array(plaintext);
 
     var challenge = new Uint8Array(32);
     window.crypto.getRandomValues(challenge);
