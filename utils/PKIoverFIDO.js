@@ -1911,8 +1911,8 @@ async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
 async function GTIDEM_GenRSA2048CSR(serialNumber,keyID) {
 
    
-    var bSerialNumber = hexStringToArrayBuffer(serialNumber);
-    var bKeyID = toUTF8Array(keyID);
+   var bSerialNumber = hexStringToArrayBuffer(serialNumber);
+   var bKeyID = toUTF8Array(keyID);
 
    var challenge = new Uint8Array(32);
    window.crypto.getRandomValues(challenge);
@@ -2084,6 +2084,82 @@ async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
     var bEcryptedOldPINHash = new Uint8Array(encryptedOldPINHash.slice(0,16));
     var bEncryptedNEWPIN = new Uint8Array(encryptedNEWPIN).slice(0,64);
     return {bExportECPublicKeyArray, bEcryptedOldPINHash, bEncryptedNEWPIN};
+}
+
+
+async function GTIDEM_ImportCertificate(serialNumber,keyID,Base64Cert) {
+
+    var bSerialNumber = hexStringToArrayBuffer(serialNumber);
+    var bKeyID = toUTF8Array(keyID);
+    var bHexCert = Uint8Array.from(window.atob(Base64Cert), c => c.charCodeAt(0));
+    var bPlainText = toUTF8Array(plaintext);
+
+    var challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
+ 
+    var keyid_buf = new Uint8Array(4 + bKeyID.length);
+    keyid_buf[0] = 0xDF;
+    keyid_buf[1] = 0x18;
+    keyid_buf[2] = bKeyID.byteLength >> 8;
+    keyid_buf[3] = bKeyID.byteLength;
+    keyid_buf.set(bKeyID, 4);
+ 
+    var sn_buf;
+    if(bSerialNumber.length!=0){
+        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+         sn_buf[0] = 0xDF;
+         sn_buf[1] = 0x20;
+         sn_buf[2] = bSerialNumber.byteLength >> 8;
+         sn_buf[3] = bSerialNumber.byteLength;
+         sn_buf.set(bSerialNumber, 4);
+    }else{
+        sn_buf = new Uint8Array(0);
+    }
+
+    var hexCert_buf = new Uint8Array(4 + bHexCert.length);
+    hexCert_buf[0] = 0xDF;
+    hexCert_buf[1] = 0x17;
+    hexCert_buf[2] = bHexCert.byteLength >> 8;
+    hexCert_buf[3] = bHexCert.byteLength;
+    hexCert_buf.set(bHexCert, 4);
+
+
+
+   var payloadLen = keyid_buf.byteLength+sn_buf.byteLength+hexCert_buf.length;
+
+   var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+ 
+   var pki_header = new Uint8Array(3);
+   pki_header[0] = CMD_ImportCertificate;
+   pki_header[1] = payloadLen>>8
+   pki_header[2] = payloadLen;
+
+   var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
+   pki_buffer = _appendBuffer(pki_buffer,keyid_buf);
+   pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+   pki_buffer = _appendBuffer(pki_buffer,hexCert_buf);
+
+
+
+   console.log("Import request_command: " + bufToHex(pki_buffer));
+
+   var getAssertionChallenge = {
+    'challenge': challenge,
+    "userVerification": "discouraged"
+    }
+    var idList = [{
+        id: pki_buffer,
+        transports: ["usb"],
+        type: "public-key"
+    }];
+
+    getAssertionChallenge.allowCredentials = idList;
+    console.log('List getAssertionChallenge', getAssertionChallenge)
+
+    await navigator.credentials.get({
+        'publicKey': getAssertionChallenge
+    });
+
 }
 
 
