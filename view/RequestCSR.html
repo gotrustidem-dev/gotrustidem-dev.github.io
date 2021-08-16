@@ -70,19 +70,30 @@
 
                                         <form style="text-align: center;" id="form_requestcsr_btn" onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
-                                                style="width: 200px; height:34px;background-color: #008CBA;">REquest CSR</button>
+                                                style="width: 200px; height:34px;background-color: #008CBA;">Request CSR</button>
                                         </form>
+
+                                        <form style="text-align: center;" id="form_importcert_btn" onsubmit="return false">
+                                            <button class="btn btn-primary" action="submit"
+                                                style="width: 200px; height:34px;background-color: #008CBA;">Import Cert</button>
+                                        </form>
+
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </td>
+                    
                 </tr>
             </tbody>
         </table>
     </div>
     <script>
         
+        var testBigCertificate =
+            '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';
+
+
         document.getElementById('form_requestcsr_btn').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
@@ -98,7 +109,25 @@
                 console.log('FAIL', error)
             })
 
+        });
+
+        document.getElementById('form_import_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            let key_id = document.getElementById('form_key_id').key_id.value;
+            console.log(token_sn);
+            console.log(key_id);
+
+            GTIDEM_ImportCertificate(token_sn,key_id,testBigCertificate).then((value) => {
+
+                alert("YES");
+            }).catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            })
+
         })
+
     </script>
 
 </body>
