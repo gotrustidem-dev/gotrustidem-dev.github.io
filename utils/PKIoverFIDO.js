@@ -2132,7 +2132,6 @@ async function GTIDEM_DeleteCertByIndex(index, serialNumber) {
 
 
     var bSerialNumber = hexStringToArrayBuffer(serialNumber);
-    var bLabel = toUTF8Array(label);
 
     var challenge = new Uint8Array(32);
     window.crypto.getRandomValues(challenge);
@@ -2193,7 +2192,7 @@ async function GTIDEM_ClearToken( serialNumber) {
 
 
     var bSerialNumber = hexStringToArrayBuffer(serialNumber);
-    var bLabel = toUTF8Array(label);
+   
 
     var challenge = new Uint8Array(32);
     window.crypto.getRandomValues(challenge);
