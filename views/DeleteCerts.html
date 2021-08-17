@@ -75,13 +75,13 @@
                                                         <p>
                                                             <form style="text-align: center;" id="form_label"
                                                                 onsubmit="return false">
-                                                                <input type="text" name="label" style="width: 342px; height:41px">
+                                                                <input type="text" name="certlabel" style="width: 342px; height:41px">
                 
                                                             </form>
                                                         </p>
                 
                 
-                                                        <form style="text-align: center;" id="form_delete_labelbtn"
+                                                        <form style="text-align: center;" id="form_delete_label_btn"
                                                             onsubmit="return false">
                                                             <button class="btn btn-primary" action="submit"
                                                                 style="width: 162px; height:34px;background-color: #008CBA;">Delete cert</button>
@@ -117,19 +117,14 @@
     </div>
     <script>
         
-        document.getElementById('form_changepin_btn').addEventListener('submit', function (event) {
+
+        document.getElementById('form_clear_certs').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
-            let oldpin = document.getElementById('form_oldpin_input').currentpin.value;
-            let newpin = document.getElementById('form_newpin_input').newpin.value;
-            let confirm_newpin = document.getElementById('form_newpin_confirm_input').confirm_newpin.value;
-            
-            console.log(token_sn);
-            console.log(oldpin);
-            console.log(newpin);
-            console.log(confirm_newpin);
-
-            GTIDEM_ChangeUserPIN(oldpin, newpin, token_sn).then((value) => {
+            let label = document.getElementById('form_label').certlabel.value;
+           
+           
+            GTIDEM_DeleteCertByLabel(label, token_sn).then((value) => {
 
                 alert("YES");
             }).catch((error) => {
@@ -138,6 +133,38 @@
             })
 
         })
+
+
+        document.getElementById('form_delete_label_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            let index = document.getElementById('form_index').certIndex.value;
+           
+            GTIDEM_DeleteCertByIndex(index,token_sn).then((value) => {
+
+                alert("YES");
+            }).catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            })
+
+        })
+
+        document.getElementById('form_delete_index_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            
+            
+            GTIDEM_ClearToken(token_sn).then((value) => {
+
+                alert("YES");
+            }).catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            })
+
+        })
+
     </script>
 
 </body>
