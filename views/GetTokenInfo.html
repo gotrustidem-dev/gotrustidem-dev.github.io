@@ -89,7 +89,7 @@
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             console.log(token_sn);
-            GTIDEM_GetTokenInfo(token_sn).then((value) => {
+            GTIDEM_GetTokenInfo(token_sn).then((newCredentialInfo) => {
 
                 console.log('SUCCESS', newCredentialInfo);
                 let responseData = parsePKIoverFIDOResponse2(newCredentialInfo, CMD_TokenInfo);
