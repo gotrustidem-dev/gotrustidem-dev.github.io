@@ -118,14 +118,25 @@
             let key_id = document.getElementById('form_key_id').key_id.value;
             console.log(token_sn);
             console.log(key_id);
+            var bHexCert = Uint8Array.from(window.atob(testBigCertificate), c => c.charCodeAt(0));
 
-            GTIDEM_ImportCertificate(token_sn,key_id,testBigCertificate).then((value) => {
+            crypto.subtle.digest("SHA-256",new Uint8Array(signDataPayload)).then(function (signHashedDataPayload) {
+                console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
+                GTIDEM_ImportCertificate(token_sn,key_id,bHexCert,new Uint8Array(signHashedDataPayload)).then((value) => {
+                    alert("YES");
+                }).catch((error) => {
+                    alert(error)
+                    console.log('FAIL', error)
+                });
+            });
 
-                alert("YES");
-            }).catch((error) => {
-                alert(error)
-                console.log('FAIL', error)
-            })
+            // GTIDEM_ImportCertificate(token_sn,key_id,bHexCert,data).then((value) => {
+
+            //     alert("YES");
+            // }).catch((error) => {
+            //     alert(error)
+            //     console.log('FAIL', error)
+            // })
 
         })
 
