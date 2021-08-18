@@ -1727,7 +1727,7 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
     var bOldPin = new Uint8Array(oldPIN);
     var bNewPin = new Uint8Array(newPIN);
 
-    var bSerialNumber = new Uint8Array(serialNumber);
+    var bSerialNumber = hexStringToArrayBuffer(serialNumber);
     
     //Get device insered PC, and compare serial number if it is exist.
     var bECPointFromToken = await GetTokenInfo().then((newCredentialInfo) => {
