@@ -18,12 +18,15 @@ const CMD_DELEE_CERT= 0xEB;
 const CMD_CLEAR_TOKEN = 0xEC;
 
 
+
+
+
 var g_encryptedPIN;
 var g_platformECpublickey;
 
-// const ALG_RSA2048SHA256;
-// const ALG_RSA2048SHA256_PreHash;
-// const ALG_RSA2048
+const ALG_RSA2048SHA256 = 0x02;
+const ALG_RSA2048SHA256_PreHash = 0x12;
+
 
 /**
  *  Return  a list of certificate that stored on token
@@ -2292,6 +2295,104 @@ async function GTIDEM_GetTokenInfo(serialNumber) {
 
 
 }
+
+async function GTIDEM_SignDataByIndex(index, serialNumber ,alg_number, plain) {
+
+    var pki_buffer = [];
+    var sn_buf;
+    if(serialNumber.length!=0){
+        var bSerialNumber = hexStringToArrayBuffer(serialNumber);
+         sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+         sn_buf[0] = 0xDF;
+         sn_buf[1] = 0x20;
+         sn_buf[2] = bSerialNumber.byteLength >> 8;
+         sn_buf[3] = bSerialNumber.byteLength;
+         sn_buf.set(bSerialNumber, 4);
+    }else{
+        sn_buf = new Uint8Array(0);
+    }
+
+
+    var challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
+    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+
+    var pki_header = new Uint8Array(3);
+
+    //PKI Command
+    var command_buf = new Uint8Array(5);
+    command_buf[0] = 0xDF;
+    command_buf[1] = 0x02;
+    command_buf[2] = 0x00;
+    command_buf[3] = 0x01;
+    command_buf[4] = index;
+
+    var alg_buf = new Uint8Array(5);
+    alg_buf[0] = 0xDF;
+    alg_buf[1] = 0x03;
+    alg_buf[2] = 0x00;
+    alg_buf[3] = 0x01;
+    alg_buf[4] = alg_number;
+
+    var signDataBuf = new Uint8Array(4 + plain.byteLength);
+    signDataBuf[0] = 0xDF;
+    signDataBuf[1] = 0x06;
+    signDataBuf[2] = plain.length >> 8;
+    signDataBuf[3] = plain.length;
+    signDataBuf.set(plain, 4);
+
+    var pki_payload_length = sn_buf.byteLength+command_buf.byteLength + alg_buf.byteLength + signDataBuf.byteLength;
+
+    pki_header[0] = CMD_Sign;
+    pki_header[1] = pki_payload_length >> 8
+    pki_header[2] = pki_payload_length;
+
+    var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
+    pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+    pki_buffer = _appendBuffer(pki_buffer,command_buf);
+    pki_buffer = _appendBuffer(pki_buffer,alg_buf);
+    pki_buffer = _appendBuffer(pki_buffer,signDataBuf);
+    
+    
+    console.log("SignDataByIndex", bufToHex(pki_buffer));
+    var getAssertionChallenge = {
+        'challenge': challenge,
+        "userVerification": "required"
+
+    }
+    var idList = [{
+        id: pki_buffer,
+        transports: ["usb", "nfc"],
+        type: "public-key"
+    }];
+
+    getAssertionChallenge.allowCredentials = idList;
+    console.log('SignDataByIndex', getAssertionChallenge)
+
+
+    return await new Promise(resolve => {
+        navigator.credentials.get({
+                'publicKey': getAssertionChallenge
+            })
+            .then((newCredentialInfo) => {
+
+                //parer response, and recoed status word and sstatus 
+                console.log('SUCCESS', newCredentialInfo);
+                console.log("Sign", newCredentialInfo.response.signature);
+
+                const sign = newCredentialInfo.response.signature;
+                resolve(sign);
+            })
+            .catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            })
+
+    });
+
+
+}
+
 
 
 
