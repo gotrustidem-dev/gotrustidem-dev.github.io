@@ -2014,7 +2014,8 @@ async function GTIDEM_ImportCertificate(serialNumber,keyID,HexCert, plain) {
 
 
     var bKeyID = toUTF8Array(keyID);
-    var bHexCert = hexStringToArrayBuffer(HexCert);
+    //var bHexCert = hexStringToArrayBuffer(HexCert);
+    var bHexCert = HexCert;
     //var bHexCert = Uint8Array.from(window.atob(Base64Cert), c => c.charCodeAt(0));
     //var bPlainText = toUTF8Array(plaintext);
 
