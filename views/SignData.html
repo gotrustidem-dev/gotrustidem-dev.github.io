@@ -135,7 +135,7 @@
                     });
                 });
             }else{
-                GTIDEM_SignDataByLabel(ckaLabel, token_sn,ALG_RSA2048SHA256, signDataPayload).then((value) => {
+                GTIDEM_SignDataByLabel(label, token_sn,ALG_RSA2048SHA256, signDataPayload).then((value) => {
                     showSignMessage(value);
                 });
             }
@@ -159,7 +159,7 @@
                 });
             }else{
 
-                GTIDEM_SignDataByIndex(certIndex, token_sn,ALG_RSA2048SHA256, signDataPayload).then((value) => {
+                GTIDEM_SignDataByIndex(index, token_sn,ALG_RSA2048SHA256, signDataPayload).then((value) => {
                     showSignMessage(value);
                 });
             }
