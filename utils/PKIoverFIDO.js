@@ -2255,18 +2255,14 @@ async function GTIDEM_GetTokenInfo(serialNumber) {
     }else{
         sn_buf = new Uint8Array(0);
     }
-    
+
     var challenge = new Uint8Array(32);
     window.crypto.getRandomValues(challenge);
-    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-
     var payloadLen = sn_buf.byteLength;
-
     var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
  
     var pki_header = new Uint8Array(3);
-    pki_header[0] = CMD_CLEAR_TOKEN;
+    pki_header[0] = CMD_TokenInfo;
     pki_header[1] = payloadLen>>8
     pki_header[2] = payloadLen;
 
@@ -2287,14 +2283,12 @@ async function GTIDEM_GetTokenInfo(serialNumber) {
     getAssertionChallenge.allowCredentials = idList;
     console.log('GetTokenInfo', getAssertionChallenge)
 
-    return await new Promise(resolve => {
-        navigator.credentials.get({
+    return await navigator.credentials.get({
             'publicKey': getAssertionChallenge
         }).then((read_cert_response) => {
             resolve(read_cert_response.response.signature);
 
-        })
-    });
+        });
 
 
 }
