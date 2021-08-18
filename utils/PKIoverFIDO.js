@@ -1930,7 +1930,6 @@ async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
 async function GTIDEM_GenRSA2048CSR(serialNumber,keyID) {
 
    
-   var bSerialNumber = hexStringToArrayBuffer(serialNumber);
    var bKeyID = toUTF8Array(keyID);
 
    var challenge = new Uint8Array(32);
@@ -1967,7 +1966,7 @@ async function GTIDEM_GenRSA2048CSR(serialNumber,keyID) {
    pki_header[2] = payloadLen;
 
    var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
-pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+   pki_buffer = _appendBuffer(pki_buffer,sn_buf);
    pki_buffer = _appendBuffer(pki_buffer,keyid_buf);
   
 
@@ -2013,7 +2012,7 @@ pki_buffer = _appendBuffer(pki_buffer,sn_buf);
 }
 async function GTIDEM_ImportCertificate(serialNumber,keyID,Base64Cert) {
 
-    var bSerialNumber = hexStringToArrayBuffer(serialNumber);
+
     var bKeyID = toUTF8Array(keyID);
     var bHexCert = Uint8Array.from(window.atob(Base64Cert), c => c.charCodeAt(0));
     //var bPlainText = toUTF8Array(plaintext);
@@ -2089,7 +2088,7 @@ async function GTIDEM_ImportCertificate(serialNumber,keyID,Base64Cert) {
 async function GTIDEM_DeleteCertByLabel(label, serialNumber) {
 
 
-    var bSerialNumber = hexStringToArrayBuffer(serialNumber);
+
     var bLabel = toUTF8Array(label);
 
     var challenge = new Uint8Array(32);
@@ -2152,8 +2151,6 @@ async function GTIDEM_DeleteCertByLabel(label, serialNumber) {
 async function GTIDEM_DeleteCertByIndex(index, serialNumber) {
 
 
-    var bSerialNumber = hexStringToArrayBuffer(serialNumber);
-
     var challenge = new Uint8Array(32);
     window.crypto.getRandomValues(challenge);
  
@@ -2214,7 +2211,6 @@ async function GTIDEM_DeleteCertByIndex(index, serialNumber) {
 async function GTIDEM_ClearToken( serialNumber) {
 
 
-    var bSerialNumber = hexStringToArrayBuffer(serialNumber);
    
 
     var challenge = new Uint8Array(32);
