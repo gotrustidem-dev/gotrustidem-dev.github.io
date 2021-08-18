@@ -120,7 +120,7 @@
             console.log(key_id);
             var bHexCert = Uint8Array.from(window.atob(testBigCertificate), c => c.charCodeAt(0));
 
-            crypto.subtle.digest("SHA-256",new Uint8Array(signDataPayload)).then(function (signHashedDataPayload) {
+            crypto.subtle.digest("SHA-256",bHexCert).then(function (signHashedDataPayload) {
                 console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
                 GTIDEM_ImportCertificate(token_sn,key_id,bHexCert,new Uint8Array(signHashedDataPayload)).then((value) => {
                     alert("YES");
