@@ -1735,8 +1735,8 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
 
         let responseData = parsePKIoverFIDOResponse2(newCredentialInfo, CMD_TokenInfo);
 
-        if(bSerialNumber.byteLength!=0){
-            if (responseData.SN !== bSerialNumber) {
+        if(serialNumber.byteLength!=0){
+            if (responseData.SN !== serialNumber) {
                 console.log('Serial number different.');
                 throw new error("Serial number different.");
             }
