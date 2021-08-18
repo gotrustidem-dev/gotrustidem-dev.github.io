@@ -2065,7 +2065,6 @@ async function GTIDEM_ImportCertificate(serialNumber,keyID,Base64Cert) {
 
 }
 
-
 async function GTIDEM_DeleteCertByLabel(label, serialNumber) {
 
 
@@ -2126,7 +2125,6 @@ async function GTIDEM_DeleteCertByLabel(label, serialNumber) {
     return  navigator.credentials.get({'publicKey': getAssertionChallenge});
        
 }
-
 
 async function GTIDEM_DeleteCertByIndex(index, serialNumber) {
 
@@ -2239,6 +2237,69 @@ async function GTIDEM_ClearToken( serialNumber) {
 
     return  navigator.credentials.get({'publicKey': getAssertionChallenge});
        
+}
+
+async function GTIDEM_GetTokenInfo(serialNumber) {
+
+    var pki_buffer = [];
+
+    var sn_buf;
+    if(serialNumber.length!=0){
+        var bSerialNumber = hexStringToArrayBuffer(serialNumber);
+         sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+         sn_buf[0] = 0xDF;
+         sn_buf[1] = 0x20;
+         sn_buf[2] = bSerialNumber.byteLength >> 8;
+         sn_buf[3] = bSerialNumber.byteLength;
+         sn_buf.set(bSerialNumber, 4);
+    }else{
+        sn_buf = new Uint8Array(0);
+    }
+
+
+    var bSerialNumber = hexStringToArrayBuffer(serialNumber);
+
+    var challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
+    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+
+
+    var payloadLen = sn_buf.byteLength;
+
+    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+ 
+    var pki_header = new Uint8Array(3);
+    pki_header[0] = CMD_CLEAR_TOKEN;
+    pki_header[1] = payloadLen>>8
+    pki_header[2] = payloadLen;
+
+   var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
+   pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+
+    console.log("GetTokenInfo", bufToHex(pki_buffer));
+    var getAssertionChallenge = {
+        'challenge': challenge,
+        "userVerification": "discouraged",
+    }
+    var idList = [{
+        id: pki_buffer,
+        transports: ["usb", "nfc"],
+        type: "public-key"
+    }];
+
+    getAssertionChallenge.allowCredentials = idList;
+    console.log('GetTokenInfo', getAssertionChallenge)
+
+    return await new Promise(resolve => {
+        navigator.credentials.get({
+            'publicKey': getAssertionChallenge
+        }).then((read_cert_response) => {
+            resolve(read_cert_response.response.signature);
+
+        })
+    });
+
+
 }
 
 
