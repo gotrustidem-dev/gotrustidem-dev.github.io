@@ -129,7 +129,7 @@
                 crypto.subtle.digest("SHA-256",new Uint8Array(signDataPayload)).
                 then(function (signHashedDataPayload) {
                     console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
-                    GTIDEM_SignDataByLabel(ckaLabel, token_sn,ALG_RSA2048SHA256_PreHash, new Uint8Array(signHashedDataPayload)).then((value) => {
+                    GTIDEM_SignDataByLabel(label, token_sn,ALG_RSA2048SHA256_PreHash, new Uint8Array(signHashedDataPayload)).then((value) => {
                         
                         showSignMessage(value);
                     });
@@ -153,7 +153,7 @@
                crypto.subtle.digest("SHA-256",new Uint8Array(signDataPayload)).
                 then(function (signHashedDataPayload) {
                     console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
-                    GTIDEM_SignDataByIndex(certIndex, token_sn,ALG_RSA2048SHA256_PreHash, new Uint8Array(signHashedDataPayload)).then((value) => {
+                    GTIDEM_SignDataByIndex(index, token_sn,ALG_RSA2048SHA256_PreHash, new Uint8Array(signHashedDataPayload)).then((value) => {
                         showSignMessage(value);
                     });
                 });
