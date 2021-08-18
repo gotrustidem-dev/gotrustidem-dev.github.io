@@ -2050,13 +2050,6 @@ async function GTIDEM_ImportCertificate(serialNumber,keyID,HexCert, plain) {
     hexCert_buf[3] = bHexCert.byteLength;
     hexCert_buf.set(bHexCert, 4);
 
-    var alg_buf = new Uint8Array(5);
-    alg_buf[0] = 0xDF;
-    alg_buf[1] = 0x03;
-    alg_buf[2] = 0x00;
-    alg_buf[3] = 0x01;
-    alg_buf[4] = ALG_RSA2048SHA256_PreHash;
-
     var signDataBuf = new Uint8Array(4 + plain.byteLength);
     signDataBuf[0] = 0xDF;
     signDataBuf[1] = 0x06;
@@ -2066,7 +2059,7 @@ async function GTIDEM_ImportCertificate(serialNumber,keyID,HexCert, plain) {
 
 
 
-   var payloadLen = keyid_buf.byteLength+sn_buf.byteLength+hexCert_buf.length+alg_buf.byteLength+signDataBuf.byteLength;
+   var payloadLen = keyid_buf.byteLength+sn_buf.byteLength+hexCert_buf.length+signDataBuf.byteLength;
 
    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
  
@@ -2079,7 +2072,6 @@ async function GTIDEM_ImportCertificate(serialNumber,keyID,HexCert, plain) {
    pki_buffer = _appendBuffer(pki_buffer,sn_buf);
    pki_buffer = _appendBuffer(pki_buffer,keyid_buf);
    pki_buffer = _appendBuffer(pki_buffer,hexCert_buf);
-   pki_buffer = _appendBuffer(pki_buffer,alg_buf);
    pki_buffer = _appendBuffer(pki_buffer,signDataBuf);
 
    
