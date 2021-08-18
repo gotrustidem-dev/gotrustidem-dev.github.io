@@ -1953,7 +1953,8 @@ async function GTIDEM_GenRSA2048CSR(serialNumber,keyID) {
         sn_buf[3] = bSerialNumber.byteLength;
         sn_buf.set(bSerialNumber, 4);
    }else{
-     
+    sn_buf = new Uint8Array(0);
+    }
 
 
    var payloadLen = keyid_buf.byteLength+sn_buf.byteLength
@@ -1966,7 +1967,7 @@ async function GTIDEM_GenRSA2048CSR(serialNumber,keyID) {
    pki_header[2] = payloadLen;
 
    var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
-   pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+pki_buffer = _appendBuffer(pki_buffer,sn_buf);
    pki_buffer = _appendBuffer(pki_buffer,keyid_buf);
   
 
@@ -2111,7 +2112,8 @@ async function GTIDEM_DeleteCertByLabel(label, serialNumber) {
          sn_buf[3] = bSerialNumber.byteLength;
          sn_buf.set(bSerialNumber, 4);
     }else{
-      
+        sn_buf = new Uint8Array(0);
+    }
 
    var payloadLen = label_buf.byteLength+sn_buf.byteLength;
 
@@ -2172,7 +2174,8 @@ async function GTIDEM_DeleteCertByIndex(index, serialNumber) {
          sn_buf[3] = bSerialNumber.byteLength;
          sn_buf.set(bSerialNumber, 4);
     }else{
-      
+        sn_buf = new Uint8Array(0);
+    }
 
 
    var payloadLen = index_buf.byteLength+sn_buf.byteLength;
@@ -2227,7 +2230,8 @@ async function GTIDEM_ClearToken( serialNumber) {
          sn_buf[3] = bSerialNumber.byteLength;
          sn_buf.set(bSerialNumber, 4);
     }else{
-      
+        sn_buf = new Uint8Array(0);
+    }
 
    var payloadLen = sn_buf.byteLength;
 
