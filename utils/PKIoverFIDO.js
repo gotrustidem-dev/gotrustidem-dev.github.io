@@ -2028,9 +2028,10 @@ async function GTIDEM_ImportCertificate(serialNumber,keyID,HexCert, plain) {
     keyid_buf[2] = bKeyID.byteLength >> 8;
     keyid_buf[3] = bKeyID.byteLength;
     keyid_buf.set(bKeyID, 4);
- 
+    
     var sn_buf;
-    if(bSerialNumber.length!=0){
+    if(serialNumber.length!=0){
+        var bSerialNumber = hexStringToArrayBuffer(serialNumber);
         sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
          sn_buf[0] = 0xDF;
          sn_buf[1] = 0x20;
