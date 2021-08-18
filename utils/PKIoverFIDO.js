@@ -2286,7 +2286,7 @@ async function GTIDEM_GetTokenInfo(serialNumber) {
     return await navigator.credentials.get({
             'publicKey': getAssertionChallenge
         }).then((read_cert_response) => {
-            resolve(read_cert_response.response.signature);
+            return (read_cert_response.response.signature);
 
         });
 
