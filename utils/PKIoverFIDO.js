@@ -2255,10 +2255,7 @@ async function GTIDEM_GetTokenInfo(serialNumber) {
     }else{
         sn_buf = new Uint8Array(0);
     }
-
-
-    var bSerialNumber = hexStringToArrayBuffer(serialNumber);
-
+    
     var challenge = new Uint8Array(32);
     window.crypto.getRandomValues(challenge);
     var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
