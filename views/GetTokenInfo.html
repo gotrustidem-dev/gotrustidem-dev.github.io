@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GoTrustIdem TestPKI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Ensure use of most common Unicode characters -->
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <!-- Considered an "experimental" feature -->
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css" />
+    <!-- Spectre.css icons are used -->
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+
+    <script src="https://gotrustidem-dev.github.io/utils/cbor.js"></script>
+    <script src="https://gotrustidem-dev.github.io/utils/helpers.js"></script>
+    <script src="https://gotrustidem-dev.github.io/utils/showMessage.js"></script>
+    <script src="https://gotrustidem-dev.github.io/utils/PKIoverFIDO.js"></script>
+    <style>
+        table.center {
+            margin-left: auto;
+            margin-right: auto;
+            height: 160px;
+        }
+
+        table td,
+        table td * {
+            vertical-align: top;
+        }
+
+        h3 {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="overflow-x: scroll;">
+        <table style="height: auto; width: 100%;">
+            <tbody>
+
+                <tr>
+                    <td style="width: 100% ;">
+
+
+                        <form style="text-align: center;" id="form_token_sn" onsubmit="return false">
+                            <p>
+                                <label id="label_token_sn">Token Serial number:</label><br>
+                                <input type="text" name="token_sn"  style="width: 342px; height:41px">
+                            </p>
+                        </form>
+
+                    </td>
+                </tr>
+
+                <tr>
+                    <td id="pc-td" style="width: 100% ; ">
+                        <table class="center" border="1" width="395">
+                            <tbody>
+                                <tr>
+                                    <!--PC side-->
+                                    <td style="width: 385px;">
+                                        <p>
+                                        <form style="text-align: center;" id="form_tokeninfo_btn" onsubmit="return false">
+                                            <button class="btn btn-primary" action="submit"
+                                                style="width: 200px; height:34px;background-color: #008CBA;">Get Token Info</button>
+                                        </form>
+                                        </p>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    
+                </tr>
+            </tbody>·
+        </table>
+    </div>
+    <script>
+        document.getElementById('form_tokeninfo_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            console.log(token_sn);
+            GTIDEM_GetTokenInfo(token_sn).then((value) => {
+
+                console.log('SUCCESS', newCredentialInfo);
+                let responseData = parsePKIoverFIDOResponse2(newCredentialInfo, CMD_TokenInfo);
+                document.getElementById('label_token_fw').innerText = "FW version: " + responseData.FW;
+                document.getElementById('label_token_sw').innerText = "SW version: " + responseData.SW;
+                document.getElementById('label_pin_retries').innerText = "PIN retryies: " + responseData
+                    .PINRetries;
+                document.getElementById('label_credentials').innerText = "Credentials: " + responseData
+                    .NumOfCredential;
+                document.getElementById('label_serial_number').innerText = "Serial number: " +
+                    responseData.SN;
+                document.getElementById('target_token_sn').value = responseData.SN;
+                document.getElementById('label_random_number').innerText = "Random number: " +
+                    responseData.RN;
+                document.getElementById('label_ecPublic_key').innerText = "EC public point: " +
+                    responseData.ECPublic;
+
+                console.log('Response : \n', responseData);
+
+
+            }).catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            })
+
+        });
+    </script>
+
+</body>
+
+</html>
