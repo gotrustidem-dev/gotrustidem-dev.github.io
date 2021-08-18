@@ -1730,7 +1730,7 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
     var bOldPin = new Uint8Array(oldPIN);
     var bNewPin = new Uint8Array(newPIN);
 
-    var bSerialNumber = hexStringToArrayBuffer(serialNumber);
+
     
     //Get device insered PC, and compare serial number if it is exist.
     var bECPointFromToken = await GetTokenInfo().then((newCredentialInfo) => {
@@ -1750,6 +1750,20 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
         throw new error("Serial number different.");
         console.log('FAIL', error)
     }); 
+
+    var sn_buf;
+    if(serialNumber.length!=0){
+        var bSerialNumber = hexStringToArrayBuffer(serialNumber);
+         sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+         sn_buf[0] = 0xDF;
+         sn_buf[1] = 0x20;
+         sn_buf[2] = bSerialNumber.byteLength >> 8;
+         sn_buf[3] = bSerialNumber.byteLength;
+         sn_buf.set(bSerialNumber, 4);
+    }else{
+        sn_buf = new Uint8Array(0);
+    }
+
 
     //Compution session Key and encrypt oldPIN and new pin.
    var prepareUpdate = await computingSessionKey(oldPIN, newPIN, bECPointFromToken);
@@ -1782,7 +1796,7 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
    encryptedNewPIN_buf.set(new Uint8Array(prepareUpdate.bEncryptedNEWPIN), 4);
 
 
-    var payloadLen = ecpubkey_buf.byteLength+encryptedOldPINHash_buf.byteLength+encryptedNewPIN_buf.byteLength;
+    var payloadLen = sn_buf.byteLength+ecpubkey_buf.byteLength+encryptedOldPINHash_buf.byteLength+encryptedNewPIN_buf.byteLength;
 
    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
  
@@ -1792,6 +1806,7 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
    pki_header[2] = payloadLen;
 
    var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
+   var pki_buffer = _appendBuffer(gtheaderbuffer,sn_buf);
    pki_buffer = _appendBuffer(pki_buffer,ecpubkey_buf);
    pki_buffer = _appendBuffer(pki_buffer,encryptedOldPINHash_buf);
    pki_buffer = _appendBuffer(pki_buffer,encryptedNewPIN_buf);
@@ -1928,17 +1943,18 @@ async function GTIDEM_GenRSA2048CSR(serialNumber,keyID) {
    keyid_buf[3] = bKeyID.byteLength;
    keyid_buf.set(bKeyID, 4);
 
-   var sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
-   if(bSerialNumber.length!=0){
-        
+   var sn_buf;
+   if(serialNumber.length!=0){
+       var bSerialNumber = hexStringToArrayBuffer(serialNumber);
+        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
         sn_buf[0] = 0xDF;
         sn_buf[1] = 0x20;
         sn_buf[2] = bSerialNumber.byteLength >> 8;
         sn_buf[3] = bSerialNumber.byteLength;
         sn_buf.set(bSerialNumber, 4);
-   }
-   
-  
+   }else{
+     
+
 
    var payloadLen = keyid_buf.byteLength+sn_buf.byteLength
 
@@ -1950,8 +1966,9 @@ async function GTIDEM_GenRSA2048CSR(serialNumber,keyID) {
    pki_header[2] = payloadLen;
 
    var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
-   pki_buffer = _appendBuffer(pki_buffer,keyid_buf);
    pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+   pki_buffer = _appendBuffer(pki_buffer,keyid_buf);
+  
 
 
 
@@ -2085,16 +2102,16 @@ async function GTIDEM_DeleteCertByLabel(label, serialNumber) {
     label_buf.set(bLabel, 4);
  
     var sn_buf;
-    if(bSerialNumber.length!=0){
-        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+    if(serialNumber.length!=0){
+        var bSerialNumber = hexStringToArrayBuffer(serialNumber);
+         sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
          sn_buf[0] = 0xDF;
          sn_buf[1] = 0x20;
          sn_buf[2] = bSerialNumber.byteLength >> 8;
          sn_buf[3] = bSerialNumber.byteLength;
          sn_buf.set(bSerialNumber, 4);
     }else{
-        sn_buf = new Uint8Array(0);
-    }
+      
 
    var payloadLen = label_buf.byteLength+sn_buf.byteLength;
 
@@ -2106,8 +2123,9 @@ async function GTIDEM_DeleteCertByLabel(label, serialNumber) {
    pki_header[2] = payloadLen;
 
    var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
-   pki_buffer = _appendBuffer(pki_buffer,label_buf);
    pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+   pki_buffer = _appendBuffer(pki_buffer,label_buf);
+   
 
    console.log("Delete cert by label request_command: " + bufToHex(pki_buffer));
 
@@ -2145,16 +2163,17 @@ async function GTIDEM_DeleteCertByIndex(index, serialNumber) {
     index_buf[4] = index;
  
     var sn_buf;
-    if(bSerialNumber.length!=0){
-        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+    if(serialNumber.length!=0){
+        var bSerialNumber = hexStringToArrayBuffer(serialNumber);
+         sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
          sn_buf[0] = 0xDF;
          sn_buf[1] = 0x20;
          sn_buf[2] = bSerialNumber.byteLength >> 8;
          sn_buf[3] = bSerialNumber.byteLength;
          sn_buf.set(bSerialNumber, 4);
     }else{
-        sn_buf = new Uint8Array(0);
-    }
+      
+
 
    var payloadLen = index_buf.byteLength+sn_buf.byteLength;
 
@@ -2166,8 +2185,8 @@ async function GTIDEM_DeleteCertByIndex(index, serialNumber) {
    pki_header[2] = payloadLen;
 
    var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
-   pki_buffer = _appendBuffer(pki_buffer,index_buf);
    pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+   pki_buffer = _appendBuffer(pki_buffer,index_buf);
 
    console.log("Delete cert by index request_command: " + bufToHex(pki_buffer));
 
@@ -2199,16 +2218,16 @@ async function GTIDEM_ClearToken( serialNumber) {
     window.crypto.getRandomValues(challenge);
  
     var sn_buf;
-    if(bSerialNumber.length!=0){
-        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+    if(serialNumber.length!=0){
+        var bSerialNumber = hexStringToArrayBuffer(serialNumber);
+         sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
          sn_buf[0] = 0xDF;
          sn_buf[1] = 0x20;
          sn_buf[2] = bSerialNumber.byteLength >> 8;
          sn_buf[3] = bSerialNumber.byteLength;
          sn_buf.set(bSerialNumber, 4);
     }else{
-        sn_buf = new Uint8Array(0);
-    }
+      
 
    var payloadLen = sn_buf.byteLength;
 
