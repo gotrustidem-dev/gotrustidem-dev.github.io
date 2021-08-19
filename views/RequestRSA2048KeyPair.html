@@ -70,13 +70,20 @@
 
                                         <form style="text-align: center;" id="form_requestcsr_btn" onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
-                                                style="width: 200px; height:34px;background-color: #008CBA;">Request CSR</button>
+                                                style="width: 200px; height:34px;background-color: #008CBA;">Generate RSA2048 KeyPair</button>
                                         </form>
-                                       
                                         <p>
                                             <label id="key_handle_value">Key Handle:</label>
                                             <label id="target_key_handle"></label>
                                         </p>
+
+                                        <p>
+                                            <form style="text-align: center;" id="form_signdata_btn" onsubmit="return false">
+                                                <button class="btn btn-primary" action="submit"
+                                                    style="width: 200px; height:34px;background-color: #008CBA;">Generate Signature</button>
+                                            </form>
+                                        </p>
+
                                         <p>
                                         <form style="text-align: center;" id="form_importcert_btn" onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
@@ -95,7 +102,7 @@
         </table>
     </div>
     <script>
-        
+        var signShortData = 'MTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWY=';
         var testBigCertificate ='MIIFCjCCA/KgAwIBAgIRAOmeRRu4pB7BKabPJNHAmpYwDQYJKoZIhvcNAQELBQAwVjELMAkGA1UEBhMCVFcxEjAQBgNVBAoMCeihjOaUv+mZojEzMDEGA1UECwwqKOa4rOippueUqCkg5pS/5bqc5ris6Kmm5oaR6K2J566h55CG5Lit5b+DMB4XDTIxMDgxMzAzMTMwNFoXDTIyMDIxMzAzMTMwNFowJTELMAkGA1UEBhMCVFcxFjAUBgNVBAoMDea4rOippuapn+mXnDEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDHzxFAXgNxcLr8YYVfGm9Fk+bfxDXzp+Y4vgZRSZnii6s91g1rXDqEKsySuqHvj6ppafdlXYf8fwy0K8LmjCPT8w5dNWtHEkiidqaR6pk2P5lEj3wyaqlOe3dnwoDP1t7DkutRdM4XsHIml5aZL0oefJAlz5jsd44EB6un+FHDL6TXfmj40XogBUUciGXtQ4BxBgAqCsK2k5GCAjHpIzqU6xbW9ViWsqOjsqHLy9lQkj2Eq/U/D1M+SbYhpoR3jJAncTP/+u38dTJ+QVz9bGe28Ss8zP34TLdiR9zLsH5MYmQ9VGqwuEm0WsKPIi3L2qcxtS/rEDiAWzQu4JNI/RBRAgMBAAGjggICMIIB/jAfBgNVHSMEGDAWgBR3r9Blh+4dyKn2l6AlRw7JldpxqzAdBgNVHQ4EFgQUM6vAHcYDXS0Tv/4i5MhxlcxAaNswDgYDVR0PAQH/BAQDAgeAMBQGA1UdIAQNMAswCQYHYIZ2ZQADADAaBgNVHREEEzARgQ90ZXN0QGNodC5jb20udHcwTgYDVR0JBEcwRTAWBgdghnYBZAIBMQsGCWCGdgFkAwIBATAUBgdghnYBZAICMQkTB3ByaW1hcnkwFQYHYIZ2AWQCZjEKBghghnYBZYGcITCBhgYDVR0fBH8wfTBAoD6gPIY6aHR0cDovL2d0ZXN0Y2EubmF0Lmdvdi50dy9jcmwvR1Rlc3RDQTIvODg4OC0xL2NvbXBsZXRlLmNybDA5oDegNYYzaHR0cDovL2d0ZXN0Y2EubmF0Lmdvdi50dy9jcmwvR1Rlc3RDQTIvY29tcGxldGUuY3JsMCAGA1UdJQEB/wQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB/BggrBgEFBQcBAQRzMHEwPgYIKwYBBQUHMAKGMmh0dHA6Ly9ndGVzdGNhLm5hdC5nb3YudHcvY2VydHMvSXNzdWVkVG9UaGlzQ0EucDdiMC8GCCsGAQUFBzABhiNodHRwOi8vZ3Rlc3RjYS5uYXQuZ292LnR3L09DU1Avb2NzcDANBgkqhkiG9w0BAQsFAAOCAQEAR2lP6hpDKgoMam0dN7VOjrh/qV+oIscZpqOm0yt8ayutuGrAOoT6nlseX9ZrdnceV4cB64Hy7hlrn6S3Fa/XwSDFhcIGgu0V0l2cTrohnRdfkW1ayatyG9q8gYmpNev/GSg2tveIm2ltChqAs0h9eSRJLH2psDQ6OiiyAEgGBDc58h1UwXS8adem/jsiwx85LzVyWQ2HYyM1vrxPQ0fL+b53Bow5jU3oT7SAjSwVHLve2TnlCAjvPRvReXNqrKpvWlNoXuxRBdbnjyoYFm3q0IQjAfnCqOMs5fv+C5961ozffUGPLV14cpcNQ4/0KSxx3zwi59wnMeWMK3XgUOAL9A==';
         document.getElementById('form_requestcsr_btn').addEventListener('submit', function (event) {
             event.preventDefault();
@@ -109,10 +116,8 @@
             }
             GTIDEM_GenRSA2048CSR(token_sn,key_id).then((value) => {
 
-
                 document.getElementById('target_key_handle').innerText = bufToHex(key_id);
                 alert("YES");
-
             }).catch((error) => {
                 alert(error)
                 console.log('FAIL', error)
@@ -120,14 +125,36 @@
 
         });
 
+        //Generate CSR
+        document.getElementById('form_signdata_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            let keyHandle = document.getElementById('target_key_handle').textContent;
+            console.log('key_handle', keyHandle);
+
+            var keyHandleBuf = hexStringToArrayBuffer(keyHandle);
+
+            let testSignCSR = Uint8Array.from(window.atob(signShortData), c => c.charCodeAt(0));
+            
+            console.log('testSignCSR', testSignCSR);
+            crypto.subtle.digest("SHA-256",new Uint8Array(testSignCSR)).then(function (signHashedDataPayload) {
+                    console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
+                    GTIDEM_SignDataByIndex(index, token_sn,ALG_RSA2048SHA256_PreHash, new Uint8Array(signHashedDataPayload)).then((value) => {
+                        showSignMessage(value);
+                    });
+            });
+        });
+
+
+
+
         document.getElementById('form_importcert_btn').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             let key_id = document.getElementById('form_key_id').key_id.value;
             console.log(token_sn);
             console.log(key_id);
-            var bHexCert = Uint8Array.from(window.atob(testBigCertificate), c => c.charCodeAt(0));
-
+            
             let keyHandle = document.getElementById('target_key_handle').textContent;
             console.log('key_handle', keyHandle);
 
@@ -136,6 +163,8 @@
             }
        
 
+
+            var bHexCert = Uint8Array.from(window.atob(testBigCertificate), c => c.charCodeAt(0));
             crypto.subtle.digest("SHA-256",bHexCert).then(function (signHashedDataPayload) {
                 console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
                 GTIDEM_ImportCertificate(token_sn,keyHandle,key_id,bHexCert,new Uint8Array(signHashedDataPayload)).then((value) => {
@@ -145,6 +174,8 @@
                     console.log('FAIL', error)
                 });
             });
+
+
         })
 
     </script>
