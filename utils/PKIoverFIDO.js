@@ -1910,17 +1910,31 @@ async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
 async function GTIDEM_GenRSA2048CSR(serialNumber,keyID) {
 
    
-   var bKeyID = toUTF8Array(keyID);
+   //var bKeyID = toUTF8Array(keyID);
 
    var challenge = new Uint8Array(32);
    window.crypto.getRandomValues(challenge);
 
-   var keyid_buf = new Uint8Array(4 + bKeyID.length);
-   keyid_buf[0] = 0xDF;
-   keyid_buf[1] = 0x18;
-   keyid_buf[2] = bKeyID.byteLength >> 8;
-   keyid_buf[3] = bKeyID.byteLength;
-   keyid_buf.set(bKeyID, 4);
+   var keyid_buf;
+   if(keyID.length!=0){
+        var bKeyID = toUTF8Array(keyID);
+        keyid_buf = new Uint8Array(4 + bKeyID.length);
+        keyid_buf[0] = 0xDF;
+        keyid_buf[1] = 0x18;
+        keyid_buf[2] = bKeyID.byteLength >> 8;
+        keyid_buf[3] = bKeyID.byteLength;
+        keyid_buf.set(bKeyID, 4);
+   }else{
+        keyid_buf = new Uint8Array(0);
+   }
+//    var keyid_buf = new Uint8Array(4 + bKeyID.length);
+//    keyid_buf[0] = 0xDF;
+//    keyid_buf[1] = 0x18;
+//    keyid_buf[2] = bKeyID.byteLength >> 8;
+//    keyid_buf[3] = bKeyID.byteLength;
+//    keyid_buf.set(bKeyID, 4);
+
+
 
    var sn_buf;
    if(serialNumber.length!=0){
@@ -1932,7 +1946,7 @@ async function GTIDEM_GenRSA2048CSR(serialNumber,keyID) {
         sn_buf[3] = bSerialNumber.byteLength;
         sn_buf.set(bSerialNumber, 4);
    }else{
-    sn_buf = new Uint8Array(0);
+        sn_buf = new Uint8Array(0);
     }
 
 
