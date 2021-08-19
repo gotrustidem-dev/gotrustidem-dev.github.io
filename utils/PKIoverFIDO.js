@@ -28,27 +28,7 @@ const ALG_RSA2048SHA256 = 0x02;
 const ALG_RSA2048SHA256_PreHash = 0x12;
 
 
-/**
- *  Return  a list of certificate that stored on token
- * 
- * 
- */
-function readSimpleCerts() {
 
-
-}
-
-/** 
- * Return a full certificate by searching the index
- * 
- * 
- */
-function readCert() {
-
-
-
-
-}
 
 
 async function requestSignDataByKEYHANDLE(keyhandle, alg_num, plaintext) {
@@ -2010,10 +1990,99 @@ async function GTIDEM_GenRSA2048CSR(serialNumber,keyID) {
         'publicKey': webauth_request
     });
 }
-async function GTIDEM_ImportCertificate(serialNumber,keyID,HexCert, plain) {
+
+async function GTIDEM_GenRSA2048(serialNumber,keyID) {
+
+
+ 
+    var challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
+ 
+    
+    var sn_buf;
+    if(serialNumber.length!=0){
+        var bSerialNumber = hexStringToArrayBuffer(serialNumber);
+         sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+         sn_buf[0] = 0xDF;
+         sn_buf[1] = 0x20;
+         sn_buf[2] = bSerialNumber.byteLength >> 8;
+         sn_buf[3] = bSerialNumber.byteLength;
+         sn_buf.set(bSerialNumber, 4);  
+    }else{
+     sn_buf = new Uint8Array(0);
+    }
+ 
+    var keyid_buf
+    
+    var bKeyID = toUTF8Array(keyID);
+    var keyid_buf = new Uint8Array(4 + bKeyID.length);
+    keyid_buf[0] = 0xDF;
+    keyid_buf[1] = 0x18;
+    keyid_buf[2] = bKeyID.byteLength >> 8;
+    keyid_buf[3] = bKeyID.byteLength;
+    keyid_buf.set(bKeyID, 4);
+
+
+    var payloadLen = keyid_buf.byteLength+sn_buf.byteLength
+ 
+    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+  
+    var pki_header = new Uint8Array(3);
+    pki_header[0] = CMD_GenRsaKeyPair;
+    pki_header[1] = payloadLen>>8
+    pki_header[2] = payloadLen;
+ 
+    var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
+    pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+    pki_buffer = _appendBuffer(pki_buffer,keyid_buf);
+   
+ 
+ 
+ 
+    console.log("Request_command: " + bufToHex(pki_buffer));
+ 
+    var webauth_request = {
+     'challenge': challenge,
+ 
+     'rp': {
+         'name': 'GoTrustID Inc.',
+     },
+ 
+     'user': {
+         'id': pki_buffer,
+         'name': 'alice@example.com',
+         'displayName': 'Alice von Wunderland'
+     },
+ 
+     "authenticatorSelection": {
+         "userVerification": "required",
+         "requireResidentKey": false,
+         "authenticatorAttachment": "cross-platform"
+ 
+     },
+     'attestation': "direct",
+     'pubKeyCredParams': [{
+             'type': 'public-key',
+             'alg': -7
+         },
+         {
+             'type': 'public-key',
+             'alg': -257
+         }
+     ]
+ }
+    console.log('webauth_request', webauth_request)
+ 
+    await navigator.credentials.create({
+         'publicKey': webauth_request
+     });
+ }
+
+async function GTIDEM_ImportCertificate(serialNumber,keyHandle,keyID,HexCert, plain) {
 
 
     var bKeyID = toUTF8Array(keyID);
+    var bKeyHandle = toUTF8Array(keyHandle);
     //var bHexCert = hexStringToArrayBuffer(HexCert);
     var bHexCert = HexCert;
     //var bHexCert = Uint8Array.from(window.atob(Base64Cert), c => c.charCodeAt(0));
@@ -2022,13 +2091,7 @@ async function GTIDEM_ImportCertificate(serialNumber,keyID,HexCert, plain) {
     var challenge = new Uint8Array(32);
     window.crypto.getRandomValues(challenge);
  
-    var keyid_buf = new Uint8Array(4 + bKeyID.length);
-    keyid_buf[0] = 0xDF;
-    keyid_buf[1] = 0x18;
-    keyid_buf[2] = bKeyID.byteLength >> 8;
-    keyid_buf[3] = bKeyID.byteLength;
-    keyid_buf.set(bKeyID, 4);
-    
+
     var sn_buf;
     if(serialNumber.length!=0){
         var bSerialNumber = hexStringToArrayBuffer(serialNumber);
@@ -2042,6 +2105,20 @@ async function GTIDEM_ImportCertificate(serialNumber,keyID,HexCert, plain) {
         sn_buf = new Uint8Array(0);
     }
 
+    var keyid_buf = new Uint8Array(4 + bKeyID.length);
+    keyid_buf[0] = 0xDF;
+    keyid_buf[1] = 0x18;
+    keyid_buf[2] = bKeyID.byteLength >> 8;
+    keyid_buf[3] = bKeyID.byteLength;
+    keyid_buf.set(bKeyID, 4);
+    
+    var keyhandle_buf = new Uint8Array(4 + bKeyHandle.length);
+    keyhandle_buf[0] = 0xDF;
+    keyhandle_buf[1] = 0x19;
+    keyhandle_buf[2] = bKeyHandle.byteLength >> 8;
+    keyhandle_buf[3] = bKeyHandle.byteLength;
+    keyhandle_buf.set(bKeyHandle, 4);
+    
 
     var hexCert_buf = new Uint8Array(4 + bHexCert.length);
     hexCert_buf[0] = 0xDF;
@@ -2059,7 +2136,7 @@ async function GTIDEM_ImportCertificate(serialNumber,keyID,HexCert, plain) {
 
 
 
-   var payloadLen = keyid_buf.byteLength+sn_buf.byteLength+hexCert_buf.length+signDataBuf.byteLength;
+   var payloadLen = keyid_buf.byteLength+sn_buf.byteLength+hexCert_buf.length+signDataBuf.byteLength+keyhandle_buf.byteLength;
 
    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
  
@@ -2071,6 +2148,7 @@ async function GTIDEM_ImportCertificate(serialNumber,keyID,HexCert, plain) {
    var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
    pki_buffer = _appendBuffer(pki_buffer,sn_buf);
    pki_buffer = _appendBuffer(pki_buffer,keyid_buf);
+   pki_buffer = _appendBuffer(pki_buffer,keyhandle_buf);
    pki_buffer = _appendBuffer(pki_buffer,hexCert_buf);
    pki_buffer = _appendBuffer(pki_buffer,signDataBuf);
 
