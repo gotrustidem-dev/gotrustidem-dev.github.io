@@ -2025,16 +2025,18 @@ async function GTIDEM_GenRSA2048(serialNumber,keyID) {
     }else{
      sn_buf = new Uint8Array(0);
     }
- 
-    var keyid_buf
-    
-    var bKeyID = toUTF8Array(keyID);
-    var keyid_buf = new Uint8Array(4 + bKeyID.length);
-    keyid_buf[0] = 0xDF;
-    keyid_buf[1] = 0x18;
-    keyid_buf[2] = bKeyID.byteLength >> 8;
-    keyid_buf[3] = bKeyID.byteLength;
-    keyid_buf.set(bKeyID, 4);
+    var keyid_buf;
+    if(keyID.length!=0){
+         var bKeyID = toUTF8Array(keyID);
+         keyid_buf = new Uint8Array(4 + bKeyID.length);
+         keyid_buf[0] = 0xDF;
+         keyid_buf[1] = 0x18;
+         keyid_buf[2] = bKeyID.byteLength >> 8;
+         keyid_buf[3] = bKeyID.byteLength;
+         keyid_buf.set(bKeyID, 4);
+    }else{
+         keyid_buf = new Uint8Array(0);
+    }
 
 
     var payloadLen = keyid_buf.byteLength+sn_buf.byteLength
