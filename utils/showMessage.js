@@ -60,7 +60,7 @@ const Msg_PIN_Trial_Counter = "The retries counter is ";
 
 var showFIDOErrorMessage = (gtidem) => {
 
-    var errorMsg ='錯誤碼 '+gtidem.statusCode;+'. ';
+    var errorMsg ='錯誤碼:'+gtidem.statusCode;+'.   ';
     switch (gtidem.statusCode) {
 
         case CTAP2_ERR_PIN_INVALID:
