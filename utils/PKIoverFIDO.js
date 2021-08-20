@@ -1800,7 +1800,7 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
    getAssertionChallenge.allowCredentials = idList;
    console.log('List getAssertionChallenge', getAssertionChallenge)
 
-   await navigator.credentials.get({
+   return await navigator.credentials.get({
        'publicKey': getAssertionChallenge
    }).then((fido) => {
            
