@@ -128,14 +128,14 @@
                             "\n-----ENDCERTIFICATE REQUEST-----"
                         console.log('CSR : \n', strCSR);
                         alert("CSR:" + "\n" + strCSR);
-                        console.log(bufToHex(response.keyHandle));
-                        document.getElementById('form_key_handle').key_handle.value = ""+bufToHex(response.keyHandle);
+                        console.log(bufToHex(new Uint8Array(response.keyhandle).buffer));
+                        document.getElementById('form_key_handle').key_handle.value = bufToHex(new Uint8Array(response.keyhandle).buffer);
                 }else{
                     alert(showFIDOErrorMessage(response));
                 }
 
             }).catch((error) => {
-                alert(error)
+            
                 console.log('FAIL', error);
             })
 
