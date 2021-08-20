@@ -1714,10 +1714,7 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
     
     //Get device insered PC, and compare serial number if it is exist.
     var gtidemA = await GTIDEM_GetTokenInfo(serialNumber).then((fido) => {
- 
-        let gtidem = new GTIdemJs();
-        gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_CHANGE_PIN);
-        return gtidem;
+        return fido;
     });
 
     if(gtidemA.statusCode !=CTAP1_ERR_SUCCESS){
