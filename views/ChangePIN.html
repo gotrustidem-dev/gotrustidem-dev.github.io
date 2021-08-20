@@ -111,7 +111,7 @@
                if(response.statusCode==CTAP1_ERR_SUCCESS){    
                     alert("密碼變更完成");
                 }else{
-                    alert(showFIDOErrorMessage(value));
+                    alert(showFIDOErrorMessage(response));
                 }
               
             }).catch((error) => {
