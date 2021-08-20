@@ -123,9 +123,10 @@
 
             if(response.statusCode==CTAP1_ERR_SUCCESS){    
                 var str = String.fromCharCode.apply(null, new Uint8Array(response.csr));
-                alert("建立 ＣＳＲ 完成 \n"+ "CSR:" + btoa(str));
-                console.log(bufToHex(response.keyHandle));
-                document.getElementById('form_key_handle').key_handle.value = bufferToString(response.keyHandle);
+                var bace64CSR = btoa(str);
+                alert("建立 ＣＳＲ 完成 \n"+ "CSR:" + bace64CSR);
+                console.log(bufToHex(response.keyHandle.buffer));
+                document.getElementById('form_key_handle').key_handle.value = bufToHex(response.keyHandle.buffer);
             }else{
                 alert(showFIDOErrorMessage(response));
             }
