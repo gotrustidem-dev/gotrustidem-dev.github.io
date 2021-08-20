@@ -2620,6 +2620,150 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, plain) 
 }
 
 
+async function GTIDEM_ReadCertByIndexWithoutPIN(index, bSerialNumber) {
+
+    var pki_buffer = [];
+    var sn_buf;
+    if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
+
+        sn_buf = new Uint8Array(0);
+    }else{
+        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+        sn_buf[0] = 0xDF;
+        sn_buf[1] = 0x20;
+        sn_buf[2] = bSerialNumber.byteLength >> 8;
+        sn_buf[3] = bSerialNumber.byteLength;
+        sn_buf.set(bSerialNumber, 4);
+    }
+
+    var challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
+    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+
+    var pki_header = new Uint8Array(3);
+
+    //PKI Command
+    var command_buf = new Uint8Array(5);
+    command_buf[0] = 0xDF;
+    command_buf[1] = 0x02;
+    command_buf[2] = 0x00;
+    command_buf[3] = 0x01;
+    command_buf[4] = index;
+
+ 
+
+    var pki_payload_length = sn_buf.byteLength+command_buf.byteLength;
+
+    pki_header[0] = CMD_ReadCertificate;
+    pki_header[1] = pki_payload_length >> 8
+    pki_header[2] = pki_payload_length;
+
+    var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
+    pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+    pki_buffer = _appendBuffer(pki_buffer,command_buf);
+    
+    console.log("SignDataByIndex", bufToHex(pki_buffer));
+    var getAssertionChallenge = {
+        'challenge': challenge,
+        "userVerification": "discouraged",
+
+    }
+    var idList = [{
+        id: pki_buffer,
+        transports: ["usb", "nfc"],
+        type: "public-key"
+    }];
+
+    getAssertionChallenge.allowCredentials = idList;
+    console.log('SignDataByIndex', getAssertionChallenge)
+
+
+    return await 
+        navigator.credentials.get({'publicKey': getAssertionChallenge}).then((fido) => {
+           
+                let gtidem = new GTIdemJs();
+                gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_Sign);
+                return gtidem;
+            });
+
+
+}
+
+
+async function GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSerialNumber) {
+
+    var pki_buffer = [];
+
+
+    var challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
+    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+    var pki_header = new Uint8Array(3);
+
+
+    var sn_buf;
+    if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
+
+        sn_buf = new Uint8Array(0);
+    }else{
+        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+        sn_buf[0] = 0xDF;
+        sn_buf[1] = 0x20;
+        sn_buf[2] = bSerialNumber.byteLength >> 8;
+        sn_buf[3] = bSerialNumber.byteLength;
+        sn_buf.set(bSerialNumber, 4);
+    }
+
+
+    //PKI Command
+
+    var command_bufer = new Uint8Array(bLabel.byteLength + 4);
+    command_bufer[0] = 0xDF
+    command_bufer[1] = 0x01;
+    command_bufer[2] = bLabel.byteLength >> 8;
+    command_bufer[3] = bLabel.byteLength;
+    command_bufer.set(bLabel, 4);
+
+
+  
+
+    var pki_payload_length = sn_buf.byteLength+command_buf.byteLength;
+
+    pki_header[0] = CMD_ReadCertificate;
+    pki_header[1] = pki_payload_length >> 8
+    pki_header[2] = pki_payload_length;
+
+    var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
+    pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+    pki_buffer = _appendBuffer(pki_buffer,command_buf);
+    
+    
+    console.log("SignDataByIndex", bufToHex(pki_buffer));
+    var getAssertionChallenge = {
+        'challenge': challenge,
+        "userVerification": "discouraged",
+    }
+    var idList = [{
+        id: pki_buffer,
+        transports: ["usb", "nfc"],
+        type: "public-key"
+    }];
+
+    getAssertionChallenge.allowCredentials = idList;
+    console.log('SignDataByIndex', getAssertionChallenge);
+
+    return await 
+        navigator.credentials.get({'publicKey': getAssertionChallenge}).then((fido) => {
+           
+                let gtidem = new GTIdemJs();
+                gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_Sign);
+                return gtidem;
+            });
+
+
+}
+
+
 
 
 /**

@@ -29,17 +29,7 @@ class GTIdemJs {
 
         let GTheaderBuf = buffer.slice(0, 16);
 
-        if (cmd == CMD_ReadCertificate) {
-            //has error
-            if (String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf)) === GTheaderStr) {
-                buffer = buffer.slice(16);
-            } else {
-                let certNumBuf = buffer.slice(0, 1);
-                this.credentialNum = certNumBuf[0];
-                buffer = buffer.slice(1);
-                this.certicficate = buffer;
-            }
-        } else if (String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf)) === GTheaderStr) {
+        if (String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf)) === GTheaderStr) {
 
             buffer = buffer.slice(16);
 
@@ -89,6 +79,10 @@ class GTIdemJs {
                     }
                 }
             }
+        } else if (cmd == CMD_ReadCertificate) {
+            this.statusCode = CTAP1_ERR_SUCCESS;
+            this.certicficate = new Uint8Array(buffer);
+            
         } else if (buffer.byteLength == 256) {
 
             this.signature = new Uint8Array(buffer);

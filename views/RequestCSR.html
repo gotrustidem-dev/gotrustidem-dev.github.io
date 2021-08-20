@@ -121,15 +121,18 @@
 
             GTIDEM_GenRSA2048CSR(bToken_sn,bKeyID).then((response) => {
 
-            if(response.statusCode==CTAP1_ERR_SUCCESS){    
-                var str = String.fromCharCode.apply(null, new Uint8Array(response.csr));
-                var bace64CSR = btoa(str);
-                alert("建立 ＣＳＲ 完成 \n"+ "CSR:" + bace64CSR);
-                console.log(bufToHex(response.keyHandle.buffer));
-                document.getElementById('form_key_handle').key_handle.value = bufToHex(response.keyHandle.buffer);
-            }else{
-                alert(showFIDOErrorMessage(response));
-            }
+                if(response.statusCode==CTAP1_ERR_SUCCESS){    
+                    var strCSR = String.fromCharCode.apply(null, new Uint8Array(response.csr));
+                        var strCert = "-----BEGIN CERTIFICATE REQUEST-----\n" +
+                            btoa(String.fromCharCode.apply(null, value.certicficate)) +
+                            "\n-----ENDCERTIFICATE REQUEST-----"
+                        console.log('CSR : \n', strCert);
+                        alert("CSR:" + "\n" + strCert);
+                        console.log(bufToHex(response.keyHandle.buffer));
+                        document.getElementById('form_key_handle').key_handle.value = bufToHex(response.keyHandle.buffer);
+                }else{
+                    alert(showFIDOErrorMessage(response));
+                }
 
             }).catch((error) => {
                 alert(error)
