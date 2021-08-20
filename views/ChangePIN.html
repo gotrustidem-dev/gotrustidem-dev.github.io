@@ -106,7 +106,16 @@
             console.log(newpin);
             console.log(confirm_newpin);
 
-            GTIDEM_ChangeUserPIN(oldpin, newpin, token_sn).then((response) => {
+            var bToken_sn = hexStringToArrayBuffer(token_sn);
+
+            var bOldPINArray = new Uint8Array(oldPIN.length);
+            bOldPINArray.set(toUTF8Array(oldPIN), 0);
+
+            var bNewPINBuffer = new Uint8Array(newpin.length);
+            bNewPINBuffer.set(toUTF8Array(newPIN), 0);
+
+
+            GTIDEM_ChangeUserPIN(bOldPINArray, bNewPINBuffer, bToken_sn).then((response) => {
 
                if(response.statusCode==CTAP1_ERR_SUCCESS){    
                     alert("密碼變更完成");

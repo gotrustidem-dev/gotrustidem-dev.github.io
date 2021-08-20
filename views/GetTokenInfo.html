@@ -92,8 +92,8 @@
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             console.log(token_sn);
 
-
-            GTIDEM_GetTokenInfo(token_sn).then((response) => {
+            var bToken_sn = hexStringToArrayBuffer(serialNumber);
+            GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
 
                 console.log('SUCCESS', response);            
                 if(response.statusCode==CTAP1_ERR_SUCCESS){
@@ -107,10 +107,6 @@
                 }else{
                    alert(showFIDOErrorMessage(response));
                 }
-               
-             
-
-
             }).catch((error) => {
                 alert(error)
                 console.log('FAIL', error)
