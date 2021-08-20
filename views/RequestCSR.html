@@ -109,10 +109,17 @@
             console.log(token_sn);
             console.log(key_id);
 
-            if(key_id.length==0){
-                //Auto generate Keyhandle
+            
+            var bToken_sn = undefined;
+            if(token_sn.length!=0){
+                bToken_sn = hexStringToArrayBuffer(token_sn);  
             }
-            GTIDEM_GenRSA2048CSR(token_sn,key_id).then((response) => {
+            var bKeyID = undefined;
+            if(key_id.length!=0){
+                bKeyID = toUTF8Array(key_id);  
+            }
+
+            GTIDEM_GenRSA2048CSR(bToken_sn,bKeyID).then((response) => {
 
             if(response.statusCode==CTAP1_ERR_SUCCESS){    
                 var str = String.fromCharCode.apply(null, new Uint8Array(response.csr));
@@ -145,13 +152,20 @@
 
             var bHexCert = Uint8Array.from(window.atob(testBigCertificate), c => c.charCodeAt(0));
 
-            var bKeyID = toUTF8Array(key_id);
+         
             var bKeyHandle = hexStringToArrayBuffer(key_handle);
 
+        
+            var bToken_sn = undefined;
             if(token_sn.length!=0){
                 bToken_sn = hexStringToArrayBuffer(token_sn);  
             }
-
+            var bKeyID = undefined;
+            if(key_id.length!=0){
+                bKeyID = toUTF8Array(key_id);  
+            }else{
+                bKeyID = bKeyHandle;
+            }
 
             crypto.subtle.digest("SHA-256",bHexCert).then(function (signHashedDataPayload) {
                 console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
