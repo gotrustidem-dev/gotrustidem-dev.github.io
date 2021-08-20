@@ -120,7 +120,10 @@
             if(token_sn.length!=0){
                 bToken_sn = hexStringToArrayBuffer(token_sn);  
             }
-            var bKeyID = toUTF8Array(key_id);
+            var bKeyID = undefined;
+            if(key_id.length!=0){
+                bKeyID = toUTF8Array(key_id);  
+            }
 
 
             GTIDEM_GenRSA2048(bToken_sn,bKeyID).then((value) => {
@@ -169,15 +172,20 @@
             console.log(token_sn);
             console.log(key_id);
             console.log(key_handle);
+
+            var bKeyHandle = hexStringToArrayBuffer(key_handle);
+            var bHexCert = Uint8Array.from(window.atob(testBigCertificate), c => c.charCodeAt(0));
+
             var bToken_sn = undefined;
             if(token_sn.length!=0){
                 bToken_sn = hexStringToArrayBuffer(token_sn);  
             }
-
-            var bKeyID = toUTF8Array(key_id);
-            var bKeyHandle = hexStringToArrayBuffer(key_handle);
-
-            var bHexCert = Uint8Array.from(window.atob(testBigCertificate), c => c.charCodeAt(0));
+            var bKeyID = undefined;
+            if(key_id.length!=0){
+                bKeyID = toUTF8Array(key_id);  
+            }else{
+                bKeyID = bKeyHandle;
+            }
 
             
             crypto.subtle.digest("SHA-256",bHexCert).then(function (signHashedDataPayload) {
