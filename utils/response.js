@@ -22,7 +22,7 @@ class GTIdemJs {
         this.rsakeypair = undefined;
     }
 
-    static parsePKIoverFIDOResponse = (buffer, cmd) => {
+    parsePKIoverFIDOResponse = (buffer, cmd) => {
 
         var GTheaderStr = "GoTrust-Idem-PKI";
 
