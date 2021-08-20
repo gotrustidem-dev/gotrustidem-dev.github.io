@@ -76,7 +76,12 @@ class GTIdemJs {
 
                             break;
                         case CMD_GenRsaKeyPair:
-
+                            this.keyhandle= responseData[1];
+                            this.rsakeypair= responseData[2];
+                            break;
+                        case CMD_REQUESTCSR:
+                            this.keyhandle= responseData[1];
+                            this.csr= responseData[2];
                             break;
                         case CMD_ImportCertificate:
 

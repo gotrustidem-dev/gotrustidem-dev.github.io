@@ -1705,13 +1705,7 @@ var ConverSNFormat = (buffer) => {
 
 async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
 
-    //Convert string to byte array
-
-    var bOldPin = new Uint8Array(oldPIN);
-    var bNewPin = new Uint8Array(newPIN);
-
-
-    
+    //Convert string to byte array    
     //Get device insered PC, and compare serial number if it is exist.
     var gtidemA = await GTIDEM_GetTokenInfo(serialNumber).then((fido) => {
         return fido;
@@ -1999,9 +1993,13 @@ async function GTIDEM_GenRSA2048CSR(serialNumber,keyID) {
    await navigator.credentials.create({
         'publicKey': webauth_request
     }).then((fido) => {
+
+        let attestationObject = CBOR.decode(fido.response.attestationObject);
+        let authData = parseAuthData(attestationObject.authData);
+  
            
         let gtidem = new GTIdemJs();
-        gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_REQUESTCSR);
+        gtidem.parsePKIoverFIDOResponse(authData.credID,CMD_REQUESTCSR);
         return gtidem;
     });
 }
@@ -2103,9 +2101,8 @@ async function GTIDEM_GenRSA2048(serialNumber,keyID) {
 async function GTIDEM_ImportCertificate(serialNumber,keyHandle,keyID,HexCert, plain) {
 
 
-    var bKeyID = toUTF8Array(keyID);
-    var bKeyHandle = toUTF8Array(keyHandle);
-    //var bHexCert = hexStringToArrayBuffer(HexCert);
+    var bKeyID = keyID;
+    var bKeyHandle = keyHandle;
     var bHexCert = HexCert;
     //var bHexCert = Uint8Array.from(window.atob(Base64Cert), c => c.charCodeAt(0));
     //var bPlainText = toUTF8Array(plaintext);
