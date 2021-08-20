@@ -1778,7 +1778,7 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
    pki_header[2] = payloadLen;
 
    var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
-   pki_buffer = _appendBuffer(gtheaderbuffer,sn_buf);
+   pki_buffer = _appendBuffer(pki_buffer,sn_buf);
    pki_buffer = _appendBuffer(pki_buffer,ecpubkey_buf);
    pki_buffer = _appendBuffer(pki_buffer,encryptedOldPINHash_buf);
    pki_buffer = _appendBuffer(pki_buffer,encryptedNewPIN_buf);
