@@ -1831,8 +1831,8 @@ async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
     var ECPublicKey;
     var EncryptOlDPIN;
 
-    let ecpoint = hexStringToArrayBuffer(ecpointXY);
-
+    //let ecpoint = hexStringToArrayBuffer(ecpointXY);
+    let ecpoint = ecpointXY;
     var externalECPublicKeyX = base64EncodeURL(ecpoint.slice(1, 33));
     var externalECPublicKeyY = base64EncodeURL(ecpoint.slice(33, 65));
    

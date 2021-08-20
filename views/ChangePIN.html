@@ -108,7 +108,7 @@
 
             GTIDEM_ChangeUserPIN(oldpin, newpin, token_sn).then((value) => {
 
-                if(value.statusCode){
+                if(value.statusCode==CTAP1_ERR_SUCCESS){
                     alert("密碼變更完成");
                 }else{
                     alert(showFIDOErrorMessage(value));
