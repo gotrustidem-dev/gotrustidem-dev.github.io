@@ -126,18 +126,38 @@
             let label = document.getElementById('form_label').certlabel.value;
             let isUseHashedData2Sign = document.getElementById('use_hashdata_label');
             var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
+
+            var bToken_sn = undefined;
+            if(token_sn.length!=0){
+                bToken_sn = hexStringToArrayBuffer(token_sn);  
+            }
+            var bLabel = new Uint8Array(label.length);
+            bLabel.set(toUTF8Array(label), 0);
+
             if(isUseHashedData2Sign.checked){
                 crypto.subtle.digest("SHA-256",new Uint8Array(signDataPayload)).
                 then(function (signHashedDataPayload) {
                     console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
-                    GTIDEM_SignDataByLabel(label, token_sn,ALG_RSA2048SHA256_PreHash, new Uint8Array(signHashedDataPayload)).then((value) => {
+                    GTIDEM_SignDataByLabel(bLabel, bToken_sn,ALG_RSA2048SHA256_PreHash, new Uint8Array(signHashedDataPayload)).then((value) => {
                         
-                        showSignMessage(value);
+                        if(value.statusCode==CTAP1_ERR_SUCCESS){
+                            var str = String.fromCharCode.apply(null, new Uint8Array(value.signature));
+                            alert("簽名:" + "\n" + btoa(str));
+
+                        }else{
+                            alert(showFIDOErrorMessage(value));
+                        }
                     });
                 });
             }else{
-                GTIDEM_SignDataByLabel(label, token_sn,ALG_RSA2048SHA256, signDataPayload).then((value) => {
-                    showSignMessage(value);
+                GTIDEM_SignDataByLabel(bLabel, bToken_sn,ALG_RSA2048SHA256, signDataPayload).then((value) => {
+                    if(value.statusCode==CTAP1_ERR_SUCCESS){
+                            var str = String.fromCharCode.apply(null, new Uint8Array(value.signature));
+                            alert("簽名:" + "\n" + btoa(str));
+
+                        }else{
+                            alert(showFIDOErrorMessage(value));
+                        }
                 });
             }
 
@@ -150,13 +170,18 @@
             let isUseHashedData2Sign = document.getElementById('use_hashdata_label');
             var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
 
+            var bToken_sn = undefined;
+            if(token_sn.length!=0){
+                bToken_sn = hexStringToArrayBuffer(token_sn);  
+            }
+
             if(isUseHashedData2Sign.checked){
                crypto.subtle.digest("SHA-256",new Uint8Array(signDataPayload)).
                 then(function (signHashedDataPayload) {
                     console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
-                    GTIDEM_SignDataByIndex(index, token_sn,ALG_RSA2048SHA256_PreHash, new Uint8Array(signHashedDataPayload)).then((value) => {
+                    GTIDEM_SignDataByIndex(index, bToken_sn,ALG_RSA2048SHA256_PreHash, new Uint8Array(signHashedDataPayload)).then((value) => {
                        
-                        if(value.statusCode){
+                        if(value.statusCode==CTAP1_ERR_SUCCESS){
                             var str = String.fromCharCode.apply(null, new Uint8Array(value.signature));
                             alert("簽名:" + "\n" + btoa(str));
 
@@ -168,8 +193,8 @@
                 });
             }else{
 
-                GTIDEM_SignDataByIndex(index, token_sn,ALG_RSA2048SHA256, signDataPayload).then((value) => {
-                    if(value.statusCode){
+                GTIDEM_SignDataByIndex(index, bToken_sn,ALG_RSA2048SHA256, signDataPayload).then((value) => {
+                    if(value.statusCode==CTAP1_ERR_SUCCESS){
                         var str = String.fromCharCode.apply(null, new Uint8Array(value.signature));
                         alert("簽名:" + "\n" + btoa(str));
 

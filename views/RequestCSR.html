@@ -145,12 +145,17 @@
 
             var bHexCert = Uint8Array.from(window.atob(testBigCertificate), c => c.charCodeAt(0));
 
-            var bKeyID = toUTF8Array(keyID);
-            var bKeyHandle = hexStringToArrayBuffer(keyHandle);
+            var bKeyID = toUTF8Array(key_id);
+            var bKeyHandle = hexStringToArrayBuffer(key_handle);
+
+            if(token_sn.length!=0){
+                bToken_sn = hexStringToArrayBuffer(token_sn);  
+            }
+
 
             crypto.subtle.digest("SHA-256",bHexCert).then(function (signHashedDataPayload) {
                 console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
-                GTIDEM_ImportCertificate(token_sn,bKeyHandle,bKeyID,bHexCert,new Uint8Array(signHashedDataPayload)).then((response) => {
+                GTIDEM_ImportCertificate(bToken_sn,bKeyHandle,bKeyID,bHexCert,new Uint8Array(signHashedDataPayload)).then((response) => {
                 if(response.statusCode==CTAP1_ERR_SUCCESS){  
                     var msg =  "匯入憑證完成";
                     if(response.signature != undefined){
