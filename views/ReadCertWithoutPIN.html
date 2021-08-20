@@ -78,7 +78,8 @@
                                                         <form style="text-align: center;" id="form_signdata_label_btn"
                                                             onsubmit="return false">
                                                             <button class="btn btn-primary" action="submit"
-                                                                style="width: 162px; height:34px;background-color: #008CBA;">Read Cert</button>
+                                                                style="width: 162px; height:34px;background-color: #008CBA;">Read
+                                                                Cert</button>
                                                         </form>
                                                     </td>
                                                     <td style="width: 385px;">
@@ -91,16 +92,18 @@
                                                             </form>
                                                         </p>
                                                         <p>
-                                                            <form style="text-align: center;" id="form_signdata_index_btn"
-                                                                onsubmit="return false">
+                                                            <form style="text-align: center;"
+                                                                id="form_signdata_index_btn" onsubmit="return false">
                                                                 <button class="btn btn-primary" action="submit"
-                                                                    style="width: 162px; height:34px;background-color: #008CBA;">Read Cert</button>
+                                                                    style="width: 162px; height:34px;background-color: #008CBA;">Read
+                                                                    Cert</button>
                                                             </form>
                                                         </p>
                                                     </td>
 
-                                                    <input type="checkbox" id="use_hashdata_label" name="vehicle1" value="Use Hashed Data">
-                                                    <label >Use Hashed Data to Sign </label> 
+                                                    <input type="checkbox" id="use_hashdata_label" name="vehicle1"
+                                                        value="Use Hashed Data">
+                                                    <label>Use Hashed Data to Sign </label>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -114,8 +117,7 @@
         </table>
     </div>
     <script>
-
-         // signed Data1: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef  
+        // signed Data1: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef  
         var signData =
             'MTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWYxMjM0NTY3ODkwYWJjZGVmMTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWYxMjM0NTY3ODkwYWJjZGVmMTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWY=';
 
@@ -128,21 +130,21 @@
             var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
 
             var bToken_sn = undefined;
-            if(token_sn.length!=0){
-                bToken_sn = hexStringToArrayBuffer(token_sn);  
+            if (token_sn.length != 0) {
+                bToken_sn = hexStringToArrayBuffer(token_sn);
             }
             var bLabel = new Uint8Array(label.length);
             bLabel.set(toUTF8Array(label), 0);
 
-            GTIDEM_SignDataByLabel(bLabel, bToken_sn).then((value) => {
-                    if(value.statusCode==CTAP1_ERR_SUCCESS){
-                            var str = String.fromCharCode.apply(null, new Uint8Array(value.signature));
-                            alert("憑證:" + "\n" + btoa(str));
+            GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bToken_sn).then((value) => {
+                if (value.statusCode == CTAP1_ERR_SUCCESS) {
+                    var str = String.fromCharCode.apply(null, new Uint8Array(value.signature));
+                    alert("憑證:" + "\n" + btoa(str));
 
-                        }else{
-                            alert(showFIDOErrorMessage(value));
-                        }
-                });
+                } else {
+                    alert(showFIDOErrorMessage(value));
+                }
+            });
 
         })
 
@@ -154,21 +156,23 @@
             var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
 
             var bToken_sn = undefined;
-            if(token_sn.length!=0){
-                bToken_sn = hexStringToArrayBuffer(token_sn);  
+            if (token_sn.length != 0) {
+                bToken_sn = hexStringToArrayBuffer(token_sn);
             }
 
-            GTIDEM_ReadCertByIndex(index, bToken_sn).then((value) => {
-                       
-                       if(value.statusCode==CTAP1_ERR_SUCCESS){
-                           var str = String.fromCharCode.apply(null, new Uint8Array(value.signature));
-                           alert("憑證:" + "\n" + btoa(str));
+            GTIDEM_ReadCertByIndexWithoutPIN(index, bToken_sn).then((value) => {
 
-                       }else{
-                           alert(showFIDOErrorMessage(value));
-                       }
-             
-                   });
+                if (value.status === CTAP1_ERR_SUCCESS) {
+                    var strCert = "-----BEGIN CERTIFICATE-----\n" +
+                        btoa(String.fromCharCode.apply(null, value.certicficate)) +
+                        "\n-----END CERTIFICATE-----"
+                    console.log('憑證 : \n', strCert);
+                    alert("憑證:" + "\n" + strCert);
+                } else {
+                    alert(showFIDOErrorMessage(value));
+                }
+
+            });
 
         })
     </script>
