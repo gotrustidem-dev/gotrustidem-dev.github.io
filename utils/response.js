@@ -58,45 +58,44 @@ class GTIdemJs {
             let totalLen = readBE16(new Uint8Array(totalLenBuf));
             buffer = buffer.slice(2);
             let statusCodeBuf = buffer.slice(0, 1);
-
-            let statusCodeBuf = new Uint8Array(statusCodeBuf);
             this.statusCode = statusCodeBuf[0];
 
             buffer = buffer.slice(1);
-            let payloadDataBuf = buffer.slice(0, (totalLen - 1));
-            let payloadCBORData = CBOR.decode(payloadDataBuf);
 
-            if (this.statusCode == CTAP2_ERR_PIN_INVALID) {
+            if((totalLen - 1)>0){//has payload
+                let payloadDataBuf = buffer.slice(0, (totalLen - 1));
+                let responseData = CBOR.decode(payloadDataBuf);
+                if (this.statusCode == CTAP2_ERR_PIN_INVALID) {
 
-                this.pinRetry = responseData[1];
+                    this.pinRetry = responseData[1];
 
-            } else if (this.statusCode == CTAP1_ERR_SUCCESS) {
-                switch (cmd) {
-                    case CMD_TokenInfo:
-                        this.fw= responseData[1];
-                        this.sw = responseData[2];
-                        this.pinRetry = responseData[3];
-                        this.credentialNum = responseData[4];
-                        this.sn = responseData[5];
-                        this.rn= responseData[6];
-                        this.ecpoint = responseData[7];
-                        
-                        break;
-                    case CMD_Sign:
+                } else if (this.statusCode == CTAP1_ERR_SUCCESS) {
+                    switch (cmd) {
+                        case CMD_TokenInfo:
+                            this.fw= responseData[1];
+                            this.sw = responseData[2];
+                            this.pinRetry = responseData[3];
+                            this.credentialNum = responseData[4];
+                            this.sn = responseData[5];
+                            this.rn= responseData[6];
+                            this.ecpoint = responseData[7];
+                            
+                            break;
+                        case CMD_Sign:
 
-                        break;
-                    case CMD_SignWithPIN:
+                            break;
+                        case CMD_SignWithPIN:
 
-                        break;
-                    case CMD_GenRsaKeyPair:
+                            break;
+                        case CMD_GenRsaKeyPair:
 
-                        break;
-                    case CMD_ImportCertificate:
+                            break;
+                        case CMD_ImportCertificate:
 
-                    default:
+                        default:
+                    }
                 }
             }
-
         } else if (value.byteLength == 256) {
 
             this.signature = new Uint8Array(buffer);
