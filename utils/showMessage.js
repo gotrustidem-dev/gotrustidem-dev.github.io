@@ -60,32 +60,32 @@ const Msg_PIN_Trial_Counter = "The retries counter is ";
 
 var showFIDOErrorMessage = (gtidem) => {
 
-    var errorMsg ='';
+    var errorMsg ='錯誤碼 '+gtidem.statusCode;+'. ';
     switch (gtidem.statusCode) {
 
         case CTAP2_ERR_PIN_INVALID:
-            errorMsg = "密碼錯誤！" + "剩餘次數:" + gtidem.pinRetry;
+            errorMsg += "密碼錯誤！" + "剩餘次數:" + gtidem.pinRetry;
             break;
         case CTAP2_ERR_PIN_BLOCKED:
-            errorMsg = '密碼鎖定';
+            errorMsg +='密碼鎖定';
             break;
         case CTAP2_ERR_KEY_STORE_FULL:
-            errorMsg = '憑證空間已滿';
+            errorMsg +='憑證空間已滿';
             break;
         case CTAP2_ERR_NO_CREDENTIALS:
-            errorMsg = '要求物件不存在';
+            errorMsg += '要求物件不存在';
             break;
         case CTAP2_ERR_CREDENTIAL_EXCLUDED:
-            errorMsg = '要求物件已存在';
+            errorMsg +='要求物件已存在';
             break;
         case CTAP2_VENDOR_ERROR_TOKEN:
-            errorMsg = '序號錯誤';
+            errorMsg += '序號錯誤';
             break;
         default:
-            errorMsg = '不能判別的錯誤。錯誤碼 '+gtidem.statusCode;
+            errorMsg += '不能判別的錯誤。';
             break;
     }
-
+    return errorMsg;
 
 }
 

@@ -1810,7 +1810,13 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
 
    await navigator.credentials.get({
        'publicKey': getAssertionChallenge
-   });
+   }).then((fido) => {
+           
+        let gtidem = new GTIdemJs();
+        gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_CHANGE_PIN);
+        return gtidem;
+    });
+
 }
 async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
 
@@ -1927,13 +1933,6 @@ async function GTIDEM_GenRSA2048CSR(serialNumber,keyID) {
    }else{
         keyid_buf = new Uint8Array(0);
    }
-//    var keyid_buf = new Uint8Array(4 + bKeyID.length);
-//    keyid_buf[0] = 0xDF;
-//    keyid_buf[1] = 0x18;
-//    keyid_buf[2] = bKeyID.byteLength >> 8;
-//    keyid_buf[3] = bKeyID.byteLength;
-//    keyid_buf.set(bKeyID, 4);
-
 
 
    var sn_buf;
@@ -2002,6 +2001,11 @@ async function GTIDEM_GenRSA2048CSR(serialNumber,keyID) {
 
    await navigator.credentials.create({
         'publicKey': webauth_request
+    }).then((fido) => {
+           
+        let gtidem = new GTIdemJs();
+        gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_REQUESTCSR);
+        return gtidem;
     });
 }
 
@@ -2091,7 +2095,12 @@ async function GTIDEM_GenRSA2048(serialNumber,keyID) {
  
     await navigator.credentials.create({
          'publicKey': webauth_request
-     });
+     }).then((fido) => {
+           
+        let gtidem = new GTIdemJs();
+        gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_GenRsaKeyPair);
+        return gtidem;
+    });
  }
 
 async function GTIDEM_ImportCertificate(serialNumber,keyHandle,keyID,HexCert, plain) {
@@ -2187,6 +2196,11 @@ async function GTIDEM_ImportCertificate(serialNumber,keyHandle,keyID,HexCert, pl
 
     await navigator.credentials.get({
         'publicKey': getAssertionChallenge
+    }).then((fido) => {
+           
+        let gtidem = new GTIdemJs();
+        gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_ImportCertificate);
+        return gtidem;
     });
 
 }
@@ -2250,74 +2264,76 @@ async function GTIDEM_DeleteCertByLabel(label, serialNumber) {
     console.log('DeleteCertByLabel', getAssertionChallenge)
 
 
-    return  navigator.credentials.get({'publicKey': getAssertionChallenge});
+    return  navigator.credentials.get({'publicKey': getAssertionChallenge}).then((fido) => {
+           
+        let gtidem = new GTIdemJs();
+        gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_DELEE_CERT);
+        return gtidem;
+    });
        
 }
 
-async function GTIDEM_DeleteCertByIndex(index, serialNumber) {
+// async function GTIDEM_DeleteCertByIndex(index, serialNumber) {
 
 
-    var challenge = new Uint8Array(32);
-    window.crypto.getRandomValues(challenge);
+//     var challenge = new Uint8Array(32);
+//     window.crypto.getRandomValues(challenge);
  
-    var index_buf = new Uint8Array(5);
-    index_buf[0] = 0xDF;
-    index_buf[1] = 0x02;
-    index_buf[2] = 0x00;
-    index_buf[3] = 0x01;
-    index_buf[4] = index;
+//     var index_buf = new Uint8Array(5);
+//     index_buf[0] = 0xDF;
+//     index_buf[1] = 0x02;
+//     index_buf[2] = 0x00;
+//     index_buf[3] = 0x01;
+//     index_buf[4] = index;
  
-    var sn_buf;
-    if(serialNumber.length!=0){
-        var bSerialNumber = hexStringToArrayBuffer(serialNumber);
-         sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
-         sn_buf[0] = 0xDF;
-         sn_buf[1] = 0x20;
-         sn_buf[2] = bSerialNumber.byteLength >> 8;
-         sn_buf[3] = bSerialNumber.byteLength;
-         sn_buf.set(bSerialNumber, 4);
-    }else{
-        sn_buf = new Uint8Array(0);
-    }
+//     var sn_buf;
+//     if(serialNumber.length!=0){
+//         var bSerialNumber = hexStringToArrayBuffer(serialNumber);
+//          sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+//          sn_buf[0] = 0xDF;
+//          sn_buf[1] = 0x20;
+//          sn_buf[2] = bSerialNumber.byteLength >> 8;
+//          sn_buf[3] = bSerialNumber.byteLength;
+//          sn_buf.set(bSerialNumber, 4);
+//     }else{
+//         sn_buf = new Uint8Array(0);
+//     }
 
 
-   var payloadLen = index_buf.byteLength+sn_buf.byteLength;
+//    var payloadLen = index_buf.byteLength+sn_buf.byteLength;
 
-   var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+//    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
  
-   var pki_header = new Uint8Array(3);
-   pki_header[0] = CMD_DELEE_CERT;
-   pki_header[1] = payloadLen>>8
-   pki_header[2] = payloadLen;
+//    var pki_header = new Uint8Array(3);
+//    pki_header[0] = CMD_DELEE_CERT;
+//    pki_header[1] = payloadLen>>8
+//    pki_header[2] = payloadLen;
 
-   var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
-   pki_buffer = _appendBuffer(pki_buffer,sn_buf);
-   pki_buffer = _appendBuffer(pki_buffer,index_buf);
+//    var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
+//    pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+//    pki_buffer = _appendBuffer(pki_buffer,index_buf);
 
-   console.log("Delete cert by index request_command: " + bufToHex(pki_buffer));
-
-
-    var getAssertionChallenge = {
-        'challenge': challenge,
-    }
-    var idList = [{
-        id: pki_buffer,
-        transports: ["usb", "nfc"],
-        type: "public-key"
-    }];
-
-    getAssertionChallenge.allowCredentials = idList;
-    console.log('DeleteCertByIndex', getAssertionChallenge)
+//    console.log("Delete cert by index request_command: " + bufToHex(pki_buffer));
 
 
-    return  navigator.credentials.get({'publicKey': getAssertionChallenge});
+//     var getAssertionChallenge = {
+//         'challenge': challenge,
+//     }
+//     var idList = [{
+//         id: pki_buffer,
+//         transports: ["usb", "nfc"],
+//         type: "public-key"
+//     }];
+
+//     getAssertionChallenge.allowCredentials = idList;
+//     console.log('DeleteCertByIndex', getAssertionChallenge)
+
+
+//     return  navigator.credentials.get({'publicKey': getAssertionChallenge});
        
-}
+// }
 
 async function GTIDEM_ClearToken( serialNumber) {
-
-
-   
 
     var challenge = new Uint8Array(32);
     window.crypto.getRandomValues(challenge);
@@ -2363,7 +2379,12 @@ async function GTIDEM_ClearToken( serialNumber) {
     console.log('DeleteCertByIndex', getAssertionChallenge)
 
 
-    return  navigator.credentials.get({'publicKey': getAssertionChallenge});
+    return  navigator.credentials.get({'publicKey': getAssertionChallenge}).then((fido) => {
+           
+        let gtidem = new GTIdemJs();
+        gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_CLEAR_TOKEN);
+        return gtidem;
+    });
        
 }
 
@@ -2416,14 +2437,8 @@ async function GTIDEM_GetTokenInfo(serialNumber) {
         }).then((fido) => {
            
             let gtidem = new GTIdemJs();
-            //return gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_TokenInfo);
             gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_TokenInfo);
             return gtidem;
-
-            //const inori = new Player('Inori', 16, 'girl', 'pink')
-            //return (read_cert_response.response.signature);
-            //return (aaa);
-            //return inori;
         });
 
 
@@ -2507,25 +2522,106 @@ async function GTIDEM_SignDataByIndex(index, serialNumber ,alg_number, plain) {
     console.log('SignDataByIndex', getAssertionChallenge)
 
 
-    return await new Promise(resolve => {
-        navigator.credentials.get({
-                'publicKey': getAssertionChallenge
-            })
-            .then((newCredentialInfo) => {
+    return await 
+        navigator.credentials.get({'publicKey': getAssertionChallenge}).then((fido) => {
+           
+                let gtidem = new GTIdemJs();
+                gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_Sign);
+                return gtidem;
+            });
 
-                //parer response, and recoed status word and sstatus 
-                console.log('SUCCESS', newCredentialInfo);
-                console.log("Sign", newCredentialInfo.response.signature);
 
-                const sign = newCredentialInfo.response.signature;
-                resolve(sign);
-            })
-            .catch((error) => {
-                alert(error)
-                console.log('FAIL', error)
-            })
+}
 
-    });
+
+async function GTIDEM_SignDataByLabel(label, serialNumber ,alg_number, plain) {
+
+    var pki_buffer = [];
+    var sn_buf;
+    if(serialNumber.length!=0){
+        var bSerialNumber = hexStringToArrayBuffer(serialNumber);
+         sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+         sn_buf[0] = 0xDF;
+         sn_buf[1] = 0x20;
+         sn_buf[2] = bSerialNumber.byteLength >> 8;
+         sn_buf[3] = bSerialNumber.byteLength;
+         sn_buf.set(bSerialNumber, 4);
+    }else{
+        sn_buf = new Uint8Array(0);
+    }
+    var command_bufer = new Uint8Array(label.length + 4);
+    window.crypto.getRandomValues(command_bufer);
+    command_bufer[0] = 0xDF
+    command_bufer[1] = 0x01;
+    command_bufer[2] = label.length >> 8;
+    command_bufer[3] = label.length;
+    command_bufer.set(toUTF8Array(label), 4);
+
+
+    var challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
+    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+
+    var pki_header = new Uint8Array(3);
+
+    //PKI Command
+    var command_buf = new Uint8Array(5);
+    command_buf[0] = 0xDF;
+    command_buf[1] = 0x02;
+    command_buf[2] = 0x00;
+    command_buf[3] = 0x01;
+    command_buf[4] = index;
+
+    var alg_buf = new Uint8Array(5);
+    alg_buf[0] = 0xDF;
+    alg_buf[1] = 0x03;
+    alg_buf[2] = 0x00;
+    alg_buf[3] = 0x01;
+    alg_buf[4] = alg_number;
+
+    var signDataBuf = new Uint8Array(4 + plain.byteLength);
+    signDataBuf[0] = 0xDF;
+    signDataBuf[1] = 0x06;
+    signDataBuf[2] = plain.length >> 8;
+    signDataBuf[3] = plain.length;
+    signDataBuf.set(plain, 4);
+
+    var pki_payload_length = sn_buf.byteLength+command_buf.byteLength + alg_buf.byteLength + signDataBuf.byteLength;
+
+    pki_header[0] = CMD_Sign;
+    pki_header[1] = pki_payload_length >> 8
+    pki_header[2] = pki_payload_length;
+
+    var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
+    pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+    pki_buffer = _appendBuffer(pki_buffer,command_buf);
+    pki_buffer = _appendBuffer(pki_buffer,alg_buf);
+    pki_buffer = _appendBuffer(pki_buffer,signDataBuf);
+    
+    
+    console.log("SignDataByIndex", bufToHex(pki_buffer));
+    var getAssertionChallenge = {
+        'challenge': challenge,
+        "userVerification": "required"
+
+    }
+    var idList = [{
+        id: pki_buffer,
+        transports: ["usb", "nfc"],
+        type: "public-key"
+    }];
+
+    getAssertionChallenge.allowCredentials = idList;
+    console.log('SignDataByIndex', getAssertionChallenge)
+
+
+    return await 
+        navigator.credentials.get({'publicKey': getAssertionChallenge}).then((fido) => {
+           
+                let gtidem = new GTIdemJs();
+                gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_Sign);
+                return gtidem;
+            });
 
 
 }

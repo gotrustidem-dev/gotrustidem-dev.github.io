@@ -107,7 +107,12 @@
 
             GTIDEM_ChangeUserPIN(oldpin, newpin, token_sn).then((value) => {
 
-                alert("YES");
+                if(value.statusCode){
+                    alert("密碼變更完成");
+                }else{
+                    alert(showFIDOErrorMessage(value));
+                }
+              
             }).catch((error) => {
                 alert(error)
                 console.log('FAIL', error)

@@ -71,7 +71,6 @@ class GTIdemJs {
                             
                             break;
                         case CMD_Sign:
-
                             break;
                         case CMD_SignWithPIN:
 

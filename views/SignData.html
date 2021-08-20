@@ -154,13 +154,27 @@
                 then(function (signHashedDataPayload) {
                     console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
                     GTIDEM_SignDataByIndex(index, token_sn,ALG_RSA2048SHA256_PreHash, new Uint8Array(signHashedDataPayload)).then((value) => {
-                        showSignMessage(value);
+                       
+                        if(value.statusCode){
+                            var str = String.fromCharCode.apply(null, new Uint8Array(value.signature));
+                            alert("簽名:" + "\n" + btoa(str));
+
+                        }else{
+                            alert(showFIDOErrorMessage(value));
+                        }
+              
                     });
                 });
             }else{
 
                 GTIDEM_SignDataByIndex(index, token_sn,ALG_RSA2048SHA256, signDataPayload).then((value) => {
-                    showSignMessage(value);
+                    if(value.statusCode){
+                        var str = String.fromCharCode.apply(null, new Uint8Array(value.signature));
+                        alert("簽名:" + "\n" + btoa(str));
+
+                    }else{
+                        alert(showFIDOErrorMessage(value));
+                    }
                 });
             }
 
