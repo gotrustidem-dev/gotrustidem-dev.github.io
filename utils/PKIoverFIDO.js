@@ -2002,25 +2002,24 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bKeyID) {
     });
 }
 
-async function GTIDEM_GenRSA2048(serialNumber,keyID) {
+async function GTIDEM_GenRSA2048(bSerialNumber,keyID) {
 
 
  
     var challenge = new Uint8Array(32);
     window.crypto.getRandomValues(challenge);
  
-    
     var sn_buf;
-    if(serialNumber.length!=0){
-        var bSerialNumber = hexStringToArrayBuffer(serialNumber);
-         sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
-         sn_buf[0] = 0xDF;
-         sn_buf[1] = 0x20;
-         sn_buf[2] = bSerialNumber.byteLength >> 8;
-         sn_buf[3] = bSerialNumber.byteLength;
-         sn_buf.set(bSerialNumber, 4);  
+    if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
+
+        sn_buf = new Uint8Array(0);
     }else{
-     sn_buf = new Uint8Array(0);
+        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+        sn_buf[0] = 0xDF;
+        sn_buf[1] = 0x20;
+        sn_buf[2] = bSerialNumber.byteLength >> 8;
+        sn_buf[3] = bSerialNumber.byteLength;
+        sn_buf.set(bSerialNumber, 4);
     }
     var keyid_buf;
     if(keyID.length!=0){
@@ -2101,7 +2100,7 @@ async function GTIDEM_GenRSA2048(serialNumber,keyID) {
     });
  }
 
-async function GTIDEM_ImportCertificate(serialNumber,keyHandle,keyID,HexCert, plain) {
+async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, plain) {
 
 
     var bKeyID = keyID;
@@ -2112,19 +2111,18 @@ async function GTIDEM_ImportCertificate(serialNumber,keyHandle,keyID,HexCert, pl
 
     var challenge = new Uint8Array(32);
     window.crypto.getRandomValues(challenge);
- 
 
     var sn_buf;
-    if(serialNumber.length!=0){
-        var bSerialNumber = hexStringToArrayBuffer(serialNumber);
-        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
-         sn_buf[0] = 0xDF;
-         sn_buf[1] = 0x20;
-         sn_buf[2] = bSerialNumber.byteLength >> 8;
-         sn_buf[3] = bSerialNumber.byteLength;
-         sn_buf.set(bSerialNumber, 4);
-    }else{
+    if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
+
         sn_buf = new Uint8Array(0);
+    }else{
+        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+        sn_buf[0] = 0xDF;
+        sn_buf[1] = 0x20;
+        sn_buf[2] = bSerialNumber.byteLength >> 8;
+        sn_buf[3] = bSerialNumber.byteLength;
+        sn_buf.set(bSerialNumber, 4);
     }
 
     var keyid_buf = new Uint8Array(4 + bKeyID.length);

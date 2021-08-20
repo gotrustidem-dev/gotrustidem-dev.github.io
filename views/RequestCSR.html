@@ -125,7 +125,7 @@
                 
                         var strCSR = "-----BEGIN CERTIFICATE REQUEST-----\n" +
                             btoa(String.fromCharCode.apply(null, new Uint8Array(response.csr))) +
-                            "\n-----ENDCERTIFICATE REQUEST-----"
+                            "\n-----END CERTIFICATE REQUEST-----"
                         console.log('CSR : \n', strCSR);
                         alert("CSR:" + "\n" + strCSR);
                         console.log(bufToHex(new Uint8Array(response.keyhandle).buffer));
