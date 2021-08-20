@@ -2415,10 +2415,10 @@ async function GTIDEM_GetTokenInfo(serialNumber) {
             'publicKey': getAssertionChallenge
         }).then((read_cert_response) => {
 
-             var aaa = new GTIdemJs();
+            return new GTIdemJs().parsePKIoverFIDOResponse(read_cert_response.response.signature);
 
             //return (read_cert_response.response.signature);
-            return (aaa);
+            //return (aaa);
         });
 
 
