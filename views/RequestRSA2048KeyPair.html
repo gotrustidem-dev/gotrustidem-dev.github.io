@@ -73,10 +73,14 @@
                                             <button class="btn btn-primary" action="submit"
                                                 style="width: 200px; height:34px;background-color: #008CBA;">Generate RSA2048 KeyPair</button>
                                         </form>
-                                        <p>
-                                            <label id="key_handle_value">Key Handle:</label>
-                                            <label id="target_key_handle"></label>
-                                        </p>
+                                        
+                                        <form style="text-align: center;" id="form_key_handle" onsubmit="return false">
+                                            <p>
+                                                <label id="label_key_handle">Key Handle:</label>
+                                                <input type="text" name="key_handle"  style="width: 342px; height:41px">
+                                            </p>
+                                        </form>
+
 
                                         <p>
                                             <form style="text-align: center;" id="form_signdata_btn" onsubmit="return false">
@@ -116,9 +120,9 @@
                 //Auto generate Keyhandle
             }
             GTIDEM_GenRSA2048(token_sn,key_id).then((value) => {
-
-                document.getElementById('target_key_handle').innerText = bufToHex(key_id);
-                alert("YES");
+                var str = String.fromCharCode.apply(null, new Uint8Array(response.rsakeypair));
+                alert("建立 KeyPair 完成 \n" + btoa(str));
+                document.getElementById('form_key_handle').key_handle.value = bufToHex(response.keyHandle);
             }).catch((error) => {
                 alert(error)
                 console.log('FAIL', error)
@@ -126,7 +130,7 @@
 
         });
 
-        //Generate CSR
+      
         document.getElementById('form_signdata_btn').addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -153,20 +157,19 @@
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             let key_id = document.getElementById('form_key_id').key_id.value;
+            let key_handle = document.getElementById('form_key_handle').key_handle.value;
             console.log(token_sn);
             console.log(key_id);
-            
-            let keyHandle = document.getElementById('target_key_handle').textContent;
-            console.log('key_handle', keyHandle);
-
-            if(key_id.length==0){
-                key_id = keyHandle;
-            }
+            console.log(key_handle);
             
             var bHexCert = Uint8Array.from(window.atob(testBigCertificate), c => c.charCodeAt(0));
+
+            var bKeyID = toUTF8Array(keyID);
+            var bKeyHandle = hexStringToArrayBuffer(keyHandle);
+            
             crypto.subtle.digest("SHA-256",bHexCert).then(function (signHashedDataPayload) {
                 console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
-                GTIDEM_ImportCertificate(token_sn,keyHandle,key_id,bHexCert,new Uint8Array(signHashedDataPayload)).then((value) => {
+                GTIDEM_ImportCertificate(token_sn,bKeyHandle,bKeyID,bHexCert,new Uint8Array(signHashedDataPayload)).then((value) => {
                     alert("YES");
                 }).catch((error) => {
                     alert(error)
