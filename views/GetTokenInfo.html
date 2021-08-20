@@ -92,7 +92,11 @@
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             console.log(token_sn);
 
-            var bToken_sn = hexStringToArrayBuffer(serialNumber);
+            var bToken_sn = undefined;
+            if(token_sn.length!=0){
+                bToken_sn = hexStringToArrayBuffer(token_sn);
+               
+            }
             GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
 
                 console.log('SUCCESS', response);            
