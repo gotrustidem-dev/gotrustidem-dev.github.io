@@ -84,7 +84,7 @@ class GTIdemJs {
                     }
                 }
             }
-        } else if (value.byteLength == 256) {
+        } else if (buffer.byteLength == 256) {
 
             this.signature = new Uint8Array(buffer);
             this.statusCode = CTAP1_ERR_SUCCESS;

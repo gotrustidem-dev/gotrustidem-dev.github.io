@@ -106,9 +106,9 @@
             console.log(newpin);
             console.log(confirm_newpin);
 
-            GTIDEM_ChangeUserPIN(oldpin, newpin, token_sn).then((value) => {
+            GTIDEM_ChangeUserPIN(oldpin, newpin, token_sn).then((response) => {
 
-                if(value.statusCode==CTAP1_ERR_SUCCESS){
+               if(response.statusCode==CTAP1_ERR_SUCCESS){    
                     alert("密碼變更完成");
                 }else{
                     alert(showFIDOErrorMessage(value));
