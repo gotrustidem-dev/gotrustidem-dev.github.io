@@ -124,12 +124,12 @@
                 if(response.statusCode==CTAP1_ERR_SUCCESS){    
                     var strCSR = String.fromCharCode.apply(null, new Uint8Array(response.csr));
                         var strCert = "-----BEGIN CERTIFICATE REQUEST-----\n" +
-                            btoa(String.fromCharCode.apply(null, value.certicficate)) +
+                            btoa(String.fromCharCode.apply(null, response.certicficate)) +
                             "\n-----ENDCERTIFICATE REQUEST-----"
                         console.log('CSR : \n', strCert);
                         alert("CSR:" + "\n" + strCert);
-                        console.log(bufToHex(response.keyHandle.buffer));
-                        document.getElementById('form_key_handle').key_handle.value = bufToHex(response.keyHandle.buffer);
+                        console.log(bufToHex(response.keyHandle));
+                        document.getElementById('form_key_handle').key_handle.value = ""+bufToHex(response.keyHandle);
                 }else{
                     alert(showFIDOErrorMessage(response));
                 }
