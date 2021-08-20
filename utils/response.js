@@ -93,8 +93,6 @@ class GTIdemJs {
             // 無法判斷
 
         }
-        return this;
-
     }
 
 

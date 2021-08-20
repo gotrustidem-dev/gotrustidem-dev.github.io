@@ -2417,8 +2417,8 @@ async function GTIDEM_GetTokenInfo(serialNumber) {
            
             let gtidem = new GTIdemJs();
             //return gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_TokenInfo);
-
-            return gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_TokenInfo);
+            gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_TokenInfo);
+            return gtidem;
 
             //const inori = new Player('Inori', 16, 'girl', 'pink')
             //return (read_cert_response.response.signature);
