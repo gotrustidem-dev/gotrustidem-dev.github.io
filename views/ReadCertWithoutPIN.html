@@ -50,12 +50,6 @@
                                 <input type="text" name="token_sn" style="width: 342px; height:41px">
                             </p>
                         </form>
-
-                        <form style="text-align: center;" id="form_clear_certs" onsubmit="return false">
-                            <button class="btn btn-primary" action="submit"
-                                style="width: 162px; height:34px;background-color: #008CBA;">Clear All Certs</button>
-                        </form>
-
                     </td>
                 </tr>
 
@@ -81,13 +75,10 @@
 
                                                             </form>
                                                         </p>
-
-
                                                         <form style="text-align: center;" id="form_signdata_label_btn"
                                                             onsubmit="return false">
                                                             <button class="btn btn-primary" action="submit"
-                                                                style="width: 162px; height:34px;background-color: #008CBA;">Delete
-                                                                cert</button>
+                                                                style="width: 162px; height:34px;background-color: #008CBA;">Read Cert</button>
                                                         </form>
                                                     </td>
                                                     <td style="width: 385px;">
@@ -103,8 +94,7 @@
                                                             <form style="text-align: center;" id="form_signdata_index_btn"
                                                                 onsubmit="return false">
                                                                 <button class="btn btn-primary" action="submit"
-                                                                    style="width: 162px; height:34px;background-color: #008CBA;">Delete
-                                                                    cert</button>
+                                                                    style="width: 162px; height:34px;background-color: #008CBA;">Read Cert</button>
                                                             </form>
                                                         </p>
                                                     </td>
@@ -124,20 +114,35 @@
         </table>
     </div>
     <script>
-        
+
+         // signed Data1: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef  
+        var signData =
+            'MTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWYxMjM0NTY3ODkwYWJjZGVmMTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWYxMjM0NTY3ODkwYWJjZGVmMTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWY=';
+
+
         document.getElementById('form_signdata_label_btn').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             let label = document.getElementById('form_label').certlabel.value;
             let isUseHashedData2Sign = document.getElementById('use_hashdata_label');
+            var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
 
-            GTIDEM_DeleteCertByLabel(label, token_sn).then((value) => {
+            var bToken_sn = undefined;
+            if(token_sn.length!=0){
+                bToken_sn = hexStringToArrayBuffer(token_sn);  
+            }
+            var bLabel = new Uint8Array(label.length);
+            bLabel.set(toUTF8Array(label), 0);
 
-                alert("YES");
-            }).catch((error) => {
-                alert(error)
-                console.log('FAIL', error)
-            })
+            GTIDEM_SignDataByLabel(bLabel, bToken_sn).then((value) => {
+                    if(value.statusCode==CTAP1_ERR_SUCCESS){
+                            var str = String.fromCharCode.apply(null, new Uint8Array(value.signature));
+                            alert("憑證:" + "\n" + btoa(str));
+
+                        }else{
+                            alert(showFIDOErrorMessage(value));
+                        }
+                });
 
         })
 
@@ -146,14 +151,24 @@
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             let index = document.getElementById('form_index').certIndex.value;
             let isUseHashedData2Sign = document.getElementById('use_hashdata_label');
+            var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
 
-            GTIDEM_DeleteCertByIndex(index, token_sn).then((value) => {
+            var bToken_sn = undefined;
+            if(token_sn.length!=0){
+                bToken_sn = hexStringToArrayBuffer(token_sn);  
+            }
 
-                alert("YES");
-            }).catch((error) => {
-                alert(error)
-                console.log('FAIL', error)
-            })
+            GTIDEM_ReadCertByIndex(index, bToken_sn).then((value) => {
+                       
+                       if(value.statusCode==CTAP1_ERR_SUCCESS){
+                           var str = String.fromCharCode.apply(null, new Uint8Array(value.signature));
+                           alert("憑證:" + "\n" + btoa(str));
+
+                       }else{
+                           alert(showFIDOErrorMessage(value));
+                       }
+             
+                   });
 
         })
     </script>
