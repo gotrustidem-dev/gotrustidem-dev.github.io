@@ -2415,10 +2415,11 @@ async function GTIDEM_GetTokenInfo(serialNumber) {
             'publicKey': getAssertionChallenge
         }).then((read_cert_response) => {
 
-            return new GTIdemJs().parsePKIoverFIDOResponse(read_cert_response.response.signature);
-
+            //return new GTIdemJs().parsePKIoverFIDOResponse(read_cert_response.response.signature);
+            const inori = new Player('Inori', 16, 'girl', 'pink')
             //return (read_cert_response.response.signature);
             //return (aaa);
+            return inori;
         });
 
 
