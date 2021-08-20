@@ -1721,6 +1721,11 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
         return gtidemA;
     }
 
+    if(gtidemA.pinRetry==0){
+        gtidemA.statusCode = CTAP2_ERR_PIN_BLOCKED;
+        return gtidemA;
+    }
+
     var bECPointFromToken = gtidemA.ecpoint;
 
     var sn_buf;
