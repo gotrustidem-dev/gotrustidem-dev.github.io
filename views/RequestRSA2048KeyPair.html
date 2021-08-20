@@ -129,7 +129,7 @@
             GTIDEM_GenRSA2048(bToken_sn,bKeyID).then((value) => {
                 var str = String.fromCharCode.apply(null, new Uint8Array(response.rsakeypair));
                 alert("建立 KeyPair 完成 \n" + btoa(str));
-                document.getElementById('form_key_handle').key_handle.value = bufToHex(response.keyHandle);
+                document.getElementById('form_key_handle').key_handle.value = bufferToString(response.keyHandle);
             }).catch((error) => {
                 alert(error)
                 console.log('FAIL', error)
