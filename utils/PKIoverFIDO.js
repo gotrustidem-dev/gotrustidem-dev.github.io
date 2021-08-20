@@ -1987,7 +1987,7 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bKeyID) {
 }
    console.log('webauth_request', webauth_request)
 
-   await navigator.credentials.create({
+   return await navigator.credentials.create({
         'publicKey': webauth_request
     }).then((fido) => {
 
@@ -2086,7 +2086,7 @@ async function GTIDEM_GenRSA2048(serialNumber,keyID) {
  }
     console.log('webauth_request', webauth_request)
  
-    await navigator.credentials.create({
+    return await navigator.credentials.create({
          'publicKey': webauth_request
      }).then((fido) => {
            
@@ -2191,7 +2191,7 @@ async function GTIDEM_ImportCertificate(serialNumber,keyHandle,keyID,HexCert, pl
     getAssertionChallenge.allowCredentials = idList;
     console.log('List getAssertionChallenge', getAssertionChallenge)
 
-    await navigator.credentials.get({
+    return await navigator.credentials.get({
         'publicKey': getAssertionChallenge
     }).then((fido) => {
            
@@ -2260,7 +2260,7 @@ async function GTIDEM_DeleteCertByLabel(bLabel, bSerialNumber) {
     console.log('DeleteCertByLabel', getAssertionChallenge)
 
 
-    return  navigator.credentials.get({'publicKey': getAssertionChallenge}).then((fido) => {
+    return  await navigator.credentials.get({'publicKey': getAssertionChallenge}).then((fido) => {
            
         let gtidem = new GTIdemJs();
         gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_DELEE_CERT);
@@ -2376,7 +2376,7 @@ async function GTIDEM_ClearToken( bSerialNumber) {
     console.log('DeleteCertByIndex', getAssertionChallenge)
 
 
-    return  navigator.credentials.get({'publicKey': getAssertionChallenge}).then((fido) => {
+    return  await navigator.credentials.get({'publicKey': getAssertionChallenge}).then((fido) => {
            
         let gtidem = new GTIdemJs();
         gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_CLEAR_TOKEN);
