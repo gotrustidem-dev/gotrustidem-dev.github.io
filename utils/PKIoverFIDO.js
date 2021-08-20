@@ -1993,8 +1993,9 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bKeyID) {
 
         let attestationObject = CBOR.decode(fido.response.attestationObject);
         let authData = parseAuthData(attestationObject.authData);
-        let bPKIoverFIDOResponse = new Uint8Array(authData.credID);
-           
+        let credID = authData.credID;
+        let bPKIoverFIDOResponse= credID.buffer.slice(credID.byteOffset, credID.byteLength + credID.byteOffset);
+
         let gtidem = new GTIdemJs();
         gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse,CMD_REQUESTCSR);
         return gtidem;
@@ -2091,8 +2092,9 @@ async function GTIDEM_GenRSA2048(serialNumber,keyID) {
            
         let attestationObject = CBOR.decode(fido.response.attestationObject);
         let authData = parseAuthData(attestationObject.authData);
-        let bPKIoverFIDOResponse = new Uint8Array(authData.credID);
-           
+        let credID = authData.credID;
+        let bPKIoverFIDOResponse= credID.buffer.slice(credID.byteOffset, credID.byteLength + credID.byteOffset);
+
         let gtidem = new GTIdemJs();
         gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse,CMD_REQUESTCSR);
         return gtidem;
