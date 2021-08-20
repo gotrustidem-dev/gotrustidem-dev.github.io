@@ -162,9 +162,7 @@
             if(key_id.length==0){
                 key_id = keyHandle;
             }
-       
-
-
+            
             var bHexCert = Uint8Array.from(window.atob(testBigCertificate), c => c.charCodeAt(0));
             crypto.subtle.digest("SHA-256",bHexCert).then(function (signHashedDataPayload) {
                 console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));

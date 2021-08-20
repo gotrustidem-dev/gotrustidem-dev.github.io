@@ -111,7 +111,8 @@
             GTIDEM_GenRSA2048CSR(token_sn,key_id).then((response) => {
 
             if(response.statusCode==CTAP1_ERR_SUCCESS){    
-                alert("建立 ＣＳＲ 完成");
+                var str = String.fromCharCode.apply(null, new Uint8Array(response.csr));
+                alert("建立 ＣＳＲ 完成 \n"+ "Signature:" + btoa(str));
                 document.getElementById('target_key_handle').innerText = bufToHex(response.keyHandle);
 
             }else{
