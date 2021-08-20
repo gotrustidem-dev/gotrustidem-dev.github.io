@@ -90,27 +90,40 @@
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             console.log(token_sn);
-            GTIDEM_GetTokenInfo(token_sn).then((newCredentialInfo) => {
 
-                console.log('SUCCESS', newCredentialInfo);
 
-                
-                let responseData = parsePKIoverFIDOResponse2(newCredentialInfo, CMD_TokenInfo);
-                document.getElementById('label_token_fw').innerText = "FW version: " + responseData.FW;
-                document.getElementById('label_token_sw').innerText = "SW version: " + responseData.SW;
-                document.getElementById('label_pin_retries').innerText = "PIN retryies: " + responseData
-                    .PINRetries;
-                document.getElementById('label_credentials').innerText = "Credentials: " + responseData
-                    .NumOfCredential;
-                document.getElementById('label_serial_number').innerText = "Serial number: " +
-                    responseData.SN;
-                document.getElementById('label_random_number').innerText = "Random number: " +
-                    responseData.RN;
-                document.getElementById('label_ecPublic_key').innerText = "EC public point: " +
-                    responseData.ECPublic;
+            GTIDEM_GetTokenInfo(token_sn).then((response) => {
+
+                console.log('SUCCESS', response);
+           
+
+                // let responseData = parsePKIoverFIDOResponse2(newCredentialInfo, CMD_TokenInfo);
+                // document.getElementById('label_token_fw').innerText = "FW version: " + ConverVersionFormat();
+                // document.getElementById('label_token_sw').innerText = "SW version: " + responseData.SW;
+                // document.getElementById('label_pin_retries').innerText = "PIN retryies: " + responseData
+                //     .PINRetries;
+                // document.getElementById('label_credentials').innerText = "Credentials: " + responseData
+                //     .NumOfCredential;
+                // document.getElementById('label_serial_number').innerText = "Serial number: " +
+                //     responseData.SN;
+                // document.getElementById('label_random_number').innerText = "Random number: " +
+                //     responseData.RN;
+                // document.getElementById('label_ecPublic_key').innerText = "EC public point: " +
+                //     responseData.ECPublic;
             
-
-                console.log('Response : \n', responseData);
+                if(response.statusCode==CTAP1_ERR_SUCCESS){
+                    document.getElementById('label_token_fw').innerText = "FW version: " + ConverVersionFormat(response.fw);
+                    document.getElementById('label_token_sw').innerText = "SW version: " + ConverVersionFormat(response.sw);
+                    document.getElementById('label_pin_retries').innerText = "PIN retryies: " + response.pinRetry;
+                    document.getElementById('label_credentials').innerText = "Credentials: " + responseData.credentialNum;
+                    document.getElementById('label_serial_number').innerText = "Serial number: " + ConverSNFormat(responseData.sn);
+                    document.getElementById('label_random_number').innerText = "Random number: " +ConverSNFormat(responseData.rn);
+                    document.getElementById('label_ecPublic_key').innerText = "EC public point: " +ConverSNFormat(esponseData.ecpoint);
+                }else{
+                   alert(showErrorMessage(response));
+                }
+               
+             
 
 
             }).catch((error) => {
