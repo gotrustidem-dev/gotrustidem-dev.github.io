@@ -2382,8 +2382,8 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
     var pki_buffer = [];
 
     var sn_buf;
-    if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
 
+    if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
         sn_buf = new Uint8Array(0);
     }else{
         sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);

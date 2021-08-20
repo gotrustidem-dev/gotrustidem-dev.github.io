@@ -106,8 +106,11 @@
             console.log(newpin);
             console.log(confirm_newpin);
 
-            var bToken_sn = hexStringToArrayBuffer(token_sn);
-
+            var bToken_sn = undefined;
+            if(token_sn.length!=0){
+                bToken_sn = hexStringToArrayBuffer(token_sn);
+               
+            }
             var bOldPINArray = new Uint8Array(oldPIN.length);
             bOldPINArray.set(toUTF8Array(oldPIN), 0);
 
