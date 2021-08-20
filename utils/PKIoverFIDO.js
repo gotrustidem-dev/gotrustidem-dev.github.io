@@ -2194,11 +2194,9 @@ async function GTIDEM_ImportCertificate(serialNumber,keyHandle,keyID,HexCert, pl
 
 }
 
-async function GTIDEM_DeleteCertByLabel(label, serialNumber) {
+async function GTIDEM_DeleteCertByLabel(bLabel, bSerialNumber) {
 
 
-
-    var bLabel = toUTF8Array(label);
 
     var challenge = new Uint8Array(32);
     window.crypto.getRandomValues(challenge);
@@ -2211,17 +2209,18 @@ async function GTIDEM_DeleteCertByLabel(label, serialNumber) {
     label_buf.set(bLabel, 4);
  
     var sn_buf;
-    if(serialNumber.length!=0){
-        var bSerialNumber = hexStringToArrayBuffer(serialNumber);
-         sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
-         sn_buf[0] = 0xDF;
-         sn_buf[1] = 0x20;
-         sn_buf[2] = bSerialNumber.byteLength >> 8;
-         sn_buf[3] = bSerialNumber.byteLength;
-         sn_buf.set(bSerialNumber, 4);
-    }else{
+    if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
         sn_buf = new Uint8Array(0);
+    }else{
+        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+        sn_buf[0] = 0xDF;
+        sn_buf[1] = 0x20;
+        sn_buf[2] = bSerialNumber.byteLength >> 8;
+        sn_buf[3] = bSerialNumber.byteLength;
+        sn_buf.set(bSerialNumber, 4);
     }
+    
+
 
    var payloadLen = label_buf.byteLength+sn_buf.byteLength;
 
@@ -2322,23 +2321,24 @@ async function GTIDEM_DeleteCertByLabel(label, serialNumber) {
        
 // }
 
-async function GTIDEM_ClearToken( serialNumber) {
+async function GTIDEM_ClearToken( bSerialNumber) {
 
     var challenge = new Uint8Array(32);
     window.crypto.getRandomValues(challenge);
  
     var sn_buf;
-    if(serialNumber.length!=0){
-        var bSerialNumber = hexStringToArrayBuffer(serialNumber);
-         sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
-         sn_buf[0] = 0xDF;
-         sn_buf[1] = 0x20;
-         sn_buf[2] = bSerialNumber.byteLength >> 8;
-         sn_buf[3] = bSerialNumber.byteLength;
-         sn_buf.set(bSerialNumber, 4);
-    }else{
+    if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
+
         sn_buf = new Uint8Array(0);
+    }else{
+        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+        sn_buf[0] = 0xDF;
+        sn_buf[1] = 0x20;
+        sn_buf[2] = bSerialNumber.byteLength >> 8;
+        sn_buf[3] = bSerialNumber.byteLength;
+        sn_buf.set(bSerialNumber, 4);
     }
+    
 
    var payloadLen = sn_buf.byteLength;
 
