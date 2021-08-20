@@ -151,8 +151,15 @@
             crypto.subtle.digest("SHA-256",bHexCert).then(function (signHashedDataPayload) {
                 console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
                 GTIDEM_ImportCertificate(token_sn,bKeyHandle,bKeyID,bHexCert,new Uint8Array(signHashedDataPayload)).then((response) => {
-                if(response.statusCode==CTAP1_ERR_SUCCESS){    
-                    alert("匯入憑證完成");
+                if(response.statusCode==CTAP1_ERR_SUCCESS){  
+                    var msg =  "匯入憑證完成";
+                    if(response.signature != undefined){
+                        var str = String.fromCharCode.apply(null, new Uint8Array(response.signature));
+                        alert(msg +"\nSignature:\n"+ btoa(str));
+                    } else{
+                        alert(msg);
+                    }
+                        
                 }else{
                     alert(showFIDOErrorMessage(response));
                 }

@@ -1703,41 +1703,38 @@ var ConverSNFormat = (buffer) => {
 }
 
 
-async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
+async function GTIDEM_ChangeUserPIN(bOldPIN, bNewPIN, bSerialNumber) {
 
-    //Convert string to byte array    
-    //Get device insered PC, and compare serial number if it is exist.
-    var gtidemA = await GTIDEM_GetTokenInfo(serialNumber).then((fido) => {
+
+    var gtidemA = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
         return fido;
     });
 
-    if(gtidemA.statusCode !=CTAP1_ERR_SUCCESS){
+    if(gtidemA.statusCode != CTAP1_ERR_SUCCESS){
         return gtidemA;
     }
 
-    if(gtidemA.pinRetry==0){
+    if(gtidemA.pinRetry == 0){
         gtidemA.statusCode = CTAP2_ERR_PIN_BLOCKED;
         return gtidemA;
     }
-
     var bECPointFromToken = gtidemA.ecpoint;
 
     var sn_buf;
-    if(serialNumber.length!=0){
-        var bSerialNumber = hexStringToArrayBuffer(serialNumber);
-         sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
-         sn_buf[0] = 0xDF;
-         sn_buf[1] = 0x20;
-         sn_buf[2] = bSerialNumber.byteLength >> 8;
-         sn_buf[3] = bSerialNumber.byteLength;
-         sn_buf.set(bSerialNumber, 4);
-    }else{
+    if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
         sn_buf = new Uint8Array(0);
+    }else{
+        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+        sn_buf[0] = 0xDF;
+        sn_buf[1] = 0x20;
+        sn_buf[2] = bSerialNumber.byteLength >> 8;
+        sn_buf[3] = bSerialNumber.byteLength;
+        sn_buf.set(bSerialNumber, 4);
     }
-
+    
 
     //Compution session Key and encrypt oldPIN and new pin.
-   var prepareUpdate = await computingSessionKey(oldPIN, newPIN, bECPointFromToken);
+   var prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
    console.log("exportECPublicKeyArray",bufToHex(prepareUpdate.bExportECPublicKeyArray));
    console.log("encryptedOldPINHash",bufToHex(prepareUpdate.bEcryptedOldPINHash));
    console.log("encryptedNEWPIN",bufToHex(prepareUpdate.bEncryptedNEWPIN));
@@ -1809,18 +1806,16 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
     });
 
 }
-async function computingSessionKey(oldPIN, newPIN, ecpointXY) {
+async function computingSessionKey(bOldPIN, bNewPIN, ecpointXY) {
 
     //Convert oldPIN to sha256 value
-    var bOldPINArray = new Uint8Array(oldPIN.length);
-    bOldPINArray.set(toUTF8Array(oldPIN), 0);
-    var oldPINHash = await crypto.subtle.digest("SHA-256", bOldPINArray);
+    var oldPINHash = await crypto.subtle.digest("SHA-256", bOldPIN);
     console.log("oldPINHash  ", oldPINHash);
 
     //During encryption, newPin is padded with trailing 0x00 bytes and is of minimum 64 bytes length. 
     var newPINBuffer = new Uint8Array(64);
     newPINBuffer.fill(0);
-    newPINBuffer.set(toUTF8Array(newPIN), 0);
+    newPINBuffer.set(bNewPIN, 0);
 
     var iv = new Uint8Array(16);
     iv.fill(0);
@@ -2382,22 +2377,23 @@ async function GTIDEM_ClearToken( serialNumber) {
        
 }
 
-async function GTIDEM_GetTokenInfo(serialNumber) {
+async function GTIDEM_GetTokenInfo(bSerialNumber) {
 
     var pki_buffer = [];
 
     var sn_buf;
-    if(serialNumber.length!=0){
-        var bSerialNumber = hexStringToArrayBuffer(serialNumber);
-         sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
-         sn_buf[0] = 0xDF;
-         sn_buf[1] = 0x20;
-         sn_buf[2] = bSerialNumber.byteLength >> 8;
-         sn_buf[3] = bSerialNumber.byteLength;
-         sn_buf.set(bSerialNumber, 4);
-    }else{
+    if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
+
         sn_buf = new Uint8Array(0);
+    }else{
+        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+        sn_buf[0] = 0xDF;
+        sn_buf[1] = 0x20;
+        sn_buf[2] = bSerialNumber.byteLength >> 8;
+        sn_buf[3] = bSerialNumber.byteLength;
+        sn_buf.set(bSerialNumber, 4);
     }
+    
 
     var challenge = new Uint8Array(32);
     window.crypto.getRandomValues(challenge);
@@ -2606,8 +2602,7 @@ async function GTIDEM_SignDataByLabel(label, serialNumber ,alg_number, plain) {
     }];
 
     getAssertionChallenge.allowCredentials = idList;
-    console.log('SignDataByIndex', getAssertionChallenge)
-
+    console.log('SignDataByIndex', getAssertionChallenge);
 
     return await 
         navigator.credentials.get({'publicKey': getAssertionChallenge}).then((fido) => {
