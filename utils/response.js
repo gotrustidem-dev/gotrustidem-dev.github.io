@@ -46,7 +46,7 @@ class GTIdemJs {
             let totalLenBuf = buffer.slice(0, 2);
             let totalLen = readBE16(new Uint8Array(totalLenBuf));
             buffer = buffer.slice(2);
-            let statusCodeBuf = buffer.slice(0, 1);
+            let statusCodeBuf = new Uint8Array(buffer.slice(0, 1));
             this.statusCode = statusCodeBuf[0];
 
             buffer = buffer.slice(1);
