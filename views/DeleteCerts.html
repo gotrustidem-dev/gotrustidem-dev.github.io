@@ -124,13 +124,18 @@
         document.getElementById('form_clear_certs').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
-            GTIDEM_ClearToken(token_sn).then((value) => {
+            GTIDEM_ClearToken(token_sn).then((response) => {
 
-                alert("YES");
-            }).catch((error) => {
+                if(response.statusCode==CTAP1_ERR_SUCCESS){    
+                    alert("清卡完成");
+                }else{
+                    alert(showFIDOErrorMessage(response));
+                }
+
+                }).catch((error) => {
                 alert(error)
                 console.log('FAIL', error)
-            })
+                })
 
         })
 
@@ -140,9 +145,14 @@
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             let label = document.getElementById('form_label').certlabel.value;
             
-            GTIDEM_DeleteCertByLabel(label, token_sn).then((value) => {
+            GTIDEM_DeleteCertByLabel(label, token_sn).then((response) => {
 
-                alert("YES");
+                if(response.statusCode==CTAP1_ERR_SUCCESS){    
+                    alert("刪除憑證完成");
+                }else{
+                    alert(showFIDOErrorMessage(response));
+                }
+
             }).catch((error) => {
                 alert(error)
                 console.log('FAIL', error)
@@ -150,20 +160,20 @@
 
         })
 
-        document.getElementById('form_delete_index_btn').addEventListener('submit', function (event) {
-            event.preventDefault();
-            let token_sn = document.getElementById('form_token_sn').token_sn.value;
-            let index = document.getElementById('form_index').certIndex.value;
+        // document.getElementById('form_delete_index_btn').addEventListener('submit', function (event) {
+        //     event.preventDefault();
+        //     let token_sn = document.getElementById('form_token_sn').token_sn.value;
+        //     let index = document.getElementById('form_index').certIndex.value;
 
-            GTIDEM_DeleteCertByIndex(index, token_sn).then((value) => {
+        //     GTIDEM_DeleteCertByIndex(index, token_sn).then((value) => {
 
-                alert("YES");
-            }).catch((error) => {
-                alert(error)
-                console.log('FAIL', error)
-            })
+        //         alert("YES");
+        //     }).catch((error) => {
+        //         alert(error)
+        //         console.log('FAIL', error)
+        //     })
 
-        })
+        // })
     </script>
 
 </body>
