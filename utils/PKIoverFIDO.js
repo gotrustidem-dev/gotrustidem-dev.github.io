@@ -1713,23 +1713,18 @@ async function GTIDEM_ChangeUserPIN(oldPIN, newPIN, serialNumber) {
 
     
     //Get device insered PC, and compare serial number if it is exist.
-    var bECPointFromToken = await GetTokenInfo().then((newCredentialInfo) => {
-        console.log('GTIDEM_ChangeUserPIN start');
+    var gtidemA = await GTIDEM_GetTokenInfo(serialNumber).then((fido) => {
+ 
+        let gtidem = new GTIdemJs();
+        gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_CHANGE_PIN);
+        return gtidem;
+    });
 
-        let responseData = parsePKIoverFIDOResponse2(newCredentialInfo, CMD_TokenInfo);
+    if(gtidemA.statusCode !=CTAP1_ERR_SUCCESS){
+        return gtidemA;
+    }
 
-        if(serialNumber.byteLength!=0){
-            if (responseData.SN !== serialNumber) {
-                console.log('Serial number different.');
-                throw new error("Serial number different.");
-            }
-        }
-        return responseData.ECPublic;
-    }).catch((error) => {
-        alert(error)
-        throw new error("Serial number different.");
-        console.log('FAIL', error)
-    }); 
+    var bECPointFromToken = gtidemA.ecpoint;
 
     var sn_buf;
     if(serialNumber.length!=0){
