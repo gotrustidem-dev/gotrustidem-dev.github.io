@@ -70,7 +70,7 @@
                                         <table class="center" style="height: 160px;" border="1" width="395">
                                             <tbody>
                                                 <tr>
-                                                    <!-- <td style="width: 385px; ">
+                                                    <td style="width: 385px; ">
                                                         <p style="text-align: center;">Target Label/KeyID</p>
 
                                                         <p>
@@ -89,8 +89,8 @@
                                                                 style="width: 162px; height:34px;background-color: #008CBA;">Delete
                                                                 cert</button>
                                                         </form>
-                                                    </td> -->
-                                                    <td style="width: 385px;">
+                                                    </td> 
+                                                    <!-- <td style="width: 385px;">
                                                         <p style="text-align: center;">Target Index</p>
                                                         <p>
                                                             <form style="text-align:center" id="form_index"
@@ -107,7 +107,7 @@
                                                                     cert</button>
                                                             </form>
                                                         </p>
-                                                    </td>
+                                                    </td> -->
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -124,7 +124,13 @@
         document.getElementById('form_clear_certs').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
-            GTIDEM_ClearToken(token_sn).then((response) => {
+
+            var bToken_sn = undefined;
+            if(token_sn.length!=0){
+                bToken_sn = hexStringToArrayBuffer(token_sn);  
+            }
+
+            GTIDEM_ClearToken(bToken_sn).then((response) => {
 
                 if(response.statusCode==CTAP1_ERR_SUCCESS){    
                     alert("清卡完成");
@@ -144,8 +150,15 @@
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             let label = document.getElementById('form_label').certlabel.value;
-            
-            GTIDEM_DeleteCertByLabel(label, token_sn).then((response) => {
+           
+            var bToken_sn = undefined;
+            if(token_sn.length!=0){
+                bToken_sn = hexStringToArrayBuffer(token_sn);  
+            }
+            var bLabel = new Uint8Array(label.length);
+            bLabel.set(toUTF8Array(label), 0);
+
+            GTIDEM_DeleteCertByLabel(bLabel, bToken_sn).then((response) => {
 
                 if(response.statusCode==CTAP1_ERR_SUCCESS){    
                     alert("刪除憑證完成");

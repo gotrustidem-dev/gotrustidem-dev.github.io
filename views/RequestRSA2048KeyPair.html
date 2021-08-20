@@ -116,10 +116,14 @@
             console.log(token_sn);
             console.log(key_id);
 
-            if(key_id.length==0){
-                //Auto generate Keyhandle
+            var bToken_sn = undefined;
+            if(token_sn.length!=0){
+                bToken_sn = hexStringToArrayBuffer(token_sn);  
             }
-            GTIDEM_GenRSA2048(token_sn,key_id).then((value) => {
+            var bKeyID = toUTF8Array(key_id);
+
+
+            GTIDEM_GenRSA2048(bToken_sn,bKeyID).then((value) => {
                 var str = String.fromCharCode.apply(null, new Uint8Array(response.rsakeypair));
                 alert("建立 KeyPair 完成 \n" + btoa(str));
                 document.getElementById('form_key_handle').key_handle.value = bufToHex(response.keyHandle);
@@ -133,18 +137,22 @@
       
         document.getElementById('form_signdata_btn').addEventListener('submit', function (event) {
             event.preventDefault();
-
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
             let keyHandle = document.getElementById('target_key_handle').textContent;
-            console.log('key_handle', keyHandle);
 
-            var keyHandleBuf = hexStringToArrayBuffer(keyHandle);
+
+            var bToken_sn = undefined;
+            if(token_sn.length!=0){
+                bToken_sn = hexStringToArrayBuffer(token_sn);  
+            }
+            var bKeyHandle = hexStringToArrayBuffer(keyHandle);
 
             let testSignCSR = Uint8Array.from(window.atob(signShortData), c => c.charCodeAt(0));
 
             console.log('testSignCSR', testSignCSR);
             crypto.subtle.digest("SHA-256",new Uint8Array(testSignCSR)).then(function (signHashedDataPayload) {
                     console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
-                    GTIDEM_SignDataByIndex(index, token_sn,ALG_RSA2048SHA256_PreHash, new Uint8Array(signHashedDataPayload)).then((value) => {
+                    GTIDEM_SignDataByLabel(bKeyHandle, bToken_sn,ALG_RSA2048SHA256_PreHash, new Uint8Array(signHashedDataPayload)).then((value) => {
                         showSignMessage(value);
                     });
             });
@@ -161,15 +169,20 @@
             console.log(token_sn);
             console.log(key_id);
             console.log(key_handle);
-            
+            var bToken_sn = undefined;
+            if(token_sn.length!=0){
+                bToken_sn = hexStringToArrayBuffer(token_sn);  
+            }
+
+            var bKeyID = toUTF8Array(key_id);
+            var bKeyHandle = hexStringToArrayBuffer(key_handle);
+
             var bHexCert = Uint8Array.from(window.atob(testBigCertificate), c => c.charCodeAt(0));
 
-            var bKeyID = toUTF8Array(keyID);
-            var bKeyHandle = hexStringToArrayBuffer(keyHandle);
             
             crypto.subtle.digest("SHA-256",bHexCert).then(function (signHashedDataPayload) {
                 console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
-                GTIDEM_ImportCertificate(token_sn,bKeyHandle,bKeyID,bHexCert,new Uint8Array(signHashedDataPayload)).then((value) => {
+                GTIDEM_ImportCertificate(bToken_sn,bKeyHandle,bKeyID,bHexCert,new Uint8Array(signHashedDataPayload)).then((value) => {
                     alert("YES");
                 }).catch((error) => {
                     alert(error)
