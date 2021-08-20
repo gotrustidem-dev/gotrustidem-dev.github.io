@@ -16,7 +16,7 @@
     <script src="https://gotrustidem-dev.github.io/utils/helpers.js"></script>
     <script src="https://gotrustidem-dev.github.io/utils/showMessage.js"></script>
     <script src="https://gotrustidem-dev.github.io/utils/PKIoverFIDO.js"></script>
-    <script src="https://gotrustidem-dev.github.io/utils/response.ts"></script>
+    <script src="https://gotrustidem-dev.github.io/utils/response.js"></script>
     <style>
         table.center {
             margin-left: auto;
@@ -93,6 +93,8 @@
             GTIDEM_GetTokenInfo(token_sn).then((newCredentialInfo) => {
 
                 console.log('SUCCESS', newCredentialInfo);
+
+                
                 let responseData = parsePKIoverFIDOResponse2(newCredentialInfo, CMD_TokenInfo);
                 document.getElementById('label_token_fw').innerText = "FW version: " + responseData.FW;
                 document.getElementById('label_token_sw').innerText = "SW version: " + responseData.SW;
@@ -106,6 +108,7 @@
                     responseData.RN;
                 document.getElementById('label_ecPublic_key').innerText = "EC public point: " +
                     responseData.ECPublic;
+            
 
                 console.log('Response : \n', responseData);
 
