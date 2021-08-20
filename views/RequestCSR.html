@@ -108,16 +108,25 @@
             if(key_id.length==0){
                 //Auto generate Keyhandle
             }
-            GTIDEM_GenRSA2048CSR(token_sn,key_id).then((value) => {
+            GTIDEM_GenRSA2048CSR(token_sn,key_id).then((response) => {
 
+            if(response.statusCode==CTAP1_ERR_SUCCESS){    
+                alert("建立 ＣＳＲ 完成");
+                document.getElementById('target_key_handle').innerText = bufToHex(response.keyHandle);
 
-                document.getElementById('target_key_handle').innerText = bufToHex(key_id);
-                alert("YES");
+            }else{
+                alert(showFIDOErrorMessage(response));
+            }
 
             }).catch((error) => {
                 alert(error)
-                console.log('FAIL', error)
+                console.log('FAIL', error);
             })
+
+          
+
+            
+
 
         });
 
@@ -132,14 +141,12 @@
             let keyHandle = document.getElementById('target_key_handle').textContent;
             console.log('key_handle', keyHandle);
 
-            if(key_id.length==0){
-                key_id = keyHandle;
-            }
-       
+            var bKeyID = toUTF8Array(keyID);
+            var bKeyHandle = hexStringToArrayBuffer(keyHandle);
 
             crypto.subtle.digest("SHA-256",bHexCert).then(function (signHashedDataPayload) {
                 console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
-                GTIDEM_ImportCertificate(token_sn,keyHandle,key_id,bHexCert,new Uint8Array(signHashedDataPayload)).then((value) => {
+                GTIDEM_ImportCertificate(token_sn,bKeyHandle,bKeyID,bHexCert,new Uint8Array(signHashedDataPayload)).then((value) => {
                     alert("YES");
                 }).catch((error) => {
                     alert(error)
