@@ -6,7 +6,7 @@
 class GTIdemJs {
 
     constructor() {
-        this.statusCode = 123;
+        this.statusCode = undefined;
         this.fw = undefined;
         this.sw = undefined;
         this.pinRetry = undefined;
@@ -93,6 +93,23 @@ class GTIdemJs {
             // 無法判斷
 
         }
+    }
+
+
+}
+
+
+var showErrorMessage = (gtidem)=>{
+
+
+
+    var msg="";
+
+
+    switch(gtidem.statusCode){
+
+
+
     }
 
 
