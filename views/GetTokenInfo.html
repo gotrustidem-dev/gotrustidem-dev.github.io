@@ -117,9 +117,9 @@
                     document.getElementById('label_token_sw').innerText = "SW version: " + ConverVersionFormat(response.sw);
                     document.getElementById('label_pin_retries').innerText = "PIN retryies: " + response.pinRetry;
                     document.getElementById('label_credentials').innerText = "Credentials: " + responseData.credentialNum;
-                    document.getElementById('label_serial_number').innerText = "Serial number: " + ConverSNFormat(responseData.sn);
-                    document.getElementById('label_random_number').innerText = "Random number: " +ConverSNFormat(responseData.rn);
-                    document.getElementById('label_ecPublic_key').innerText = "EC public point: " +ConverSNFormat(esponseData.ecpoint);
+                    document.getElementById('label_serial_number').innerText = "Serial number: " + ConverSNFormat(response.sn);
+                    document.getElementById('label_random_number').innerText = "Random number: " +ConverSNFormat(response.rn);
+                    document.getElementById('label_ecPublic_key').innerText = "EC public point: " +ConverSNFormat(response.ecpoint);
                 }else{
                    alert(showErrorMessage(response));
                 }
