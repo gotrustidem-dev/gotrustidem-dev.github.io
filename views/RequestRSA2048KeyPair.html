@@ -156,8 +156,7 @@
         document.getElementById('form_signdata_btn').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
-            let keyHandle = document.getElementById('target_key_handle').textContent;
-
+            let keyHandle = document.getElementById('form_key_handle').key_handle.value;
 
             var bToken_sn = undefined;
             if (token_sn.length != 0) {
@@ -170,7 +169,7 @@
             console.log('testSignCSR', testSignCSR);
             crypto.subtle.digest("SHA-256", new Uint8Array(testSignCSR)).then(function (signHashedDataPayload) {
                 console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
-                GTIDEM_SignDataByLabel(bLabel, bToken_sn, ALG_RSA2048SHA256_PreHash, new Uint8Array(signHashedDataPayload)).then((value) => {
+                GTIDEM_SignDataByLabel(bKeyHandle, bToken_sn, ALG_RSA2048SHA256_PreHash, new Uint8Array(signHashedDataPayload)).then((value) => {
                     if (value.statusCode == CTAP1_ERR_SUCCESS) {
                         var str = String.fromCharCode.apply(null, new Uint8Array(value
                             .signature));
