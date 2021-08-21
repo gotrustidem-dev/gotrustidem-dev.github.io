@@ -17,6 +17,40 @@
     <script src="https://gotrustidem-dev.github.io/utils/showMessage.js"></script>
     <script src="https://gotrustidem-dev.github.io/utils/response.js"></script>
     <script src="https://gotrustidem-dev.github.io/utils/PKIoverFIDO.js"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', 'UA-3776848-14');
+    </script>
+    <script>
+        (function (d) {
+            var wf = d.createElement('script'),
+                s = d.scripts[0];
+            wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
+            wf.async = true;
+            s.parentNode.insertBefore(wf, s);
+        })(document);
+    </script>
+    <script src="https://gotrustidem-dev.github.io/library/jquery.min.js"></script>
+    <script src="https://gotrustidem-dev.github.io/library/bootstrap.min.js"
+        integrity="sha256-Tz+u7EaSlLYQ9sqCqhzCszaP1WYRsxxVHC7iJP6ttBE=" crossorigin="anonymous"></script>
+    <script async="" src="https://gotrustidem-dev.github.io/library/bundle.js"></script>
+    <script>
+        function displayCert(strCertificate) {
+
+            $('#certificate').text(strCertificate)
+            window.setTimeout(function () {
+                console.log("Timeout ... trigger decode");
+                $("#decode .btn").click();
+            }, 100);
+
+
+        }
+    </script>
     <style>
         table.center {
             margin-left: auto;
@@ -137,10 +171,13 @@
             bLabel.set(toUTF8Array(label), 0);
 
             GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bToken_sn).then((value) => {
-                if (value.statusCode == CTAP1_ERR_SUCCESS) {
-                    var str = String.fromCharCode.apply(null, new Uint8Array(value.signature));
-                    alert("憑證:" + "\n" + btoa(str));
-
+                if (value.status === CTAP1_ERR_SUCCESS) {
+                    var strCert = "-----BEGIN CERTIFICATE-----\n" +
+                        btoa(String.fromCharCode.apply(null, value.certicficate)) +
+                        "\n-----END CERTIFICATE-----"
+                    console.log('憑證 : \n', strCert);
+                    displayCert(strCert);
+                   // alert("憑證:" + "\n" + strCert);
                 } else {
                     alert(showFIDOErrorMessage(value));
                 }
@@ -167,7 +204,8 @@
                         btoa(String.fromCharCode.apply(null, value.certicficate)) +
                         "\n-----END CERTIFICATE-----"
                     console.log('憑證 : \n', strCert);
-                    alert("憑證:" + "\n" + strCert);
+                    displayCert(strCert);
+                   // alert("憑證:" + "\n" + strCert);
                 } else {
                     alert(showFIDOErrorMessage(value));
                 }
