@@ -2532,7 +2532,7 @@ async function GTIDEM_SignDataByIndex(index, bSerialNumber ,alg_number, plain) {
 }
 
 
-async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, plain) {
+async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, bPlain) {
 
     var pki_buffer = [];
 
@@ -2574,12 +2574,12 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, plain) 
     alg_buf[3] = 0x01;
     alg_buf[4] = alg_number;
 
-    var signDataBuf = new Uint8Array(4 + plain.byteLength);
+    var signDataBuf = new Uint8Array(4 + bPlain.byteLength);
     signDataBuf[0] = 0xDF;
     signDataBuf[1] = 0x06;
-    signDataBuf[2] = plain.length >> 8;
-    signDataBuf[3] = plain.length;
-    signDataBuf.set(plain, 4);
+    signDataBuf[2] = bPlain.length >> 8;
+    signDataBuf[3] = bPlain.length;
+    signDataBuf.set(bPlain, 4);
 
     var pki_payload_length = sn_buf.byteLength+command_bufer.byteLength + alg_buf.byteLength + signDataBuf.byteLength;
 
