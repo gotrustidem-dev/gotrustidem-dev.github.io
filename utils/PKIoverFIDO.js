@@ -2095,7 +2095,7 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
         let bPKIoverFIDOResponse= credID.buffer.slice(credID.byteOffset, credID.byteLength + credID.byteOffset);
 
         let gtidem = new GTIdemJs();
-        gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse,CMD_REQUESTCSR);
+        gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse,CMD_GenRsaKeyPair);
         return gtidem;
     });
  }
