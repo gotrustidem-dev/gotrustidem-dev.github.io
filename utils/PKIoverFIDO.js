@@ -2100,7 +2100,7 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
     });
  }
 
-async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, plain) {
+async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, bPlain) {
 
 
     var bKeyID = keyID;
@@ -2147,14 +2147,17 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, p
     hexCert_buf[3] = bHexCert.byteLength;
     hexCert_buf.set(bHexCert, 4);
 
-    var signDataBuf = new Uint8Array(4 + plain.byteLength);
-    signDataBuf[0] = 0xDF;
-    signDataBuf[1] = 0x06;
-    signDataBuf[2] = plain.length >> 8;
-    signDataBuf[3] = plain.length;
-    signDataBuf.set(plain, 4);
-
-
+    var signDataBuf;
+    if((bPlain==undefined)||(bPlain.byteLength==0)){
+        var signDataBuf =  new Uint8Array(0);
+    }else{
+        var signDataBuf = new Uint8Array(4 + bPlain.byteLength);
+        signDataBuf[0] = 0xDF;
+        signDataBuf[1] = 0x06;
+        signDataBuf[2] = bPlain.length >> 8;
+        signDataBuf[3] = bPlain.length;
+        signDataBuf.set(bPlain, 4);
+    }
 
    var payloadLen = keyid_buf.byteLength+sn_buf.byteLength+hexCert_buf.length+signDataBuf.byteLength+keyhandle_buf.byteLength;
 
