@@ -126,7 +126,7 @@
                         var strCSR = "-----BEGIN CERTIFICATE REQUEST-----\n" +
                             btoa(String.fromCharCode.apply(null, new Uint8Array(response.csr))) +
                             "\n-----END CERTIFICATE REQUEST-----"
-                        console.log('CSR : \n', strCSR);
+                        console.log('CSR :\n', strCSR);
                         alert("CSR:" + "\n" + strCSR);
                         if(bKeyID!=undefined){
                             console.log(bufToHex(bKeyID));
@@ -185,7 +185,7 @@
                     var msg =  "匯入憑證完成";
                     if(response.signature != undefined){
                         var str = String.fromCharCode.apply(null, new Uint8Array(response.signature));
-                        alert(msg +"\nSignature:\n"+ btoa(str));
+                        alert(msg +"\n 簽名:\n"+ btoa(str));
                     } else{
                         alert(msg);
                     }
