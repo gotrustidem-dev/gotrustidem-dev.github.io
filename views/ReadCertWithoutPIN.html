@@ -195,7 +195,7 @@
 
             GTIDEM_ReadCertByIndexWithoutPIN(index, bToken_sn).then((value) => {
 
-                if (value.status === CTAP1_ERR_SUCCESS) {
+                if (value.statusCode === CTAP1_ERR_SUCCESS) {
                     var strCert = "-----BEGIN CERTIFICATE-----\n" +
                         btoa(String.fromCharCode.apply(null, value.certicficate)) +
                         "\n-----END CERTIFICATE-----"
