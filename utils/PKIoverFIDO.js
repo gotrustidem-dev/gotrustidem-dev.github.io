@@ -2002,7 +2002,7 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bKeyID) {
     });
 }
 
-async function GTIDEM_GenRSA2048(bSerialNumber,keyID) {
+async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
 
 
  
@@ -2022,17 +2022,17 @@ async function GTIDEM_GenRSA2048(bSerialNumber,keyID) {
         sn_buf.set(bSerialNumber, 4);
     }
     var keyid_buf;
-    if(keyID.length!=0){
-         var bKeyID = toUTF8Array(keyID);
-         keyid_buf = new Uint8Array(4 + bKeyID.length);
+    if((bKeyID==undefined)||(bKeyID.byteLength==0)){
+ 
+         keyid_buf = new Uint8Array(0);
+     }else{
+         keyid_buf = new Uint8Array(4 + bKeyID.byteLength);
          keyid_buf[0] = 0xDF;
          keyid_buf[1] = 0x18;
          keyid_buf[2] = bKeyID.byteLength >> 8;
          keyid_buf[3] = bKeyID.byteLength;
          keyid_buf.set(bKeyID, 4);
-    }else{
-         keyid_buf = new Uint8Array(0);
-    }
+     }
 
 
     var payloadLen = keyid_buf.byteLength+sn_buf.byteLength
