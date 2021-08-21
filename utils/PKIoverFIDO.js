@@ -2447,7 +2447,7 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
  * @param {Date} myDate The date
  * @param {string} myString The string
  */
-async function GTIDEM_SignDataByIndex(index, bSerialNumber ,alg_number, plain) {
+async function GTIDEM_SignDataByIndex(index, bSerialNumber ,alg_number, bPlain) {
 
     var pki_buffer = [];
     var sn_buf;
@@ -2484,12 +2484,12 @@ async function GTIDEM_SignDataByIndex(index, bSerialNumber ,alg_number, plain) {
     alg_buf[3] = 0x01;
     alg_buf[4] = alg_number;
 
-    var signDataBuf = new Uint8Array(4 + plain.byteLength);
+    var signDataBuf = new Uint8Array(4 + bPlain.byteLength);
     signDataBuf[0] = 0xDF;
     signDataBuf[1] = 0x06;
-    signDataBuf[2] = plain.length >> 8;
-    signDataBuf[3] = plain.length;
-    signDataBuf.set(plain, 4);
+    signDataBuf[2] = bPlain.length >> 8;
+    signDataBuf[3] = bPlain.length;
+    signDataBuf.set(bPlain, 4);
 
     var pki_payload_length = sn_buf.byteLength+command_buf.byteLength + alg_buf.byteLength + signDataBuf.byteLength;
 
@@ -2728,7 +2728,7 @@ async function GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSerialNumber) {
 
   
 
-    var pki_payload_length = sn_buf.byteLength+command_buf.byteLength;
+    var pki_payload_length = sn_buf.byteLength+command_bufer.byteLength;
 
     pki_header[0] = CMD_ReadCertificate;
     pki_header[1] = pki_payload_length >> 8
@@ -2736,7 +2736,7 @@ async function GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSerialNumber) {
 
     var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
     pki_buffer = _appendBuffer(pki_buffer,sn_buf);
-    pki_buffer = _appendBuffer(pki_buffer,command_buf);
+    pki_buffer = _appendBuffer(pki_buffer,command_bufer);
     
     
     console.log("SignDataByIndex", bufToHex(pki_buffer));
