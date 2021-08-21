@@ -2683,7 +2683,7 @@ async function GTIDEM_ReadCertByIndexWithoutPIN(index, bSerialNumber) {
         navigator.credentials.get({'publicKey': getAssertionChallenge}).then((fido) => {
            
                 let gtidem = new GTIdemJs();
-                gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_Sign);
+                gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_ReadCertificate);
                 return gtidem;
             });
 
@@ -2757,7 +2757,7 @@ async function GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSerialNumber) {
         navigator.credentials.get({'publicKey': getAssertionChallenge}).then((fido) => {
            
                 let gtidem = new GTIdemJs();
-                gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_Sign);
+                gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_ReadCertificate);
                 return gtidem;
             });
 
