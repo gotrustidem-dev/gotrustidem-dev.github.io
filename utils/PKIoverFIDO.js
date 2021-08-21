@@ -2581,7 +2581,7 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, plain) 
     signDataBuf[3] = plain.length;
     signDataBuf.set(plain, 4);
 
-    var pki_payload_length = sn_buf.byteLength+command_buf.byteLength + alg_buf.byteLength + signDataBuf.byteLength;
+    var pki_payload_length = sn_buf.byteLength+command_bufer.byteLength + alg_buf.byteLength + signDataBuf.byteLength;
 
     pki_header[0] = CMD_Sign;
     pki_header[1] = pki_payload_length >> 8
@@ -2589,7 +2589,7 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, plain) 
 
     var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
     pki_buffer = _appendBuffer(pki_buffer,sn_buf);
-    pki_buffer = _appendBuffer(pki_buffer,command_buf);
+    pki_buffer = _appendBuffer(pki_buffer,command_bufer);
     pki_buffer = _appendBuffer(pki_buffer,alg_buf);
     pki_buffer = _appendBuffer(pki_buffer,signDataBuf);
     
