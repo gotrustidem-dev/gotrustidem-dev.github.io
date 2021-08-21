@@ -140,9 +140,9 @@
                     console.log(bufToHex(bKeyID));
                     document.getElementById('form_key_handle').key_handle.value = bufToHex(bKeyID);
                 } else {
-                    console.log(bufToHex(new Uint8Array(response.keyhandle).buffer));
+                    console.log(bufToHex(new Uint8Array(value.keyhandle).buffer));
                     document.getElementById('form_key_handle').key_handle.value = bufToHex(
-                        new Uint8Array(response.keyhandle).buffer);
+                        new Uint8Array(value.keyhandle).buffer);
                 }
 
             }).catch((error) => {
