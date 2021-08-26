@@ -1703,6 +1703,13 @@ var ConverSNFormat = (buffer) => {
 }
 
 
+/**
+ * 修改使用者密碼。
+ * @param {Uint8Array} bOldPIN 舊密碼
+ * @param {Uint8Array} bNewPIN 新密碼
+ * @param {Uint8Array｜undefined} bSerialNumber 指定序號序號。若不指定載具序號，則可填入 undefined 或是空陣列
+ * @returns 
+ */
 async function GTIDEM_ChangeUserPIN(bOldPIN, bNewPIN, bSerialNumber) {
 
 
@@ -1806,6 +1813,7 @@ async function GTIDEM_ChangeUserPIN(bOldPIN, bNewPIN, bSerialNumber) {
     });
 
 }
+
 async function computingSessionKey(bOldPIN, bNewPIN, ecpointXY) {
 
     //Convert oldPIN to sha256 value
@@ -1899,6 +1907,13 @@ async function computingSessionKey(bOldPIN, bNewPIN, ecpointXY) {
     var bEncryptedNEWPIN = new Uint8Array(encryptedNEWPIN).slice(0,64);
     return {bExportECPublicKeyArray, bEcryptedOldPINHash, bEncryptedNEWPIN};
 }
+
+/**
+ * 產生 RSA 2048 金鑰對，會組合成 CSR 格式回傳
+ * @param {Uint8Array｜undefined} bSerialNumber 指定序號序號。若不指定載具序號，則可填入 undefined 或是空陣列
+ * @param {Uint8Array｜undefined} bKeyID 用來關聯金鑰對，若是不替換則填入 undefined 或是空陣列。若不使用 KeyID,則載具會產生預設的 KeyHandle。
+ * @returns {GTIdemJs} 回傳結果的集合
+ */
 async function GTIDEM_GenRSA2048CSR(bSerialNumber,bKeyID) {
 
    
@@ -2001,7 +2016,12 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bKeyID) {
         return gtidem;
     });
 }
-
+/**
+ * 產生 RSA 2048 金鑰對，並回傳 raw data
+ * @param {Uint8Array｜undefined} bSerialNumber 指定序號序號。若不指定載具序號，則可填入 undefined 或是空陣列
+ * @param {Uint8Array｜undefined} bKeyID 用來關聯金鑰對，若是不替換則填入 undefined 或是空陣列。若不使用 KeyID,則載具會產生預設的 KeyHandle。
+ * @returns {GTIdemJs} 回傳結果的集合
+ */
 async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
 
 
@@ -2100,6 +2120,16 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
     });
  }
 
+/**
+ * 指定 KeyHandle 匯入憑證。若在 GTIDEM_GenRSA2048 或是 GTIDEM_GenRSA2048CSR 已使用 KeyID 則此處的 KeyHandle 要使用已指定的 KeyID。
+ * 
+ * @param {Uint8Array｜undefined} bSerialNumber 指定序號序號。若不指定載具序號，則可填入 undefined 或是空陣列
+ * @param {Uint8Array} keyHandle  匯入憑證
+ * @param {Uint8Array｜undefined} keyID 用來替換 KeyHandle，若是不替換則填入 undefined 或是空陣列
+ * @param {Uint8Array} HexCert 欲匯入的憑證
+ * @param {Uint8Array｜undefined} bPlain 使用匯入的憑證金鑰簽名並用 ALG_RSA2048SHA256_PreHash演算法對填入的資料簽名，所以資料長度必須為32 bytes，可做為確認憑證和金鑰對的匹配。若不需此功能，則可填入 undefined 或是空陣列。
+ * @returns {GTIdemJs} 回傳結果的集合
+ */
 async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, bPlain) {
 
 
@@ -2124,13 +2154,25 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
         sn_buf[3] = bSerialNumber.byteLength;
         sn_buf.set(bSerialNumber, 4);
     }
+    var keyid_buf;
 
-    var keyid_buf = new Uint8Array(4 + bKeyID.length);
-    keyid_buf[0] = 0xDF;
-    keyid_buf[1] = 0x18;
-    keyid_buf[2] = bKeyID.byteLength >> 8;
-    keyid_buf[3] = bKeyID.byteLength;
-    keyid_buf.set(bKeyID, 4);
+    if((bKeyID==undefined)||(bKeyID.byteLength==0)){
+
+        keyid_buf = new Uint8Array(4 + bKeyHandle.byteLength);
+        keyid_buf[0] = 0xDF;
+        keyid_buf[1] = 0x20;
+        keyid_buf[2] = bKeyHandle.byteLength >> 8;
+        keyid_buf[3] = bKeyHandle.byteLength;
+        keyid_buf.set(bKeyHandle, 4);
+    }else{
+        keyid_buf = new Uint8Array(4 + bKeyID.length);
+        keyid_buf[0] = 0xDF;
+        keyid_buf[1] = 0x18;
+        keyid_buf[2] = bKeyID.byteLength >> 8;
+        keyid_buf[3] = bKeyID.byteLength;
+        keyid_buf.set(bKeyID, 4);
+    }
+
     
     var keyhandle_buf = new Uint8Array(4 + bKeyHandle.length);
     keyhandle_buf[0] = 0xDF;
@@ -2203,6 +2245,13 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
 
 }
 
+/**
+ * 刪除特定標籤的金鑰對和憑證，需要驗證使用者密碼
+ * 
+ * @param {Uint8Array} bLabel  指定標籤
+ * @param {Uint8Array｜undefined} bSerialNumber 指定序號序號。若不指定載具序號，則可填入 undefined 或是空陣列
+ * @returns {GTIdemJs} 回傳結果的集合
+ */
 async function GTIDEM_DeleteCertByLabel(bLabel, bSerialNumber) {
 
 
@@ -2270,66 +2319,12 @@ async function GTIDEM_DeleteCertByLabel(bLabel, bSerialNumber) {
        
 }
 
-// async function GTIDEM_DeleteCertByIndex(index, serialNumber) {
 
-
-//     var challenge = new Uint8Array(32);
-//     window.crypto.getRandomValues(challenge);
- 
-//     var index_buf = new Uint8Array(5);
-//     index_buf[0] = 0xDF;
-//     index_buf[1] = 0x02;
-//     index_buf[2] = 0x00;
-//     index_buf[3] = 0x01;
-//     index_buf[4] = index;
- 
-//     var sn_buf;
-//     if(serialNumber.length!=0){
-//         var bSerialNumber = hexStringToArrayBuffer(serialNumber);
-//          sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
-//          sn_buf[0] = 0xDF;
-//          sn_buf[1] = 0x20;
-//          sn_buf[2] = bSerialNumber.byteLength >> 8;
-//          sn_buf[3] = bSerialNumber.byteLength;
-//          sn_buf.set(bSerialNumber, 4);
-//     }else{
-//         sn_buf = new Uint8Array(0);
-//     }
-
-
-//    var payloadLen = index_buf.byteLength+sn_buf.byteLength;
-
-//    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
- 
-//    var pki_header = new Uint8Array(3);
-//    pki_header[0] = CMD_DELEE_CERT;
-//    pki_header[1] = payloadLen>>8
-//    pki_header[2] = payloadLen;
-
-//    var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
-//    pki_buffer = _appendBuffer(pki_buffer,sn_buf);
-//    pki_buffer = _appendBuffer(pki_buffer,index_buf);
-
-//    console.log("Delete cert by index request_command: " + bufToHex(pki_buffer));
-
-
-//     var getAssertionChallenge = {
-//         'challenge': challenge,
-//     }
-//     var idList = [{
-//         id: pki_buffer,
-//         transports: ["usb", "nfc"],
-//         type: "public-key"
-//     }];
-
-//     getAssertionChallenge.allowCredentials = idList;
-//     console.log('DeleteCertByIndex', getAssertionChallenge)
-
-
-//     return  navigator.credentials.get({'publicKey': getAssertionChallenge});
-       
-// }
-
+/**
+ * 清除載具中的所有憑證和金鑰，需要驗證使用者密碼
+ * @param {Uint8Array｜undefined} bSerialNumber 指定序號序號。若不指定載具序號，則可填入 undefined 或是空陣列
+ * @returns {GTIdemJs} 回傳結果的集合
+ */
 async function GTIDEM_ClearToken( bSerialNumber) {
 
     var challenge = new Uint8Array(32);
@@ -2386,6 +2381,11 @@ async function GTIDEM_ClearToken( bSerialNumber) {
        
 }
 
+/**
+ * 回傳載具資訊
+ * @param {Uint8Array｜undefined} bSerialNumber 指定序號序號。若不指定載具序號，則可填入 undefined 或是空陣列
+ * @returns {GTIdemJs} 回傳結果的集合
+ */
 async function GTIDEM_GetTokenInfo(bSerialNumber) {
 
     var pki_buffer = [];
@@ -2444,8 +2444,13 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
 }
 
 /**
- * @param {Date} myDate The date
- * @param {string} myString The string
+ * 使用特定位址的金鑰對資料簽名，會出現瀏覽器或是系統畫面 PIN 視窗，要求驗證密碼。
+ * 
+ * @param {number} index  指定位址的金鑰對
+ * @param {Uint8Array｜undefined} bSerialNumber 指定序號序號。若不指定載具序號，則可填入 undefined 或是空陣列
+ * @param {number} alg_number 簽名演算法,  ALG_RSA2048SHA256 或者 ALG_RSA2048SHA256_PreHash
+ * @param {Uint8Array} bPlain 被簽名的資料
+ * @returns {GTIdemJs} 回傳結果的集合
  */
 async function GTIDEM_SignDataByIndex(index, bSerialNumber ,alg_number, bPlain) {
 
@@ -2531,7 +2536,15 @@ async function GTIDEM_SignDataByIndex(index, bSerialNumber ,alg_number, bPlain) 
 
 }
 
-
+/**
+ * 使用特定標籤的金鑰對資料簽名，會出現瀏覽器或是系統畫面 PIN 視窗，要求驗證密碼。
+ * 
+ * @param {Uint8Array} bLabel  指定標籤
+ * @param {Uint8Array｜undefined} bSerialNumber 指定序號序號。若不指定載具序號，則可填入 undefined 或是空陣列
+ * @param {number} alg_number 簽名演算法,  ALG_RSA2048SHA256 或者 ALG_RSA2048SHA256_PreHash
+ * @param {Uint8Array} bPlain 被簽名的資料
+ * @returns {GTIdemJs} 回傳結果的集合
+ */
 async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, bPlain) {
 
     var pki_buffer = [];
@@ -2620,7 +2633,13 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, bPlain)
 
 }
 
-
+/**
+ * 不需要使用者密碼，就讀取特定位址的憑證。
+ * 
+ * @param {Number} bindex 指定標籤
+ * @param {Uint8Array} bSerialNumber 指定序號序號。若不指定載具序號，則可填入 undefined 或是空陣列
+ * @returns {GTIdemJs} 回傳結果的集合
+ */
 async function GTIDEM_ReadCertByIndexWithoutPIN(index, bSerialNumber) {
 
     var pki_buffer = [];
@@ -2690,7 +2709,13 @@ async function GTIDEM_ReadCertByIndexWithoutPIN(index, bSerialNumber) {
 
 }
 
-
+/**
+ * 不需要使用者密碼，就讀取特定標籤的憑證。
+ * 
+ * @param {Uint8Array} bLabel 指定標籤
+ * @param {Uint8Array} bSerialNumber 指定序號序號。若不指定載具序號，則可填入 undefined 或是空陣列
+ * @returns {GTIdemJs} 回傳結果的集合
+ */
 async function GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSerialNumber) {
 
     var pki_buffer = [];
