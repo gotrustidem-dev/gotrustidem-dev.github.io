@@ -179,7 +179,10 @@
                         alert(showFIDOErrorMessage(value));
                     }
                 });
-            });
+            }).catch((error) => {
+                    alert(error)
+                    console.log('FAIL', error)
+                });
 
         
 

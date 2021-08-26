@@ -147,7 +147,10 @@
                         }else{
                             alert(showFIDOErrorMessage(value));
                         }
-                    });
+                    }).catch((error) => {
+                    alert(error)
+                    console.log('FAIL', error)
+                });
                 });
             }else{
                 GTIDEM_SignDataByLabel(bLabel, bToken_sn,ALG_RSA2048SHA256, signDataPayload).then((value) => {
@@ -158,6 +161,9 @@
                         }else{
                             alert(showFIDOErrorMessage(value));
                         }
+                }).catch((error) => {
+                    alert(error)
+                    console.log('FAIL', error)
                 });
             }
 
