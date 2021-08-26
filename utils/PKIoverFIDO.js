@@ -2482,20 +2482,47 @@ async function GTIDEM_SignDataByIndex(index, bSerialNumber ,alg_number, bPlain) 
     command_buf[3] = 0x01;
     command_buf[4] = index;
 
-    var alg_buf = new Uint8Array(5);
-    alg_buf[0] = 0xDF;
-    alg_buf[1] = 0x03;
-    alg_buf[2] = 0x00;
-    alg_buf[3] = 0x01;
-    alg_buf[4] = alg_number;
+    var alg_buf;
+    var signDataBuf;
+    if(alg_number==ALG_RSA2048SHA256){
+        await crypto.subtle.digest("SHA-256", new Uint8Array(bPlain)).then(function (signHashedDataPayload) {
 
-    var signDataBuf = new Uint8Array(4 + bPlain.byteLength);
-    signDataBuf[0] = 0xDF;
-    signDataBuf[1] = 0x06;
-    signDataBuf[2] = bPlain.length >> 8;
-    signDataBuf[3] = bPlain.length;
-    signDataBuf.set(bPlain, 4);
+            alg_buf = new Uint8Array(5);
+            alg_buf[0] = 0xDF;
+            alg_buf[1] = 0x03;
+            alg_buf[2] = 0x00;
+            alg_buf[3] = 0x01;
+            alg_buf[4] = ALG_RSA2048SHA256_PreHash;
 
+            var bHashData = new Uint8Array(signHashedDataPayload)
+            signDataBuf = new Uint8Array(4 + bHashData.byteLength);
+            signDataBuf[0] = 0xDF;
+            signDataBuf[1] = 0x06;
+            signDataBuf[2] = bHashData.length >> 8;
+            signDataBuf[3] = bHashData.length;
+            signDataBuf.set(bHashData, 4);
+            return;
+        });
+
+    }else{
+
+        alg_buf = new Uint8Array(5);
+        alg_buf[0] = 0xDF;
+        alg_buf[1] = 0x03;
+        alg_buf[2] = 0x00;
+        alg_buf[3] = 0x01;
+        alg_buf[4] = alg_number;
+    
+
+        signDataBuf = new Uint8Array(4 + bPlain.byteLength);
+        signDataBuf[0] = 0xDF;
+        signDataBuf[1] = 0x06;
+        signDataBuf[2] = bPlain.length >> 8;
+        signDataBuf[3] = bPlain.length;
+        signDataBuf.set(bPlain, 4);
+    }
+
+    
     var pki_payload_length = sn_buf.byteLength+command_buf.byteLength + alg_buf.byteLength + signDataBuf.byteLength;
 
     pki_header[0] = CMD_Sign;
