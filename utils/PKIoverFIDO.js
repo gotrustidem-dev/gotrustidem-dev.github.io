@@ -1792,7 +1792,8 @@ async function GTIDEM_ChangeUserPIN(bOldPIN, bNewPIN, bSerialNumber) {
 
    var getAssertionChallenge = {
        'challenge': challenge,
-       "userVerification": "discouraged"
+       //"userVerification": "discouraged"
+       "userVerification": "required"
    }
    var idList = [{
        id: pki_buffer,
