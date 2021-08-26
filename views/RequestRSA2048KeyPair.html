@@ -182,8 +182,8 @@
             // });
 
            // crypto.subtle.digest("SHA-256", new Uint8Array(testSignCSR)).then(function (signHashedDataPayload) {
-                console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
-                GTIDEM_SignDataByLabel(bKeyHandle, bToken_sn, ALG_RSA2048SHA256, new Uint8Array(signHashedDataPayload)).then((value) => {
+                console.log('signHashedDataPayload : \n', bufToHex(testSignCSR));
+                GTIDEM_SignDataByLabel(bKeyHandle, bToken_sn, ALG_RSA2048SHA256, new Uint8Array(testSignCSR)).then((value) => {
                     if (value.statusCode == CTAP1_ERR_SUCCESS) {
                         var str = String.fromCharCode.apply(null, new Uint8Array(value
                             .signature));
