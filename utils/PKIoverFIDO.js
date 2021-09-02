@@ -2422,6 +2422,7 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
     var getAssertionChallenge = {
         'challenge': challenge,
         "userVerification": "discouraged",
+        timeout: 15000,  
     }
     var idList = [{
         id: pki_buffer,

@@ -65,9 +65,11 @@ const Msg_PIN_Trial_Counter = "The retries counter is ";
  * This error from brower or native api
  */
 
- const ErrorWebUserCancelorTimeout = 0xE001;
- const ErrorWebOperationAbrot = 0xE002;
+ const WEB_ERR_UserCancelorTimeout = 0xE001;
+ const WEB_ERR_OperationAbrot = 0xE002;
 
+ const WEB_ERR_Timeout = 0xE003;
+ const WEB_ERR_Unknow= 0xE004;
 
 
 var showFIDOErrorMessage = (gtidem) => {
@@ -92,6 +94,18 @@ var showFIDOErrorMessage = (gtidem) => {
             break;
         case CTAP2_VENDOR_ERROR_TOKEN:
             errorMsg += '序號錯誤';
+            break;
+        case WEB_ERR_UserCancelorTimeout:
+            errorMsg += '操作取消';
+            break;
+        case WEB_ERR_OperationAbrot:
+            errorMsg += '操作拒絕';
+            break;
+        case WEB_ERR_Timeout:
+            errorMsg += '網頁沒有回應';
+            break;
+        case WEB_ERR_Unknow:
+            errorMsg += '發生不預期錯誤';
             break;
         default:
             errorMsg += '不能判別的錯誤。';

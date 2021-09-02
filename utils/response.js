@@ -25,14 +25,23 @@ class GTIdemJs {
 
     ConvertWebError(error){
 
-        if(error == "NotAllowedError"){
+        if(error == "AbortError "){
 
-            this.statusCode = ErrorWebOperationAbrot;
+            this.statusCode = WEB_ERR_OperationAbrot;
         }
 
         if(error == "NotAllowedError"){
-            this.statusCode = ErrorWebUserCancelorTimeout;
+            this.statusCode = WEB_ERR_UserCancelorTimeout;
         }
+
+        if(error == "TimeoutError"){
+            this.statusCode = WEB_ERR_Timeout;
+        }
+
+        if(error == "UnknownError "){
+            this.statusCode = WEB_ERR_Unknow;
+        }
+
     }
     parsePKIoverFIDOResponse(buffer, cmd){
 
