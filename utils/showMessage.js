@@ -49,6 +49,8 @@ const CTAP2_ERR_VENDOR_LAST = 0xFF; //Vendor specific error.
 
 const CTAP2_VENDOR_ERROR_TOKEN = 0xF2;
 const CTAP2_VENDOR_ERROR_LENGTH = 0xF3;
+
+
 const ErrorMsg_OK = "No ERROR";
 const ErrorMsg_PIN_INVALID = "PIN invalid.";
 const ErrorMsg_PIN_BLOCKED = "PIN blocked.";
@@ -56,6 +58,16 @@ const ErrorMsg_PIN_REQUIRED = "The request has to verify PIN.";
 const ErrorMsg_NO_CREDENTIALS = "Not found the credential.";
 const ErrorMsg_UNKNOW = "Unknow error. ";
 const Msg_PIN_Trial_Counter = "The retries counter is ";
+
+
+/**
+ * Ref:https://www.w3.org/TR/webauthn-2/#sctn-privacy-considerations-client.
+ * This error from brower or native api
+ */
+
+ const ErrorWebUserCancelorTimeout = 0xE001;
+ const ErrorWebOperationAbrot = 0xE002;
+
 
 
 var showFIDOErrorMessage = (gtidem) => {
@@ -67,7 +79,7 @@ var showFIDOErrorMessage = (gtidem) => {
             errorMsg += "密碼錯誤！" + "剩餘次數:" + gtidem.pinRetry;
             break;
         case CTAP2_ERR_PIN_BLOCKED:
-            errorMsg +='密碼鎖定';
+            errorMsg +='超過嘗試次數，密碼鎖定';
             break;
         case CTAP2_ERR_KEY_STORE_FULL:
             errorMsg +='憑證空間已滿';

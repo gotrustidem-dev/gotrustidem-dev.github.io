@@ -4,6 +4,7 @@
 
 
 class GTIdemJs {
+    
 
     constructor() {
         this.statusCode = undefined;
@@ -22,6 +23,17 @@ class GTIdemJs {
         this.rsakeypair = undefined;
     }
 
+    ConvertWebError(error){
+
+        if(error == "NotAllowedError"){
+
+            this.statusCode = ErrorWebOperationAbrot;
+        }
+
+        if(error == "NotAllowedError"){
+            this.statusCode = ErrorWebUserCancelorTimeout;
+        }
+    }
     parsePKIoverFIDOResponse(buffer, cmd){
 
         var GTheaderStr = "GoTrust-Idem-PKI";

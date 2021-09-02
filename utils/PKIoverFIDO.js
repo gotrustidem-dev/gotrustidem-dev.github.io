@@ -2439,7 +2439,9 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
             let gtidem = new GTIdemJs();
             gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_TokenInfo);
             return gtidem;
-        });
+        }).catch((error) => {
+            return ConvertWebError(error);
+        })
 
 
 }
