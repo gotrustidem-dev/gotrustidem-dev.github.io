@@ -2440,6 +2440,10 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
             gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_TokenInfo);
             return gtidem;
         }).catch((error) => {
+            console.log(error);
+            console.log(error.name);
+            console.log(error.code);
+            console.log(error.message);
             let gtidem = new GTIdemJs();
             gtidem.ConvertWebError(error);
             return gtidem;
