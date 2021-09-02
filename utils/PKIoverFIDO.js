@@ -2445,7 +2445,7 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
             console.log(error.code);
             console.log(error.message);
             let gtidem = new GTIdemJs();
-            gtidem.ConvertWebError(error);
+            gtidem.ConvertWebError(error.name);
             return gtidem;
         })
 
