@@ -41,8 +41,18 @@
 
     </style>
 </head>
+<script>
+    function load()
+    {
+        let certBox = document.getElementById('certBox');
+        var strCert = "-----BEGIN CERTIFICATE-----\n" +
+                            testBigCertificate+
+                        "\n-----END CERTIFICATE-----"
+        certBox.textContent = strCert;
 
-<body>
+    }
+</script>
+<body onload="load()">
     <div style="overflow-x: scroll;">
         <table style="height: auto; width: 100%;">
             <tbody>
@@ -165,21 +175,17 @@
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             let key_id = document.getElementById('form_key_id').key_id.value;
             let key_handle = document.getElementById('form_key_handle').key_handle.value;
-            let certBox = document.getElementById('certBox');
-            console.log(token_sn);
-            console.log(key_id);
-            console.log(key_handle);
 
-            var strCert = "-----BEGIN CERTIFICATE-----\n" +
-                            testBigCertificate+
-                        "\n-----END CERTIFICATE-----"
-            certBox.textContent = strCert;
-            var bHexCert = Uint8Array.from(window.atob(testBigCertificate), c => c.charCodeAt(0));
+            let sCert = document.getElementById('certBox').value;
+            var lines = sCert.split('\n');
+            lines.splice(lines.length-1,lines.length);
+            lines.splice(0,1);
+            sCert = lines.join('\n');
+            console.log(sCert);
 
-         
-            var bKeyHandle = hexStringToArrayBuffer(key_handle);
 
-        
+            var bHexCert = Uint8Array.from(window.atob(testBigCertificate), c => c.charCodeAt(0));         
+            var bKeyHandle = hexStringToArrayBuffer(key_handle);        
             var bToken_sn = undefined;
             if(token_sn.length!=0){
                 bToken_sn = hexStringToArrayBuffer(token_sn);  
