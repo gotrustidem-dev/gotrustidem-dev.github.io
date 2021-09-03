@@ -69,6 +69,8 @@ class GTIdemJs {
 
                     this.pinRetry = responseData[1];
 
+                }else if(this.statusCode == CTAP2_VENDOR_ERROR_TOKEN ){
+                    this.sn = responseData[sn];
                 } else if (this.statusCode == CTAP1_ERR_SUCCESS) {
                     switch (cmd) {
                         case CMD_TokenInfo:
@@ -102,7 +104,17 @@ class GTIdemJs {
             }
         } else if (cmd == CMD_ReadCertificate) {
             this.statusCode = CTAP1_ERR_SUCCESS;
-            this.certicficate = new Uint8Array(buffer);
+            let bCERTBuf = new Uint8Array(buffer);
+            let num  = bCERTBuf.slice(0, 1);
+            if(num[0]==0x30){ //only cert
+                this.certicficate = bCERTBuf;
+            }else{{
+                this.credentialNum = num[0];
+                this.certicficate = bCERTBuf.slice(1);
+
+            }}
+
+  
             
         } else if (buffer.byteLength == 256) {
 
