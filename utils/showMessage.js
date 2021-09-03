@@ -49,7 +49,8 @@ const CTAP2_ERR_VENDOR_LAST = 0xFF; //Vendor specific error.
 
 const CTAP2_VENDOR_ERROR_TOKEN = 0xF2;
 const CTAP2_VENDOR_ERROR_LENGTH = 0xF3;
-
+const CTAP2_ERR_VENDOR_ERROR_NO_USER    = 0xF4;    //Vendor specific error.
+const CTAP2_ERR_VENDOR_ERROR_CREDENTIAL_EXIST    =0xF5;    //Vendor specific error.
 
 const ErrorMsg_OK = "No ERROR";
 const ErrorMsg_PIN_INVALID = "PIN invalid.";
@@ -93,8 +94,16 @@ var showFIDOErrorMessage = (gtidem) => {
             errorMsg +='要求物件已存在';
             break;
         case CTAP2_VENDOR_ERROR_TOKEN:
-            errorMsg += '序號錯誤';
+            errorMsg += '序號錯誤.';
+            if(gtidem.sn!= undefined){
+                errorMsg += '該裝置序號為'+ gtidem.sn;
+            }    
             break;
+
+        case CTAP2_ERR_VENDOR_ERROR_CREDENTIAL_EXIST:
+            errorMsg += '憑證已經存在';  
+            break;
+
         case WEB_ERR_UserCancelorTimeout:
             errorMsg += '操作取消';
             break;
