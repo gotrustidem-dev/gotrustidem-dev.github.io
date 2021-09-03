@@ -133,18 +133,24 @@
             }
 
 
-            GTIDEM_GenRSA2048(bToken_sn, bKeyID).then((value) => {
+            GTIDEM_GenRSA2048(bToken_sn, bKeyID).then((response) => {
 
-                alert("建立 KeyPair 完成 \n" + bufToHex(new Uint8Array(value.rsakeypair)));
-                if (bKeyID != undefined) {
-                    console.log(bufToHex(bKeyID));
-                    document.getElementById('form_key_handle').key_handle.value = bufToHex(bKeyID);
+
+                if (response.statusCode == CTAP1_ERR_SUCCESS) {
+
+                    alert("建立 KeyPair 完成 \n" + bufToHex(new Uint8Array(value.rsakeypair)));
+
+                    if (bKeyID != undefined) {
+                        console.log(bufToHex(bKeyID));
+                        document.getElementById('form_key_handle').key_handle.value = bufToHex(bKeyID);
+                    } else {
+                        console.log(bufToHex(new Uint8Array(value.keyhandle).buffer));
+                        document.getElementById('form_key_handle').key_handle.value = bufToHex(
+                            new Uint8Array(value.keyhandle).buffer);
+                    }
                 } else {
-                    console.log(bufToHex(new Uint8Array(value.keyhandle).buffer));
-                    document.getElementById('form_key_handle').key_handle.value = bufToHex(
-                        new Uint8Array(value.keyhandle).buffer);
+                    alert(showFIDOErrorMessage(response));
                 }
-
             }).catch((error) => {
                 alert(error)
                 console.log('FAIL', error)
@@ -169,7 +175,8 @@
             console.log('testSignCSR', testSignCSR);
             crypto.subtle.digest("SHA-256", new Uint8Array(testSignCSR)).then(function (signHashedDataPayload) {
                 console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
-                GTIDEM_SignDataByLabel(bKeyHandle, bToken_sn, ALG_RSA2048SHA256_PreHash, new Uint8Array(signHashedDataPayload)).then((value) => {
+                GTIDEM_SignDataByLabel(bKeyHandle, bToken_sn, ALG_RSA2048SHA256_PreHash, new Uint8Array(
+                    signHashedDataPayload)).then((value) => {
                     if (value.statusCode == CTAP1_ERR_SUCCESS) {
                         var str = String.fromCharCode.apply(null, new Uint8Array(value
                             .signature));
@@ -180,11 +187,11 @@
                     }
                 });
             }).catch((error) => {
-                    alert(error)
-                    console.log('FAIL', error)
-                });
+                alert(error)
+                console.log('FAIL', error)
+            });
 
-        
+
 
         });
 
