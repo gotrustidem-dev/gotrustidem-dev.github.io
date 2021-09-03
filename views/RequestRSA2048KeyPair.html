@@ -138,15 +138,15 @@
 
                 if (response.statusCode == CTAP1_ERR_SUCCESS) {
 
-                    alert("建立 KeyPair 完成 \n" + bufToHex(new Uint8Array(value.rsakeypair)));
+                    alert("建立 KeyPair 完成 \n" + bufToHex(new Uint8Array(response.rsakeypair)));
 
                     if (bKeyID != undefined) {
                         console.log(bufToHex(bKeyID));
                         document.getElementById('form_key_handle').key_handle.value = bufToHex(bKeyID);
                     } else {
-                        console.log(bufToHex(new Uint8Array(value.keyhandle).buffer));
+                        console.log(bufToHex(new Uint8Array(response.keyhandle).buffer));
                         document.getElementById('form_key_handle').key_handle.value = bufToHex(
-                            new Uint8Array(value.keyhandle).buffer);
+                            new Uint8Array(response.keyhandle).buffer);
                     }
                 } else {
                     alert(showFIDOErrorMessage(response));
