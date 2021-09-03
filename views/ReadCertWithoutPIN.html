@@ -168,7 +168,12 @@
 
             GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bToken_sn).then((value) => {
                 if (value.statusCode === CTAP1_ERR_SUCCESS) {
-                    var strCert = "-----BEGIN CERTIFICATE-----\n" +
+                    var strCert="";
+                    if(value.credentialNum!=undefined){
+                        strCert+= "憑證數量 "+value.credentialNum+"\n";
+
+                    }
+                    strCert+= "-----BEGIN CERTIFICATE-----\n" +
                         btoa(String.fromCharCode.apply(null, value.certicficate)) +
                         "\n-----END CERTIFICATE-----"
                     console.log('憑證 :\n', strCert);
@@ -177,6 +182,7 @@
                 } else {
                     alert(showFIDOErrorMessage(value));
                 }
+
             });
 
         })
