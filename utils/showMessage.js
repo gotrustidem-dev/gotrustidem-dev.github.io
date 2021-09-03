@@ -96,7 +96,7 @@ var showFIDOErrorMessage = (gtidem) => {
         case CTAP2_VENDOR_ERROR_TOKEN:
             errorMsg += '序號錯誤.';
             if(gtidem.sn!= undefined){
-                errorMsg += '該裝置序號為'+ gtidem.sn;
+                errorMsg += '該裝置序號為'+ ConverSNFormat(gtidem.sn);
             }    
             break;
 
