@@ -173,6 +173,11 @@
                         strCert+= "憑證數量 "+value.credentialNum+"\n";
 
                     }
+                    if(value.sn!=undefined){
+                        strCert+= "載具序號"+ConverSNFormat(value.sn)+"\n";
+
+                    }
+
                     strCert+= "-----BEGIN CERTIFICATE-----\n" +
                         btoa(String.fromCharCode.apply(null, value.certicficate)) +
                         "\n-----END CERTIFICATE-----"
@@ -207,6 +212,11 @@
                         strCert+= "憑證數量 "+value.credentialNum+"\n";
 
                     }
+                    if(value.sn!=undefined){
+                        strCert+= "載具序號"+ConverSNFormat(value.sn)+"\n";
+
+                    }
+
                     strCert+= "-----BEGIN CERTIFICATE-----\n" +
                         btoa(String.fromCharCode.apply(null, value.certicficate)) +
                         "\n-----END CERTIFICATE-----"
