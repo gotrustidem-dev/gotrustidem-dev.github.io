@@ -3,6 +3,8 @@
 
 // Command Header GoTrust-Idem-PKI
 const GTheader = 'R29UcnVzdC1JZGVtLVBLSQ==';
+var sRpName = GoTrustID.com;
+
 
 const CMD_KeyAgreement = 0xE0;
 const CMD_ReadCertificate = 0xE1;
@@ -2873,11 +2875,6 @@ async function GTIDEM_ReadCertByIndexWithoutPIN(index, bSerialNumber) {
 async function GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSerialNumber) {
 
     var pki_buffer = [];
-
-
- 
-
-
     var challenge = new Uint8Array(32);
     window.crypto.getRandomValues(challenge);
     var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
@@ -2994,6 +2991,11 @@ async function GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSerialNumber) {
             });
 
 
+}
+
+async function GTIDEM_SetName(sName){
+
+    sRpName = sName;
 }
 
 
