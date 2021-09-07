@@ -71,7 +71,7 @@ const Msg_PIN_Trial_Counter = "The retries counter is ";
 
  const WEB_ERR_Timeout = 0xE003;
  const WEB_ERR_Unknow= 0xE004;
-
+ const WEB_ERR_InvalidState= 0xE005;
 
 var showFIDOErrorMessage = (gtidem) => {
 
@@ -115,6 +115,9 @@ var showFIDOErrorMessage = (gtidem) => {
             break;
         case WEB_ERR_Unknow:
             errorMsg += '發生不預期錯誤';
+            break;
+        case WEB_ERR_Unknow:
+             errorMsg += '無效的操作';
             break;
         default:
             errorMsg += '不能判別的錯誤。';
