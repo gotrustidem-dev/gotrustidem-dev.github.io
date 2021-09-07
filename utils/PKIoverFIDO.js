@@ -1811,6 +1811,11 @@ async function GTIDEM_ChangeUserPIN(bOldPIN, bNewPIN, bSerialNumber) {
         let gtidem = new GTIdemJs();
         gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_CHANGE_PIN);
         return gtidem;
+    }).catch((error) => {
+        //console.log(error.name);
+        let gtidem = new GTIdemJs();
+        gtidem.ConvertWebError(error.name);
+        return gtidem;
     });
 
 }
@@ -2015,6 +2020,11 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bKeyID) {
         let gtidem = new GTIdemJs();
         gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse,CMD_REQUESTCSR);
         return gtidem;
+    }).catch((error) => {
+        //console.log(error.name);
+        let gtidem = new GTIdemJs();
+        gtidem.ConvertWebError(error.name);
+        return gtidem;
     });
 }
 /**
@@ -2117,6 +2127,11 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
 
         let gtidem = new GTIdemJs();
         gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse,CMD_GenRsaKeyPair);
+        return gtidem;
+    }).catch((error) => {
+        //console.log(error.name);
+        let gtidem = new GTIdemJs();
+        gtidem.ConvertWebError(error.name);
         return gtidem;
     });
  }
@@ -2242,6 +2257,11 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
         let gtidem = new GTIdemJs();
         gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_ImportCertificate);
         return gtidem;
+    }).catch((error) => {
+        //console.log(error.name);
+        let gtidem = new GTIdemJs();
+        gtidem.ConvertWebError(error.name);
+        return gtidem;
     });
 
 }
@@ -2316,6 +2336,11 @@ async function GTIDEM_DeleteCertByLabel(bLabel, bSerialNumber) {
         let gtidem = new GTIdemJs();
         gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_DELEE_CERT);
         return gtidem;
+    }).catch((error) => {
+        //console.log(error.name);
+        let gtidem = new GTIdemJs();
+        gtidem.ConvertWebError(error.name);
+        return gtidem;
     });
        
 }
@@ -2377,6 +2402,11 @@ async function GTIDEM_ClearToken( bSerialNumber) {
            
         let gtidem = new GTIdemJs();
         gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_CLEAR_TOKEN);
+        return gtidem;
+    }).catch((error) => {
+        //console.log(error.name);
+        let gtidem = new GTIdemJs();
+        gtidem.ConvertWebError(error.name);
         return gtidem;
     });
        
@@ -2445,7 +2475,7 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
             let gtidem = new GTIdemJs();
             gtidem.ConvertWebError(error.name);
             return gtidem;
-        })
+        });
 
 
 }
@@ -2564,6 +2594,11 @@ async function GTIDEM_SignDataByIndex(index, bSerialNumber ,alg_number, bPlain) 
            
                 let gtidem = new GTIdemJs();
                 gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_Sign);
+                return gtidem;
+            }).catch((error) => {
+                //console.log(error.name);
+                let gtidem = new GTIdemJs();
+                gtidem.ConvertWebError(error.name);
                 return gtidem;
             });
 
@@ -2697,8 +2732,12 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, bPlain)
                 let gtidem = new GTIdemJs();
                 gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_Sign);
                 return gtidem;
+            }).catch((error) => {
+                //console.log(error.name);
+                let gtidem = new GTIdemJs();
+                gtidem.ConvertWebError(error.name);
+                return gtidem;
             });
-
 
 }
 
@@ -2772,6 +2811,11 @@ async function GTIDEM_ReadCertByIndexWithoutPIN(index, bSerialNumber) {
            
                 let gtidem = new GTIdemJs();
                 gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_ReadCertificate);
+                return gtidem;
+            }).catch((error) => {
+                //console.log(error.name);
+                let gtidem = new GTIdemJs();
+                gtidem.ConvertWebError(error.name);
                 return gtidem;
             });
 
@@ -2852,6 +2896,11 @@ async function GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSerialNumber) {
            
                 let gtidem = new GTIdemJs();
                 gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_ReadCertificate);
+                return gtidem;
+            }).catch((error) => {
+                //console.log(error.name);
+                let gtidem = new GTIdemJs();
+                gtidem.ConvertWebError(error.name);
                 return gtidem;
             });
 
