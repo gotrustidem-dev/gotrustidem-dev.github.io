@@ -38,7 +38,11 @@ class GTIdemJs {
             this.statusCode = WEB_ERR_Timeout;
         }
 
-        if(error == "UnknownError "){
+        if(error == "UnknownError"){
+            this.statusCode = WEB_ERR_Unknow;
+        }
+
+        if(error == "InvalidStateError"){
             this.statusCode = WEB_ERR_Unknow;
         }
 
