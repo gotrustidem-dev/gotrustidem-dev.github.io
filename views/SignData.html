@@ -141,8 +141,14 @@
                     GTIDEM_SignDataByLabel(bLabel, bToken_sn,ALG_RSA2048SHA256_PreHash, new Uint8Array(signHashedDataPayload)).then((value) => {
                         
                         if(value.statusCode==CTAP1_ERR_SUCCESS){
+                            var strCert="";
+                            if(value.sn!=undefined){
+                                strCert+="序號:"+ ConverSNFormat(value.sn)+"\n";
+                            }
                             var str = String.fromCharCode.apply(null, new Uint8Array(value.signature));
-                            alert("簽名:" + "\n" + btoa(str));
+                            strCert+="簽名:" + "\n" + btoa(str);
+
+                            alert(strCert);
 
                         }else{
                             alert(showFIDOErrorMessage(value));
@@ -155,12 +161,18 @@
             }else{
                 GTIDEM_SignDataByLabel(bLabel, bToken_sn,ALG_RSA2048SHA256, signDataPayload).then((value) => {
                     if(value.statusCode==CTAP1_ERR_SUCCESS){
-                            var str = String.fromCharCode.apply(null, new Uint8Array(value.signature));
-                            alert("簽名:" + "\n" + btoa(str));
-
-                        }else{
-                            alert(showFIDOErrorMessage(value));
+                        var strCert="";
+                        if(value.sn!=undefined){
+                            strCert+="序號:"+ ConverSNFormat(value.sn)+"\n";
                         }
+                        var str = String.fromCharCode.apply(null, new Uint8Array(value.signature));
+                        strCert+="簽名:" + "\n" + btoa(str);
+
+                        alert(strCert);
+
+                    }else{
+                        alert(showFIDOErrorMessage(value));
+                    }
                 }).catch((error) => {
                     alert(error)
                     console.log('FAIL', error)
@@ -188,9 +200,14 @@
                     GTIDEM_SignDataByIndex(index, bToken_sn,ALG_RSA2048SHA256_PreHash, new Uint8Array(signHashedDataPayload)).then((value) => {
                        
                         if(value.statusCode==CTAP1_ERR_SUCCESS){
+                            var strCert="";
+                            if(value.sn!=undefined){
+                                strCert+="序號:"+ ConverSNFormat(value.sn)+"\n";
+                            }
                             var str = String.fromCharCode.apply(null, new Uint8Array(value.signature));
-                            alert("簽名:" + "\n" + btoa(str));
+                            strCert+="簽名:" + "\n" + btoa(str);
 
+                            alert(strCert);
                         }else{
                             alert(showFIDOErrorMessage(value));
                         }
@@ -201,8 +218,14 @@
 
                 GTIDEM_SignDataByIndex(index, bToken_sn,ALG_RSA2048SHA256, signDataPayload).then((value) => {
                     if(value.statusCode==CTAP1_ERR_SUCCESS){
+                        var strCert="";
+                        if(value.sn!=undefined){
+                            strCert+="序號:"+ ConverSNFormat(value.sn)+"\n";
+                        }
                         var str = String.fromCharCode.apply(null, new Uint8Array(value.signature));
-                        alert("簽名:" + "\n" + btoa(str));
+                        strCert+="簽名:" + "\n" + btoa(str);
+
+                        alert(strCert);
 
                     }else{
                         alert(showFIDOErrorMessage(value));
