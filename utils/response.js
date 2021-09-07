@@ -43,7 +43,7 @@ class GTIdemJs {
         }
 
         if(error == "InvalidStateError"){
-            this.statusCode = WEB_ERR_Unknow;
+            this.statusCode = WEB_ERR_InvalidState;
         }
 
     }
