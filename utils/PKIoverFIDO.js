@@ -3,7 +3,7 @@
 
 // Command Header GoTrust-Idem-PKI
 const GTheader = 'R29UcnVzdC1JZGVtLVBLSQ==';
-var sRpName = GoTrustID.com;
+var sRpName = 'GoTrustID.com';
 
 
 const CMD_KeyAgreement = 0xE0;
