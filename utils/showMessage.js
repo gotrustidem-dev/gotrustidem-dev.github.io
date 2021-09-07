@@ -116,7 +116,7 @@ var showFIDOErrorMessage = (gtidem) => {
         case WEB_ERR_Unknow:
             errorMsg += '發生不預期錯誤';
             break;
-        case WEB_ERR_Unknow:
+        case WEB_ERR_InvalidState:
              errorMsg += '無效的操作';
             break;
         default:
