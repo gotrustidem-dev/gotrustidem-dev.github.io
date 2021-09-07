@@ -2769,6 +2769,9 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, bPlain)
            
                 let gtidem = new GTIdemJs();
                 gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_Sign);
+                if(gtidemA.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
+                    gtidem.sn =token_sn;
+                }
                 return gtidem;
             }).catch((error) => {
                 //console.log(error.name);
@@ -2978,7 +2981,10 @@ async function GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSerialNumber) {
            
                 let gtidem = new GTIdemJs();
                 gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_ReadCertificate);
-                gtidem.sn =token_sn;
+                if(gtidemA.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
+                    gtidem.sn =token_sn;
+                }
+                
                 return gtidem;
             }).catch((error) => {
                 //console.log(error.name);
