@@ -510,8 +510,8 @@ async function ReadCertByIndex(index) {
 
         'user': {
             'id': pki_buffer,
-            'name': '王大強',
-            'displayName': '王大強的名字'
+            'name': '王大強Name',
+            'displayName': '王大強displayName'
         },
 
         "authenticatorSelection": {
