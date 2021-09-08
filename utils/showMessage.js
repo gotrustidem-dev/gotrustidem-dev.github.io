@@ -67,7 +67,7 @@ const Msg_PIN_Trial_Counter = "The retries counter is ";
  */
 
  const WEB_ERR_UserCancelorTimeout = 0xE001;
- const WEB_ERR_OperationAbrot = 0xE002;
+ const WEB_ERR_OperationAbort = 0xE002;
 
  const WEB_ERR_Timeout = 0xE003;
  const WEB_ERR_Unknow= 0xE004;
@@ -107,7 +107,7 @@ var showFIDOErrorMessage = (gtidem) => {
         case WEB_ERR_UserCancelorTimeout:
             errorMsg += '操作取消';
             break;
-        case WEB_ERR_OperationAbrot:
+        case WEB_ERR_OperationAbort:
             errorMsg += '操作拒絕';
             break;
         case WEB_ERR_Timeout:
