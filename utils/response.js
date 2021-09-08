@@ -27,7 +27,7 @@ class GTIdemJs {
 
         if(error == "AbortError "){
 
-            this.statusCode = WEB_ERR_OperationAbrot;
+            this.statusCode = WEB_ERR_OperationAbort;
         }
 
         if(error == "NotAllowedError"){
