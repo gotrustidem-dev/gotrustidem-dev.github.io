@@ -111,6 +111,9 @@
                 }else{
                    alert(showFIDOErrorMessage(response));
                 }
+            }).catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
             });
 
         });
