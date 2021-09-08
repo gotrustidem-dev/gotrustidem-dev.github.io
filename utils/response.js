@@ -102,6 +102,10 @@ class GTIdemJs {
                             break;
                         case CMD_ImportCertificate:
 
+                            break;
+                        case CMD_CHANGE_PIN:
+                            this.pinRetry = responseData[1];
+                            break;
                         default:
                     }
                 }

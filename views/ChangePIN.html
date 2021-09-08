@@ -120,7 +120,12 @@
             GTIDEM_ChangeUserPIN(bOldPINArray, bNewPINBuffer, bToken_sn).then((response) => {
 
                if(response.statusCode==CTAP1_ERR_SUCCESS){    
+                   if(response.pinRetry != undefined){
+                    alert("密碼變更完成. 剩餘次數為 "+response.pinRetry);
+                   }else{
                     alert("密碼變更完成");
+                   }
+                    
                 }else{
                     alert(showFIDOErrorMessage(response));
                 }
