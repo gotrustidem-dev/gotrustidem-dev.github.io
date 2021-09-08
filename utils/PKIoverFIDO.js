@@ -1715,19 +1715,19 @@ var ConverSNFormat = (buffer) => {
 async function GTIDEM_ChangeUserPIN(bOldPIN, bNewPIN, bSerialNumber) {
 
 
-    var gtidemA = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
+    var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
         return fido;
     });
 
-    if(gtidemA.statusCode != CTAP1_ERR_SUCCESS){
-        return gtidemA;
+    if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
+        return gtidem;
     }
 
-    if(gtidemA.pinRetry == 0){
-        gtidemA.statusCode = CTAP2_ERR_PIN_BLOCKED;
-        return gtidemA;
+    if(gtidem.pinRetry == 0){
+        gtidem.statusCode = CTAP2_ERR_PIN_BLOCKED;
+        return gtidem;
     }
-    var bECPointFromToken = gtidemA.ecpoint;
+    var bECPointFromToken = gtidem.ecpoint;
 
     var sn_buf;
 	var token_sn = undefined;
@@ -3164,7 +3164,7 @@ async function GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSerialNumber) {
            
                 let gtidem = new GTIdemJs();
                 gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_ReadCertificate);
-                if(gtidemA.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
+                if(gtidem.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
                     gtidem.sn =token_sn;
                 }
                 
