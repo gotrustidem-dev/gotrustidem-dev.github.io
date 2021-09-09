@@ -94,10 +94,7 @@ var showFIDOErrorMessage = (gtidem) => {
             errorMsg +='要求物件已存在';
             break;
         case CTAP2_VENDOR_ERROR_TOKEN:
-            errorMsg += '序號錯誤.';
-            if(gtidem.sn!= undefined){
-                errorMsg += '該裝置序號為'+ ConverSNFormat(gtidem.sn);
-            }    
+            errorMsg += '序號錯誤.'; 
             break;
 
         case CTAP2_ERR_VENDOR_ERROR_CREDENTIAL_EXIST:
@@ -123,6 +120,11 @@ var showFIDOErrorMessage = (gtidem) => {
             errorMsg += '不能判別的錯誤。';
             break;
     }
+
+    if(gtidem.sn!= undefined){
+        errorMsg += '該裝置序號為'+ ConverSNFormat(gtidem.sn);
+    }   
+    
     return errorMsg;
 
 }
