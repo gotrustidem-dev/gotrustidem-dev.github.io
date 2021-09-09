@@ -119,12 +119,17 @@
 
             GTIDEM_ChangeUserPIN(bOldPINArray, bNewPINBuffer, bToken_sn).then((response) => {
 
-               if(response.statusCode==CTAP1_ERR_SUCCESS){    
+               if(response.statusCode==CTAP1_ERR_SUCCESS){   
+                   var str = '密碼變更完成'; 
                    if(response.pinRetry != undefined){
-                    alert("密碼變更完成. 剩餘次數為 "+response.pinRetry);
-                   }else{
-                    alert("密碼變更完成");
+                     str+= '\n剩餘次數為 '+response.pinRetry;
                    }
+                   if(response.sn != undefined){
+                        str+= '\n 載具序號為 '+response.sn;
+                    
+                   }
+                   alert(str);
+                   
                     
                 }else{
                     alert(showFIDOErrorMessage(response));

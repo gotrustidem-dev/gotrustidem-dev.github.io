@@ -73,9 +73,7 @@ class GTIdemJs {
 
                     this.pinRetry = responseData[1];
 
-                }else if(this.statusCode == CTAP2_VENDOR_ERROR_TOKEN ){
-                    this.sn = responseData['sn'];
-                } else if (this.statusCode == CTAP1_ERR_SUCCESS) {
+                }else if (this.statusCode == CTAP1_ERR_SUCCESS) {
                     switch (cmd) {
                         case CMD_TokenInfo:
                             this.fw= responseData[1];
@@ -108,6 +106,9 @@ class GTIdemJs {
                             break;
                         default:
                     }
+                    //always get serial_number
+                    this.sn = responseData['sn'];
+                     
                 }
             }
         } else if (cmd == CMD_ReadCertificate) {
