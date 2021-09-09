@@ -107,7 +107,11 @@ class GTIdemJs {
                         default:
                     }
                     //always get serial_number
-                    this.sn = responseData['sn'];
+                    if(responseData['sn']!=undefined){
+                        this.sn = responseData['sn'];
+                    }
+
+              
                      
                 }
             }
