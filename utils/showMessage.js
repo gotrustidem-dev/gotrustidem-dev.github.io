@@ -122,9 +122,9 @@ var showFIDOErrorMessage = (gtidem) => {
     }
 
     if(gtidem.sn!= undefined){
-        errorMsg += '該裝置序號為'+ ConverSNFormat(gtidem.sn);
-    }   
-    
+        errorMsg += '\n該裝置序號為'+ ConverSNFormat(gtidem.sn);
+    }  
+
     return errorMsg;
 
 }

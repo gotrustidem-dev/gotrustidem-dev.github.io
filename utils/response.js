@@ -76,6 +76,8 @@ class GTIdemJs {
                 }else if (this.statusCode == CTAP1_ERR_SUCCESS) {
                     switch (cmd) {
                         case CMD_TokenInfo:
+
+                        if( responseData[1]!=undefined){
                             this.fw= responseData[1];
                             this.sw = responseData[2];
                             this.pinRetry = responseData[3];
@@ -83,7 +85,15 @@ class GTIdemJs {
                             this.sn = responseData[5];
                             this.rn= responseData[6];
                             this.ecpoint = responseData[7];
-                            
+                        }else{
+                            this.fw= responseData['fw'];
+                            this.sw = responseData['sw'];
+                            this.pinRetry = responseData['pinRetry'];
+                            this.credentialNum = responseData['credentialNum'];
+                            this.sn = responseData['sn'];
+                            this.rn= responseData['rn'];
+                            this.ecpoint = responseData['ecpoint'];
+                        }
                             break;
                         case CMD_Sign:
                             break;
@@ -105,15 +115,15 @@ class GTIdemJs {
                             this.pinRetry = responseData[1];
                             break;
                         default:
-                    }
-                    //always get serial_number
-                    if(responseData['sn']!=undefined){
-                        this.sn = responseData['sn'];
-                    }
-
-              
-                     
+                    }                
                 }
+
+                //always get serial_number
+               if(responseData['sn']!=undefined){                                
+                   this.sn = responseData['sn'];
+               }
+
+                            
             }
         } else if (cmd == CMD_ReadCertificate) {
             this.statusCode = CTAP1_ERR_SUCCESS;
