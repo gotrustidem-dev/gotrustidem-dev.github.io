@@ -2593,7 +2593,7 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
     console.log("GetTokenInfo", bufToHex(pki_buffer));
     var getAssertionChallenge = {
         'challenge': challenge,
-        'rpid':'www.gotrustid.com',
+        'rpid':'info.gotrustidema-dev.github.io',
         "userVerification": "discouraged",
         timeout: 15000,  
     }
