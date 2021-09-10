@@ -101,18 +101,29 @@ class GTIdemJs {
 
                             break;
                         case CMD_GenRsaKeyPair:
-                            this.keyhandle= new Uint8Array( responseData[1]);
-                            this.rsakeypair= new Uint8Array( responseData[2]);
+                            if( responseData[2]!=undefined){
+                                this.keyhandle= new Uint8Array( responseData[1]);
+                                this.rsakeypair= new Uint8Array( responseData[2]);
+                            }else{
+                                this.keyhandle= new Uint8Array( responseData['id']);
+                                this.rsakeypair= new Uint8Array( responseData['rsaPubKey']);
+                            }
                             break;
                         case CMD_REQUESTCSR:
-                            this.keyhandle= new Uint8Array( responseData[1]);
-                            this.csr= new Uint8Array( responseData[2]);
+                            if( responseData[2]!=undefined){
+                                this.keyhandle= new Uint8Array( responseData[1]);
+                                this.csr= new Uint8Array( responseData[2]);
+                            }else{
+                                this.keyhandle= new Uint8Array( responseData['id']);
+                                this.csr= new Uint8Array( responseData['csr']);
+                            }
                             break;
                         case CMD_ImportCertificate:
 
                             break;
                         case CMD_CHANGE_PIN:
                             this.pinRetry = responseData[1];
+
                             break;
                         default:
                     }                
