@@ -138,7 +138,12 @@
 
                 if (response.statusCode == CTAP1_ERR_SUCCESS) {
 
-                    alert("建立 KeyPair 完成 \n" + bufToHex(new Uint8Array(response.rsakeypair)));
+                    var sMsg = '';
+                    if(response.sn!=undefined){
+                        sMsg = "載具序號"+ConverSNFormat(response.sn)+"\n";
+                    }
+                    sMsg+="建立 KeyPair 完成 \n" + bufToHex(new Uint8Array(response.rsakeypair));
+                    alert(sMsg);
 
                     if (bKeyID != undefined) {
                         console.log(bufToHex(bKeyID));
@@ -178,9 +183,13 @@
                 GTIDEM_SignDataByLabel(bKeyHandle, bToken_sn, ALG_RSA2048SHA256_PreHash, new Uint8Array(
                     signHashedDataPayload)).then((value) => {
                     if (value.statusCode == CTAP1_ERR_SUCCESS) {
-                        var str = String.fromCharCode.apply(null, new Uint8Array(value
-                            .signature));
-                        alert("簽名:" + "\n" + btoa(str));
+                        var str = "";
+                        if(value.sn!=undefined){
+
+                            str+="載具序號"+ConverSNFormat(value.sn)+"\n";
+                        }
+                        str += "簽名:"+"\n"+(String.fromCharCode.apply(null, new Uint8Array(value.signature)));
+                        alert(str);
 
                     } else {
                         alert(showFIDOErrorMessage(value));
@@ -223,13 +232,16 @@
 
             GTIDEM_ImportCertificate(bToken_sn, bKeyHandle, bKeyID, bHexCert, undefined).then((response) => {
                 if (response.statusCode == CTAP1_ERR_SUCCESS) {
-                    var msg = "匯入憑證完成";
-                    if (response.signature != undefined) {
-                        var str = String.fromCharCode.apply(null, new Uint8Array(response.signature));
-                        alert(msg + "\nSignature:\n" + btoa(str));
-                    } else {
-                        alert(msg);
+                    var msg = "匯入憑證完成\n";
+                    if(response.sn!=undefined){
+                        msg += "載具序號"+ConverSNFormat(response.sn)+"\n";
                     }
+                    if (response.signature != undefined) {
+                        msg +=  "\n Signature:\n" +btoa(String.fromCharCode.apply(null, new Uint8Array(response.signature)));
+                       
+                    } 
+                    alert(msg);
+                    
 
                 } else {
                     alert(showFIDOErrorMessage(response));
