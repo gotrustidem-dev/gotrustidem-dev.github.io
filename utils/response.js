@@ -85,14 +85,14 @@ class GTIdemJs {
                             this.sn = responseData[5];
                             this.rn= responseData[6];
                             this.ecpoint = responseData[7];
-                        }else{
+                        }else{ //support 3.0.8+
                             this.fw= responseData['fw'];
                             this.sw = responseData['sw'];
                             this.pinRetry = responseData['pinRetry'];
-                            this.credentialNum = responseData['credentialNum'];
+                            this.credentialNum = responseData['credNum'];
                             this.sn = responseData['sn'];
                             this.rn= responseData['rn'];
-                            this.ecpoint = responseData['ecpoint'];
+                            this.ecpoint = responseData['ecPoint'];
                         }
                             break;
                         case CMD_Sign:
