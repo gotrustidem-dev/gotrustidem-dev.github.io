@@ -2758,9 +2758,9 @@ async function GTIDEM_SignDataByIndex(index, bSerialNumber ,alg_number, bPlain) 
            
                 let gtidem = new GTIdemJs();
                 gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_Sign);
-                if(gtidem.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
-                    gtidem.sn =token_sn;
-                }
+                // if(gtidem.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
+                //     gtidem.sn =token_sn;
+                // }
                 return gtidem;
             }).catch((error) => {
                 //console.log(error.name);
@@ -2921,9 +2921,9 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, bPlain)
            
                 let gtidem = new GTIdemJs();
                 gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_Sign);
-                if(gtidem.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
-                    gtidem.sn =token_sn;
-                }
+                // if(gtidem.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
+                //     gtidem.sn =token_sn;
+                // }
                 return gtidem;
             }).catch((error) => {
                 //console.log(error.name);
@@ -2945,37 +2945,37 @@ async function GTIDEM_ReadCertByIndexWithoutPIN(index, bSerialNumber) {
 
     var pki_buffer = [];
     var sn_buf;
-    // if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
-
-    //     sn_buf = new Uint8Array(0);
-    // }else{
-    //     sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
-    //     sn_buf[0] = 0xDF;
-    //     sn_buf[1] = 0x20;
-    //     sn_buf[2] = bSerialNumber.byteLength >> 8;
-    //     sn_buf[3] = bSerialNumber.byteLength;
-    //     sn_buf.set(bSerialNumber, 4);
-    // }
-    var token_sn = undefined;
     if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
-        var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
-            return fido;
-       });
-       if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
-           return gtidem;
-       }else{
-           token_sn = new Uint8Array(gtidem.sn);
-       }
-    }else{
-        token_sn =  new Uint8Array(bSerialNumber);
-    }
 
-    sn_buf = new Uint8Array(4 + token_sn.byteLength);
-    sn_buf[0] = 0xDF;
-    sn_buf[1] = 0x20;
-    sn_buf[2] = token_sn.byteLength >> 8;
-    sn_buf[3] = token_sn.byteLength;
-    sn_buf.set(token_sn, 4);
+        sn_buf = new Uint8Array(0);
+    }else{
+        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+        sn_buf[0] = 0xDF;
+        sn_buf[1] = 0x20;
+        sn_buf[2] = bSerialNumber.byteLength >> 8;
+        sn_buf[3] = bSerialNumber.byteLength;
+        sn_buf.set(bSerialNumber, 4);
+    }
+    // var token_sn = undefined;
+    // if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
+    //     var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
+    //         return fido;
+    //    });
+    //    if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
+    //        return gtidem;
+    //    }else{
+    //        token_sn = new Uint8Array(gtidem.sn);
+    //    }
+    // }else{
+    //     token_sn =  new Uint8Array(bSerialNumber);
+    // }
+
+    // sn_buf = new Uint8Array(4 + token_sn.byteLength);
+    // sn_buf[0] = 0xDF;
+    // sn_buf[1] = 0x20;
+    // sn_buf[2] = token_sn.byteLength >> 8;
+    // sn_buf[3] = token_sn.byteLength;
+    // sn_buf.set(token_sn, 4);
 
     var challenge = new Uint8Array(32);
     window.crypto.getRandomValues(challenge);
@@ -3024,9 +3024,9 @@ async function GTIDEM_ReadCertByIndexWithoutPIN(index, bSerialNumber) {
            
                 let gtidem = new GTIdemJs();
                 gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_ReadCertificate);
-                if(gtidem.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
-                    gtidem.sn =token_sn;
-                }
+                // if(gtidem.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
+                //     gtidem.sn =token_sn;
+                // }
                 return gtidem;
             }).catch((error) => {
                 //console.log(error.name);
@@ -3055,55 +3055,37 @@ async function GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSerialNumber) {
 
 
     var sn_buf;
-    var token_sn = undefined;
-     var token_sn = undefined;
-    // if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
-
-    //     //call get token info if sn feild is empty
-    //     // sn_buf = new Uint8Array(0);
-    //     var gtidemA = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
-    //             return fido;
-    //     });
-
-    //     if(gtidemA.statusCode != CTAP1_ERR_SUCCESS){
-    //         return gtidemA;
-    //     }else{
-    //         token_sn = new Uint8Array(gtidemA.sn)
-    //         sn_buf = new Uint8Array(4 + token_sn.byteLength);
-    //         sn_buf[0] = 0xDF;
-    //         sn_buf[1] = 0x20;
-    //         sn_buf[2] = token_sn.byteLength >> 8;
-    //         sn_buf[3] = token_sn.byteLength;
-    //         sn_buf.set(token_sn, 4);
-    //     }
-    // }else{
-    //     sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
-    //     sn_buf[0] = 0xDF;
-    //     sn_buf[1] = 0x20;
-    //     sn_buf[2] = bSerialNumber.byteLength >> 8;
-    //     sn_buf[3] = bSerialNumber.byteLength;
-    //     sn_buf.set(bSerialNumber, 4);
-    // }
-
     if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
-        var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
-            return fido;
-       });
-       if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
-           return gtidem;
-       }else{
-           token_sn = new Uint8Array(gtidem.sn);
-       }
+
+        sn_buf = new Uint8Array(0);
     }else{
-        token_sn =  new Uint8Array(bSerialNumber);
+        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+        sn_buf[0] = 0xDF;
+        sn_buf[1] = 0x20;
+        sn_buf[2] = bSerialNumber.byteLength >> 8;
+        sn_buf[3] = bSerialNumber.byteLength;
+        sn_buf.set(bSerialNumber, 4);
     }
+    // var token_sn = undefined;
+    // if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
+    //     var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
+    //         return fido;
+    //    });
+    //    if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
+    //        return gtidem;
+    //    }else{
+    //        token_sn = new Uint8Array(gtidem.sn);
+    //    }
+    // }else{
+    //     token_sn =  new Uint8Array(bSerialNumber);
+    // }
     
-    sn_buf = new Uint8Array(4 + token_sn.byteLength);
-    sn_buf[0] = 0xDF;
-    sn_buf[1] = 0x20;
-    sn_buf[2] = token_sn.byteLength >> 8;
-    sn_buf[3] = token_sn.byteLength;
-    sn_buf.set(token_sn, 4);
+    // sn_buf = new Uint8Array(4 + token_sn.byteLength);
+    // sn_buf[0] = 0xDF;
+    // sn_buf[1] = 0x20;
+    // sn_buf[2] = token_sn.byteLength >> 8;
+    // sn_buf[3] = token_sn.byteLength;
+    // sn_buf.set(token_sn, 4);
 
 
 
@@ -3151,9 +3133,9 @@ async function GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSerialNumber) {
            
                 let gtidem = new GTIdemJs();
                 gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_ReadCertificate);
-                if(gtidem.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
-                    gtidem.sn =token_sn;
-                }
+                // if(gtidem.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
+                //     gtidem.sn =token_sn;
+                // }
                 
                 return gtidem;
             }).catch((error) => {
