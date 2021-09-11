@@ -25,7 +25,7 @@ class GTIdemJs {
 
     ConvertWebError(error){
 
-        if(error == "AbortError "){
+        if(error == "AbortError"){
 
             this.statusCode = WEB_ERR_OperationAbort;
         }
