@@ -2030,7 +2030,7 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bKeyID) {
 
     'user': {
         'id': pki_buffer,
-        'name': 'alice@example.com',
+        'name': 'ˋGenRSA2048CSR 這個可以換',
         'displayName': 'Alice von Wunderland'
     },
 
@@ -2163,7 +2163,7 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
  
      'user': {
          'id': pki_buffer,
-         'name': 'alice@example.com',
+         'name': 'GenRSA2048CSR 這個可以換',
          'displayName': 'Alice von Wunderland'
      },
  
