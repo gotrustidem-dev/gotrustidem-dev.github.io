@@ -135,8 +135,8 @@
                
                 if(response.statusCode==CTAP1_ERR_SUCCESS){  
                     var strCert="清卡完成";
-                    if(value.sn!=undefined){
-                        strCert+="\n序號:"+ ConverSNFormat(value.sn)+"\n";
+                    if(response.sn!=undefined){
+                        strCert+="\n序號:"+ ConverSNFormat(response.sn)+"\n";
                     }  
                     alert(strCert);
                 }else{
@@ -167,8 +167,8 @@
 
                 if(response.statusCode==CTAP1_ERR_SUCCESS){    
                     var strCert="刪除憑證完成";
-                    if(value.sn!=undefined){
-                        strCert+="\n序號:"+ ConverSNFormat(value.sn)+"\n";
+                    if(response.sn!=undefined){
+                        strCert+="\n序號:"+ ConverSNFormat(response.sn)+"\n";
                     }  
                     alert(strCert);
                 }else{
