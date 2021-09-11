@@ -96,9 +96,10 @@ class GTIdemJs {
                         }
                             break;
                         case CMD_Sign:
+                            this.signature = responseData['sig'];
                             break;
                         case CMD_SignWithPIN:
-
+                            this.signature = responseData['sig'];
                             break;
                         case CMD_GenRsaKeyPair:
                             if( responseData[2]!=undefined){
@@ -119,7 +120,7 @@ class GTIdemJs {
                             }
                             break;
                         case CMD_ImportCertificate:
-
+                            this.signature = responseData['sig'];
                             break;
                         case CMD_CHANGE_PIN:
                             this.pinRetry = responseData[1];
@@ -129,7 +130,7 @@ class GTIdemJs {
                     }                
                 }
 
-                //always get serial_number
+                //Each api always get serial_number
                if(responseData['sn']!=undefined){                                
                    this.sn = responseData['sn'];
                }
