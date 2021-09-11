@@ -126,6 +126,9 @@ class GTIdemJs {
                             this.pinRetry = responseData[1];
 
                             break;
+                        case CMD_ReadCertificate:
+                            this.certicficate = responseData['cer'];
+                            break;    
                         default:
                     }                
                 }
