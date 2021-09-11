@@ -132,8 +132,13 @@
 
             GTIDEM_ClearToken(bToken_sn).then((response) => {
 
-                if(response.statusCode==CTAP1_ERR_SUCCESS){    
-                    alert("清卡完成");
+               
+                if(response.statusCode==CTAP1_ERR_SUCCESS){  
+                    var strCert="清卡完成";
+                    if(value.sn!=undefined){
+                        strCert+="\n序號:"+ ConverSNFormat(value.sn)+"\n";
+                    }  
+                    alert(strCert);
                 }else{
                     alert(showFIDOErrorMessage(response));
                 }
@@ -161,7 +166,11 @@
             GTIDEM_DeleteCertByLabel(bLabel, bToken_sn).then((response) => {
 
                 if(response.statusCode==CTAP1_ERR_SUCCESS){    
-                    alert("刪除憑證完成");
+                    var strCert="刪除憑證完成";
+                    if(value.sn!=undefined){
+                        strCert+="\n序號:"+ ConverSNFormat(value.sn)+"\n";
+                    }  
+                    alert(strCert);
                 }else{
                     alert(showFIDOErrorMessage(response));
                 }
