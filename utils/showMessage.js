@@ -84,6 +84,10 @@ var showFIDOErrorMessage = (gtidem) => {
         case CTAP2_ERR_PIN_BLOCKED:
             errorMsg +='超過嘗試次數，密碼鎖定';
             break;
+
+        case CTAP2_ERR_PIN_POLICY_VIOLATION:
+            errorMsg = "密碼不符合要求";
+            break;    
         case CTAP2_ERR_KEY_STORE_FULL:
             errorMsg +='憑證空間已滿';
             break;
@@ -224,6 +228,7 @@ var showSignMessage = (buffer) => {
 
                 errorMsg = ErrorMsg_PIN_REQUIRED;
                 break;
+  
             case CTAP2_ERR_MISSING_PARAMETER:
 
                 errorMsg = "Command error!";
