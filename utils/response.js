@@ -133,6 +133,7 @@ class GTIdemJs {
                             break;
                         case CMD_ReadCertificate:
                             this.certicficate = responseData['cer'];
+                            this.credentialNum = responseData['credNum'];
                             break;    
                         default:
                     }                
