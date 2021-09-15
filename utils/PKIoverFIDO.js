@@ -3,7 +3,7 @@
 
 // Command Header GoTrust-Idem-PKI
 const GTheader = 'R29UcnVzdC1JZGVtLVBLSQ==';
-var sRpName = 'GoTrustID.com';
+var sUserName = 'GoTrustID.com';
 
 
 const CMD_KeyAgreement = 0xE0;
@@ -2030,8 +2030,8 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bKeyID) {
 
     'user': {
         'id': pki_buffer,
-        'name': 'ˋGenRSA2048CSR 這個可以換',
-        'displayName': 'Alice von Wunderland'
+        'name': sUserName,
+        'displayName': sUserName
     },
 
     "authenticatorSelection": {
@@ -2163,8 +2163,8 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
  
      'user': {
          'id': pki_buffer,
-         'name': 'GenRSA2048CSR 這個可以換',
-         'displayName': 'Alice von Wunderland'
+         'name': sUserName,
+         'displayName': sUserName
      },
  
      "authenticatorSelection": {
@@ -3152,9 +3152,15 @@ async function GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSerialNumber) {
 
 async function GTIDEM_SetName(sName){
 
-    sRpName = sName;
+    sUserName = sName;
 }
 
+
+async function GTIDEM_InitToken(bSerialNumber, encrypted_new_so, encrypted_new_user, allowedHsotDomains){
+
+
+
+}
 
 
 

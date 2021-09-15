@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GoTrustIdem TestPKI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://gotrustidem-dev.github.io/utils/cbor.js"></script>
+    <script src="https://gotrustidem-dev.github.io/utils/helpers.js"></script>
+    <script src="https://gotrustidem-dev.github.io/utils/showMessage.js"></script>
+    <script src="https://gotrustidem-dev.github.io/utils/response.js"></script>
+    <script src="https://gotrustidem-dev.github.io/utils/PKIoverFIDO.js"></script>
+</head>
+
+<body>
+    <div style="overflow-x: scroll;">
+        <table style="height: auto; width: 100%;">
+            <tbody>
+
+                <tr>
+                    <td style="width: 100% ;">
+
+
+                        <form style="text-align: center;" id="form_token_sn" onsubmit="return false">
+                            <p>
+                                <label id="label_token_sn">Token Serial number:</label><br>
+                                <input type="text" name="token_sn" style="width: 342px; height:41px">
+                            </p>
+                        </form>
+
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="width: 100% ; ">
+                        <table class="center" border="1" width="100%">
+                            <tbody>
+                                <tr>
+                                    <!--PC side-->
+                                    <td style="width: 385px;">
+
+                                        <form style="text-align: center;" id="form_so_pin" onsubmit="return false">
+                                            <p>
+                                                <label id="label_so_pin"> Old SO PIN:</label><br>
+                                                <input type="text" name="so_pin" style="width: 342px; height:41px">
+                                            </p>
+                                        </form>
+
+                                        <form style="text-align: center;" id="form_new_so_pin" onsubmit="return false">
+                                            <p>
+                                                <label id="label_new_so_pin"> New SO PIN:</label><br>
+                                                <input type="text" name="new_so_pin" style="width: 342px; height:41px">
+                                            </p>
+                                        </form>
+
+                                        <form style="text-align: center;" id="form_new_user_pin" onsubmit="return false">
+                                            <p>
+                                                <label id="label_new_user_pin"> New User PIN:</label><br>
+                                                <input type="text" name="new_user_pin" style="width: 342px; height:41px">
+                                            </p>
+                                        </form>
+
+                                        <form style="text-align: center;" id="form_allow_domain" onsubmit="return false">
+                                            <p>
+                                                <label id="label_allow_domain"> Allow host domain :</label><br>
+                                                <input type="text" name="allowrpid1" style="width: 342px; height:41px"><br>
+                                                <input type="text" name="allowrpid2" style="width: 342px; height:41px"><br>
+                                                <input type="text" name="allowrpid3" style="width: 342px; height:41px"><br>
+                                                <input type="text" name="allowrpid4" style="width: 342px; height:41px"><br>
+                                                <input type="text" name="allowrpid5" style="width: 342px; height:41px"><br>
+                                                <input type="text" name="allowrpid6" style="width: 342px; height:41px"><br>
+                                            </p>
+                                        </form>
+                                        <p>
+                                            <form style="text-align: center;" id="form_init_btn"
+                                                onsubmit="return false">
+                                                <button class="btn btn-primary" action="submit"
+                                                    style="width: 200px; height:34px;background-color: #008CBA;">Init Token</button>
+                                            </form>
+                                        </p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+
+                </tr>
+            </tbody>·
+        </table>
+    </div>
+    <script>
+      
+        var testBigCertificate =
+            'MIIFCjCCA/KgAwIBAgIRAOmeRRu4pB7BKabPJNHAmpYwDQYJKoZIhvcNAQELBQAwVjELMAkGA1UEBhMCVFcxEjAQBgNVBAoMCeihjOaUv+mZojEzMDEGA1UECwwqKOa4rOippueUqCkg5pS/5bqc5ris6Kmm5oaR6K2J566h55CG5Lit5b+DMB4XDTIxMDgxMzAzMTMwNFoXDTIyMDIxMzAzMTMwNFowJTELMAkGA1UEBhMCVFcxFjAUBgNVBAoMDea4rOippuapn+mXnDEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDHzxFAXgNxcLr8YYVfGm9Fk+bfxDXzp+Y4vgZRSZnii6s91g1rXDqEKsySuqHvj6ppafdlXYf8fwy0K8LmjCPT8w5dNWtHEkiidqaR6pk2P5lEj3wyaqlOe3dnwoDP1t7DkutRdM4XsHIml5aZL0oefJAlz5jsd44EB6un+FHDL6TXfmj40XogBUUciGXtQ4BxBgAqCsK2k5GCAjHpIzqU6xbW9ViWsqOjsqHLy9lQkj2Eq/U/D1M+SbYhpoR3jJAncTP/+u38dTJ+QVz9bGe28Ss8zP34TLdiR9zLsH5MYmQ9VGqwuEm0WsKPIi3L2qcxtS/rEDiAWzQu4JNI/RBRAgMBAAGjggICMIIB/jAfBgNVHSMEGDAWgBR3r9Blh+4dyKn2l6AlRw7JldpxqzAdBgNVHQ4EFgQUM6vAHcYDXS0Tv/4i5MhxlcxAaNswDgYDVR0PAQH/BAQDAgeAMBQGA1UdIAQNMAswCQYHYIZ2ZQADADAaBgNVHREEEzARgQ90ZXN0QGNodC5jb20udHcwTgYDVR0JBEcwRTAWBgdghnYBZAIBMQsGCWCGdgFkAwIBATAUBgdghnYBZAICMQkTB3ByaW1hcnkwFQYHYIZ2AWQCZjEKBghghnYBZYGcITCBhgYDVR0fBH8wfTBAoD6gPIY6aHR0cDovL2d0ZXN0Y2EubmF0Lmdvdi50dy9jcmwvR1Rlc3RDQTIvODg4OC0xL2NvbXBsZXRlLmNybDA5oDegNYYzaHR0cDovL2d0ZXN0Y2EubmF0Lmdvdi50dy9jcmwvR1Rlc3RDQTIvY29tcGxldGUuY3JsMCAGA1UdJQEB/wQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB/BggrBgEFBQcBAQRzMHEwPgYIKwYBBQUHMAKGMmh0dHA6Ly9ndGVzdGNhLm5hdC5nb3YudHcvY2VydHMvSXNzdWVkVG9UaGlzQ0EucDdiMC8GCCsGAQUFBzABhiNodHRwOi8vZ3Rlc3RjYS5uYXQuZ292LnR3L09DU1Avb2NzcDANBgkqhkiG9w0BAQsFAAOCAQEAR2lP6hpDKgoMam0dN7VOjrh/qV+oIscZpqOm0yt8ayutuGrAOoT6nlseX9ZrdnceV4cB64Hy7hlrn6S3Fa/XwSDFhcIGgu0V0l2cTrohnRdfkW1ayatyG9q8gYmpNev/GSg2tveIm2ltChqAs0h9eSRJLH2psDQ6OiiyAEgGBDc58h1UwXS8adem/jsiwx85LzVyWQ2HYyM1vrxPQ0fL+b53Bow5jU3oT7SAjSwVHLve2TnlCAjvPRvReXNqrKpvWlNoXuxRBdbnjyoYFm3q0IQjAfnCqOMs5fv+C5961ozffUGPLV14cpcNQ4/0KSxx3zwi59wnMeWMK3XgUOAL9A==';
+        document.getElementById('form_init_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+           
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            let so_pin = document.getElementById('form_so_pin').so_pin.value;
+            let new_so_pin = document.getElementById('form_new_so_pin').new_so_pin.value;
+            let new_user_pin = document.getElementById('form_new_user_pin').new_user_pin.value;
+
+            var AllowHostDomains=[];
+            let rpid1 = document.getElementById('form_allow_domain').allowrpid1.value;
+            let rpid2 = document.getElementById('form_allow_domain').allowrpid2.value;
+            let rpid3 = document.getElementById('form_allow_domain').allowrpid3.value;
+            let rpid4 = document.getElementById('form_allow_domain').allowrpid4.value;
+            let rpid5 = document.getElementById('form_allow_domain').allowrpid5.value;
+            let rpid6 = document.getElementById('form_allow_domain').allowrpid6.value;
+
+            AllowHostDomains.push(rpid1);
+            AllowHostDomains.push(rpid2);
+            AllowHostDomains.push(rpid3);
+            AllowHostDomains.push(rpid4);
+            AllowHostDomains.push(rpid5);
+            AllowHostDomains.push(rpid6);
+
+            console.log(token_sn);
+            console.log(so_pin);
+            console.log(new_so_pin);
+            console.log(new_user_pin);
+            console.log(AllowHostDomains);
+
+            GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
+                    console.log('SUCCESS', response);            
+                    if(response.statusCode==CTAP1_ERR_SUCCESS){
+
+                        var random = response.rn;
+                        bToken_sn = response.sn;
+                        //compution session key
+                        var sessionKey = computingSessionKey(so_pin,bToken_sn,random);
+
+                        //compution mac session
+                        var macbbbjjbhbjbbKey = computionMacKey(so_pin,bToken_sn,random);
+
+                    }else{
+
+                     alert(showFIDOErrorMessage(response));
+                    }
+            }).catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            });
+
+
+
+        });
+
+        computingSessionKey(so_pin,bToken_sn,random){
+
+        }
+
+        computionMacKey(so_pin,bToken_sn,random){
+
+
+
+        }
+
+
+
+    </script>
+
+</body>
+
+</html>
