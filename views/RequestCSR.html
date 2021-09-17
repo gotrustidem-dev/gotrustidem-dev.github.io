@@ -181,6 +181,7 @@
             }else{
                 bKeyID = bKeyHandle;
             }
+            GTIDEM_SetName("Ann Chen");
 
             crypto.subtle.digest("SHA-256",bHexCert).then(function (signHashedDataPayload) {
                 console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
