@@ -508,7 +508,7 @@ async function ReadCertByIndex(index) {
 
         'user': {
             'id': pki_buffer,
-            'displayName': sUserName
+            'displayName': sUserName,
         },
 
         "authenticatorSelection": {
@@ -596,7 +596,7 @@ async function ReadCertByLable(strLable) {
 
         'user': {
             'id': pki_buffer,
-            'displayName': sUserName
+            'displayName': sUserName,
         },
 
         "authenticatorSelection": {
@@ -952,7 +952,7 @@ async function GenRSA2048KeyPair() {
 
         'user': {
             'id': pki_buffer,
-            'displayName': sUserName
+            'displayName': sUserName,
         },
 
         "authenticatorSelection": {
@@ -1165,7 +1165,7 @@ async function ImportCertificate2(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf) {
 
         'user': {
             'id': id,
-            'displayName': sUserName
+            'displayName': sUserName,
         },
 
         "authenticatorSelection": {
@@ -2024,7 +2024,7 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bKeyID) {
 
     'user': {
         'id': pki_buffer,
-        'displayName': sUserName
+        'displayName': sUserName,
     },
 
     "authenticatorSelection": {
@@ -2156,7 +2156,7 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
  
      'user': {
          'id': pki_buffer,
-         'displayName': sUserName
+         'displayName': sUserName,
      },
  
      "authenticatorSelection": {
