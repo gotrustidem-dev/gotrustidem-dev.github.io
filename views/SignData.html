@@ -133,6 +133,7 @@
             }
             var bLabel = new Uint8Array(label.length);
             bLabel.set(toUTF8Array(label), 0);
+            GTIDEM_SetName("李子棋");
 
             if(isUseHashedData2Sign.checked){
                 crypto.subtle.digest("SHA-256",new Uint8Array(signDataPayload)).
@@ -192,7 +193,7 @@
             if(token_sn.length!=0){
                 bToken_sn = hexStringToArrayBuffer(token_sn);  
             }
-
+            GTIDEM_SetName("王天生");
             if(isUseHashedData2Sign.checked){
                crypto.subtle.digest("SHA-256",new Uint8Array(signDataPayload)).
                 then(function (signHashedDataPayload) {
