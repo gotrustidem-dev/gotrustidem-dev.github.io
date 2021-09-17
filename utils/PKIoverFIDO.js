@@ -152,7 +152,6 @@ async function requirePINVerify() {
         'user': {
             //'id': pki_buffer,
             'id': id,
-            'name': 'alice@example.com',
             'displayName': 'Alice von Wunderland'
         },
 
@@ -320,7 +319,6 @@ async function requireEncryptedPINandEncryptedNewPIN(oldpin, newpin) {
 
         'user': {
             'id': pki_buffer,
-            'name': 'alice@example.com',
             'displayName': 'Alice von Wunderland'
         },
 
@@ -510,8 +508,7 @@ async function ReadCertByIndex(index) {
 
         'user': {
             'id': pki_buffer,
-            'name': '王大強Name',
-            'displayName': '王大強displayName'
+            'displayName': sUserName
         },
 
         "authenticatorSelection": {
@@ -599,8 +596,7 @@ async function ReadCertByLable(strLable) {
 
         'user': {
             'id': pki_buffer,
-            'name': 'Get Cert By Label',
-            'displayName': 'Get Cert By Label'
+            'displayName': sUserName
         },
 
         "authenticatorSelection": {
@@ -956,8 +952,7 @@ async function GenRSA2048KeyPair() {
 
         'user': {
             'id': pki_buffer,
-            'name': 'Get Cert By Index',
-            'displayName': 'Get Cert By Index'
+            'displayName': sUserName
         },
 
         "authenticatorSelection": {
@@ -1170,8 +1165,7 @@ async function ImportCertificate2(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf) {
 
         'user': {
             'id': id,
-            'name': 'GoTrustID Inc.',
-            'displayName': 'Alice von Wunderland'
+            'displayName': sUserName
         },
 
         "authenticatorSelection": {
@@ -2030,7 +2024,6 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bKeyID) {
 
     'user': {
         'id': pki_buffer,
-        'name': sUserName,
         'displayName': sUserName
     },
 
@@ -2163,7 +2156,6 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
  
      'user': {
          'id': pki_buffer,
-         'name': sUserName,
          'displayName': sUserName
      },
  
