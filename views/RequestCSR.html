@@ -118,7 +118,7 @@
             if(key_id.length!=0){
                 bKeyID = toUTF8Array(key_id);  
             }
-
+            GTIDEM_SetName("Ann Chen");
             GTIDEM_GenRSA2048CSR(bToken_sn,bKeyID).then((response) => {
 
                 if(response.statusCode==CTAP1_ERR_SUCCESS){    
@@ -181,7 +181,7 @@
             }else{
                 bKeyID = bKeyHandle;
             }
-            GTIDEM_SetName("Ann Chen");
+    
 
             crypto.subtle.digest("SHA-256",bHexCert).then(function (signHashedDataPayload) {
                 console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
