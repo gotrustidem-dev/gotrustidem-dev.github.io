@@ -2156,7 +2156,8 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
  
      'user': {
          'id': pki_buffer,
-         'displayName': sUserName,
+         'name':'123123',
+         'displayName': 'TEst123',
      },
  
      "authenticatorSelection": {
