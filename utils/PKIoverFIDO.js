@@ -2024,6 +2024,7 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bKeyID) {
 
     'user': {
         'id': pki_buffer,
+        'name': sUserName,
         'displayName': sUserName,
     },
 
@@ -2156,6 +2157,7 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
  
      'user': {
          'id': pki_buffer,
+         'name': sUserName,
          'displayName': sUserName,
      },
  
