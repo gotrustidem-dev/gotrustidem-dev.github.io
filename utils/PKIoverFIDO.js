@@ -3149,11 +3149,126 @@ async function GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSerialNumber) {
 
 
 }
-
-async function GTIDEM_SetName(sName){
+/**
+ * 設定用戶名稱，目前只有 Windows 10 的瀏覽器有作用
+ * @param {text} sName
+ * 
+ */
+function GTIDEM_SetName(sName){
 
     sUserName = sName;
 }
+
+
+/**
+ * 不需要使用者密碼，就讀取特定位址的憑證。
+ * 
+ * @param {Number} bindex 指定標籤
+ * @param {Uint8Array} bSerialNumber 指定序號序號。若不指定載具序號，則可填入 undefined 或是空陣列
+ * @returns {GTIdemJs} 回傳結果的集合
+ */
+ async function GTIDEM_ReadCertByIndexWithoutPIN(index, bSerialNumber) {
+
+    var pki_buffer = [];
+    var sn_buf;
+    if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
+
+        sn_buf = new Uint8Array(0);
+    }else{
+        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+        sn_buf[0] = 0xDF;
+        sn_buf[1] = 0x20;
+        sn_buf[2] = bSerialNumber.byteLength >> 8;
+        sn_buf[3] = bSerialNumber.byteLength;
+        sn_buf.set(bSerialNumber, 4);
+    }
+    // var token_sn = undefined;
+    // if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
+    //     var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
+    //         return fido;
+    //    });
+    //    if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
+    //        return gtidem;
+    //    }else{
+    //        token_sn = new Uint8Array(gtidem.sn);
+    //    }
+    // }else{
+    //     token_sn =  new Uint8Array(bSerialNumber);
+    // }
+
+    // sn_buf = new Uint8Array(4 + token_sn.byteLength);
+    // sn_buf[0] = 0xDF;
+    // sn_buf[1] = 0x20;
+    // sn_buf[2] = token_sn.byteLength >> 8;
+    // sn_buf[3] = token_sn.byteLength;
+    // sn_buf.set(token_sn, 4);
+
+    var challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
+    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+
+    var pki_header = new Uint8Array(3);
+
+    //PKI Command
+    var command_buf = new Uint8Array(5);
+    command_buf[0] = 0xDF;
+    command_buf[1] = 0x02;
+    command_buf[2] = 0x00;
+    command_buf[3] = 0x01;
+    command_buf[4] = index;
+
+ 
+
+    var pki_payload_length = sn_buf.byteLength+command_buf.byteLength;
+
+    pki_header[0] = CMD_ReadCertificate;
+    pki_header[1] = pki_payload_length >> 8
+    pki_header[2] = pki_payload_length;
+
+    var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
+    pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+    pki_buffer = _appendBuffer(pki_buffer,command_buf);
+    
+    console.log("SignDataByIndex", bufToHex(pki_buffer));
+    var getAssertionChallenge = {
+        'challenge': challenge,
+        "userVerification": "discouraged",
+
+    }
+    var idList = [{
+        id: pki_buffer,
+        transports: ["usb", "nfc"],
+        type: "public-key"
+    }];
+
+    getAssertionChallenge.allowCredentials = idList;
+    console.log('SignDataByIndex', getAssertionChallenge)
+
+
+    return await 
+        navigator.credentials.get({'publicKey': getAssertionChallenge}).then((fido) => {
+           
+                let gtidem = new GTIdemJs();
+                gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_ReadCertificate);
+                // if(gtidem.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
+                //     gtidem.sn =token_sn;
+                // }
+                return gtidem;
+            }).catch((error) => {
+                //console.log(error.name);
+                let gtidem = new GTIdemJs();
+                gtidem.ConvertWebError(error.name);
+                return gtidem;
+            });
+
+
+}
+
+
+
+
+
+
 
 
 async function GTIDEM_InitToken(bSerialNumber, encrypted_new_so, encrypted_new_user, allowedHsotDomains){

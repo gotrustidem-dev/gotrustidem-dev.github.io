@@ -51,6 +51,8 @@ const CTAP2_VENDOR_ERROR_TOKEN = 0xF2;
 const CTAP2_VENDOR_ERROR_LENGTH = 0xF3;
 const CTAP2_ERR_VENDOR_ERROR_NO_USER    = 0xF4;    //Vendor specific error.
 const CTAP2_ERR_VENDOR_ERROR_CREDENTIAL_EXIST    =0xF5;    //Vendor specific error.
+const CTAP2_ERR_VENDOR_ERROR_NOT_ALLOWED_RPID    =0xF7;    //Vendor specific error.
+const CTAP2_ERR_VENDOR_ERROR_PIN_RXPIRED    =0xF8;    //Vendor specific error.
 
 const ErrorMsg_OK = "No ERROR";
 const ErrorMsg_PIN_INVALID = "PIN invalid.";
@@ -87,7 +89,12 @@ var showFIDOErrorMessage = (gtidem) => {
 
         case CTAP2_ERR_PIN_POLICY_VIOLATION:
             errorMsg = "密碼不符合要求";
-            break;    
+            break; 
+            
+        case CTAP2_ERR_VENDOR_ERROR_PIN_RXPIRED:
+            errorMsg += '密碼到期，變更密碼'; 
+            break;       
+
         case CTAP2_ERR_KEY_STORE_FULL:
             errorMsg +='憑證空間已滿';
             break;
@@ -104,7 +111,9 @@ var showFIDOErrorMessage = (gtidem) => {
         case CTAP2_ERR_VENDOR_ERROR_CREDENTIAL_EXIST:
             errorMsg += '憑證已經存在';  
             break;
-
+        case CTAP2_ERR_VENDOR_ERROR_NOT_ALLOWED_RPID:
+            errorMsg += '此網站不能使用載具'; 
+            break;    
         case WEB_ERR_UserCancelorTimeout:
             errorMsg += '操作取消';
             break;
