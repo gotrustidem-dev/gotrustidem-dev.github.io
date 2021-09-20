@@ -178,11 +178,14 @@
             //let bNewSOPIN = new Uint8Array([0x71,0x72,0x73,0x74,0x75,0x76,0x77,0x78]);
             //let bNewUserPIN = new Uint8Array([0x81,0x82,0x83,0x84,0x85,0x86,0x87,0x88]);
 
-            var para = buildInitToken(bSOPINArray,bRandom,bToken_sn,bNewSOPINArray,bNewUserPINArray,AllowHostDomains);
+            var para = buildInitToken(bSOPINArray,bRandom,bToken_sn,bNewSOPINArray,bNewUserPINArray,AllowHostDomains)
+            .then(result=>{
+                GTIDEM_InitToken(bToken_sn, result.bEncryptedInitData, result.bHashMacofInitData); 
+            });
 
             //do Token Initial
 
-            GTIDEM_InitToken(bToken_sn, para.bEncryptedInitData, para.bHashMacofInitData); 
+           
 
 
 
