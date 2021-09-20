@@ -47,7 +47,7 @@
 
                                         <form style="text-align: center;" id="form_so_pin" onsubmit="return false">
                                             <p>
-                                                <label id="label_so_pin"> Old SO PIN:</label><br>
+                                                <label id="label_so_pin"> SO PIN:</label><br>
                                                 <input type="text" name="so_pin" style="width: 342px; height:41px">
                                             </p>
                                         </form>
@@ -131,8 +131,6 @@
             var bSOPINArray = new Uint8Array(so_pin.length);
             bSOPINArray.set(toUTF8Array(so_pin), 0);
 
-            var bNewSOPINArray = new Uint8Array(new_so_pin.length);
-            bNewSOPINArray.set(toUTF8Array(new_so_pin), 0);
 
             var bNewUserPINArray = new Uint8Array(new_user_pin.length);
             bNewUserPINArray.set(toUTF8Array(new_user_pin), 0);
