@@ -31,8 +31,8 @@
                         <form style="text-align: center;" id="form_tokeninfo_btn" onsubmit="return false">
                             <button class="btn btn-primary" action="submit"
                                 style="width: 200px; height:34px;background-color: #008CBA;">Get Token Info</button>
-                                <br><label></label>Serial number: <br>  
-                                <br><label id="label_serial_number"></label><br>    
+                                <br><label></label>Random number: <br>  
+                                <br><label id="label_random_number"></label><br>    
                         </form>
                     </td>
                 </tr>
@@ -110,7 +110,8 @@
 
                 console.log('SUCCESS', response);            
                 if(response.statusCode==CTAP1_ERR_SUCCESS){
-                    document.getElementById('label_serial_number').innerText =ConverSNFormat(response.sn);
+                    document.getElementById('form_token_sn').token_sn.value =ConverSNFormat(response.sn);
+                    document.getElementById('label_random_number').innerText =ConverSNFormat(response.rn);
                 }else{
                    alert(showFIDOErrorMessage(response));
                 }
@@ -135,11 +136,10 @@
             var bToken_sn = undefined;
             if(token_sn.length!=0){
                 bToken_sn = hexStringToArrayBuffer(token_sn);
-               
             }
 
 
-            bRandom = hexStringToArrayBuffer(random).slice(0,8);
+            bRandom = hexStringToArrayBuffer(random);
         
             var AllowHostDomains=[];
          
