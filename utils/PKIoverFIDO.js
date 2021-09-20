@@ -3275,7 +3275,8 @@ function GTIDEM_SetName(sName){
  */
  async function GTIDEM_InitToken(bSerialNumber, encrypted_InitData, HmacValueOfInitData) {
 
-
+    var pki_buffer = [];
+    var sn_buf;
     if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
         sn_buf = new Uint8Array(0);
     }else{
