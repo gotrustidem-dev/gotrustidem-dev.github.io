@@ -182,7 +182,8 @@
 
             //do Token Initial
 
-            
+            GTIDEM_InitToken(bToken_sn, para.bEncryptedInitData, para.bHashMacofInitData); 
+
 
 
 
@@ -255,6 +256,7 @@
                 );
             });
             console.log("InitData HMAC: \n"+bufToHex(bHashMacofInitData));
+            return {bEncryptedInitData,bHashMacofInitData};
         }
         async function computingSessionKey(so_pin,random){
 
