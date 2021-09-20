@@ -31,7 +31,7 @@
                         <form style="text-align: center;" id="form_tokeninfo_btn" onsubmit="return false">
                             <button class="btn btn-primary" action="submit"
                                 style="width: 200px; height:34px;background-color: #008CBA;">Get Token Info</button>
-                            <label id="label_serial_number"></label><br>    
+                                <br><label id="label_serial_number"></label><br>    
                         </form>
                     </td>
                 </tr>
@@ -138,9 +138,8 @@
             }
 
 
-            bRandom = hexStringToArrayBuffer(token_sn).slice(0,8);
-           
-
+            bRandom = hexStringToArrayBuffer(random).slice(0,8);
+        
             var AllowHostDomains=[];
          
 
