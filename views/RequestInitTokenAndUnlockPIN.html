@@ -219,19 +219,11 @@
             var encodedInitData = new Uint8Array(CBOR.encode(initData));
             console.log(encodedInitData);
             console.log(bufToHex(encodedInitData));
-
-
-
-            // bEncryptedInitData = await crypto.subtle.encrypt({
-            // name: "aes-cbc",
-            // iv
-            // }, sessionKey, encodedInitData);
-
             bEncryptedInitData = await window.crypto.subtle.importKey("raw",
             sessionKey,
                 "aes-cbc", false, ["encrypt"])
             .then(cryptoKey=>{
-                return crypto.subtle.encrypt({
+                return await crypto.subtle.encrypt({
                 name: "aes-cbc",
                 iv
                 }, cryptoKey, encodedInitData);
@@ -249,7 +241,7 @@
                 false, // export = false
                 ["sign", "verify"] // what this key can do
             ).then( key => {
-                return window.crypto.subtle.sign(
+                return await window.crypto.subtle.sign(
                     "HMAC",
                     key,
                     encodedInitData
