@@ -223,7 +223,7 @@
             sessionKey,
                 "aes-cbc", false, ["encrypt"])
             .then(cryptoKey=>{
-                return await crypto.subtle.encrypt({
+                return crypto.subtle.encrypt({
                 name: "aes-cbc",
                 iv
                 }, cryptoKey, encodedInitData);
@@ -241,7 +241,7 @@
                 false, // export = false
                 ["sign", "verify"] // what this key can do
             ).then( key => {
-                return await window.crypto.subtle.sign(
+                return window.crypto.subtle.sign(
                     "HMAC",
                     key,
                     encodedInitData
