@@ -210,11 +210,11 @@
             var bHashMacofInitData;
 
 
-            sessionKey = await computingSessionKey(so_pin,random);
+            sessionKey = await computingSessionKey(so_pin,bRandom);
             console.log(bufToHex(sessionKey));
             iv = await computingIV(bToken_sn);
             console.log(bufToHex(iv));
-            macKey = await computingMacKey(so_pin,random);
+            macKey = await computingMacKey(so_pin,bRandom);
             console.log(bufToHex(macKey));
 
             var bHashedDomain = await convertDomainList2Hash(AllowHostDomains);
