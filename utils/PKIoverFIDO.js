@@ -18,7 +18,7 @@ const CMD_UNLOCK_PIN = 0xE9;
 const CMD_REQUESTCSR = 0xEA;
 const CMD_DELEE_CERT= 0xEB;
 const CMD_CLEAR_TOKEN = 0xEC;
-
+const CMD_INIT_TOKEN = 0xED;
 
 
 
@@ -3265,11 +3265,90 @@ function GTIDEM_SetName(sName){
 
 
 
-async function GTIDEM_InitToken(bSerialNumber, encrypted_new_so, encrypted_new_user, allowedHsotDomains){
+
+/**
+ * 
+ * @param {Uint8Array} bSerialNumber 指定序號序號。若不指定載具序號，則可填入 undefined 或是空陣列
+ * @param {Uint8Array} encrypted_InitData 
+ * @param {Uint8Array} HmacValueOfInitData 
+ * @returns 
+ */
+ async function GTIDEM_InitToken(bSerialNumber, encrypted_InitData, HmacValueOfInitData) {
 
 
+    if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
+        sn_buf = new Uint8Array(0);
+    }else{
+        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+        sn_buf[0] = 0xDF;
+        sn_buf[1] = 0x20;
+        sn_buf[2] = bSerialNumber.byteLength >> 8;
+        sn_buf[3] = bSerialNumber.byteLength;
+        sn_buf.set(bSerialNumber, 4);
+    }
+    
+   var challenge = new Uint8Array(32);
+   window.crypto.getRandomValues(challenge);
+   var encryptedInitData_buf = new Uint8Array(4 + encrypted_InitData.byteLength);
+   ecpubkey_buf[0] = 0xDF;
+   ecpubkey_buf[1] = 0x21;
+   ecpubkey_buf[2] = encrypted_InitData.byteLength >> 8;
+   ecpubkey_buf[3] = encrypted_InitData.byteLength;
+   ecpubkey_buf.set(new Uint8Array(encrypted_InitData), 4);
+
+   var hmacInitData_buf = new Uint8Array(4 + HmacValueOfInitData.byteLength);
+   encryptedOldPINHash_buf[0] = 0xDF;
+   encryptedOldPINHash_buf[1] = 0x22;
+   encryptedOldPINHash_buf[2] = HmacValueOfInitData.byteLength >> 8;
+   encryptedOldPINHash_buf[3] = HmacValueOfInitData.byteLength;
+   encryptedOldPINHash_buf.set(new Uint8Array(HmacValueOfInitData), 4);
+  
+   var payloadLen = sn_buf.byteLength+encryptedInitData_buf.byteLength+hmacInitData_buf.byteLength;
+
+   var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+ 
+   var pki_header = new Uint8Array(3);
+   pki_header[0] = CMD_INIT_TOKEN;
+   pki_header[1] = payloadLen>>8
+   pki_header[2] = payloadLen;
+
+   var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
+   pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+   pki_buffer = _appendBuffer(pki_buffer,encryptedInitData_buf);
+   pki_buffer = _appendBuffer(pki_buffer,hmacInitData_buf);
+
+
+
+   console.log("Token_init_command: " + bufToHex(pki_buffer));
+
+   var getAssertionChallenge = {
+       'challenge': challenge,
+       "userVerification": "discouraged"
+   }
+   var idList = [{
+       id: pki_buffer,
+       transports: ["usb"],
+       type: "public-key"
+   }];
+
+   getAssertionChallenge.allowCredentials = idList;
+
+   return await navigator.credentials.get({
+       'publicKey': getAssertionChallenge
+   }).then((fido) => {
+           
+        let gtidem = new GTIdemJs();
+        gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_CHANGE_PIN);
+        return gtidem;
+    }).catch((error) => {
+        //console.log(error.name);
+        let gtidem = new GTIdemJs();
+        gtidem.ConvertWebError(error.name);
+        return gtidem;
+    });
 
 }
+
 
 
 
