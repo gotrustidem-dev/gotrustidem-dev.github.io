@@ -25,8 +25,14 @@
                                 <label id="label_token_sn">Token Serial number:</label><br>
                                 <input type="text" name="token_sn" style="width: 342px; height:41px">
                             </p>
-                        </form>
 
+
+                        </form>
+                        <form style="text-align: center;" id="form_tokeninfo_btn" onsubmit="return false">
+                            <button class="btn btn-primary" action="submit"
+                                style="width: 200px; height:34px;background-color: #008CBA;">Get Token Info</button>
+                            <label id="label_serial_number"></label><br>    
+                        </form>
                     </td>
                 </tr>
 
@@ -89,12 +95,37 @@
     </div>
     <script>
       
-        var testBigCertificate =
-            'MIIFCjCCA/KgAwIBAgIRAOmeRRu4pB7BKabPJNHAmpYwDQYJKoZIhvcNAQELBQAwVjELMAkGA1UEBhMCVFcxEjAQBgNVBAoMCeihjOaUv+mZojEzMDEGA1UECwwqKOa4rOippueUqCkg5pS/5bqc5ris6Kmm5oaR6K2J566h55CG5Lit5b+DMB4XDTIxMDgxMzAzMTMwNFoXDTIyMDIxMzAzMTMwNFowJTELMAkGA1UEBhMCVFcxFjAUBgNVBAoMDea4rOippuapn+mXnDEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDHzxFAXgNxcLr8YYVfGm9Fk+bfxDXzp+Y4vgZRSZnii6s91g1rXDqEKsySuqHvj6ppafdlXYf8fwy0K8LmjCPT8w5dNWtHEkiidqaR6pk2P5lEj3wyaqlOe3dnwoDP1t7DkutRdM4XsHIml5aZL0oefJAlz5jsd44EB6un+FHDL6TXfmj40XogBUUciGXtQ4BxBgAqCsK2k5GCAjHpIzqU6xbW9ViWsqOjsqHLy9lQkj2Eq/U/D1M+SbYhpoR3jJAncTP/+u38dTJ+QVz9bGe28Ss8zP34TLdiR9zLsH5MYmQ9VGqwuEm0WsKPIi3L2qcxtS/rEDiAWzQu4JNI/RBRAgMBAAGjggICMIIB/jAfBgNVHSMEGDAWgBR3r9Blh+4dyKn2l6AlRw7JldpxqzAdBgNVHQ4EFgQUM6vAHcYDXS0Tv/4i5MhxlcxAaNswDgYDVR0PAQH/BAQDAgeAMBQGA1UdIAQNMAswCQYHYIZ2ZQADADAaBgNVHREEEzARgQ90ZXN0QGNodC5jb20udHcwTgYDVR0JBEcwRTAWBgdghnYBZAIBMQsGCWCGdgFkAwIBATAUBgdghnYBZAICMQkTB3ByaW1hcnkwFQYHYIZ2AWQCZjEKBghghnYBZYGcITCBhgYDVR0fBH8wfTBAoD6gPIY6aHR0cDovL2d0ZXN0Y2EubmF0Lmdvdi50dy9jcmwvR1Rlc3RDQTIvODg4OC0xL2NvbXBsZXRlLmNybDA5oDegNYYzaHR0cDovL2d0ZXN0Y2EubmF0Lmdvdi50dy9jcmwvR1Rlc3RDQTIvY29tcGxldGUuY3JsMCAGA1UdJQEB/wQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB/BggrBgEFBQcBAQRzMHEwPgYIKwYBBQUHMAKGMmh0dHA6Ly9ndGVzdGNhLm5hdC5nb3YudHcvY2VydHMvSXNzdWVkVG9UaGlzQ0EucDdiMC8GCCsGAQUFBzABhiNodHRwOi8vZ3Rlc3RjYS5uYXQuZ292LnR3L09DU1Avb2NzcDANBgkqhkiG9w0BAQsFAAOCAQEAR2lP6hpDKgoMam0dN7VOjrh/qV+oIscZpqOm0yt8ayutuGrAOoT6nlseX9ZrdnceV4cB64Hy7hlrn6S3Fa/XwSDFhcIGgu0V0l2cTrohnRdfkW1ayatyG9q8gYmpNev/GSg2tveIm2ltChqAs0h9eSRJLH2psDQ6OiiyAEgGBDc58h1UwXS8adem/jsiwx85LzVyWQ2HYyM1vrxPQ0fL+b53Bow5jU3oT7SAjSwVHLve2TnlCAjvPRvReXNqrKpvWlNoXuxRBdbnjyoYFm3q0IQjAfnCqOMs5fv+C5961ozffUGPLV14cpcNQ4/0KSxx3zwi59wnMeWMK3XgUOAL9A==';
+      document.getElementById('form_tokeninfo_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            console.log(token_sn);
+
+            var bToken_sn = undefined;
+            if(token_sn.length!=0){
+                bToken_sn = hexStringToArrayBuffer(token_sn);
+               
+            }
+            GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
+
+                console.log('SUCCESS', response);            
+                if(response.statusCode==CTAP1_ERR_SUCCESS){
+                    document.getElementById('label_serial_number').innerText = "Serial number: " + ConverSNFormat(response.sn);
+                }else{
+                   alert(showFIDOErrorMessage(response));
+                }
+            }).catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            });
+
+        });
+        
         document.getElementById('form_init_btn').addEventListener('submit', function (event) {
 
             event.preventDefault();
             let bRandom = [];
+
+            let random = document.getElementById('label_serial_number').value;
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             let so_pin = document.getElementById('form_so_pin').so_pin.value;
             let new_so_pin = document.getElementById('form_new_so_pin').new_so_pin.value;
@@ -105,24 +136,10 @@
                 bToken_sn = hexStringToArrayBuffer(token_sn);
                
             }
-           
-            GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
-                        
-                if(response.statusCode==CTAP1_ERR_SUCCESS){
-                    
-                    bRandom = (response.rn).slice(0,8);
-                    bToken_sn = response.sn;
-                    console.log("RandomNumber: \n"+bufToHex(bRandom));
 
-                }else{
-                   alert(showFIDOErrorMessage(response));
-                   return;
-                }
-            }).catch((error) => {
-                alert(error)
-                console.log('FAIL', error);
-                return;
-            });
+
+            bRandom = hexStringToArrayBuffer(token_sn).slice(0,8);
+           
 
             var AllowHostDomains=[];
          
