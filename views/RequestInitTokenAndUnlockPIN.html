@@ -106,7 +106,7 @@
                
             }
            
-            GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
+            await GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
                         
                 if(response.statusCode==CTAP1_ERR_SUCCESS){
                     
