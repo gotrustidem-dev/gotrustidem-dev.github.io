@@ -182,23 +182,17 @@
             .then(result=>{
                 GTIDEM_InitToken(bToken_sn, result.bEncryptedInitData, result.bHashMacofInitData); 
             });
-
-            //do Token Initial
-
-           
-
-
-
-
-
         });
 
         async function buildInitToken(bSOPIN,bRandom,bToken_sn,bNewSOPin,bNewUserPIN,AllowHostDomains){
-
-
             return await prepareInitToken(bSOPIN,bRandom,bToken_sn,bNewSOPin,bNewUserPIN,AllowHostDomains);
-
         }
+
+        async function buildUnlockToken(bSOPIN,bRandom,bToken_sn,bNewUserPIN){
+            return await prepareInitToken(bSOPIN,bRandom,bToken_sn,bNewUserPIN);
+        }
+
+
         async function prepareInitToken(bSOPIN,bRandom,bToken_sn,bNewSOPin,bNewUserPIN,AllowHostDomains){
 
             var sessionKey;
@@ -221,7 +215,7 @@
             var initData = {
                 soPIN : bNewSOPin,
                 userPIN: bNewUserPIN,
-                allowRPID:bHashedDomain
+                allowedRPID:bHashedDomain
             }
             //build init data with cbor 
             var encodedInitData = new Uint8Array(CBOR.encode(initData));
@@ -332,7 +326,7 @@
             var bHashedDomain = await convertDomainList2Hash(AllowHostDomains);
 
             var initData = {
-                userpin: bNewUserPIN
+                userPIN: bNewUserPIN
             }
             //build init data with cbor 
             var encodedInitData = new Uint8Array(CBOR.encode(initData));
@@ -377,7 +371,7 @@
             console.log("InitData HMAC: \n"+bufToHex(bHashMacofInitData));
 
 
-
+            return {bEncryptedInitData,bHashMacofInitData};
 
 
         }
