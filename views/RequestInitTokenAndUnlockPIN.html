@@ -190,7 +190,12 @@
 
         });
 
+        async function buildInitToken(bSOPIN,bRandom,bToken_sn,bNewSOPin,bNewUserPIN,AllowHostDomains){
 
+
+            return await prepareInitToken(bSOPIN,bRandom,bToken_sn,bNewSOPin,bNewUserPIN,AllowHostDomains);
+
+        }
         async function prepareInitToken(bSOPIN,bRandom,bToken_sn,bNewSOPin,bNewUserPIN,AllowHostDomains){
 
             var sessionKey;
@@ -398,6 +403,8 @@
             return hashedDomainList;
 
         }
+
+
 
     </script>
 
