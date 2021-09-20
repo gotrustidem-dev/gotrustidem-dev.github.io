@@ -3291,18 +3291,18 @@ function GTIDEM_SetName(sName){
    var challenge = new Uint8Array(32);
    window.crypto.getRandomValues(challenge);
    var encryptedInitData_buf = new Uint8Array(4 + encrypted_InitData.byteLength);
-   ecpubkey_buf[0] = 0xDF;
-   ecpubkey_buf[1] = 0x21;
-   ecpubkey_buf[2] = encrypted_InitData.byteLength >> 8;
-   ecpubkey_buf[3] = encrypted_InitData.byteLength;
-   ecpubkey_buf.set(new Uint8Array(encrypted_InitData), 4);
+   encryptedInitData_buf[0] = 0xDF;
+   encryptedInitData_buf[1] = 0x21;
+   encryptedInitData_buf[2] = encrypted_InitData.byteLength >> 8;
+   encryptedInitData_buf[3] = encrypted_InitData.byteLength;
+   encryptedInitData_buf.set(new Uint8Array(encrypted_InitData), 4);
 
    var hmacInitData_buf = new Uint8Array(4 + HmacValueOfInitData.byteLength);
-   encryptedOldPINHash_buf[0] = 0xDF;
-   encryptedOldPINHash_buf[1] = 0x22;
-   encryptedOldPINHash_buf[2] = HmacValueOfInitData.byteLength >> 8;
-   encryptedOldPINHash_buf[3] = HmacValueOfInitData.byteLength;
-   encryptedOldPINHash_buf.set(new Uint8Array(HmacValueOfInitData), 4);
+   hmacInitData_buf[0] = 0xDF;
+   hmacInitData_buf[1] = 0x22;
+   hmacInitData_buf[2] = HmacValueOfInitData.byteLength >> 8;
+   hmacInitData_buf[3] = HmacValueOfInitData.byteLength;
+   hmacInitData_buf.set(new Uint8Array(HmacValueOfInitData), 4);
   
    var payloadLen = sn_buf.byteLength+encryptedInitData_buf.byteLength+hmacInitData_buf.byteLength;
 
