@@ -217,7 +217,6 @@
             macKey = await computingMacKey(so_pin,bRandom);
             console.log(bufToHex(macKey));
 
-            var bHashedDomain = await convertDomainList2Hash(AllowHostDomains);
 
             var initData = {
                 userPIN: bNewUserPIN
