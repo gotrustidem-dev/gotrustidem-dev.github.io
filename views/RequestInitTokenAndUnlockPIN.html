@@ -25,12 +25,13 @@
                                 <label id="label_token_sn">Token Serial number:</label><br>
                                 <input type="text" name="token_sn" style="width: 342px; height:41px">
                             </p>
-
+                            
 
                         </form>
                         <form style="text-align: center;" id="form_tokeninfo_btn" onsubmit="return false">
                             <button class="btn btn-primary" action="submit"
                                 style="width: 200px; height:34px;background-color: #008CBA;">Get Token Info</button>
+                                <br><label></label>Serial number: <br>  
                                 <br><label id="label_serial_number"></label><br>    
                         </form>
                     </td>
@@ -109,7 +110,7 @@
 
                 console.log('SUCCESS', response);            
                 if(response.statusCode==CTAP1_ERR_SUCCESS){
-                    document.getElementById('label_serial_number').innerText = "Serial number: " + ConverSNFormat(response.sn);
+                    document.getElementById('label_serial_number').innerText =ConverSNFormat(response.sn);
                 }else{
                    alert(showFIDOErrorMessage(response));
                 }
