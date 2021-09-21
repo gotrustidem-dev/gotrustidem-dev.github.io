@@ -51,8 +51,8 @@ const CTAP2_VENDOR_ERROR_TOKEN = 0xF2;
 const CTAP2_VENDOR_ERROR_LENGTH = 0xF3;
 const CTAP2_ERR_VENDOR_ERROR_NO_USER    = 0xF4;    //Vendor specific error.
 const CTAP2_ERR_VENDOR_ERROR_CREDENTIAL_EXIST    =0xF5;    //Vendor specific error.
-const CTAP2_ERR_VENDOR_ERROR_NOT_ALLOWED_RPID    =0xF6;    //Vendor specific error.
-const CTAP2_ERR_VENDOR_ERROR_INVALID_DATA    =0xF7;    //Vendor specific error.
+const CTAP2_ERR_VENDOR_ERROR_INVALID_DATA    =0xF6;    //Vendor specific error.
+const CTAP2_ERR_VENDOR_ERROR_NOT_ALLOWED_RPID    =0xF7;    //Vendor specific error.
 const CTAP2_ERR_VENDOR_ERROR_PIN_RXPIRED    =0xF8;    //Vendor specific error.
 
 const ErrorMsg_OK = "No ERROR";
