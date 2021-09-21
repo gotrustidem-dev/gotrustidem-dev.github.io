@@ -25,14 +25,14 @@
                                 <label id="label_token_sn">Token Serial number:</label><br>
                                 <input type="text" name="token_sn" style="width: 342px; height:41px">
                             </p>
-                            
+
 
                         </form>
                         <form style="text-align: center;" id="form_tokeninfo_btn" onsubmit="return false">
                             <button class="btn btn-primary" action="submit"
                                 style="width: 200px; height:34px;background-color: #008CBA;">Get Token Info</button>
-                                <br><label></label>Random number: <br>  
-                                <br><label id="label_random_number"></label><br>    
+                            <br><label></label>Random number: <br>
+                            <br><label id="label_random_number"></label><br>
                         </form>
                     </td>
                 </tr>
@@ -52,19 +52,22 @@
                                             </p>
                                         </form>
 
-                                        <form style="text-align: center;" id="form_new_user_pin" onsubmit="return false">
+                                        <form style="text-align: center;" id="form_new_user_pin"
+                                            onsubmit="return false">
                                             <p>
                                                 <label id="label_new_user_pin"> New User PIN:</label><br>
-                                                <input type="text" name="new_user_pin" style="width: 342px; height:41px">
+                                                <input type="text" name="new_user_pin"
+                                                    style="width: 342px; height:41px">
                                             </p>
                                         </form>
 
-                                
+
                                         <p>
                                             <form style="text-align: center;" id="form_init_btn"
                                                 onsubmit="return false">
                                                 <button class="btn btn-primary" action="submit"
-                                                    style="width: 200px; height:34px;background-color: #008CBA;">Unlock PIN</button>
+                                                    style="width: 200px; height:34px;background-color: #008CBA;">Unlock
+                                                    PIN</button>
                                             </form>
                                         </p>
                                     </td>
@@ -78,25 +81,26 @@
         </table>
     </div>
     <script>
-      
-      document.getElementById('form_tokeninfo_btn').addEventListener('submit', function (event) {
+        document.getElementById('form_tokeninfo_btn').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             console.log(token_sn);
 
             var bToken_sn = undefined;
-            if(token_sn.length!=0){
+            if (token_sn.length != 0) {
                 bToken_sn = hexStringToArrayBuffer(token_sn);
-               
+
             }
             GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
 
-                console.log('SUCCESS', response);            
-                if(response.statusCode==CTAP1_ERR_SUCCESS){
-                    document.getElementById('form_token_sn').token_sn.value =ConverSNFormat(response.sn);
-                    document.getElementById('label_random_number').innerText =ConverSNFormat(response.rn);
-                }else{
-                   alert(showFIDOErrorMessage(response));
+                console.log('SUCCESS', response);
+                if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                    document.getElementById('form_token_sn').token_sn.value = ConverSNFormat(response
+                        .sn);
+                    document.getElementById('label_random_number').innerText = ConverSNFormat(response
+                        .rn);
+                } else {
+                    alert(showFIDOErrorMessage(response));
                 }
             }).catch((error) => {
                 alert(error)
@@ -104,7 +108,7 @@
             });
 
         });
-        
+
         document.getElementById('form_init_btn').addEventListener('submit', function (event) {
 
             event.preventDefault();
@@ -116,14 +120,14 @@
             let new_user_pin = document.getElementById('form_new_user_pin').new_user_pin.value;
 
             var bToken_sn = undefined;
-            if(token_sn.length!=0){
+            if (token_sn.length != 0) {
                 bToken_sn = hexStringToArrayBuffer(token_sn);
             }
 
 
             bRandom = hexStringToArrayBuffer(random);
-        
-            
+
+
             console.log(token_sn);
             console.log(so_pin);
             console.log(new_user_pin);
@@ -135,72 +139,91 @@
             var bNewUserPINArray = new Uint8Array(new_user_pin.length);
             bNewUserPINArray.set(toUTF8Array(new_user_pin), 0);
 
-            var para = buildUnlockToken(bSOPINArray,bRandom,bToken_sn,bNewUserPINArray)
-            .then(result=>{
-                GTIDEM_UnlockPIN(bToken_sn, result.bEncryptedInitData, result.bHashMacofInitData); 
-            });
+            var para = buildUnlockToken(bSOPINArray, bRandom, bToken_sn, bNewUserPINArray)
+                .then(result => {
+                    GTIDEM_UnlockPIN(bToken_sn, result.bEncryptedInitData, result.bHashMacofInitData).then(
+                        response => {
+
+                            if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                                var str = '密碼解鎖完成';
+                                if (response.pinRetry != undefined) {
+                                    str += '\n剩餘次數為 ' + response.pinRetry;
+                                }
+                                if (response.sn != undefined) {
+                                    str += '\n 載具序號為 ' + response.sn;
+
+                                }
+                                alert(str);
+
+                            } else {
+                                alert(showFIDOErrorMessage(response));
+                            }
+
+
+                        });
+                });
         });
 
-      
-        async function buildUnlockToken(bSOPIN,bRandom,bToken_sn,bNewUserPIN){
-            return await prepareUnloukPIN(bSOPIN,bRandom,bToken_sn,bNewUserPIN);
+
+        async function buildUnlockToken(bSOPIN, bRandom, bToken_sn, bNewUserPIN) {
+            return await prepareUnloukPIN(bSOPIN, bRandom, bToken_sn, bNewUserPIN);
         }
 
-        async function computingSessionKey(so_pin,random){
+        async function computingSessionKey(so_pin, random) {
 
-              
-                var sessionKey;
 
-                var sessionKeyData = new Uint8Array(so_pin.byteLength+random.byteLength+1);
-                sessionKeyData.set(so_pin, 0);
-                sessionKeyData.set(random, so_pin.byteLength);
-                sessionKeyData.set(new Uint8Array([0x1]),so_pin.byteLength+random.byteLength);
-            
-                  await window.crypto.subtle.digest(
-                    "SHA-256",sessionKeyData
+            var sessionKey;
+
+            var sessionKeyData = new Uint8Array(so_pin.byteLength + random.byteLength + 1);
+            sessionKeyData.set(so_pin, 0);
+            sessionKeyData.set(random, so_pin.byteLength);
+            sessionKeyData.set(new Uint8Array([0x1]), so_pin.byteLength + random.byteLength);
+
+            await window.crypto.subtle.digest(
+                    "SHA-256", sessionKeyData
                 )
-                .then(function(key){
+                .then(function (key) {
 
                     return sessionKey = new Uint8Array(key);
                 });
-             
-                return sessionKey;
+
+            return sessionKey;
 
 
         }
-        async function computingIV(bToken_sn){
+        async function computingIV(bToken_sn) {
 
-            var hash; 
-              await window.crypto.subtle.digest(
-                    "SHA-256",bToken_sn
-                ).then(function(value){
-                    return hash =  new Uint8Array(value);
-                });
+            var hash;
+            await window.crypto.subtle.digest(
+                "SHA-256", bToken_sn
+            ).then(function (value) {
+                return hash = new Uint8Array(value);
+            });
 
-                return hash.slice(0,16);
+            return hash.slice(0, 16);
 
         }
-        async function computingMacKey(so_pin,random){
+        async function computingMacKey(so_pin, random) {
             var iv;
             var MacKey;
 
-            var macKeyData = new Uint8Array(so_pin.byteLength+random.byteLength+1);
+            var macKeyData = new Uint8Array(so_pin.byteLength + random.byteLength + 1);
             macKeyData.set(so_pin, 0);
             macKeyData.set(random, so_pin.byteLength);
-            macKeyData.set(new Uint8Array([0x2]),so_pin.byteLength+random.byteLength);
+            macKeyData.set(new Uint8Array([0x2]), so_pin.byteLength + random.byteLength);
 
-              await window.crypto.subtle.digest(
-                    "SHA-256",macKeyData
-                ).then(function(key){
+            await window.crypto.subtle.digest(
+                "SHA-256", macKeyData
+            ).then(function (key) {
 
-                    return MacKey  = new Uint8Array(key);
-                });
+                return MacKey = new Uint8Array(key);
+            });
 
-                return MacKey;
-            
+            return MacKey;
+
 
         }
-        async function prepareUnloukPIN(so_pin,bRandom,bToken_sn,bNewUserPIN){
+        async function prepareUnloukPIN(so_pin, bRandom, bToken_sn, bNewUserPIN) {
 
             var sessionKey;
             var iv;
@@ -210,11 +233,11 @@
             var bHashMacofInitData;
 
 
-            sessionKey = await computingSessionKey(so_pin,bRandom);
+            sessionKey = await computingSessionKey(so_pin, bRandom);
             console.log(bufToHex(sessionKey));
             iv = await computingIV(bToken_sn);
             console.log(bufToHex(iv));
-            macKey = await computingMacKey(so_pin,bRandom);
+            macKey = await computingMacKey(so_pin, bRandom);
             console.log(bufToHex(macKey));
 
 
@@ -234,68 +257,69 @@
             // }, sessionKey, encodedInitData);
 
             bEncryptedInitData = await window.crypto.subtle.importKey("raw",
-            sessionKey,
-                "aes-cbc", false, ["encrypt"])
-            .then(cryptoKey=>{
-                return crypto.subtle.encrypt({
-                name: "aes-cbc",
-                iv
-                }, cryptoKey, encodedInitData);
+                    sessionKey,
+                    "aes-cbc", false, ["encrypt"])
+                .then(cryptoKey => {
+                    return crypto.subtle.encrypt({
+                        name: "aes-cbc",
+                        iv
+                    }, cryptoKey, encodedInitData);
 
-            });
-            console.log("bEncryptedInitData: \n"+bufToHex(bEncryptedInitData));
+                });
+            console.log("bEncryptedInitData: \n" + bufToHex(bEncryptedInitData));
 
             bHashMacofInitData = await window.crypto.subtle.importKey(
                 "raw", // raw format of the key - should be Uint8Array
-                macKey,
-                { // algorithm details
+                macKey, { // algorithm details
                     name: "HMAC",
-                    hash: {name: "SHA-256"}
+                    hash: {
+                        name: "SHA-256"
+                    }
                 },
                 false, // export = false
                 ["sign", "verify"] // what this key can do
-            ).then( key => {
+            ).then(key => {
                 return window.crypto.subtle.sign(
                     "HMAC",
                     key,
                     encodedInitData
                 );
             });
-            console.log("Unlock HMAC: \n"+bufToHex(bHashMacofInitData));
+            console.log("Unlock HMAC: \n" + bufToHex(bHashMacofInitData));
 
 
-            return {bEncryptedInitData,bHashMacofInitData};
+            return {
+                bEncryptedInitData,
+                bHashMacofInitData
+            };
 
 
         }
-        async function convertDomainList2Hash(allowRpid){
+        async function convertDomainList2Hash(allowRpid) {
 
 
-            var hashedDomainList = new Uint8Array(allowRpid.length*8);
-            for (let i = 0; i < allowRpid.length; i++) { 
+            var hashedDomainList = new Uint8Array(allowRpid.length * 8);
+            for (let i = 0; i < allowRpid.length; i++) {
 
                 var binDomain;
 
                 //check wildcard domain
-                if(allowRpid[i].indexOf('*.')>=0){
-                    binDomain = toUTF8Array(allowRpid[i].substring(allowRpid[i].indexOf('*.')+2)); 
-                }else{
-                   binDomain = toUTF8Array(allowRpid[i]); 
+                if (allowRpid[i].indexOf('*.') >= 0) {
+                    binDomain = toUTF8Array(allowRpid[i].substring(allowRpid[i].indexOf('*.') + 2));
+                } else {
+                    binDomain = toUTF8Array(allowRpid[i]);
                 }
-                 
+
                 await window.crypto.subtle.digest(
-                    "SHA-256",binDomain
-                ).then(function(hashDomain){
-                    hashedDomainList.set(new Uint8Array(hashDomain).slice(0,8),i*8);
+                    "SHA-256", binDomain
+                ).then(function (hashDomain) {
+                    hashedDomainList.set(new Uint8Array(hashDomain).slice(0, 8), i * 8);
                 });
             }
             console.log(bufToHex(hashedDomainList));
             return hashedDomainList;
 
         }
-
-
-
     </script>
 
 </body>
