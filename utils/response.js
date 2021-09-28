@@ -73,6 +73,9 @@ class GTIdemJs {
 
                     this.pinRetry = responseData[1];
 
+                }else if(this.statusCode == CTAP2_ERR_PIN_BLOCKED){
+                    
+                    this.pinRetry = 0;
                 }else if (this.statusCode == CTAP1_ERR_SUCCESS) {
                     switch (cmd) {
                         case CMD_TokenInfo:
