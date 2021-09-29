@@ -355,11 +355,11 @@
 
 
             sessionKey = await computingSessionKey(so_pin, random);
-            console.log(bufToHex(sessionKey));
+            console.log("INIT_SESSION_KEY: "+bufToHex(sessionKey));
             iv = await computingIV(bToken_sn);
-            console.log(bufToHex(iv));
+            console.log("IV: "+bufToHex(iv));
             macKey = await computingMacKey(so_pin, random);
-            console.log(bufToHex(macKey));
+            console.log("INIT_MAC_KEY: "+bufToHex(macKey));
 
             var bHashedDomain = await convertDomainList2Hash(AllowHostDomains);
 
@@ -369,7 +369,7 @@
             //build init data with cbor 
             var encodedInitData = new Uint8Array(CBOR.encode(initData));
             console.log(encodedInitData);
-            console.log(bufToHex(encodedInitData));
+            console.log("INIT_DATA: "+ bufToHex(encodedInitData));
 
 
 
@@ -388,7 +388,7 @@
                     }, cryptoKey, encodedInitData);
 
                 });
-            console.log("bEncryptedInitData: \n" + bufToHex(bEncryptedInitData));
+            console.log(" ENC_INIT_DATA: : \n" + bufToHex(bEncryptedInitData));
 
             bHashMacofInitData = await window.crypto.subtle.importKey(
                 "raw", // raw format of the key - should be Uint8Array
