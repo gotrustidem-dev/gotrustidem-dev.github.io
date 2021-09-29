@@ -1728,7 +1728,11 @@ async function GTIDEM_ChangeUserPIN(bOldPIN, bNewPIN, bSerialNumber) {
     var bECPointFromToken = gtidem.ecpoint;
     var flags = gtidem.flags;
     if(flags!=undefined){
-        
+        if(!checkPINFormatLevel(bNewPIN, flags[1])){
+            gtidem.statusCode = CTAP2_ERR_PIN_POLICY_VIOLATION;
+            return gtidem;
+        }
+
     }
     var sn_buf;
     if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
