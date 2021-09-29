@@ -28,7 +28,11 @@ var g_platformECpublickey;
 const ALG_RSA2048SHA256 = 0x02;
 const ALG_RSA2048SHA256_PreHash = 0x12;
 
-
+const PIN_FORMAT_FREE =0x00;
+const PIN_FORMAT_NUMBER =0x01;
+const PIN_FORMAT_LOWERCASE =0x02;
+const PIN_FORMAT_HIGERCASE =0x04;
+const PIN_FORMAT_SYMBOL =0x08;
 
 
 
@@ -1722,11 +1726,11 @@ async function GTIDEM_ChangeUserPIN(bOldPIN, bNewPIN, bSerialNumber) {
         return gtidem;
     }
     var bECPointFromToken = gtidem.ecpoint;
-
+    var flags = gtidem.flags;
+    if(flags!=undefined){
+        
+    }
     var sn_buf;
-
-
-
     if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
         sn_buf = new Uint8Array(0);
     }else{
@@ -1932,6 +1936,42 @@ async function computingSessionKey(bOldPIN, bNewPIN, ecpointXY) {
     var bEncryptedNEWPIN = new Uint8Array(encryptedNEWPIN).slice(0,64);
     return {bExportECPublicKeyArray, bEcryptedOldPINHash, bEncryptedNEWPIN};
 }
+
+
+function checkPINFormatLevel(bNewPIN, pinLevel){
+    var localLevel  = 0 ; 
+    if(pinLevel == PIN_FORMAT_FREE)
+        return CTAP1_ERR_SUCCESS;
+
+    for(var i =0; i<bNewPIN.byteLength;i++){
+        var value = bNewPIN[i];
+        if ((value >= '0') && (value <= '9')) {
+            localLevel |= PIN_FORMAT_NUMBER;
+        }else if ((value >= 'a') && (value <= 'z')) {
+            localLevel |= PIN_FORMAT_LOWERCASE;
+        }else if ((value >= 'A') && (value <= 'Z')) {
+            localLevel |= PIN_FORMAT_HIGERCASE;
+        }else if (isAllowedSymbol(value)) {
+            localLevel |= PIN_FORMAT_SYMBOL;
+        }
+    }
+    if(((pinLevel&0x0f)&localLevel) == (pinLevel&0x0f)){
+        return CTAP1_ERR_SUCCESS;
+    }else{
+        return CTAP2_ERR_PIN_POLICY_VIOLATION;
+    }
+}
+function isAllowedSymbol(value) {
+    switch (value) {
+        case '~':case '!':case '@':case '#':case '$':case '%':case '^':case '&':case '*':
+        case '(':case ')':case '_':case '-':case '=':case '+':case '{':case '}':case '[':
+        case ']':case '|':case '\\':case ':':case ';':case '\"':case '\'':case ',':case '.':
+        case '<':case '>':case '?':case '/':
+            return true;
+        default:
+            return false;
+    }
+} 
 
 /**
  * 產生 RSA 2048 金鑰對，會組合成 CSR 格式回傳

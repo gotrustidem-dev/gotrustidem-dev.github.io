@@ -85,7 +85,7 @@ var showFIDOErrorMessage = (gtidem) => {
             errorMsg += "密碼錯誤！" + "剩餘次數:" + gtidem.pinRetry;
             break;
         case CTAP2_ERR_PIN_BLOCKED:
-            errorMsg +='超過嘗試次數，密碼鎖定';
+            errorMsg +='超過嘗試次數，密碼鎖定'+ "剩餘次數:" + gtidem.pinRetry;
             break;
 
         case CTAP2_ERR_PIN_POLICY_VIOLATION:
