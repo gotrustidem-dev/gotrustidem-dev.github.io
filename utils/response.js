@@ -96,6 +96,7 @@ class GTIdemJs {
                             this.sn = responseData['sn'];
                             this.rn= responseData['rn'];
                             this.ecpoint = responseData['ecPoint'];
+                            this.flags = responseData['flags'];
                         }
                             break;
                         case CMD_Sign:
