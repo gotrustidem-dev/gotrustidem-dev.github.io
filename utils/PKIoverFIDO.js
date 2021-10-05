@@ -599,6 +599,7 @@ async function ReadCertByLable(strLable) {
 
         'user': {
             'id': pki_buffer,
+            'name': sUserName,
             'displayName': sUserName,
         },
 
@@ -955,6 +956,7 @@ async function GenRSA2048KeyPair() {
 
         'user': {
             'id': pki_buffer,
+            'name': sUserName,
             'displayName': sUserName,
         },
 
@@ -1168,6 +1170,7 @@ async function ImportCertificate2(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf) {
 
         'user': {
             'id': id,
+            'name': sUserName,
             'displayName': sUserName,
         },
 
