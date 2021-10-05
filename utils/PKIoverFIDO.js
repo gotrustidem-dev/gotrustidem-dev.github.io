@@ -511,6 +511,7 @@ async function ReadCertByIndex(index) {
 
         'user': {
             'id': pki_buffer,
+            'name': sUserName,
             'displayName': sUserName,
         },
 
