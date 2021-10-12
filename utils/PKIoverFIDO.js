@@ -1949,7 +1949,7 @@ async function computingSessionKey(bOldPIN, bNewPIN, ecpointXY) {
 function checkPINFormatLevel(bNewPIN, pinLevel){
     var localLevel  = 0 ; 
     if(pinLevel == PIN_FORMAT_FREE)
-        return CTAP1_ERR_SUCCESS;
+        return true;
 
     for(var i =0; i<bNewPIN.byteLength;i++){
         var value = bNewPIN[i];
@@ -1964,9 +1964,9 @@ function checkPINFormatLevel(bNewPIN, pinLevel){
         }
     }
     if(((pinLevel&0x0f)&localLevel) == (pinLevel&0x0f)){
-        return CTAP1_ERR_SUCCESS;
+        return true;
     }else{
-        return CTAP2_ERR_PIN_POLICY_VIOLATION;
+        return false;
     }
 }
 function isAllowedSymbol(value) {
