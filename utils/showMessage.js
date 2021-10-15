@@ -92,10 +92,6 @@ var showFIDOErrorMessage = (gtidem) => {
             errorMsg = "密碼不符合要求";
             break; 
             
-        case CTAP2_ERR_VENDOR_ERROR_PIN_RXPIRED:
-            errorMsg += '密碼到期，變更密碼'; 
-            break;       
-
         case CTAP2_ERR_KEY_STORE_FULL:
             errorMsg +='憑證空間已滿';
             break;
