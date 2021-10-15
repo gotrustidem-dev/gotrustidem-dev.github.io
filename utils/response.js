@@ -135,6 +135,10 @@ class GTIdemJs {
                             this.pinRetry = responseData[1];
 
                             break;
+                        case CMD_UNLOCK_PIN:
+                            this.pinRetry = responseData['pinRetry'];
+                            break;
+
                         case CMD_ReadCertificate:
                             this.certicficate = responseData['cer'];
                             this.credentialNum = responseData['credNum'];
