@@ -99,10 +99,10 @@
                                         <form style="text-align: center;" id="form_pin_format" onsubmit="return false">
                                             <fieldset>      
                                                 <legend>Pin format</legend>      
-                                                <input type="checkbox" name="favorite_pet" value="number">number<br>      
-                                                <input type="checkbox" name="favorite_pet" value="lowcase">low case<br>      
-                                                <input type="checkbox" name="favorite_pet" value="highcase">high case<br>      
-                                                <input type="checkbox" name="favorite_pet" value="symbol">Symbol<br>      
+                                                <input type="checkbox" name="number" value="number">number<br>      
+                                                <input type="checkbox" name="lowcase" value="lowcase">low case<br>      
+                                                <input type="checkbox" name="highcase" value="highcase">high case<br>      
+                                                <input type="checkbox" name="symbol" value="symbol">Symbol<br>      
                                                 <br>           
                                             </fieldset>    
                                         </form>
@@ -205,9 +205,32 @@
             bNewUserPINArray.set(toUTF8Array(new_user_pin), 0);
 
 
-            let isPINExpired = document.getElementById('pinexpired_checkbox').checked;
+            let isPINExpired = document.getElementById('form_pin_params').pinexpired_checkbox.checked;
 
-            //let PINFormat = document.getElementById('pinexpired_checkbox');
+            let PINMaxRetry = document.getElementById('form_pin_params').token_pin_retry.value;
+            let sPinMinLen= document.getElementById('form_pin_params').token_pin_min_len.value;
+
+
+
+            let PINLevel=0;
+
+            if(document.getElementById('form_pin_format').number.checked){
+                PINLevel|= PIN_FORMAT_NUMBER;
+            }
+
+            if(document.getElementById('form_pin_format').lowcase.checked){
+                PINLevel|= PIN_FORMAT_LOWERCASE;
+            }
+
+            if(document.getElementById('form_pin_format').highcase.checked){
+                PINLevel|= PIN_FORMAT_HIGERCASE;
+            }
+
+            if(document.getElementById('form_pin_format').symbol.checked){
+                PINLevel|= PIN_FORMAT_SYMBOL;
+            }
+
+
             //let PINMaxRetry = document.getElementById('pinexpired_checkbox');
             //let PINMinLen= document.getElementById('pinexpired_checkbox');
 
@@ -242,8 +265,8 @@
                 });
         });
 
-        async function buildInitToken(bSOPIN, bRandom, bToken_sn, bNewSOPin, bNewUserPIN, AllowHostDomains, isPinExpired, sPinRetry, sPinMinLen, sPinFormat) {
-            return await prepareInitToken(bSOPIN, bRandom, bToken_sn, bNewSOPin, bNewUserPIN, AllowHostDomains, isPinExpired, sPinRetry, sPinMinLen, sPinFormat);
+        async function buildInitToken(bSOPIN, bRandom, bToken_sn, bNewSOPin, bNewUserPIN, AllowHostDomains, isPinExpired, sPinRetry, sPinMinLen, sPinLevel) {
+            return await prepareInitToken(bSOPIN, bRandom, bToken_sn, bNewSOPin, bNewUserPIN, AllowHostDomains, isPinExpired, sPinRetry, sPinMinLen, sPinLevel);
         }
 
         async function buildUnlockToken(bSOPIN, bRandom, bToken_sn, bNewUserPIN) {
@@ -251,7 +274,7 @@
         }
 
 
-        async function prepareInitToken(bSOPIN, bRandom, bToken_sn, bNewSOPin, bNewUserPIN, AllowHostDomains, isPinExpired, sPinRetry, sPinMinLen, sPinFormat) {
+        async function prepareInitToken(bSOPIN, bRandom, bToken_sn, bNewSOPin, bNewUserPIN, AllowHostDomains, isPinExpired, sPinRetry, sPinMinLen, sPinLevel) {
 
             var sessionKey;
             var iv;
@@ -273,9 +296,28 @@
             var initData={};
 
             initData.soPIN = bNewSOPin
-
             initData.userPIN =bNewUserPIN;
             initData.allowedRPID = bHashedDomain;
+
+            if(isPinExpired!=undefined){
+
+                initData.allowedRPID = isPinExpired;
+            }
+
+            if(sPinRetry!=undefined){
+
+                initData.pinRetry = sPinRetry;
+            }
+
+            if(sPinMinLen!=undefined){
+
+                initData.pinMinLen = sPinMinLen;
+            }
+
+            if(sPinLevel!=undefined){
+
+                initData.pinLevel = sPinLevel;
+            }
             // var initData = {
             //     soPIN: bNewSOPin,
             //     userPIN: bNewUserPIN,
