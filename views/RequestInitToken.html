@@ -40,7 +40,7 @@
                 <tr>
                     <td style="width: 100% ; ">
                         <table class="center" border="1" width="100%">
-                            <tbody>
+                            <table>
                                 <tr>
                                     <!--PC side-->
                                     <td style="width: 385px;">
@@ -86,17 +86,38 @@
                                                     value="test.ctbc.com"><br>
                                             </p>
                                         </form>
+                                        <form style="text-align: center;" id="form_pin_params" onsubmit="return false">
+                                            <input type="checkbox" id="pinexpired_checkbox" name="pinexpired_checkbox" value="pin_expired"> Set PIN Expired<br>
+                                            <p>
+                                                <label id="label_pinretry">PIN Retry Times(1~15):</label>
+                                                <input type="number" name="token_pin_retry" style="width: 342px; height:41px"><br>
+                                                <label id="label_pinminlen">PIN MIN LEN(4~16): </label>
+                                                <input type="number" name="token_pin_min_len" style="width: 342px; height:41px">
+                                            </p>
+                                        </form>
+
+                                        <form style="text-align: center;" id="form_pin_format" onsubmit="return false">
+                                            <fieldset>      
+                                                <legend>Pin format</legend>      
+                                                <input type="checkbox" name="favorite_pet" value="number">number<br>      
+                                                <input type="checkbox" name="favorite_pet" value="lowcase">low case<br>      
+                                                <input type="checkbox" name="favorite_pet" value="highcase">high case<br>      
+                                                <input type="checkbox" name="favorite_pet" value="symbol">Symbol<br>      
+                                                <br>           
+                                            </fieldset>    
+                                        </form>
+
                                         <p>
-                                            <form style="text-align: center;" id="form_init_btn"
-                                                onsubmit="return false">
-                                                <button class="btn btn-primary" action="submit"
-                                                    style="width: 200px; height:34px;background-color: #008CBA;">Init
-                                                    Token</button>
-                                            </form>
+                                        <form style="text-align: center;" id="form_init_btn"
+                                            onsubmit="return false">
+                                            <button class="btn btn-primary" action="submit"
+                                                style="width: 200px; height:34px;background-color: #008CBA;">Init
+                                                Token</button>
+                                        </form>
                                         </p>
                                     </td>
                                 </tr>
-                            </tbody>
+                            </table>
                         </table>
                     </td>
 
@@ -184,7 +205,11 @@
             bNewUserPINArray.set(toUTF8Array(new_user_pin), 0);
 
 
+            let isPINExpired = document.getElementById('pinexpired_checkbox').checked;
 
+            //let PINFormat = document.getElementById('pinexpired_checkbox');
+            //let PINMaxRetry = document.getElementById('pinexpired_checkbox');
+            //let PINMinLen= document.getElementById('pinexpired_checkbox');
 
 
 
@@ -193,8 +218,7 @@
             //let bNewSOPIN = new Uint8Array([0x71,0x72,0x73,0x74,0x75,0x76,0x77,0x78]);
             //let bNewUserPIN = new Uint8Array([0x81,0x82,0x83,0x84,0x85,0x86,0x87,0x88]);
 
-            var para = buildInitToken(bSOPINArray, bRandom, bToken_sn, bNewSOPINArray, bNewUserPINArray,
-                    AllowHostDomains)
+            var para = buildInitToken(bSOPINArray, bRandom, bToken_sn, bNewSOPINArray, bNewUserPINArray,AllowHostDomains,isPINExpired)
                 .then(result => {
                     GTIDEM_InitToken(bToken_sn, result.bEncryptedInitData, result.bHashMacofInitData).then(
                         response => {
@@ -218,16 +242,16 @@
                 });
         });
 
-        async function buildInitToken(bSOPIN, bRandom, bToken_sn, bNewSOPin, bNewUserPIN, AllowHostDomains) {
-            return await prepareInitToken(bSOPIN, bRandom, bToken_sn, bNewSOPin, bNewUserPIN, AllowHostDomains);
+        async function buildInitToken(bSOPIN, bRandom, bToken_sn, bNewSOPin, bNewUserPIN, AllowHostDomains, isPinExpired, sPinRetry, sPinMinLen, sPinFormat) {
+            return await prepareInitToken(bSOPIN, bRandom, bToken_sn, bNewSOPin, bNewUserPIN, AllowHostDomains, isPinExpired, sPinRetry, sPinMinLen, sPinFormat);
         }
 
         async function buildUnlockToken(bSOPIN, bRandom, bToken_sn, bNewUserPIN) {
-            return await prepareInitToken(bSOPIN, bRandom, bToken_sn, bNewUserPIN);
+            return await prepareUnloukPIN(bSOPIN, bRandom, bToken_sn, bNewUserPIN);
         }
 
 
-        async function prepareInitToken(bSOPIN, bRandom, bToken_sn, bNewSOPin, bNewUserPIN, AllowHostDomains) {
+        async function prepareInitToken(bSOPIN, bRandom, bToken_sn, bNewSOPin, bNewUserPIN, AllowHostDomains, isPinExpired, sPinRetry, sPinMinLen, sPinFormat) {
 
             var sessionKey;
             var iv;
@@ -249,7 +273,18 @@
             var initData = {
                 soPIN: bNewSOPin,
                 userPIN: bNewUserPIN,
-                allowedRPID: bHashedDomain
+                allowedRPID: bHashedDomain,
+                function(sPinRetry){
+                    if(sPinRetry!=undefined){
+                        return {pinRerty:sPinRetry}
+                    }
+                },
+
+                // pinLevel:
+                // pinExpired:
+                // pinRerty:
+                // pinMinLen:
+
             }
             //build init data with cbor 
             var encodedInitData = new Uint8Array(CBOR.encode(initData));
