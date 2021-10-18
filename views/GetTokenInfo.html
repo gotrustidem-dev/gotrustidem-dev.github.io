@@ -57,6 +57,7 @@
                             <label id="label_serial_number"></label><br>
                             <label id="label_random_number"></label><br>
                             <label id="label_ecPublic_key"></label><br>
+                            <label id="label_flags"></label><br>
                         </form>
 
                     </td>
@@ -108,6 +109,7 @@
                     document.getElementById('label_serial_number').innerText = "Serial number: " + ConverSNFormat(response.sn);
                     document.getElementById('label_random_number').innerText = "Random number: " +ConverSNFormat(response.rn);
                     document.getElementById('label_ecPublic_key').innerText = "EC public point: " +ConverSNFormat(response.ecpoint);
+                    document.getElementById('label_flags').innerText = "Flags: " +ConverSNFormat(response.flags);
                 }else{
                    alert(showFIDOErrorMessage(response));
                 }
