@@ -270,22 +270,23 @@
 
             var bHashedDomain = await convertDomainList2Hash(AllowHostDomains);
 
-            var initData = {
-                soPIN: bNewSOPin,
-                userPIN: bNewUserPIN,
-                allowedRPID: bHashedDomain,
-                function(sPinRetry){
-                    if(sPinRetry!=undefined){
-                        return {pinRerty:sPinRetry}
-                    }
-                },
+            var initData={};
 
-                // pinLevel:
-                // pinExpired:
-                // pinRerty:
-                // pinMinLen:
+            initData+={soPIN: bNewSOPin};
 
-            }
+            initData+={userPIN: bNewUserPIN};
+            initData+={allowedRPID: bHashedDomain};
+            // var initData = {
+            //     soPIN: bNewSOPin,
+            //     userPIN: bNewUserPIN,
+            //     allowedRPID: bHashedDomain,
+              
+            //     // pinLevel:
+            //     // pinExpired:
+            //     // pinRerty:
+            //     // pinMinLen:
+
+            // }
             //build init data with cbor 
             var encodedInitData = new Uint8Array(CBOR.encode(initData));
             console.log(encodedInitData);
