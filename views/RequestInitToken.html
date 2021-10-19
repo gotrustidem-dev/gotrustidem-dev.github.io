@@ -208,8 +208,13 @@
             let isPINExpired = document.getElementById('form_pin_params').pinexpired_checkbox.checked;
 
             let PINMaxRetry = document.getElementById('form_pin_params').token_pin_retry.value;
+            if(PINMaxRetry.length==0){
+                PINMaxRetry = undefined;
+            }
             let sPinMinLen= document.getElementById('form_pin_params').token_pin_min_len.value;
-
+            if(sPinMinLen.length==0){
+                sPinMinLen = undefined;
+            }
 
 
             let PINLevel=0;
