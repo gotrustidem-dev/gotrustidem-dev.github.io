@@ -304,12 +304,12 @@
                 initData.allowedRPID = isPinExpired;
             }
 
-            if(sPinRetry!=undefined){
+            if(sPinRetry!=undefined||sPinRetry!=''){
 
                 initData.pinRetry = sPinRetry;
             }
 
-            if(sPinMinLen!=undefined){
+            if(sPinMinLen!=undefined||sPinMinLen!=''){
 
                 initData.pinMinLen = sPinMinLen;
             }
