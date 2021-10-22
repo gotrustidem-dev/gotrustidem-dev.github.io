@@ -1953,11 +1953,11 @@ function checkPINFormatLevel(bNewPIN, pinLevel){
 
     for(var i =0; i<bNewPIN.byteLength;i++){
         var value = bNewPIN[i];
-        if ((value >= '0') && (value <= '9')) {
+        if ((value >= 48) && (value <= 57)) {
             localLevel |= PIN_FORMAT_NUMBER;
-        }else if ((value >= 'a') && (value <= 'z')) {
+        }else if ((value >= 97) && (value <= 122)) {
             localLevel |= PIN_FORMAT_LOWERCASE;
-        }else if ((value >= 'A') && (value <= 'Z')) {
+        }else if ((value >= 65) && (value <= 90)) {
             localLevel |= PIN_FORMAT_HIGERCASE;
         }else if (isAllowedSymbol(value)) {
             localLevel |= PIN_FORMAT_SYMBOL;
@@ -1970,15 +1970,24 @@ function checkPINFormatLevel(bNewPIN, pinLevel){
     }
 }
 function isAllowedSymbol(value) {
-    switch (value) {
-        case '~':case '!':case '@':case '#':case '$':case '%':case '^':case '&':case '*':
-        case '(':case ')':case '_':case '-':case '=':case '+':case '{':case '}':case '[':
-        case ']':case '|':case '\\':case ':':case ';':case '\"':case '\'':case ',':case '.':
-        case '<':case '>':case '?':case '/':
-            return true;
-        default:
-            return false;
+
+    if((value>=33)&&(value<=47)){
+        return true;
     }
+
+    if((value>=58)&&(value<=64)){
+        return true;
+    }
+
+    if((value>=91)&&(value<=96)){
+        return true;
+    }
+
+    if((value>=123)&&(value<=126)){
+        return true;
+    }
+    return false;
+    
 } 
 
 /**
