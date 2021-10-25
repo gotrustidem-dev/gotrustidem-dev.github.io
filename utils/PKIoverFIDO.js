@@ -1737,6 +1737,12 @@ async function GTIDEM_ChangeUserPIN(bOldPIN, bNewPIN, bSerialNumber) {
             return gtidem;
         }
 
+        if((bNewPIN.length<flags[2])|| (bNewPIN.length>flags[3])){
+            gtidem.statusCode = CTAP2_ERR_PIN_POLICY_VIOLATION;
+            return gtidem;
+        }
+
+
     }
     var sn_buf;
     if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
