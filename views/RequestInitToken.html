@@ -96,7 +96,7 @@
                                             </p>
                                         </form>
 
-                                        <form style="text-align: center;" id="form_pin_format" onsubmit="return false">
+                                        <!--<form style="text-align: center;" id="form_pin_format" onsubmit="return false">
                                             <fieldset>      
                                                 <legend>Pin format</legend>      
                                                 <input type="checkbox" name="number" value="number">number<br>      
@@ -105,7 +105,7 @@
                                                 <input type="checkbox" name="symbol" value="symbol">Symbol<br>      
                                                 <br>           
                                             </fieldset>    
-                                        </form>
+                                        </form>-->
 
                                         <p>
                                         <form style="text-align: center;" id="form_init_btn"
@@ -211,6 +211,7 @@
           
             let sPinMinLen= document.getElementById('form_pin_params').token_pin_min_len.value;
        
+            /*
             let PINLevel="";
 
             if(document.getElementById('form_pin_format').number.checked){
@@ -228,7 +229,7 @@
             if(document.getElementById('form_pin_format').symbol.checked){
                 PINLevel|= PIN_FORMAT_SYMBOL;
             }
-
+            */
 
             //let PINMaxRetry = document.getElementById('pinexpired_checkbox');
             //let PINMinLen= document.getElementById('pinexpired_checkbox');
