@@ -211,7 +211,7 @@
           
             let sPinMinLen= document.getElementById('form_pin_params').token_pin_min_len.value;
        
-            let PINLevel=0;
+            let PINLevel="";
 
             if(document.getElementById('form_pin_format').number.checked){
                 PINLevel|= PIN_FORMAT_NUMBER;
@@ -311,8 +311,10 @@
 
                 initData.pinMinLen = new Uint8Array([sPinMinLen]);
             }
-            initData.pinLevel = new Uint8Array([sPinLevel]);
-            
+
+            if(sPinLevel!=""){
+                initData.pinLevel = new Uint8Array([sPinLevel]);
+             }
             // var initData = {
             //     soPIN: bNewSOPin,
             //     userPIN: bNewUserPIN,
