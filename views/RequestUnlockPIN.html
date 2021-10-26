@@ -251,7 +251,7 @@
                 userPIN: bNewUserPIN
             }
 
-            initData.pinExpired = isPinExpired;
+            initData.pinExpired = isPINExpired;
             //build init data with cbor 
             var encodedInitData = new Uint8Array(CBOR.encode(initData));
             console.log(encodedInitData);
