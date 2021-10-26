@@ -70,6 +70,10 @@
                                                     PIN</button>
                                             </form>
                                         </p>
+                                        <form style="text-align: center;" id="form_pin_params" onsubmit="return false">
+                                            <input type="checkbox" id="pinexpired_checkbox" name="pinexpired_checkbox" value="pin_expired"> Set PIN Expired<br>
+                                        </form>
+
                                     </td>
                                 </tr>
                             </tbody>
@@ -139,7 +143,9 @@
             var bNewUserPINArray = new Uint8Array(new_user_pin.length);
             bNewUserPINArray.set(toUTF8Array(new_user_pin), 0);
 
-            var para = buildUnlockToken(bSOPINArray, bRandom, bToken_sn, bNewUserPINArray)
+            let isPINExpired = document.getElementById('form_pin_params').pinexpired_checkbox.checked;
+
+            var para = buildUnlockToken(bSOPINArray, bRandom, bToken_sn, bNewUserPINArray,isPINExpired)
                 .then(result => {
                     GTIDEM_UnlockPIN(bToken_sn, result.bEncryptedInitData, result.bHashMacofInitData).then(
                         response => {
@@ -165,8 +171,8 @@
         });
 
 
-        async function buildUnlockToken(bSOPIN, bRandom, bToken_sn, bNewUserPIN) {
-            return await prepareUnloukPIN(bSOPIN, bRandom, bToken_sn, bNewUserPIN);
+        async function buildUnlockToken(bSOPIN, bRandom, bToken_sn, bNewUserPIN, isPINExpired) {
+            return await prepareUnloukPIN(bSOPIN, bRandom, bToken_sn, bNewUserPIN, isPINExpired);
         }
 
         async function computingSessionKey(so_pin, random) {
@@ -223,7 +229,7 @@
 
 
         }
-        async function prepareUnloukPIN(so_pin, bRandom, bToken_sn, bNewUserPIN) {
+        async function prepareUnloukPIN(so_pin, bRandom, bToken_sn, bNewUserPIN,isPINExpired) {
 
             var sessionKey;
             var iv;
@@ -244,6 +250,8 @@
             var initData = {
                 userPIN: bNewUserPIN
             }
+
+            initData.pinExpired = isPinExpired;
             //build init data with cbor 
             var encodedInitData = new Uint8Array(CBOR.encode(initData));
             console.log(encodedInitData);
