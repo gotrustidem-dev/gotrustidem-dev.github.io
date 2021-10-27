@@ -103,7 +103,7 @@ class GTIdemJs {
                             this.rn= responseData['rn'];
                             this.ecpoint = responseData['ecPoint'];
                             this.flags = responseData['flags'];
-                            this.flags = responseData['sopinRetry'];
+                            this.sopinRetry = responseData['sopinRetry'];
                         }
                             break;
                         case CMD_Sign:
