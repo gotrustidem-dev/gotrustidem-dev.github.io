@@ -21,6 +21,7 @@ class GTIdemJs {
         this.keyid = undefined;
         this.csr = undefined;
         this.rsakeypair = undefined;
+        this.sopinRetry = undefined;
     }
 
     ConvertWebError(error){
@@ -72,10 +73,15 @@ class GTIdemJs {
                 if (this.statusCode == CTAP2_ERR_PIN_INVALID) {
 
                     this.pinRetry = responseData[1];
+                    this.sopinRetry = responseData['sopinRetry'];
 
                 }else if(this.statusCode == CTAP2_ERR_PIN_BLOCKED){
+                    if((cmd==CMD_UNLOCK_PIN)||(cmd==CMD_INIT_TOKEN)){
+                        this.sopinRetry = 0;
+                    }else{
+                        this.pinRetry = 0;
+                    }
                     
-                    this.pinRetry = 0;
                 }else if (this.statusCode == CTAP1_ERR_SUCCESS) {
                     switch (cmd) {
                         case CMD_TokenInfo:
@@ -97,6 +103,7 @@ class GTIdemJs {
                             this.rn= responseData['rn'];
                             this.ecpoint = responseData['ecPoint'];
                             this.flags = responseData['flags'];
+                            this.flags = responseData['sopinRetry'];
                         }
                             break;
                         case CMD_Sign:
