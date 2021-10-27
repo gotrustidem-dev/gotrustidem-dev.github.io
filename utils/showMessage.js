@@ -82,10 +82,21 @@ var showFIDOErrorMessage = (gtidem) => {
     switch (gtidem.statusCode) {
 
         case CTAP2_ERR_PIN_INVALID:
-            errorMsg += "密碼錯誤！" + "剩餘次數:" + gtidem.pinRetry;
+            errorMsg += "密碼錯誤！";
+            if(gtidem.pinRetry!=undefined){
+                errorMsg+= "User PIN剩餘次數:" + gtidem.pinRetry;
+            }else if(gtidem.sopinRetry!=undefined){
+                errorMsg+= "SO PIN剩餘次數:" + gtidem.sopinRetry;
+            }
+            
             break;
         case CTAP2_ERR_PIN_BLOCKED:
-            errorMsg +='超過嘗試次數，密碼鎖定'+ "剩餘次數:" + gtidem.pinRetry;
+            errorMsg +='超過嘗試次數，密碼鎖定';
+            if(gtidem.pinRetry!=undefined){
+                errorMsg+= "User PIN剩餘次數:" + gtidem.pinRetry;
+            }else if(gtidem.sopinRetry!=undefined){
+                errorMsg+= "SO PIN剩餘次數:" + gtidem.sopinRetry;
+            }
             break;
 
         case CTAP2_ERR_PIN_POLICY_VIOLATION:
