@@ -169,6 +169,7 @@
                     var strCert="刪除憑證完成";
                     if(response.sn!=undefined){
                         strCert+="\n序號:"+ ConverSNFormat(response.sn)+"\n";
+                        strCert+="\n剩餘憑證數量:"+ response.credentialNum+"\n";
                     }  
                     alert(strCert);
                 }else{
