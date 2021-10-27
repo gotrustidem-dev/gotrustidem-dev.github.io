@@ -112,7 +112,7 @@
                     document.getElementById('label_ecPublic_key').innerText = "EC public point: " +ConverSNFormat(response.ecpoint);
                     document.getElementById('label_flags').innerText = "Flags: " +ConverSNFormat(response.flags);
                     if(response.sopinRetry!=undefined){
-                        document.getElementById('label_sopin_retries').innerText = "SOPIN retryies:: " +ConverSNFormat(response.sopinRetry);
+                        document.getElementById('label_sopin_retries').innerText = "SOPIN retryies:: " +response.sopinRetry;
                     }
 
                 }else{
