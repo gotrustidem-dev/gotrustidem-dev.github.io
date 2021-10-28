@@ -290,8 +290,8 @@
 
        
             initData.pinExpired = isPinExpired;
-            initData.pinLevel = sPinLevel;
-            
+        
+            initData.pinLevel = new Uint8Array([sPinLevel]);
 
             if(sPinRetry!=""){
 
