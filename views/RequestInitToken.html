@@ -96,16 +96,16 @@
                                             </p>
                                         </form>
 
-                                        <!--<form style="text-align: center;" id="form_pin_format" onsubmit="return false">
+                                        <form style="text-align: center;" id="form_pin_format" onsubmit="return false">
                                             <fieldset>      
                                                 <legend>Pin format</legend>      
-                                                <input type="checkbox" name="number" value="number">number<br>      
-                                                <input type="checkbox" name="lowcase" value="lowcase">low case<br>      
+                                                <input type="checkbox" name="number" value="number" checked>number<br>      
+                                                <input type="checkbox" name="lowcase" value="lowcase" checked>low case<br>      
                                                 <input type="checkbox" name="highcase" value="highcase">high case<br>      
                                                 <input type="checkbox" name="symbol" value="symbol">Symbol<br>      
                                                 <br>           
                                             </fieldset>    
-                                        </form>-->
+                                        </form>
 
                                         <p>
                                         <form style="text-align: center;" id="form_init_btn"
@@ -211,8 +211,8 @@
           
             let sPinMinLen= document.getElementById('form_pin_params').token_pin_min_len.value;
        
-            /*
-            let PINLevel="";
+            
+            let PINLevel=0;
 
             if(document.getElementById('form_pin_format').number.checked){
                 PINLevel|= PIN_FORMAT_NUMBER;
@@ -229,19 +229,8 @@
             if(document.getElementById('form_pin_format').symbol.checked){
                 PINLevel|= PIN_FORMAT_SYMBOL;
             }
-            */
 
-            //let PINMaxRetry = document.getElementById('pinexpired_checkbox');
-            //let PINMinLen= document.getElementById('pinexpired_checkbox');
-
-
-
-            //let bSOPIN = new Uint8Array([0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38]);
-            //let bToken_sn = new Uint8Array([0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48]);
-            //let bNewSOPIN = new Uint8Array([0x71,0x72,0x73,0x74,0x75,0x76,0x77,0x78]);
-            //let bNewUserPIN = new Uint8Array([0x81,0x82,0x83,0x84,0x85,0x86,0x87,0x88]);
-
-            var para = buildInitToken(bSOPINArray, bRandom, bToken_sn, bNewSOPINArray, bNewUserPINArray,AllowHostDomains,isPINExpired,PINMaxRetry,sPinMinLen)
+            var para = buildInitToken(bSOPINArray, bRandom, bToken_sn, bNewSOPINArray, bNewUserPINArray,AllowHostDomains,isPINExpired,PINMaxRetry,sPinMinLen, PINLevel)
                 .then(result => {
                     GTIDEM_InitToken(bToken_sn, result.bEncryptedInitData, result.bHashMacofInitData).then(
                         response => {
@@ -274,7 +263,7 @@
         }
 
 
-        async function prepareInitToken(bSOPIN, bRandom, bToken_sn, bNewSOPin, bNewUserPIN, AllowHostDomains, isPinExpired, sPinRetry, sPinMinLen) {
+        async function prepareInitToken(bSOPIN, bRandom, bToken_sn, bNewSOPin, bNewUserPIN, AllowHostDomains, isPinExpired, sPinRetry, sPinMinLen, sPinLevel) {
 
             var sessionKey;
             var iv;
@@ -301,6 +290,7 @@
 
        
             initData.pinExpired = isPinExpired;
+            initData.pinLevel = sPinLevel;
             
 
             if(sPinRetry!=""){
