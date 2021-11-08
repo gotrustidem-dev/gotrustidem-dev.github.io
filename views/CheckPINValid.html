@@ -86,7 +86,7 @@
             var bNewPINBuffer = new Uint8Array(newpin.length);
             bNewPINBuffer.set(toUTF8Array(newpin), 0);
             if(bNewPINBuffer.length==0){
-                alert("新密碼不為空");
+                alert("新密碼不能為空");
                 return;
             }
 
@@ -142,7 +142,7 @@
                         alert("密碼長度不符合");
                         return;
                     }
-
+                    alert("密碼可用");
 
                 } else {
                     alert(showFIDOErrorMessage(response));
