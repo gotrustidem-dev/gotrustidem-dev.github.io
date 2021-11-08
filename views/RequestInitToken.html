@@ -162,25 +162,25 @@
                         }
 
 
-                        if(response.flags[1]&PIN_FORMAT_NUMBER == PIN_FORMAT_NUMBER){
+                        if(r(esponse.flags[1]&PIN_FORMAT_NUMBER)== PIN_FORMAT_NUMBER){
                             msg += "[0-9]必須,";
                         }else{
                             msg += "[0-9]允許";
                         }
 
-                        if(response.flags[1]&PIN_FORMAT_LOWERCASE == PIN_FORMAT_LOWERCASE){
+                        if(r(esponse.flags[1]&PIN_FORMAT_LOWERCASE) == PIN_FORMAT_LOWERCASE){
                             msg += "[a-z]必須,";
                         }else{
                             msg += "[a-z]允許";
                         }
 
-                        if(response.flags[1]&PIN_FORMAT_HIGERCASE == PIN_FORMAT_HIGERCASE){
+                        if((response.flags[1]&PIN_FORMAT_HIGERCASE) == PIN_FORMAT_HIGERCASE){
                             msg += "[A-Z]必須,";
                         }else{
                             msg += "[A-Z]允許";
                         }
 
-                        if(response.flags[1]&PIN_FORMAT_SYMBOL == PIN_FORMAT_SYMBOL){
+                        if((response.flags[1]&PIN_FORMAT_SYMBOL) == PIN_FORMAT_SYMBOL){
                             msg += "特殊符號必須\n";
                         }else{
                             msg += "特殊符號允許\n";
