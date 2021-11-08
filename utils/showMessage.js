@@ -147,6 +147,15 @@ var showFIDOErrorMessage = (gtidem) => {
         case WEB_ERR_InvalidState:
              errorMsg += '無效的操作';
             break;
+        case SETTING_ERR_USERPIN_SAME:
+            errorMsg += '新舊密碼必須不同';
+           break;
+        case SETTING_ERR_USERPIN_LEN:
+            errorMsg += '新密碼長度不合';
+           break;
+        case SETTING_ERR_USERPIN_LEVEL:
+            errorMsg += '新密碼複雜度不合';
+           break;   
         default:
             errorMsg += '不能判別的錯誤。';
             break;
