@@ -1759,24 +1759,6 @@ async function GTIDEM_ChangeUserPIN(bOldPIN, bNewPIN, bSerialNumber) {
         sn_buf[3] = bSerialNumber.byteLength;
         sn_buf.set(bSerialNumber, 4);
     }
-    
-    // var token_sn = undefined;
-    // if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
-    //     token_sn = new Uint8Array(gtidem.sn);
-    // }else{
-    //     token_sn =  new Uint8Array(bSerialNumber);
-    // }
-
-    // sn_buf = new Uint8Array(4 + token_sn.byteLength);
-    // sn_buf[0] = 0xDF;
-    // sn_buf[1] = 0x20;
-    // sn_buf[2] = token_sn.byteLength >> 8;
-    // sn_buf[3] = token_sn.byteLength;
-    // sn_buf.set(token_sn, 4);
-	
-
-    
-
     //Compution session Key and encrypt oldPIN and new pin.
    var prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
    console.log("exportECPublicKeyArray",bufToHex(prepareUpdate.bExportECPublicKeyArray));
