@@ -82,9 +82,6 @@
             console.log(newpin);
 
             var bToken_sn = undefined;
-            if (token_sn.length != 0) {
-                bToken_sn = hexStringToArrayBuffer(token_sn);
-            }
 
             var bNewPINBuffer = new Uint8Array(newpin.length);
             bNewPINBuffer.set(toUTF8Array(newpin), 0);
