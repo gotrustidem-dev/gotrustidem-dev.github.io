@@ -33,6 +33,9 @@
                                 style="width: 200px; height:34px;background-color: #008CBA;">Get Token Info</button>
                             <br><label></label>Random number: <br>
                             <br><label id="label_random_number"></label><br>
+                            <br><label></label>PIN policy: <br>
+                            <br><label id="label_pin_policy"></label><br>
+
                         </form>
                     </td>
                 </tr>
@@ -146,6 +149,47 @@
                         .sn);
                     document.getElementById('label_random_number').innerText = ConverSNFormat(response
                         .rn);
+
+                    if(response.flags!=undefined){
+                        var msg;
+                        if(response.flags[0]==1){
+                            msg += "密碼到期，首次使用需變更\n";
+                        }else{
+                            msg += "密碼不需變更\n";
+                        }
+
+
+                        if(response.flags[1]&PIN_FORMAT_NUMBER == PIN_FORMAT_NUMBER){
+                            msg += "[0-9]必須,";
+                        }else{
+                            msg += "[0-9]允許";
+                        }
+
+                        if(response.flags[1]&PIN_FORMAT_LOWERCASE == PIN_FORMAT_LOWERCASE){
+                            msg += "[a-z]必須,";
+                        }else{
+                            msg += "[a-z]允許";
+                        }
+
+                        if(response.flags[1]&PIN_FORMAT_HIGERCASE == PIN_FORMAT_HIGERCASE){
+                            msg += "[A-Z]必須,";
+                        }else{
+                            msg += "[A-Z]允許";
+                        }
+
+                        if(response.flags[1]&PIN_FORMAT_SYMBOL == PIN_FORMAT_SYMBOL){
+                            msg += "特殊符號必須,";
+                        }else{
+                            msg += "特殊符號允許";
+                        }
+
+
+                        msg +="密碼最小長度"+response.flags[2]+"\n";
+                        msg +="密碼最大長度"+response.flags[3]+"\n";
+                        
+                    } 
+
+
                 } else {
                     alert(showFIDOErrorMessage(response));
                 }
@@ -308,20 +352,6 @@
                 initData.pinMinLen = new Uint8Array([sPinMinLen]);
             }
 
-            // if(sPinLevel!=""){
-            //     initData.pinLevel = new Uint8Array([sPinLevel]);
-            //  }
-            // var initData = {
-            //     soPIN: bNewSOPin,
-            //     userPIN: bNewUserPIN,
-            //     allowedRPID: bHashedDomain,
-              
-            //     // pinLevel:
-            //     // pinExpired:
-            //     // pinRerty:
-            //     // pinMinLen:
-
-            // }
             //build init data with cbor 
             var encodedInitData = new Uint8Array(CBOR.encode(initData));
             console.log(encodedInitData);

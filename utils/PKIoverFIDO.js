@@ -1959,13 +1959,13 @@ function checkPINFormatLevel(bNewPIN, pinLevel){
 
     for(var i =0; i<bNewPIN.byteLength;i++){
         var value = bNewPIN[i];
-        if ((value >= 48) && (value <= 57)) {
+        if ((value >= 48) && (value <= 57)) { //[0-9]
             localLevel |= PIN_FORMAT_NUMBER;
-        }else if ((value >= 97) && (value <= 122)) {
+        }else if ((value >= 97) && (value <= 122)) {//[a-z]
             localLevel |= PIN_FORMAT_LOWERCASE;
-        }else if ((value >= 65) && (value <= 90)) {
+        }else if ((value >= 65) && (value <= 90)) {//[A-Z]
             localLevel |= PIN_FORMAT_HIGERCASE;
-        }else if (isAllowedSymbol(value)) {
+        }else if (isAllowedSymbol(value)) {//special symbol
             localLevel |= PIN_FORMAT_SYMBOL;
         }
     }
