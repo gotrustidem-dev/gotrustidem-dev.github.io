@@ -71,10 +71,15 @@ const Msg_PIN_Trial_Counter = "The retries counter is ";
 
  const WEB_ERR_UserCancelorTimeout = 0xE001;
  const WEB_ERR_OperationAbort = 0xE002;
-
  const WEB_ERR_Timeout = 0xE003;
  const WEB_ERR_Unknow= 0xE004;
  const WEB_ERR_InvalidState= 0xE005;
+
+ 
+ const SETTING_ERR_USERPIN_SAME= 0xA001;
+ const SETTING_ERR_USERPIN_LEN= 0xA002;
+ const SETTING_ERR_USERPIN_LEVEL= 0xA003;
+
 
 var showFIDOErrorMessage = (gtidem) => {
 

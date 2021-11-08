@@ -1731,14 +1731,18 @@ async function GTIDEM_ChangeUserPIN(bOldPIN, bNewPIN, bSerialNumber) {
     }
     var bECPointFromToken = gtidem.ecpoint;
     var flags = gtidem.flags;
+    if((JSON.stringify(bOldPIN)==JSON.stringify(bNewPIN))){
+        gtidem.statusCode = SETTING_ERR_USERPIN_SAME;
+        return gtidem;
+    }
     if(flags!=undefined){
         if(!checkPINFormatLevel(bNewPIN, flags[1])){
-            gtidem.statusCode = CTAP2_ERR_PIN_POLICY_VIOLATION;
+            gtidem.statusCode = SETTING_ERR_USERPIN_LEVEL;
             return gtidem;
         }
 
         if((bNewPIN.length<flags[2])|| (bNewPIN.length>flags[3])){
-            gtidem.statusCode = CTAP2_ERR_PIN_POLICY_VIOLATION;
+            gtidem.statusCode = SETTING_ERR_USERPIN_LEN;
             return gtidem;
         }
 
