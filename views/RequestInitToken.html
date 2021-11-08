@@ -33,9 +33,6 @@
                                 style="width: 200px; height:34px;background-color: #008CBA;">Get Token Info</button>
                             <br><label></label>Random number: <br>
                             <br><label id="label_random_number"></label><br>
-                            <br><label></label>PIN policy: <br>
-                            <br><label id="label_pin_policy"></label><br>
-
                         </form>
                     </td>
                 </tr>
@@ -152,47 +149,6 @@
                     document.getElementById('label_random_number').innerText = ConverSNFormat(response
                         .rn);
 
-                    if(response.flags!=undefined){
-                        flags = response.flags;
-                        var msg="";
-                        if(response.flags[0]==1){
-                            msg += "密碼到期，首次使用需變更\n";
-                        }else{
-                            msg += "密碼不需變更\n";
-                        }
-
-
-                        if((response.flags[1]&PIN_FORMAT_NUMBER)== PIN_FORMAT_NUMBER){
-                            msg += "[0-9]必須,";
-                        }else{
-                            msg += "[0-9]允許";
-                        }
-
-                        if((response.flags[1]&PIN_FORMAT_LOWERCASE) == PIN_FORMAT_LOWERCASE){
-                            msg += "[a-z]必須,";
-                        }else{
-                            msg += "[a-z]允許";
-                        }
-
-                        if((response.flags[1]&PIN_FORMAT_HIGERCASE) == PIN_FORMAT_HIGERCASE){
-                            msg += "[A-Z]必須,";
-                        }else{
-                            msg += "[A-Z]允許";
-                        }
-
-                        if((response.flags[1]&PIN_FORMAT_SYMBOL) == PIN_FORMAT_SYMBOL){
-                            msg += "特殊符號必須\n";
-                        }else{
-                            msg += "特殊符號允許\n";
-                        }
-
-
-                        msg +="密碼最小長度"+response.flags[2]+"\n";
-                        msg +="密碼最大長度"+response.flags[3]+"\n";
-                        document.getElementById('label_pin_policy').innerText =msg;
-                    } 
-
-
                 } else {
                     alert(showFIDOErrorMessage(response));
                 }
@@ -254,16 +210,7 @@
             bNewUserPINArray.set(toUTF8Array(new_user_pin), 0);
 
 
-            //Check PIN policy
-            if(!checkPINFormatLevel(bNewPIN, flags[1])){
-                alert("密碼複雜度不符合");
-                return;
-            }
-
-            if((bNewPIN.length<flags[2])|| (bNewPIN.length>flags[3])){
-                alert("密碼長度不符合");
-                return;
-            }
+   
 
 
             let isPINExpired = document.getElementById('form_pin_params').pinexpired_checkbox.checked;
