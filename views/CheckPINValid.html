@@ -145,12 +145,12 @@
                     }
 
                     //Check PIN policy
-                    if (!checkPINFormatLevel(bNewUserPINArray, flags[1])) {
+                    if (!checkPINFormatLevel(bNewPINBuffer, flags[1])) {
                         alert("密碼複雜度不符合");
                         return;
                     }
 
-                    if ((bNewPIN.length < flags[2]) || (bNewPIN.length > flags[3])) {
+                    if ((bNewPINBuffer.length < flags[2]) || (bNewPINBuffer.length > flags[3])) {
                         alert("密碼長度不符合");
                         return;
                     }
