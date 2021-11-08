@@ -40,18 +40,6 @@
         <table style="height: auto; width: 100%;">
             <tbody>
 
-                <tr>
-                    <td style="width: 100% ;">
-
-
-                        <form style="text-align: center;" id="form_token_sn" onsubmit="return false">
-                            <p>
-                                <label id="label_token_sn">Token Serial number:</label><br>
-                                <input type="text" name="token_sn" style="width: 342px; height:41px">
-                            </p>
-                        </form>
-                    </td>
-                </tr>
 
                 <tr>
                     <td id="pc-td" style="width: 100% ; ">
@@ -101,6 +89,10 @@
 
             var bNewPINBuffer = new Uint8Array(newpin.length);
             bNewPINBuffer.set(toUTF8Array(newpin), 0);
+            if(bNewPINBuffer.length==0){
+                alert("新密碼不為空");
+                return;
+            }
 
             GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
 
@@ -117,21 +109,21 @@
 
 
                         if ((response.flags[1] & PIN_FORMAT_NUMBER) == PIN_FORMAT_NUMBER) {
-                            msg += "[0-9]必須,";
+                            msg += "[0-9]必須, ";
                         } else {
-                            msg += "[0-9]允許";
+                            msg += "[0-9]允許, ";
                         }
 
                         if ((response.flags[1] & PIN_FORMAT_LOWERCASE) == PIN_FORMAT_LOWERCASE) {
-                            msg += "[a-z]必須,";
+                            msg += "[a-z]必須, ";
                         } else {
-                            msg += "[a-z]允許";
+                            msg += "[a-z]允許, ";
                         }
 
                         if ((response.flags[1] & PIN_FORMAT_HIGERCASE) == PIN_FORMAT_HIGERCASE) {
-                            msg += "[A-Z]必須,";
+                            msg += "[A-Z]必須, ";
                         } else {
-                            msg += "[A-Z]允許";
+                            msg += "[A-Z]允許, ";
                         }
 
                         if ((response.flags[1] & PIN_FORMAT_SYMBOL) == PIN_FORMAT_SYMBOL) {
