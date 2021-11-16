@@ -70,7 +70,7 @@
 
                                         <form style="text-align: center;" id="form_allow_domain"
                                             onsubmit="return false">
-                                            <input type="checkbox" id="rpidfilter_checkbox" name="rpidfilter_checkbox" value="rpid_filter"> Enable RPID filter<br>
+                                            <!--<input type="checkbox" id="rpidfilter_checkbox" name="rpidfilter_checkbox" value="rpid_filter"> Enable RPID filter<br><-->
         
                                             <p>
                                                 <label id="label_allow_domain"> Allow host domain :</label><br>
@@ -288,18 +288,18 @@
             macKey = await computingMacKey(bSOPIN, bRandom);
             console.log("INIT_MAC_KEY: "+bufToHex(macKey));
             var bHashedDomain = [];
-            if(AllowHostDomains.length != 0){
-           
-                bHashedDomain = await convertDomainList2Hash(AllowHostDomains);
-            }
-            
             var initData={};
 
             initData.soPIN = bNewSOPin
             initData.userPIN =bNewUserPIN;
-            initData.allowedRPID = bHashedDomain;
 
-       
+            if(AllowHostDomains.length != 0){
+           
+                bHashedDomain = await convertDomainList2Hash(AllowHostDomains);
+                initData.allowedRPID = bHashedDomain;
+            }else{
+                initData.allowedRPID = [];
+            }
             initData.pinExpired = isPinExpired;
         
             initData.pinLevel = new Uint8Array([sPinLevel]);
