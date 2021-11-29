@@ -93,7 +93,6 @@ async function requestSignDataByKEYHANDLE(keyhandle, alg_num, plaintext) {
     }
     var idList = [{
         id: pki_buffer,
-        transports: ["usb"],
         type: "public-key"
     }];
 
@@ -704,7 +703,6 @@ async function SignDataByIndex(index, alg_number, plain) {
     }
     var idList = [{
         id: pki_buffer,
-        transports: ["usb", "nfc"],
         type: "public-key"
     }];
 
@@ -801,7 +799,6 @@ async function SignDataByIndex2(index, alg_number, plain, serial_number) {
     }
     var idList = [{
         id: pki_buffer,
-        transports: ["usb", "nfc"],
         type: "public-key"
     }];
 
@@ -888,7 +885,6 @@ async function SignDataByLabel(label, alg_number, plain) {
     }
     var idList = [{
         id: pki_buffer,
-        transports: ["usb", "nfc"],
         type: "public-key"
     }];
 
@@ -1073,7 +1069,6 @@ async function ImportCertificate(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf) {
     }
     var idList = [{
         id: pki_buffer,
-        transports: ["usb"],
         type: "public-key"
     }];
 
@@ -1384,7 +1379,6 @@ async function ReadCertByIndexFunction2(index) {
     }
     var idList = [{
         id: pki_buffer,
-        transports: ["usb", "nfc"],
         type: "public-key"
     }];
 
@@ -1439,7 +1433,6 @@ async function ReadCertByLableFunction2(strLable) {
     }
     var idList = [{
         id: pki_buffer,
-        transports: ["usb", "nfc"],
         type: "public-key"
     }];
 
@@ -1483,7 +1476,6 @@ async function GetTokenInfo() {
     }
     var idList = [{
         id: pki_buffer,
-        transports: ["usb", "nfc"],
         type: "public-key"
     }];
 
@@ -1566,7 +1558,6 @@ async function TestExtendsToReadSign(index, plain) {
     }
     var idList = [{
         id: pki_buffer,
-        transports: ["usb", "nfc"],
         type: "public-key"
     }];
 
@@ -1816,7 +1807,6 @@ async function GTIDEM_ChangeUserPIN(bOldPIN, bNewPIN, bSerialNumber) {
    }
    var idList = [{
        id: pki_buffer,
-       transports: ["usb"],
        type: "public-key"
    }];
 
@@ -2381,7 +2371,6 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
     }
     var idList = [{
         id: pki_buffer,
-        transports: ["usb"],
         type: "public-key"
     }];
 
@@ -2483,7 +2472,6 @@ async function GTIDEM_DeleteCertByLabel(bLabel, bSerialNumber) {
     }
     var idList = [{
         id: pki_buffer,
-        transports: ["usb", "nfc"],
         type: "public-key"
     }];
 
@@ -2573,7 +2561,6 @@ async function GTIDEM_ClearToken( bSerialNumber) {
     }
     var idList = [{
         id: pki_buffer,
-        transports: ["usb", "nfc"],
         type: "public-key"
     }];
 
@@ -2643,7 +2630,6 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
     }
     var idList = [{
         id: pki_buffer,
-        transports: ["usb", "nfc"],
         type: "public-key"
     }];
 
@@ -2789,7 +2775,6 @@ async function GTIDEM_SignDataByIndex(index, bSerialNumber ,alg_number, bPlain) 
     }
     var idList = [{
         id: pki_buffer,
-        transports: ["usb", "nfc"],
         type: "public-key"
     }];
 
@@ -2953,7 +2938,6 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, bPlain)
     }
     var idList = [{
         id: pki_buffer,
-        transports: ["usb", "nfc"],
         type: "public-key"
     }];
 
@@ -3055,7 +3039,6 @@ async function GTIDEM_ReadCertByIndexWithoutPIN(index, bSerialNumber) {
     }
     var idList = [{
         id: pki_buffer,
-        transports: ["usb", "nfc"],
         type: "public-key"
     }];
 
@@ -3165,7 +3148,6 @@ async function GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSerialNumber) {
     }
     var idList = [{
         id: pki_buffer,
-        transports: ["usb", "nfc"],
         type: "public-key"
     }];
 
@@ -3279,7 +3261,6 @@ function GTIDEM_SetName(sName){
     }
     var idList = [{
         id: pki_buffer,
-        transports: ["usb", "nfc"],
         type: "public-key"
     }];
 
@@ -3376,7 +3357,6 @@ function GTIDEM_SetName(sName){
    }
    var idList = [{
        id: pki_buffer,
-       transports: ["usb"],
        type: "public-key"
    }];
 
@@ -3460,7 +3440,6 @@ function GTIDEM_SetName(sName){
    }
    var idList = [{
        id: pki_buffer,
-       transports: ["usb"],
        type: "public-key"
    }];
 
