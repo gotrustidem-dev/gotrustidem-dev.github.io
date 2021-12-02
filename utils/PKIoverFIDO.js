@@ -2624,9 +2624,9 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
     console.log("GetTokenInfo", bufToHex(pki_buffer));
     var getAssertionChallenge = {
         'challenge': challenge,
-        'rpid':'info.gotrustidema-dev.github.io',
+        'rpid':'www.github.io',
         "userVerification": "discouraged",
-        timeout: 15000,  
+        timeout: 60000,  
     }
     var idList = [{
         id: pki_buffer,
