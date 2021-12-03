@@ -2006,124 +2006,123 @@ function checkPINFormatLevel2(bNewPIN, pinLevel){
         }
     }
      //check english
-		 switch(level&0xc0){
-		 
-            case 0x80: //英文必要
-                
-                if((level&0x30)==0x00){//英文必要，大小寫都可
+        switch(level&0xc0){
+        
+        case 0x80: //英文必要
+            
+            if((level&0x30)==0x00){//英文必要，大小寫都可
 
-                    if((localLevel&(PIN_FORMAT_HIGERCASE|PIN_FORMAT_LOWERCASE))==0x00){
-                        return false;
-                    } 
-                }
-            
-                if((level&0x30)==0x10){//英文必要，小寫必要
-                    if((localLevel&PIN_FORMAT_LOWERCASE)==0x00){
-                        return false;
-                    }
-                     
-                 }
-            
-                 if((level&0x30)==0x20){//英文必要，大寫必要
-                     
-                    if((localLevel&PIN_FORMAT_HIGERCASE)==0x00){
-                        return false;
-                    }
-                 }
-                 
-                
-    
-                 if((level&0x30)==0x30){//英文必要，大小寫皆必要
-                    if((localLevel&(PIN_FORMAT_HIGERCASE|PIN_FORMAT_LOWERCASE))!=(PIN_FORMAT_HIGERCASE|PIN_FORMAT_LOWERCASE)){
-                        return false;
-                    }
-                     
-                 }
-                 
-                
-                break;
-            case 0x60: //英文禁止
-           
-
-                 if((level&0x30)==0x30){//英文大小寫都禁止
-                    if((localLevel&(PIN_FORMAT_HIGERCASE|PIN_FORMAT_LOWERCASE))!=0x00){
-                        return false;
-                    }
-                     
-                 }
-            
-                 if((level&0x10)==0x10){//小寫禁止, 大寫允許
-                    if((localLevel&PIN_FORMAT_LOWERCASE)!=0x00){
-                        return false;
-                    }
-                 }
-                 
-                 if((level&0x10)==0x20){//大寫禁止, 小寫允許
-                    if((localLevel&PIN_FORMAT_HIGERCASE)!=0x00){
-                        return false;
-                    }
-                }
-                 
-                 
-                break;
-            case (byte) 0xC0: //特殊
-                if((level&0x20)==0x20){//	大寫必要，小寫禁止
-                    if(((localLevel&PIN_FORMAT_HIGERCASE)==0x00)||((localLevel&PIN_FORMAT_LOWERCASE)==PIN_FORMAT_LOWERCASE)){
-                        return false;
-                    }
-                         
-                }
-                
-                if((level&0x10)==0x10){//		大寫禁止，小寫必要
-                   if(((localLevel&PIN_FORMAT_HIGERCASE)==PIN_FORMAT_HIGERCASE)||((localLevel&PIN_FORMAT_LOWERCASE)==0x00)){
-                        return false;
-                    }
-                         
-                }
-            
-                break;
-        }
+                if((localLevel&(PIN_FORMAT_HIGERCASE|PIN_FORMAT_LOWERCASE))==0x00){
+                    return false;
+                } 
+            }
         
-        //check number
-        switch(level&0x03){
-        
-            case 0x01: //樹字必要
-                
-                if((level&PIN_FORMAT_NUMBER)!=PIN_FORMAT_NUMBER){
-                   return false; 
-                }
-                
-                break;
-            case  0x03: //樹字禁止
-           
-                if((level&PIN_FORMAT_NUMBER)==PIN_FORMAT_NUMBER){
-                       return false; 
-                }
-            
-                break;
-        }
-        
-        //check symbol
-        switch(level&0x0C){
-            
-            case 0x04: //福號必要
-                
-                if((level&PIN_FORMAT_SYMBOL)!=PIN_FORMAT_SYMBOL){
-                       return false; 
+            if((level&0x30)==0x10){//英文必要，小寫必要
+                if((localLevel&PIN_FORMAT_LOWERCASE)==0x00){
+                    return false;
                 }
                     
-                
-                break;
-            case 0x0c: //福號禁止
-           
-                if((level&PIN_FORMAT_SYMBOL)==PIN_FORMAT_SYMBOL){
-                       return false; 
+                }
+        
+                if((level&0x30)==0x20){//英文必要，大寫必要
+                    
+                if((localLevel&PIN_FORMAT_HIGERCASE)==0x00){
+                    return false;
+                }
                 }
                 
-                break;
-        }
+            
+
+                if((level&0x30)==0x30){//英文必要，大小寫皆必要
+                if((localLevel&(PIN_FORMAT_HIGERCASE|PIN_FORMAT_LOWERCASE))!=(PIN_FORMAT_HIGERCASE|PIN_FORMAT_LOWERCASE)){
+                    return false;
+                }
+                    
+                }
+                
+            
+            break;
+        case 0x60: //英文禁止
         
-       return true;
+
+                if((level&0x30)==0x30){//英文大小寫都禁止
+                if((localLevel&(PIN_FORMAT_HIGERCASE|PIN_FORMAT_LOWERCASE))!=0x00){
+                    return false;
+                }
+                    
+                }
+        
+                if((level&0x10)==0x10){//小寫禁止, 大寫允許
+                if((localLevel&PIN_FORMAT_LOWERCASE)!=0x00){
+                    return false;
+                }
+                }
+                
+                if((level&0x10)==0x20){//大寫禁止, 小寫允許
+                if((localLevel&PIN_FORMAT_HIGERCASE)!=0x00){
+                    return false;
+                }
+            }
+                
+                
+            break;
+        case 0xC0: //特殊
+            if((level&0x20)==0x20){//	大寫必要，小寫禁止
+                if(((localLevel&PIN_FORMAT_HIGERCASE)==0x00)||((localLevel&PIN_FORMAT_LOWERCASE)==PIN_FORMAT_LOWERCASE)){
+                    return false;
+                }
+                        
+            }
+            
+            if((level&0x10)==0x10){//		大寫禁止，小寫必要
+                if(((localLevel&PIN_FORMAT_HIGERCASE)==PIN_FORMAT_HIGERCASE)||((localLevel&PIN_FORMAT_LOWERCASE)==0x00)){
+                    return false;
+                }
+                        
+            }
+        
+            break;
+    }
+    
+    //check number
+    switch(level&0x03){
+    
+        case 0x01: //樹字必要
+            
+            if((level&PIN_FORMAT_NUMBER)!=PIN_FORMAT_NUMBER){
+                return false; 
+            }
+            
+            break;
+        case  0x03: //樹字禁止
+        
+            if((level&PIN_FORMAT_NUMBER)==PIN_FORMAT_NUMBER){
+                    return false; 
+            }
+        
+            break;
+    }
+    
+    //check symbol
+    switch(level&0x0C){
+        
+        case 0x04: //福號必要
+            
+            if((level&PIN_FORMAT_SYMBOL)!=PIN_FORMAT_SYMBOL){
+                    return false; 
+            }
+                
+            
+            break;
+        case 0x0c: //福號禁止
+        
+            if((level&PIN_FORMAT_SYMBOL)==PIN_FORMAT_SYMBOL){
+                    return false; 
+            }
+            break;
+    }
+        
+    return true;
 }
 
 /**
