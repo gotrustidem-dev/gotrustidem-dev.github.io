@@ -25,8 +25,24 @@ const CMD_INIT_TOKEN = 0xED;
 var g_encryptedPIN;
 var g_platformECpublickey;
 
+const ALG_RSA2048SHA1 = 0x01;
 const ALG_RSA2048SHA256 = 0x02;
+const ALG_RSA2048SHA384 = 0x03;
+const ALG_RSA2048SHA512 = 0x04;
+const ALG_RSA2048SHA1_PSS = 0x05;
+const ALG_RSA2048SHA256_PSS = 0x06;
+const ALG_RSA2048SHA384_PSS = 0x07;
+const ALG_RSA2048SHA512_PSS = 0x08;
+
+const ALG_RSA2048SHA1_PreHash = 0x11;
 const ALG_RSA2048SHA256_PreHash = 0x12;
+const ALG_RSA2048SHA384_PreHash = 0x13;
+const ALG_RSA2048SHA512_PreHash = 0x14;
+const ALG_RSA2048SHA1_PSS_PreHash = 0x15;
+const ALG_RSA2048SHA256_PSS_PreHash = 0x16;
+const ALG_RSA2048SHA384_PSS_PreHash = 0x17;
+const ALG_RSA2048SHA512_PSS_PreHash = 0x18;
+
 
 const PIN_FORMAT_FREE =0x00;
 const PIN_FORMAT_NUMBER =0x01;
@@ -1727,7 +1743,7 @@ async function GTIDEM_ChangeUserPIN(bOldPIN, bNewPIN, bSerialNumber) {
         return gtidem;
     }
     if(flags!=undefined){
-        if(!checkPINFormatLevel(bNewPIN, flags[1])){
+        if(!checkPINFormatLevel2(bNewPIN, flags[1])){
             gtidem.statusCode = SETTING_ERR_USERPIN_LEVEL;
             return gtidem;
         }
@@ -1971,6 +1987,144 @@ function isAllowedSymbol(value) {
     return false;
     
 } 
+
+function checkPINFormatLevel2(bNewPIN, pinLevel){
+    var localLevel  = 0 ; 
+    if(pinLevel == PIN_FORMAT_FREE)
+        return true;
+
+    for(var i =0; i<bNewPIN.byteLength;i++){
+        var value = bNewPIN[i];
+        if ((value >= 48) && (value <= 57)) { //[0-9]
+            localLevel |= PIN_FORMAT_NUMBER;
+        }else if ((value >= 97) && (value <= 122)) {//[a-z]
+            localLevel |= PIN_FORMAT_LOWERCASE;
+        }else if ((value >= 65) && (value <= 90)) {//[A-Z]
+            localLevel |= PIN_FORMAT_HIGERCASE;
+        }else if (isAllowedSymbol(value)) {//special symbol
+            localLevel |= PIN_FORMAT_SYMBOL;
+        }
+    }
+     //check english
+		 switch(level&0xc0){
+		 
+            case 0x80: //英文必要
+                
+                if((level&0x30)==0x00){//英文必要，大小寫都可
+
+                    if((localLevel&(PIN_FORMAT_HIGERCASE|PIN_FORMAT_LOWERCASE))==0x00){
+                        return false;
+                    } 
+                }
+            
+                if((level&0x30)==0x10){//英文必要，小寫必要
+                    if((localLevel&PIN_FORMAT_LOWERCASE)==0x00){
+                        return false;
+                    }
+                     
+                 }
+            
+                 if((level&0x30)==0x20){//英文必要，大寫必要
+                     
+                    if((localLevel&PIN_FORMAT_HIGERCASE)==0x00){
+                        return false;
+                    }
+                 }
+                 
+                
+    
+                 if((level&0x30)==0x30){//英文必要，大小寫皆必要
+                    if((localLevel&(PIN_FORMAT_HIGERCASE|PIN_FORMAT_LOWERCASE))!=(PIN_FORMAT_HIGERCASE|PIN_FORMAT_LOWERCASE)){
+                        return false;
+                    }
+                     
+                 }
+                 
+                
+                break;
+            case 0x60: //英文禁止
+           
+
+                 if((level&0x30)==0x30){//英文大小寫都禁止
+                    if((localLevel&(PIN_FORMAT_HIGERCASE|PIN_FORMAT_LOWERCASE))!=0x00){
+                        return false;
+                    }
+                     
+                 }
+            
+                 if((level&0x10)==0x10){//小寫禁止, 大寫允許
+                    if((localLevel&PIN_FORMAT_LOWERCASE)!=0x00){
+                        return false;
+                    }
+                 }
+                 
+                 if((level&0x10)==0x20){//大寫禁止, 小寫允許
+                    if((localLevel&PIN_FORMAT_HIGERCASE)!=0x00){
+                        return false;
+                    }
+                }
+                 
+                 
+                break;
+            case (byte) 0xC0: //特殊
+                if((level&0x20)==0x20){//	大寫必要，小寫禁止
+                    if(((localLevel&PIN_FORMAT_HIGERCASE)==0x00)||((localLevel&PIN_FORMAT_LOWERCASE)==PIN_FORMAT_LOWERCASE)){
+                        return false;
+                    }
+                         
+                }
+                
+                if((level&0x10)==0x10){//		大寫禁止，小寫必要
+                   if(((localLevel&PIN_FORMAT_HIGERCASE)==PIN_FORMAT_HIGERCASE)||((localLevel&PIN_FORMAT_LOWERCASE)==0x00)){
+                        return false;
+                    }
+                         
+                }
+            
+                break;
+        }
+        
+        //check number
+        switch(level&0x03){
+        
+            case 0x01: //樹字必要
+                
+                if((level&PIN_FORMAT_NUMBER)!=PIN_FORMAT_NUMBER){
+                   return false; 
+                }
+                
+                break;
+            case  0x03: //樹字禁止
+           
+                if((level&PIN_FORMAT_NUMBER)==PIN_FORMAT_NUMBER){
+                       return false; 
+                }
+            
+                break;
+        }
+        
+        //check symbol
+        switch(level&0x0C){
+            
+            case 0x04: //福號必要
+                
+                if((level&PIN_FORMAT_SYMBOL)!=PIN_FORMAT_SYMBOL){
+                       return false; 
+                }
+                    
+                
+                break;
+            case 0x0c: //福號禁止
+           
+                if((level&PIN_FORMAT_SYMBOL)==PIN_FORMAT_SYMBOL){
+                       return false; 
+                }
+                
+                break;
+        }
+        
+       return true;
+}
 
 /**
  * 產生 RSA 2048 金鑰對，會組合成 CSR 格式回傳
