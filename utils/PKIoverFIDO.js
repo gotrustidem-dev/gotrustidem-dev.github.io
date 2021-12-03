@@ -2089,14 +2089,14 @@ function checkPINFormatLevel2(bNewPIN, level){
     
         case 0x01: //樹字必要
             
-            if((level&PIN_FORMAT_NUMBER)!=PIN_FORMAT_NUMBER){
+            if((localLevel&PIN_FORMAT_NUMBER)!=PIN_FORMAT_NUMBER){
                 return false; 
             }
             
             break;
         case  0x03: //樹字禁止
         
-            if((level&PIN_FORMAT_NUMBER)==PIN_FORMAT_NUMBER){
+            if((localLevel&PIN_FORMAT_NUMBER)==PIN_FORMAT_NUMBER){
                     return false; 
             }
         
@@ -2108,7 +2108,7 @@ function checkPINFormatLevel2(bNewPIN, level){
         
         case 0x04: //福號必要
             
-            if((level&PIN_FORMAT_SYMBOL)!=PIN_FORMAT_SYMBOL){
+            if((localLevel&PIN_FORMAT_SYMBOL)!=PIN_FORMAT_SYMBOL){
                     return false; 
             }
                 
@@ -2116,7 +2116,7 @@ function checkPINFormatLevel2(bNewPIN, level){
             break;
         case 0x0c: //福號禁止
         
-            if((level&PIN_FORMAT_SYMBOL)==PIN_FORMAT_SYMBOL){
+            if((localLevel&PIN_FORMAT_SYMBOL)==PIN_FORMAT_SYMBOL){
                     return false; 
             }
             break;
