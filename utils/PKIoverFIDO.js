@@ -1988,9 +1988,9 @@ function isAllowedSymbol(value) {
     
 } 
 
-function checkPINFormatLevel2(bNewPIN, pinLevel){
+function checkPINFormatLevel2(bNewPIN, level){
     var localLevel  = 0 ; 
-    if(pinLevel == PIN_FORMAT_FREE)
+    if(level == PIN_FORMAT_FREE)
         return true;
 
     for(var i =0; i<bNewPIN.byteLength;i++){
