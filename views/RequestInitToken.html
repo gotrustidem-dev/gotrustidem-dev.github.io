@@ -196,7 +196,7 @@
 
             bRandom = hexStringToArrayBuffer(random);
 
-            var AllowHostDomains = [];
+            var AllowHostDomains =  new Uint8Array(0);
 
 
             //AllowHostDomains = ["*.gotrustid.com","gotrustid.com.tw", "gotrustidem-dev.github.io","ctbc.com","ctbc123.com","test.ctbc.com"];
@@ -310,7 +310,7 @@
             console.log("IV: "+bufToHex(iv));
             macKey = await computingMacKey(bSOPIN, bRandom);
             console.log("INIT_MAC_KEY: "+bufToHex(macKey));
-            var bHashedDomain = [];
+            var bHashedDomain;
             var initData={};
 
             initData.soPIN = bNewSOPin
@@ -321,7 +321,7 @@
                 bHashedDomain = await convertDomainList2Hash(AllowHostDomains);
                 initData.allowedRPID = bHashedDomain;
             }else{
-                initData.allowedRPID = [];
+                initData.allowedRPID = new Uint8Array(0);
             }
             initData.pinExpired = isPinExpired;
         
