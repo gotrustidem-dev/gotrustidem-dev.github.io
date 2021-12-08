@@ -103,7 +103,7 @@
                             msg += "密碼不需變更\n";
                         }
 
-
+                        /*
                         if ((response.flags[1] & PIN_FORMAT_NUMBER) == PIN_FORMAT_NUMBER) {
                             msg += "[0-9]必須, ";
                         } else {
@@ -127,6 +127,82 @@
                         } else {
                             msg += "特殊符號允許\n";
                         }
+                        */
+
+                        if ((response.flags[1] & 0xc0) == 0x00) {
+                            msg += "[a-z][A-Z]允許, ";
+                        } 
+
+                        if ((response.flags[1] & 0xc0) == 0x80) {
+
+                            if((response.flags[1] & 0x30) == 0x00){
+                                msg += "英文必要,[a-z][A-Z]都接受, ";
+                            }
+                           
+                            if((response.flags[1] & 0x30) == 0x10){
+                                msg += "英文小寫必要, ";
+                            }
+
+                            if((response.flags[1] & 0x30) == 0x20){
+                                msg += "英文大寫必要, ";
+                            }
+
+                            if((response.flags[1] & 0x30) == 0x30){
+                                msg += "英文大小寫皆必要, ";
+                            }
+                        } 
+
+                        if ((response.flags[1] & 0xc0) == 0x40) {
+
+                            if((response.flags[1] & 0x30) == 0x10){
+                                msg += "英文小寫禁止, ";
+                            }
+
+                            if((response.flags[1] & 0x30) == 0x20){
+                                msg += "英文大寫禁止, ";
+                            }
+
+                            if((response.flags[1] & 0x30) == 0x30){
+                                msg += "英文大小寫皆禁止, ";
+                        }
+
+                        if ((response.flags[1] & 0xc0) == 0xc0) {
+
+                            if((response.flags[1] & 0x30) == 0x10){
+                                msg += "英文大寫禁止，小寫必要, ";
+                            }
+
+                            if((response.flags[1] & 0x30) == 0x20){
+                                msg += "英文大寫必要，小寫禁止, ";
+                            }
+                        }
+
+
+                        if ((response.flags[1] & 0x0c) == 0x00) {
+                            msg += "符號允許, ";
+                        }
+
+                        if ((response.flags[1] & 0x0c) == 0x0c) {
+                            msg += "符號禁止, ";
+                        }
+
+                        if ((response.flags[1] & 0x0c) == 0x04) {
+                            msg += "符號必要, ";
+                        }
+
+                        if ((response.flags[1] & 0x03) == 0x00) {
+                            msg += "數字允許, ";
+                        }
+
+                        if ((response.flags[1] & 0x03) == 0x03) {
+                            msg += "數字禁止, ";
+                        }
+
+                        if ((response.flags[1] & 0x03) == 0x01) {
+                            msg += "數字必要, ";
+                        }
+
+
                         msg += "密碼最小長度" + response.flags[2] + "\n";
                         msg += "密碼最大長度" + response.flags[3] + "\n";
                         document.getElementById('label_pin_policy').innerText = msg;
