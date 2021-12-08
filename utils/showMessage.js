@@ -54,6 +54,8 @@ const CTAP2_ERR_VENDOR_ERROR_CREDENTIAL_EXIST    =0xF5;    //Vendor specific err
 const CTAP2_ERR_VENDOR_ERROR_INVALID_DATA    =0xF6;    //Vendor specific error.
 const CTAP2_ERR_VENDOR_ERROR_NOT_ALLOWED_RPID    =0xF7;    //Vendor specific error.
 const CTAP2_ERR_VENDOR_ERROR_PIN_EXPIRED    =0xF8;    //Vendor specific error.
+const CTAP2_ERR_VENDOR_ERROR_PIN_LEN    =0xF9;    //Vendor specific error.
+const CTAP2_ERR_VENDOR_ERROR_PIN_REUSE    =0xFA;    //Vendor specific error.
 
 const ErrorMsg_OK = "No ERROR";
 const ErrorMsg_PIN_INVALID = "PIN invalid.";
@@ -132,6 +134,10 @@ var showFIDOErrorMessage = (gtidem) => {
         case CTAP2_ERR_VENDOR_ERROR_PIN_EXPIRED:
             errorMsg += '密碼到期。需變更密碼'; 
             break;    
+        case CTAP2_ERR_VENDOR_ERROR_PIN_REUSE:
+            errorMsg += '無法變更預設密碼'; 
+            break;    
+            
         case WEB_ERR_UserCancelorTimeout:
             errorMsg += '操作取消';
             break;
