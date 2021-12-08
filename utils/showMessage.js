@@ -135,7 +135,7 @@ var showFIDOErrorMessage = (gtidem) => {
             errorMsg += '密碼到期。需變更密碼'; 
             break;    
         case CTAP2_ERR_VENDOR_ERROR_PIN_REUSE:
-            errorMsg += '無法變更預設密碼'; 
+            errorMsg += '無法變更為預設密碼'; 
             break;    
             
         case WEB_ERR_UserCancelorTimeout:
