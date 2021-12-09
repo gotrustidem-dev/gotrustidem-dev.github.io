@@ -154,9 +154,9 @@
                     document.getElementById('label_random_number').innerText = "Random number: " +ConverSNFormat(response.rn);
                     document.getElementById('label_ecPublic_key').innerText = "EC public point: " +ConverSNFormat(response.ecpoint);
                     document.getElementById('label_flags').innerText = "Flags: " +ConverSNFormat(response.flags);
-                    if(response.sopinRetry!=undefined){
-                        document.getElementById('label_sopin_retries').innerText = "SOPIN retryies:: " +response.sopinRetry;
-                    }
+                    
+                    document.getElementById('label_sopin_retries').innerText = " 已經測試次數: " +loopCnt;
+                    
                     console.log("test loopCnt: "+ loopCnt); //for StressTest
                     var endTime = performance.now()
                     console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
