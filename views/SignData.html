@@ -99,8 +99,32 @@
                                                         </p>
                                                     </td>
 
-                                                    <input type="checkbox" id="use_hashdata_label" name="vehicle1" value="Use Hashed Data">
-                                                    <label >Use Hashed Data to Sign </label> 
+                                                    <!--<input type="checkbox" id="use_hashdata_label" name="vehicle1" value="Use Hashed Data">
+                                                    <label >Use Hashed Data to Sign </label> -->
+                                                    <select id="select_alg">
+                                                        <option>Select alg</option>
+                                                        <optgroup label="PKCSv1.5">
+                                                            <option value="1">ALG_RSA2048SHA1</option>
+                                                            <option value="2">ALG_RSA2048SHA256</option>
+                                                            <option value="3">ALG_RSA2048SHA384</option>
+                                                            <option value="4">ALG_RSA2048SHA512</option>
+                                                            <option value="5">ALG_RSA2048SHA1_PreHash</option>
+                                                            <option value="6">ALG_RSA2048SHA256_PreHash</option>
+                                                            <option value="7">ALG_RSA2048SHA384_PreHash</option>
+                                                            <option value="8">ALG_RSA2048SHA512_PreHash</option>
+                                                        </optgroup>
+                                                       
+                                                        <optgroup label="PKCS#1 PSS">
+                                                            <option value="9">ALG_RSA2048SHA1_PSS</option>
+                                                            <option value="10">ALG_RSA2048SHA256_PSS</option>
+                                                            <option value="11">ALG_RSA2048SHA384_PSS</option>
+                                                            <option value="12">ALG_RSA2048SHA512_PSS</option>                                                        
+                                                            <option value="13">ALG_RSA2048SHA1_PSS_PreHash</option>
+                                                            <option value="14">ALG_RSA2048SHA256_PSS_PreHash</option>
+                                                            <option value="15">ALG_RSA2048SHA384_PSS_PreHash</option>
+                                                            <option value="16">ALG_RSA2048SHA512_PSS_PreHash</option>
+                                                        </optgroup>
+                                                    </select>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -134,6 +158,30 @@
             var bLabel = new Uint8Array(label.length);
             bLabel.set(toUTF8Array(label), 0);
             GTIDEM_SetName("李子棋");
+
+            var selectedAlg;
+            var e = document.getElementById('form_token_sn').value; 
+            switch(e){
+
+                case "1":selectedAlg = ALG_RSA2048SHA1; break;
+                case "2":selectedAlg = ALG_RSA2048SHA256; break;
+                case "3":selectedAlg = ALG_RSA2048SHA384; break;
+                case "4":selectedAlg = ALG_RSA2048SHA512; break;
+                case "5":selectedAlg = ALG_RSA2048SHA1_PreHash; break;
+                case "6":selectedAlg = ALG_RSA2048SHA256_PreHash; break;
+                case "7":selectedAlg = ALG_RSA2048SHA384_PreHash; break;
+                case "8":selectedAlg = ALG_RSA2048SHA512_PreHash; break;
+                case "9":selectedAlg = ALG_RSA2048SHA1; break;
+                case "10":selectedAlg = ALG_RSA2048SHA1; break;
+                case "11":selectedAlg = ALG_RSA2048SHA1; break;
+                case "12":selectedAlg = ALG_RSA2048SHA1; break;
+                case "13":selectedAlg = ALG_RSA2048SHA1; break;
+                case "14":selectedAlg = ALG_RSA2048SHA1; break;
+                case "15":selectedAlg = ALG_RSA2048SHA1; break;
+                case "16":selectedAlg = ALG_RSA2048SHA1; break;
+            }
+
+
 
             if(isUseHashedData2Sign.checked){
                 crypto.subtle.digest("SHA-256",new Uint8Array(signDataPayload)).
