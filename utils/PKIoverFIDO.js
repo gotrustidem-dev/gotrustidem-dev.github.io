@@ -102,7 +102,7 @@ async function requestSignDataByKEYHANDLE(keyhandle, alg_num, plaintext) {
     pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + keyHandle_buf
         .byteLength + alg_buf.byteLength);
 
-    console.log("sign-keyhandle: " + bufToHex(pki_buffer));
+    //console.log("sign-keyhandle: " + bufToHex(pki_buffer));
 
     var getAssertionChallenge = {
         'challenge': challenge,
@@ -113,14 +113,14 @@ async function requestSignDataByKEYHANDLE(keyhandle, alg_num, plaintext) {
     }];
 
     getAssertionChallenge.allowCredentials = idList;
-    console.log('List getAssertionChallenge', getAssertionChallenge)
+    //console.log('List getAssertionChallenge', getAssertionChallenge)
 
     return await new Promise(resolve => {
         navigator.credentials.get({
                 'publicKey': getAssertionChallenge
             })
             .then((newCredentialInfo) => {
-                console.log('GetAssertion response', newCredentialInfo);
+                //console.log('GetAssertion response', newCredentialInfo);
                 resolve(newCredentialInfo);
             })
     });
@@ -154,7 +154,7 @@ async function requirePINVerify() {
     pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
     pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
 
-    console.log(bufToHex(pki_buffer));
+    //console.log(bufToHex(pki_buffer));
 
     //because pki command : 0xe0 has bug, use randomly id as user id 
     var userID = 'Kosv9fPtkDoh4Oz7Yq/pVgWHS8HhdlCto5cR0aBoVMw='
@@ -190,7 +190,7 @@ async function requirePINVerify() {
             }
         ]
     }
-    console.log('Get ECDH Key request', request_keyagreement);
+    //console.log('Get ECDH Key request', request_keyagreement);
 
     return await new Promise(resolve => {
         navigator.credentials.create({
@@ -200,13 +200,13 @@ async function requirePINVerify() {
             if (userpin == null) {
                 return;
             }
-            console.log('PIN', userpin);
+            //console.log('PIN', userpin);
 
             let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
             let authData = parseAuthData(attestationObject.authData);
             var publicKEy = CBOR.decode(authData.COSEPublicKey.buffer);
-            console.log('X point: ', bufToHex(Object.values(publicKEy)[3]));
-            console.log('Y point: ', bufToHex(Object.values(publicKEy)[4]));
+            //console.log('X point: ', bufToHex(Object.values(publicKEy)[3]));
+            //console.log('Y point: ', bufToHex(Object.values(publicKEy)[4]));
 
             var externalECPublicKeyX = base64EncodeURL(Object.values(publicKEy)[3]);
             var externalECPublicKeyY = base64EncodeURL(Object.values(publicKEy)[4]);
@@ -229,7 +229,7 @@ async function requirePINVerify() {
         }).then(function (external_public) {
             //returns a privateKey (or publicKey if you are importing a public key)
             externalECPublicKey = external_public;
-            console.log("external_public", externalECPublicKey);
+            //console.log("external_public", externalECPublicKey);
             return window.crypto.subtle.generateKey({
                     name: "ECDH",
                     namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
@@ -246,7 +246,7 @@ async function requirePINVerify() {
             window.crypto.subtle.exportKey("raw", local_publicKey).then(
                 function (keydata) {
                     exportECPublicKeyArray = keydata;
-                    console.log("exportECPublicKeyArray", bufToHex(exportECPublicKeyArray));
+                    //console.log("exportECPublicKeyArray", bufToHex(exportECPublicKeyArray));
                 }
             );
             return window.crypto.subtle.deriveBits({
@@ -265,23 +265,23 @@ async function requirePINVerify() {
                 new Uint8Array(keybits)
             );
         }).then(function (pinEncKeyBytes) {
-            console.log("pinEncKeyBytes", bufToHex(pinEncKeyBytes));
+            //console.log("pinEncKeyBytes", bufToHex(pinEncKeyBytes));
             return crypto.subtle.importKey("raw",
                 pinEncKeyBytes,
                 "aes-cbc", false, ["encrypt"]);
 
         }).then(function (importKey) {
             pinEncKey = importKey;
-            console.log("pinEncKey ", pinEncKey);
+            //console.log("pinEncKey ", pinEncKey);
             const encoder = new TextEncoder();
             const data = encoder.encode(userpin);
             return crypto.subtle.digest(
                 "SHA-256",
                 data);
         }).then(function (userpin_digestBytes) {
-            console.log("userpin_digestBytes", bufToHex(userpin_digestBytes.slice(0, 16)));
+            //console.log("userpin_digestBytes", bufToHex(userpin_digestBytes.slice(0, 16)));
             var iv = new Uint8Array(16);
-            console.log("iv .... ", iv);
+            //console.log("iv .... ", iv);
 
             return crypto.subtle.encrypt({
                 name: "aes-cbc",
@@ -290,7 +290,7 @@ async function requirePINVerify() {
         }).then(function (cipherPIN) { // start get assertion
 
             EncryptedPINArray = cipherPIN.slice(0, 16);
-            console.log("EncryptedPINArray", bufToHex(EncryptedPINArray.slice(0, 16)));
+            //console.log("EncryptedPINArray", bufToHex(EncryptedPINArray.slice(0, 16)));
             resolve([EncryptedPINArray, exportECPublicKeyArray]);
             //return EncryptedPINArray;
         });
@@ -326,7 +326,7 @@ async function requireEncryptedPINandEncryptedNewPIN(oldpin, newpin) {
     pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
     pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
 
-    console.log(bufToHex(pki_buffer));
+    //console.log(bufToHex(pki_buffer));
 
     var request_keyagreement = {
         'challenge': challenge,
@@ -357,21 +357,21 @@ async function requireEncryptedPINandEncryptedNewPIN(oldpin, newpin) {
             }
         ]
     }
-    console.log('Get ECDH Key request', request_keyagreement);
+    //console.log('Get ECDH Key request', request_keyagreement);
     return await (new Promise(resolve => {
         navigator.credentials.create({
             'publicKey': request_keyagreement
         }).then((newCredentialInfo) => {
 
 
-            console.log('oldpin', oldpin);
-            console.log('newpin', newpin);
+            //console.log('oldpin', oldpin);
+            //console.log('newpin', newpin);
 
             let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
             let authData = parseAuthData(attestationObject.authData);
             var publicKEy = CBOR.decode(authData.COSEPublicKey.buffer);
-            console.log('X point: ', bufToHex(Object.values(publicKEy)[3]));
-            console.log('Y point: ', bufToHex(Object.values(publicKEy)[4]));
+            //console.log('X point: ', bufToHex(Object.values(publicKEy)[3]));
+            //console.log('Y point: ', bufToHex(Object.values(publicKEy)[4]));
 
             var externalECPublicKeyX = base64EncodeURL(Object.values(publicKEy)[3]);
             var externalECPublicKeyY = base64EncodeURL(Object.values(publicKEy)[4]);
@@ -394,7 +394,7 @@ async function requireEncryptedPINandEncryptedNewPIN(oldpin, newpin) {
         }).then(function (external_public) {
             //returns a privateKey (or publicKey if you are importing a public key)
             externalECPublicKey = external_public;
-            console.log("external_public", externalECPublicKey);
+            //console.log("external_public", externalECPublicKey);
             return window.crypto.subtle.generateKey({
                     name: "ECDH",
                     namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
@@ -411,7 +411,7 @@ async function requireEncryptedPINandEncryptedNewPIN(oldpin, newpin) {
             window.crypto.subtle.exportKey("raw", local_publicKey).then(
                 function (keydata) {
                     exportECPublicKeyArray = keydata;
-                    console.log("exportECPublicKeyArray", bufToHex(exportECPublicKeyArray));
+                    //console.log("exportECPublicKeyArray", bufToHex(exportECPublicKeyArray));
                 }
             );
             return window.crypto.subtle.deriveBits({
@@ -430,23 +430,23 @@ async function requireEncryptedPINandEncryptedNewPIN(oldpin, newpin) {
                 new Uint8Array(keybits)
             );
         }).then(function (pinEncKeyBytes) {
-            console.log("pinEncKeyBytes", bufToHex(pinEncKeyBytes));
+            //console.log("pinEncKeyBytes", bufToHex(pinEncKeyBytes));
             return crypto.subtle.importKey("raw",
                 pinEncKeyBytes,
                 "aes-cbc", false, ["encrypt"]);
 
         }).then(function (importKey) {
             pinEncKey = importKey;
-            console.log("pinEncKey ", pinEncKey);
+            //console.log("pinEncKey ", pinEncKey);
             const encoder = new TextEncoder();
             const data = encoder.encode(oldpin);
             return crypto.subtle.digest(
                 "SHA-256",
                 data);
         }).then(function (oldpin_digestBytes) {
-            console.log("oldpin_digestBytes", bufToHex(oldpin_digestBytes.slice(0, 16)));
+            //console.log("oldpin_digestBytes", bufToHex(oldpin_digestBytes.slice(0, 16)));
             var iv = new Uint8Array(16);
-            console.log("iv .... ", iv);
+            //console.log("iv .... ", iv);
 
             return crypto.subtle.encrypt({
                 name: "aes-cbc",
@@ -460,7 +460,7 @@ async function requireEncryptedPINandEncryptedNewPIN(oldpin, newpin) {
                 "SHA-256",
                 data);
         }).then(function (newpin_digestBytes) {
-            console.log("newpin_digestBytes", bufToHex(newpin_digestBytes.slice(0, 16)));
+            //console.log("newpin_digestBytes", bufToHex(newpin_digestBytes.slice(0, 16)));
             var iv = new Uint8Array(16);
 
             return crypto.subtle.encrypt({
@@ -471,7 +471,7 @@ async function requireEncryptedPINandEncryptedNewPIN(oldpin, newpin) {
 
             EncryptedNewUserPINArray = cipherPIN.slice(0, 16);
 
-            console.log("EncryptedNewUserPINArray", bufToHex(EncryptedNewUserPINArray.slice(0, 16)));
+            //console.log("EncryptedNewUserPINArray", bufToHex(EncryptedNewUserPINArray.slice(0, 16)));
 
             resolve([EncryptedPINArray, EncryptedNewUserPINArray, exportECPublicKeyArray]);
         });
@@ -515,7 +515,7 @@ async function ReadCertByIndex(index) {
     pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
     pki_buffer.set(new Uint8Array(command_bufer), 3 + gtheaderbuffer.byteLength);
 
-    console.log(bufToHex(pki_buffer));
+    //console.log(bufToHex(pki_buffer));
 
     var publicKey1 = {
         'challenge': challenge,
@@ -547,7 +547,7 @@ async function ReadCertByIndex(index) {
             }
         ]
     }
-    console.log('Search_by_Index:', publicKey1)
+    //console.log('Search_by_Index:', publicKey1)
 
     return await new Promise(resolve => {
         navigator.credentials.create({
@@ -555,20 +555,20 @@ async function ReadCertByIndex(index) {
             })
             .then((newCredentialInfo) => {
 
-                console.log('SUCCESS', newCredentialInfo)
-                console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response.clientDataJSON))
+                //console.log('SUCCESS', newCredentialInfo)
+                //console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response.clientDataJSON))
                 let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
-                console.log('AttestationObject: ', attestationObject)
+                //console.log('AttestationObject: ', attestationObject)
                 let authData = parseAuthData(attestationObject.authData);
-                console.log('AuthData: ', authData);
-                console.log('CredID: ', bufToHex(authData.credID));
-                console.log('AAGUID: ', bufToHex(authData.aaguid));
-                console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
+                //console.log('AuthData: ', authData);
+                //console.log('CredID: ', bufToHex(authData.credID));
+                //console.log('AAGUID: ', bufToHex(authData.aaguid));
+                //console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
                 resolve(new Uint8Array(authData.credID.slice(1, authData.credID.length)));
             })
             .catch((error) => {
                 alert(error)
-                console.log('FAIL', error)
+                //console.log('FAIL', error)
             })
     });
 }
@@ -604,7 +604,7 @@ async function ReadCertByLable(strLable) {
     pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
     pki_buffer.set(new Uint8Array(command_bufer), gtheaderbuffer.byteLength + pki_header.byteLength);
 
-    console.log(bufToHex(pki_buffer));
+    //console.log(bufToHex(pki_buffer));
 
     var publicKey1 = {
         'challenge': challenge,
@@ -635,7 +635,7 @@ async function ReadCertByLable(strLable) {
             }
         ]
     }
-    console.log('List publicKey1', publicKey1)
+    //console.log('List publicKey1', publicKey1)
 
 
     return await new Promise(resolve => {
@@ -644,21 +644,21 @@ async function ReadCertByLable(strLable) {
             })
             .then((newCredentialInfo) => {
 
-                console.log('SUCCESS', newCredentialInfo)
-                console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response
+                //console.log('SUCCESS', newCredentialInfo)
+                //console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response
                     .clientDataJSON))
                 let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
-                console.log('AttestationObject: ', attestationObject);
+                //console.log('AttestationObject: ', attestationObject);
                 let authData = parseAuthData(attestationObject.authData);
-                console.log('AuthData: ', authData);
-                console.log('CredID: ', bufToHex(authData.credID));
-                console.log('AAGUID: ', bufToHex(authData.aaguid));
-                console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
+                //console.log('AuthData: ', authData);
+                //console.log('CredID: ', bufToHex(authData.credID));
+                //console.log('AAGUID: ', bufToHex(authData.aaguid));
+                //console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
                 resolve(new Uint8Array(authData.credID.slice(1, authData.credID.length)));
             })
             .catch((error) => {
                 alert(error)
-                console.log('FAIL', error)
+                //console.log('FAIL', error)
             })
     });
 }
@@ -709,7 +709,7 @@ async function SignDataByIndex(index, alg_number, plain) {
     pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + command_buf
         .byteLength + alg_buf.byteLength);
 
-    console.log("SignDataByIndex", bufToHex(pki_buffer));
+    //console.log("SignDataByIndex", bufToHex(pki_buffer));
     var getAssertionChallenge = {
         'challenge': challenge,
         'rp': {
@@ -723,7 +723,7 @@ async function SignDataByIndex(index, alg_number, plain) {
     }];
 
     getAssertionChallenge.allowCredentials = idList;
-    console.log('SignDataByIndex', getAssertionChallenge)
+    //console.log('SignDataByIndex', getAssertionChallenge)
 
 
     return await new Promise(resolve => {
@@ -732,15 +732,15 @@ async function SignDataByIndex(index, alg_number, plain) {
             })
             .then((newCredentialInfo) => {
 
-                console.log('SUCCESS', newCredentialInfo);
-                console.log("Sign", newCredentialInfo.response.signature);
+                //console.log('SUCCESS', newCredentialInfo);
+                //console.log("Sign", newCredentialInfo.response.signature);
 
                 const sign = newCredentialInfo.response.signature;
                 resolve(sign);
             })
             .catch((error) => {
                 alert(error)
-                console.log('FAIL', error)
+                //console.log('FAIL', error)
             })
 
     });
@@ -805,7 +805,7 @@ async function SignDataByIndex2(index, alg_number, plain, serial_number) {
     pki_buffer.set(new Uint8Array(sn_Buf), gtheaderbuffer.byteLength + 3 + command_buf.byteLength + alg_buf.byteLength + signDataBuf.byteLength);
 
 
-    console.log("SignDataByIndex", bufToHex(pki_buffer));
+    //console.log("SignDataByIndex", bufToHex(pki_buffer));
     var getAssertionChallenge = {
         'challenge': challenge,
         'rp': {
@@ -819,7 +819,7 @@ async function SignDataByIndex2(index, alg_number, plain, serial_number) {
     }];
 
     getAssertionChallenge.allowCredentials = idList;
-    console.log('SignDataByIndex', getAssertionChallenge)
+    //console.log('SignDataByIndex', getAssertionChallenge)
 
 
     return await new Promise(resolve => {
@@ -828,15 +828,15 @@ async function SignDataByIndex2(index, alg_number, plain, serial_number) {
             })
             .then((newCredentialInfo) => {
 
-                console.log('SUCCESS', newCredentialInfo);
-                console.log("Sign", newCredentialInfo.response.signature);
+                //console.log('SUCCESS', newCredentialInfo);
+                //console.log("Sign", newCredentialInfo.response.signature);
 
                 const sign = newCredentialInfo.response.signature;
                 resolve(sign);
             })
             .catch((error) => {
                 alert(error)
-                console.log('FAIL', error)
+                //console.log('FAIL', error)
             })
 
     });
@@ -893,7 +893,7 @@ async function SignDataByLabel(label, alg_number, plain) {
     pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + command_bufer
         .byteLength + alg_buf.byteLength);
 
-    console.log("SignDataByLabel", bufToHex(pki_buffer));
+    //console.log("SignDataByLabel", bufToHex(pki_buffer));
 
 
     var getAssertionChallenge = {
@@ -905,7 +905,7 @@ async function SignDataByLabel(label, alg_number, plain) {
     }];
 
     getAssertionChallenge.allowCredentials = idList;
-    console.log('SignDataByLabel', getAssertionChallenge)
+    //console.log('SignDataByLabel', getAssertionChallenge)
 
 
     return await new Promise(resolve => {
@@ -914,15 +914,15 @@ async function SignDataByLabel(label, alg_number, plain) {
             })
             .then((newCredentialInfo) => {
 
-                console.log('SUCCESS', newCredentialInfo)
-                console.log("Sign", newCredentialInfo.response.signature)
+                //console.log('SUCCESS', newCredentialInfo)
+                //console.log("Sign", newCredentialInfo.response.signature)
                 const sign = newCredentialInfo.response.signature;
                 resolve(sign);
 
             })
             .catch((error) => {
                 alert(error)
-                console.log('FAIL', error)
+                //console.log('FAIL', error)
             })
     });
 }
@@ -958,7 +958,7 @@ async function GenRSA2048KeyPair() {
     pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
     pki_buffer.set(new Uint8Array(command_bufer), 3 + gtheaderbuffer.byteLength);
 
-    console.log(bufToHex(pki_buffer));
+    //console.log(bufToHex(pki_buffer));
 
     var publicKey1 = {
         'challenge': challenge,
@@ -984,7 +984,7 @@ async function GenRSA2048KeyPair() {
             'alg': -7
         }]
     }
-    console.log('Gen RSA Key Pair:', publicKey1)
+    //console.log('Gen RSA Key Pair:', publicKey1)
 
 
     return await new Promise(resolve => {
@@ -993,16 +993,16 @@ async function GenRSA2048KeyPair() {
             })
             .then((newCredentialInfo) => {
 
-                console.log('SUCCESS', newCredentialInfo)
-                console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response
+                //console.log('SUCCESS', newCredentialInfo)
+                //console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response
                     .clientDataJSON))
                 let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
-                console.log('AttestationObject: ', attestationObject)
+                //console.log('AttestationObject: ', attestationObject)
                 let authData = parseAuthData(attestationObject.authData);
-                console.log('AuthData: ', authData);
-                console.log('CredID: ', bufToHex(authData.credID));
-                console.log('AAGUID: ', bufToHex(authData.aaguid));
-                console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
+                //console.log('AuthData: ', authData);
+                //console.log('CredID: ', bufToHex(authData.credID));
+                //console.log('AAGUID: ', bufToHex(authData.aaguid));
+                //console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
 
                 let returnData = showRSAKeyPair(authData.credID);
 
@@ -1014,16 +1014,16 @@ async function GenRSA2048KeyPair() {
             })
         // .catch((error) => {
         //     alert(error)
-        //     console.log('FAIL', error)
+        //     //console.log('FAIL', error)
         // })
     });
 }
 
 async function ImportCertificate(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf) {
 
-    console.log('key_handle', bufToHex(keyHandleBuf));
-    console.log('key_id', bufToHex(KeyIDBuf));
-    console.log('hexCert', bufToHex(ImportedHexCertBuf));
+    //console.log('key_handle', bufToHex(keyHandleBuf));
+    //console.log('key_id', bufToHex(KeyIDBuf));
+    //console.log('hexCert', bufToHex(ImportedHexCertBuf));
 
     var pki_buffer = [];
     var challenge = new Uint8Array(32);
@@ -1077,7 +1077,7 @@ async function ImportCertificate(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf) {
         .byteLength +
         keyId_buf.byteLength);
 
-    console.log("Import cert command: " + bufToHex(pki_buffer));
+    //console.log("Import cert command: " + bufToHex(pki_buffer));
 
     var getAssertionChallenge = {
         'challenge': challenge,
@@ -1089,7 +1089,7 @@ async function ImportCertificate(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf) {
     }];
 
     getAssertionChallenge.allowCredentials = idList;
-    console.log('Import cert command getAssertionChallenge', getAssertionChallenge);
+    //console.log('Import cert command getAssertionChallenge', getAssertionChallenge);
 
     return await new Promise(resolve => {
         navigator.credentials.get({
@@ -1097,14 +1097,14 @@ async function ImportCertificate(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf) {
             })
             .then((newCredentialInfo) => {
 
-                console.log('SUCCESS', newCredentialInfo)
-                console.log("Sign", newCredentialInfo.response.signature)
+                //console.log('SUCCESS', newCredentialInfo)
+                //console.log("Sign", newCredentialInfo.response.signature)
                 const sign = newCredentialInfo.response.signature;
                 resolve(sign);
             })
             .catch((error) => {
                 alert(error)
-                console.log('FAIL', error)
+                //console.log('FAIL', error)
             })
 
     });
@@ -1113,9 +1113,9 @@ async function ImportCertificate(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf) {
 
 async function ImportCertificate2(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf) {
 
-    console.log('key_handle', bufToHex(keyHandleBuf));
-    console.log('key_id', bufToHex(KeyIDBuf));
-    console.log('hexCert', bufToHex(ImportedHexCertBuf));
+    //console.log('key_handle', bufToHex(keyHandleBuf));
+    //console.log('key_id', bufToHex(KeyIDBuf));
+    //console.log('hexCert', bufToHex(ImportedHexCertBuf));
 
     var pki_buffer = [];
     var challenge = new Uint8Array(32);
@@ -1169,7 +1169,7 @@ async function ImportCertificate2(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf) {
         .byteLength +
         keyId_buf.byteLength);
 
-    console.log("Import cert command: " + bufToHex(pki_buffer));
+    //console.log("Import cert command: " + bufToHex(pki_buffer));
 
     // use randomly id as user id 
     var userID = 'Kosv9fPtkDoh4Oz7Yq/pVgWHS8HhdlCto5cR0aBoVMw='
@@ -1210,7 +1210,7 @@ async function ImportCertificate2(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf) {
     }];
 
     createCredentialOptions.excludeCredentials = idList;
-    console.log('Import cert command createCredentialOptions', createCredentialOptions);
+    //console.log('Import cert command createCredentialOptions', createCredentialOptions);
 
     return await new Promise(resolve => {
         navigator.credentials.create({
@@ -1218,21 +1218,21 @@ async function ImportCertificate2(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf) {
             })
             .then((newCredentialInfo) => {
 
-                console.log('SUCCESS', newCredentialInfo)
-                console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response.clientDataJSON))
+                //console.log('SUCCESS', newCredentialInfo)
+                //console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response.clientDataJSON))
                 let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
-                console.log('AttestationObject: ', attestationObject)
+                //console.log('AttestationObject: ', attestationObject)
                 let authData = parseAuthData(attestationObject.authData);
-                console.log('AuthData: ', authData);
-                console.log('CredID: ', bufToHex(authData.credID));
-                console.log('AAGUID: ', bufToHex(authData.aaguid));
-                console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
+                //console.log('AuthData: ', authData);
+                //console.log('CredID: ', bufToHex(authData.credID));
+                //console.log('AAGUID: ', bufToHex(authData.aaguid));
+                //console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
                 resolve(authData.credID);
 
             })
             .catch((error) => {
                 alert(error)
-                console.log('FAIL', error)
+                //console.log('FAIL', error)
             })
 
     });
@@ -1282,13 +1282,13 @@ function hexStringToArrayBuffer(hexString) {
 
     // ensure even number of characters
     if (hexString.length % 2 != 0) {
-        console.log('WARNING: expecting an even number of characters in the hexString');
+        //console.log('WARNING: expecting an even number of characters in the hexString');
     }
 
     // check for some non-hex characters
     var bad = hexString.match(/[G-Z\s]/i);
     if (bad) {
-        console.log('WARNING: found non-hex characters', bad);
+        //console.log('WARNING: found non-hex characters', bad);
     }
 
     // split the string into pairs of octets
@@ -1300,7 +1300,7 @@ function hexStringToArrayBuffer(hexString) {
     });
 
     var array = new Uint8Array(integers);
-    //console.log(array);
+    ////console.log(array);
 
     return array;
 }
@@ -1311,7 +1311,7 @@ var parsePKIoverFIDOResponse = (buffer, cmd) => {
 
     // check directly return 256 bytes which doesn't  include header and status code; 
     //let testData = CBOR.decode(buffer);
-    //console.log("check point1",testData)    
+    ////console.log("check point1",testData)    
     let status = undefined;
     let signature = undefined;
     let retries = undefined;
@@ -1388,7 +1388,7 @@ async function ReadCertByIndexFunction2(index) {
     pki_buffer.set(new Uint8Array(command_buf), gtheaderbuffer.byteLength + 3);
 
 
-    console.log("SignDataByIndex", bufToHex(pki_buffer));
+    //console.log("SignDataByIndex", bufToHex(pki_buffer));
     var getAssertionChallenge = {
         'challenge': challenge,
         "userVerification": "discouraged",
@@ -1399,7 +1399,7 @@ async function ReadCertByIndexFunction2(index) {
     }];
 
     getAssertionChallenge.allowCredentials = idList;
-    console.log('SignDataByIndex', getAssertionChallenge)
+    //console.log('SignDataByIndex', getAssertionChallenge)
 
     return await new Promise(resolve => {
         navigator.credentials.get({
@@ -1442,7 +1442,7 @@ async function ReadCertByLableFunction2(strLable) {
     pki_buffer.set(new Uint8Array(command_bufer), gtheaderbuffer.byteLength + 3);
 
 
-    console.log("SignDataByIndex", bufToHex(pki_buffer));
+    //console.log("SignDataByIndex", bufToHex(pki_buffer));
     var getAssertionChallenge = {
         'challenge': challenge,
         "userVerification": "discouraged",
@@ -1453,7 +1453,7 @@ async function ReadCertByLableFunction2(strLable) {
     }];
 
     getAssertionChallenge.allowCredentials = idList;
-    console.log('SignDataByIndex', getAssertionChallenge)
+    //console.log('SignDataByIndex', getAssertionChallenge)
 
     return await new Promise(resolve => {
         navigator.credentials.get({
@@ -1484,7 +1484,7 @@ async function GetTokenInfo() {
     pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
 
 
-    console.log("GetTokenInfo", bufToHex(pki_buffer));
+    //console.log("GetTokenInfo", bufToHex(pki_buffer));
     var getAssertionChallenge = {
         'challenge': challenge,
   
@@ -1496,7 +1496,7 @@ async function GetTokenInfo() {
     }];
 
     getAssertionChallenge.allowCredentials = idList;
-    console.log('GetTokenInfo', getAssertionChallenge)
+    //console.log('GetTokenInfo', getAssertionChallenge)
 
     return await new Promise(resolve => {
         navigator.credentials.get({
@@ -1559,7 +1559,7 @@ async function TestExtendsToReadSign(index, plain) {
     pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + command_buf
         .byteLength + alg_buf.byteLength);
 
-    console.log("SignDataByIndex", bufToHex(pki_buffer));
+    //console.log("SignDataByIndex", bufToHex(pki_buffer));
     var getAssertionChallenge = {
         'challenge': challenge,
         'extensions': {
@@ -1578,7 +1578,7 @@ async function TestExtendsToReadSign(index, plain) {
     }];
 
     getAssertionChallenge.allowCredentials = idList;
-    console.log('SignDataByIndex', getAssertionChallenge)
+    //console.log('SignDataByIndex', getAssertionChallenge)
 
 
     return await new Promise(resolve => {
@@ -1587,15 +1587,15 @@ async function TestExtendsToReadSign(index, plain) {
             })
             .then((newCredentialInfo) => {
 
-                console.log('SUCCESS', newCredentialInfo);
-                console.log("Sign", newCredentialInfo.response.signature);
+                //console.log('SUCCESS', newCredentialInfo);
+                //console.log("Sign", newCredentialInfo.response.signature);
 
                 const sign = newCredentialInfo.response.signature;
                 resolve(sign);
             })
             .catch((error) => {
                 alert(error)
-                console.log('FAIL', error)
+                //console.log('FAIL', error)
             })
 
     });
@@ -1768,9 +1768,9 @@ async function GTIDEM_ChangeUserPIN(bOldPIN, bNewPIN, bSerialNumber) {
     }
     //Compution session Key and encrypt oldPIN and new pin.
    var prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
-   console.log("exportECPublicKeyArray",bufToHex(prepareUpdate.bExportECPublicKeyArray));
-   console.log("encryptedOldPINHash",bufToHex(prepareUpdate.bEcryptedOldPINHash));
-   console.log("encryptedNEWPIN",bufToHex(prepareUpdate.bEncryptedNEWPIN));
+   //console.log("exportECPublicKeyArray",bufToHex(prepareUpdate.bExportECPublicKeyArray));
+   //console.log("encryptedOldPINHash",bufToHex(prepareUpdate.bEcryptedOldPINHash));
+   //console.log("encryptedNEWPIN",bufToHex(prepareUpdate.bEncryptedNEWPIN));
 
 
    var challenge = new Uint8Array(32);
@@ -1814,7 +1814,7 @@ async function GTIDEM_ChangeUserPIN(bOldPIN, bNewPIN, bSerialNumber) {
 
 
 
-   console.log("Change_pin_command: " + bufToHex(pki_buffer));
+   //console.log("Change_pin_command: " + bufToHex(pki_buffer));
 
    var getAssertionChallenge = {
        'challenge': challenge,
@@ -1827,7 +1827,7 @@ async function GTIDEM_ChangeUserPIN(bOldPIN, bNewPIN, bSerialNumber) {
    }];
 
    getAssertionChallenge.allowCredentials = idList;
-   console.log('List getAssertionChallenge', getAssertionChallenge)
+   //console.log('List getAssertionChallenge', getAssertionChallenge)
 
    return await navigator.credentials.get({
        'publicKey': getAssertionChallenge
@@ -1841,7 +1841,7 @@ async function GTIDEM_ChangeUserPIN(bOldPIN, bNewPIN, bSerialNumber) {
 
         return gtidem;
     }).catch((error) => {
-        //console.log(error.name);
+        ////console.log(error.name);
         let gtidem = new GTIdemJs();
         gtidem.ConvertWebError(error.name);
         return gtidem;
@@ -1853,7 +1853,7 @@ async function computingSessionKey(bOldPIN, bNewPIN, ecpointXY) {
 
     //Convert oldPIN to sha256 value
     var oldPINHash = await crypto.subtle.digest("SHA-256", bOldPIN);
-    console.log("oldPINHash  ", oldPINHash);
+    //console.log("oldPINHash  ", oldPINHash);
 
     //During encryption, newPin is padded with trailing 0x00 bytes and is of minimum 64 bytes length. 
     var newPINBuffer = new Uint8Array(64);
@@ -1919,7 +1919,7 @@ async function computingSessionKey(bOldPIN, bNewPIN, ecpointXY) {
             new Uint8Array(keybits)
         );
     }).then(function (sessionKeyBytes) {
-        console.log("sessionKeyBytes", bufToHex(sessionKeyBytes));
+        //console.log("sessionKeyBytes", bufToHex(sessionKeyBytes));
         return crypto.subtle.importKey("raw",
             sessionKeyBytes,
             "aes-cbc", false, ["encrypt"]);
@@ -2187,7 +2187,7 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bKeyID) {
 
 
 
-   console.log("Request_command: " + bufToHex(pki_buffer));
+   //console.log("Request_command: " + bufToHex(pki_buffer));
 
    var webauth_request = {
     'challenge': challenge,
@@ -2219,7 +2219,7 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bKeyID) {
         }
     ]
 }
-   console.log('webauth_request', webauth_request)
+   //console.log('webauth_request', webauth_request)
 
    return await navigator.credentials.create({
         'publicKey': webauth_request
@@ -2237,7 +2237,7 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bKeyID) {
         // }
         return gtidem;
     }).catch((error) => {
-        //console.log(error.name);
+        ////console.log(error.name);
         let gtidem = new GTIdemJs();
         gtidem.ConvertWebError(error.name);
         return gtidem;
@@ -2320,7 +2320,7 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
  
  
  
-    console.log("Request_command: " + bufToHex(pki_buffer));
+    //console.log("Request_command: " + bufToHex(pki_buffer));
  
     var webauth_request = {
      'challenge': challenge,
@@ -2352,7 +2352,7 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
          }
      ]
  }
-    console.log('webauth_request', webauth_request)
+    //console.log('webauth_request', webauth_request)
  
     return await navigator.credentials.create({
          'publicKey': webauth_request
@@ -2371,7 +2371,7 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
 
         return gtidem;
     }).catch((error) => {
-        //console.log(error.name);
+        ////console.log(error.name);
         let gtidem = new GTIdemJs();
         gtidem.ConvertWebError(error.name);
         return gtidem;
@@ -2499,7 +2499,7 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
 
    
 
-   console.log("Import request_command: " + bufToHex(pki_buffer));
+   //console.log("Import request_command: " + bufToHex(pki_buffer));
 
    var getAssertionChallenge = {
     'challenge': challenge,
@@ -2511,7 +2511,7 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
     }];
 
     getAssertionChallenge.allowCredentials = idList;
-    console.log('List getAssertionChallenge', getAssertionChallenge)
+    //console.log('List getAssertionChallenge', getAssertionChallenge)
 
     return await navigator.credentials.get({
         'publicKey': getAssertionChallenge
@@ -2524,7 +2524,7 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
         // }
         return gtidem;
     }).catch((error) => {
-        //console.log(error.name);
+        ////console.log(error.name);
         let gtidem = new GTIdemJs();
         gtidem.ConvertWebError(error.name);
         return gtidem;
@@ -2600,7 +2600,7 @@ async function GTIDEM_DeleteCertByLabel(bLabel, bSerialNumber) {
    pki_buffer = _appendBuffer(pki_buffer,label_buf);
    
 
-   console.log("Delete cert by label request_command: " + bufToHex(pki_buffer));
+   //console.log("Delete cert by label request_command: " + bufToHex(pki_buffer));
 
 
     var getAssertionChallenge = {
@@ -2612,7 +2612,7 @@ async function GTIDEM_DeleteCertByLabel(bLabel, bSerialNumber) {
     }];
 
     getAssertionChallenge.allowCredentials = idList;
-    console.log('DeleteCertByLabel', getAssertionChallenge)
+    //console.log('DeleteCertByLabel', getAssertionChallenge)
 
 
     return  await navigator.credentials.get({'publicKey': getAssertionChallenge}).then((fido) => {
@@ -2624,7 +2624,7 @@ async function GTIDEM_DeleteCertByLabel(bLabel, bSerialNumber) {
         // }
         return gtidem;
     }).catch((error) => {
-        //console.log(error.name);
+        ////console.log(error.name);
         let gtidem = new GTIdemJs();
         gtidem.ConvertWebError(error.name);
         return gtidem;
@@ -2689,7 +2689,7 @@ async function GTIDEM_ClearToken( bSerialNumber) {
    var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
    pki_buffer = _appendBuffer(pki_buffer,sn_buf);
 
-   console.log("Clear Token equest_command: " + bufToHex(pki_buffer));
+   //console.log("Clear Token equest_command: " + bufToHex(pki_buffer));
 
 
     var getAssertionChallenge = {
@@ -2701,7 +2701,7 @@ async function GTIDEM_ClearToken( bSerialNumber) {
     }];
 
     getAssertionChallenge.allowCredentials = idList;
-    console.log('DeleteCertByIndex', getAssertionChallenge)
+    //console.log('DeleteCertByIndex', getAssertionChallenge)
 
 
     return  await navigator.credentials.get({'publicKey': getAssertionChallenge}).then((fido) => {
@@ -2713,7 +2713,7 @@ async function GTIDEM_ClearToken( bSerialNumber) {
         // }
         return gtidem;
     }).catch((error) => {
-        //console.log(error.name);
+        ////console.log(error.name);
         let gtidem = new GTIdemJs();
         gtidem.ConvertWebError(error.name);
         return gtidem;
@@ -2757,7 +2757,7 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
    var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
    pki_buffer = _appendBuffer(pki_buffer,sn_buf);
 
-    console.log("GetTokenInfo", bufToHex(pki_buffer));
+    ////console.log("GetTokenInfo", bufToHex(pki_buffer));
     var getAssertionChallenge = {
         'challenge': challenge,
         'rpid':'github.io',
@@ -2771,7 +2771,7 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
     }];
 
     getAssertionChallenge.allowCredentials = idList;
-    console.log('GetTokenInfo', getAssertionChallenge)
+    ////console.log('GetTokenInfo', getAssertionChallenge);
 
     return await navigator.credentials.get({
             'publicKey': getAssertionChallenge
@@ -2781,7 +2781,7 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
             gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_TokenInfo);
             return gtidem;
         }).catch((error) => {
-            //console.log(error.name);
+            ////console.log(error.name);
             let gtidem = new GTIdemJs();
             gtidem.ConvertWebError(error.name);
             return gtidem;
@@ -2904,7 +2904,7 @@ async function GTIDEM_SignDataByIndex(index, bSerialNumber ,alg_number, bPlain) 
     pki_buffer = _appendBuffer(pki_buffer,signDataBuf);
     
     
-    console.log("SignDataByIndex", bufToHex(pki_buffer));
+    //console.log("SignDataByIndex", bufToHex(pki_buffer));
     var getAssertionChallenge = {
         'challenge': challenge,
         "userVerification": "required"
@@ -2916,7 +2916,7 @@ async function GTIDEM_SignDataByIndex(index, bSerialNumber ,alg_number, bPlain) 
     }];
 
     getAssertionChallenge.allowCredentials = idList;
-    console.log('SignDataByIndex', getAssertionChallenge)
+    //console.log('SignDataByIndex', getAssertionChallenge)
 
 
     return await 
@@ -2929,7 +2929,7 @@ async function GTIDEM_SignDataByIndex(index, bSerialNumber ,alg_number, bPlain) 
                 // }
                 return gtidem;
             }).catch((error) => {
-                //console.log(error.name);
+                ////console.log(error.name);
                 let gtidem = new GTIdemJs();
                 gtidem.ConvertWebError(error.name);
                 return gtidem;
@@ -3067,7 +3067,7 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, bPlain)
     pki_buffer = _appendBuffer(pki_buffer,signDataBuf);
     
     
-    console.log("SignDataByIndex", bufToHex(pki_buffer));
+    //console.log("SignDataByIndex", bufToHex(pki_buffer));
     var getAssertionChallenge = {
         'challenge': challenge,
         "userVerification": "required"
@@ -3079,7 +3079,7 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, bPlain)
     }];
 
     getAssertionChallenge.allowCredentials = idList;
-    console.log('SignDataByIndex', getAssertionChallenge);
+    //console.log('SignDataByIndex', getAssertionChallenge);
 
     return await 
         navigator.credentials.get({'publicKey': getAssertionChallenge}).then((fido) => {
@@ -3091,7 +3091,7 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, bPlain)
                 // }
                 return gtidem;
             }).catch((error) => {
-                //console.log(error.name);
+                ////console.log(error.name);
                 let gtidem = new GTIdemJs();
                 gtidem.ConvertWebError(error.name);
                 return gtidem;
@@ -3168,7 +3168,7 @@ async function GTIDEM_ReadCertByIndexWithoutPIN(index, bSerialNumber) {
     pki_buffer = _appendBuffer(pki_buffer,sn_buf);
     pki_buffer = _appendBuffer(pki_buffer,command_buf);
     
-    console.log("SignDataByIndex", bufToHex(pki_buffer));
+    //console.log("SignDataByIndex", bufToHex(pki_buffer));
     var getAssertionChallenge = {
         'challenge': challenge,
         "userVerification": "discouraged",
@@ -3180,7 +3180,7 @@ async function GTIDEM_ReadCertByIndexWithoutPIN(index, bSerialNumber) {
     }];
 
     getAssertionChallenge.allowCredentials = idList;
-    console.log('SignDataByIndex', getAssertionChallenge)
+    //console.log('SignDataByIndex', getAssertionChallenge)
 
 
     return await 
@@ -3193,7 +3193,7 @@ async function GTIDEM_ReadCertByIndexWithoutPIN(index, bSerialNumber) {
                 // }
                 return gtidem;
             }).catch((error) => {
-                //console.log(error.name);
+                ////console.log(error.name);
                 let gtidem = new GTIdemJs();
                 gtidem.ConvertWebError(error.name);
                 return gtidem;
@@ -3278,7 +3278,7 @@ async function GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSerialNumber) {
     pki_buffer = _appendBuffer(pki_buffer,command_bufer);
     
     
-    console.log("SignDataByIndex", bufToHex(pki_buffer));
+    //console.log("SignDataByIndex", bufToHex(pki_buffer));
     var getAssertionChallenge = {
         'challenge': challenge,
         "userVerification": "discouraged",
@@ -3289,7 +3289,7 @@ async function GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSerialNumber) {
     }];
 
     getAssertionChallenge.allowCredentials = idList;
-    console.log('SignDataByIndex', getAssertionChallenge);
+    //console.log('SignDataByIndex', getAssertionChallenge);
 
     return await 
         navigator.credentials.get({'publicKey': getAssertionChallenge}).then((fido) => {
@@ -3302,7 +3302,7 @@ async function GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSerialNumber) {
                 
                 return gtidem;
             }).catch((error) => {
-                //console.log(error.name);
+                ////console.log(error.name);
                 let gtidem = new GTIdemJs();
                 gtidem.ConvertWebError(error.name);
                 return gtidem;
@@ -3390,7 +3390,7 @@ function GTIDEM_SetName(sName){
     pki_buffer = _appendBuffer(pki_buffer,sn_buf);
     pki_buffer = _appendBuffer(pki_buffer,command_buf);
     
-    console.log("SignDataByIndex", bufToHex(pki_buffer));
+    //console.log("SignDataByIndex", bufToHex(pki_buffer));
     var getAssertionChallenge = {
         'challenge': challenge,
         "userVerification": "discouraged",
@@ -3402,7 +3402,7 @@ function GTIDEM_SetName(sName){
     }];
 
     getAssertionChallenge.allowCredentials = idList;
-    console.log('SignDataByIndex', getAssertionChallenge)
+    //console.log('SignDataByIndex', getAssertionChallenge)
 
 
     return await 
@@ -3415,7 +3415,7 @@ function GTIDEM_SetName(sName){
                 // }
                 return gtidem;
             }).catch((error) => {
-                //console.log(error.name);
+                ////console.log(error.name);
                 let gtidem = new GTIdemJs();
                 gtidem.ConvertWebError(error.name);
                 return gtidem;
@@ -3486,7 +3486,7 @@ function GTIDEM_SetName(sName){
 
 
 
-   console.log("Token_init_command: " + bufToHex(pki_buffer));
+   //console.log("Token_init_command: " + bufToHex(pki_buffer));
 
    var getAssertionChallenge = {
        'challenge': challenge,
@@ -3507,7 +3507,7 @@ function GTIDEM_SetName(sName){
         gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_CHANGE_PIN);
         return gtidem;
     }).catch((error) => {
-        //console.log(error.name);
+        ////console.log(error.name);
         let gtidem = new GTIdemJs();
         gtidem.ConvertWebError(error.name);
         return gtidem;
@@ -3569,7 +3569,7 @@ function GTIDEM_SetName(sName){
 
 
 
-   console.log("Token_init_command: " + bufToHex(pki_buffer));
+   //console.log("Token_init_command: " + bufToHex(pki_buffer));
 
    var getAssertionChallenge = {
        'challenge': challenge,
@@ -3590,7 +3590,7 @@ function GTIDEM_SetName(sName){
         gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_UNLOCK_PIN);
         return gtidem;
     }).catch((error) => {
-        //console.log(error.name);
+        ////console.log(error.name);
         let gtidem = new GTIdemJs();
         gtidem.ConvertWebError(error.name);
         return gtidem;
