@@ -994,8 +994,7 @@ async function GenRSA2048KeyPair() {
             .then((newCredentialInfo) => {
 
                 //console.log('SUCCESS', newCredentialInfo)
-                //console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response
-                    .clientDataJSON))
+                //console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response.clientDataJSON))
                 let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
                 //console.log('AttestationObject: ', attestationObject)
                 let authData = parseAuthData(attestationObject.authData);
