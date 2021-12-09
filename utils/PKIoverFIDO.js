@@ -2760,7 +2760,7 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
         'challenge': challenge,
         'rpid':'github.io',
         "userVerification": "discouraged",
-        timeout: 20000,  
+        timeout: 60000,  
     }
     var idList = [{
         id: pki_buffer,
