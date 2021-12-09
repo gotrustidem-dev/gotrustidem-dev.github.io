@@ -143,6 +143,7 @@
             loopCnt = loopCnt + 1;//for StressTest  
             
             try{  
+                var startTime = performance.now();
                 let response = await GTIDEM_GetTokenInfo(bToken_sn);      
                 if(response.statusCode==CTAP1_ERR_SUCCESS){
                     document.getElementById('label_token_fw').innerText = "FW version: " + ConverVersionFormat(response.fw);
@@ -157,11 +158,16 @@
                         document.getElementById('label_sopin_retries').innerText = "SOPIN retryies:: " +response.sopinRetry;
                     }
                     console.log("test loopCnt: "+ loopCnt); //for StressTest
-                    
+                    var endTime = performance.now()
+                    console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
                 }else{
                     alert(showFIDOErrorMessage(response));
                     console.log("test loopCnt: " + loopCnt + ", response.statusCode: " + response.statusCode); //for StressTest
                     alert("test loopCnt: " + loopCnt + ", response.statusCode: " + response.statusCode);//for StressTest          
+                                        
+                    var endTime = performance.now();
+
+                    console.log(`Call to doSomething took ${endTime - startTime} milliseconds`);
                     return;//for StressTest                      
                 }
                 
@@ -170,7 +176,9 @@
                     console.log('error', error);
                     
                     console.log("test loopCnt: "+ loopCnt);//for StressTest
-                    alert("test loopCnt: "+ loopCnt);//for StressTest  
+                    alert("test loopCnt: "+ loopCnt);//for StressTest 
+                    var endTime = performance.now();
+                    console.log(` catch Call to doSomething took ${endTime - startTime} milliseconds`); 
                     return;//for StressTest    
                 }
             }   
