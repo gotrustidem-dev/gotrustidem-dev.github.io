@@ -104,7 +104,7 @@
             var counter = 0;
             while(true){
 
-                while(isProgressing){
+                while(!isProgressing){
                     GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
 
                         console.log('SUCCESS', response);            
@@ -125,9 +125,11 @@
                         alert(showFIDOErrorMessage(response));
                         }
                         console.log('Times: ', counter++);
+                        isProgressing = false;
                     }).catch((error) => {
                         alert(error)
-                        console.log('FAIL', error)
+                        console.log('FAIL', error);
+                        isProgressing = false;
                     });
                 }
             }
