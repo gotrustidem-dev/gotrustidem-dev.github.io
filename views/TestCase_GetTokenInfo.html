@@ -156,7 +156,8 @@
                     if(response.sopinRetry!=undefined){
                         document.getElementById('label_sopin_retries').innerText = "SOPIN retryies:: " +response.sopinRetry;
                     }
-
+                    console.log("test loopCnt: "+ loopCnt); //for StressTest
+                    
                 }else{
                     alert(showFIDOErrorMessage(response));
                     console.log("test loopCnt: " + loopCnt + ", response.statusCode: " + response.statusCode); //for StressTest
