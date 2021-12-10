@@ -160,7 +160,8 @@
             GTIDEM_SetName("李子棋");
 
             var selectedAlg;
-            var e = document.getElementById('form_token_sn').value; 
+            var e = document.getElementById('form_token_sn').value;
+            console.log(e); 
             switch(e){
 
                 case "1":selectedAlg = ALG_RSA2048SHA1; break;
@@ -362,7 +363,7 @@
                     alert(error)
                     console.log('FAIL', error)
                 });
-                
+
             /*
             if(isUseHashedData2Sign.checked){
                crypto.subtle.digest("SHA-256",new Uint8Array(signDataPayload)).
