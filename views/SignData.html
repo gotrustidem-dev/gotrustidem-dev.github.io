@@ -320,7 +320,7 @@
 
                 case ALG_RSA2048SHA1_PreHash:
                 case ALG_RSA2048SHA1_PSS_PreHash:
-                    signDataPayload = GenDataHash("SHA-1",signDataPayload);
+                    signDataPayload = await GenDataHash("SHA-1",signDataPayload);
                     console.log('SHA-1 SignData :', bufToHex(signDataPayload));
                     break;
 
