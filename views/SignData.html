@@ -320,7 +320,7 @@
 
                 case ALG_RSA2048SHA1_PreHash:
                 case ALG_RSA2048SHA1_PSS_PreHash:
-                    signDataPayload = await GenDataHash("SHA-1",signDataPayload);
+                    signDataPayload = GenDataHash("SHA-1",signDataPayload);
                     console.log('SHA-1 SignData :', bufToHex(signDataPayload));
                     break;
 
@@ -410,7 +410,10 @@
 
         async function GenDataHash(alg,signDataPayload){
 
-            return await crypto.subtle.digest(alg,new Uint8Array(signDataPayload));
+             await crypto.subtle.digest(alg,new Uint8Array(signDataPayload)).then(function (signHashedDataPayload) {
+
+                return new Uint8Array(signHashedDataPayload);
+            });
         }
     </script>
 
