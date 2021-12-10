@@ -171,17 +171,66 @@
                 case "6":selectedAlg = ALG_RSA2048SHA256_PreHash; break;
                 case "7":selectedAlg = ALG_RSA2048SHA384_PreHash; break;
                 case "8":selectedAlg = ALG_RSA2048SHA512_PreHash; break;
-                case "9":selectedAlg = ALG_RSA2048SHA1; break;
-                case "10":selectedAlg = ALG_RSA2048SHA1; break;
-                case "11":selectedAlg = ALG_RSA2048SHA1; break;
-                case "12":selectedAlg = ALG_RSA2048SHA1; break;
-                case "13":selectedAlg = ALG_RSA2048SHA1; break;
-                case "14":selectedAlg = ALG_RSA2048SHA1; break;
-                case "15":selectedAlg = ALG_RSA2048SHA1; break;
-                case "16":selectedAlg = ALG_RSA2048SHA1; break;
+                case "9":selectedAlg = ALG_RSA2048SHA1_PSS; break;
+                case "10":selectedAlg = ALG_RSA2048SHA256_PSS; break;
+                case "11":selectedAlg = ALG_RSA2048SHA384_PSS; break;
+                case "12":selectedAlg = ALG_RSA2048SHA512_PSS; break;
+                case "13":selectedAlg = ALG_RSA2048SHA1_PSS_PreHash; break;
+                case "14":selectedAlg = ALG_RSA2048SHA256_PSS_PreHash; break;
+                case "15":selectedAlg = ALG_RSA2048SHA384_PSS_PreHash; break;
+                case "16":selectedAlg = ALG_RSA2048SHA512_PSS_PreHash; break;
             }
 
 
+            switch(selectedAlg){
+
+                case ALG_RSA2048SHA1_PreHash:
+                case ALG_RSA2048SHA1_PSS_PreHash:
+                    signDataPayload = GenDataHash("SHA-1",signDataPayload);
+                    console.log('SHA-1 SignData :', bufToHex(signDataPayload));
+                    break;
+
+                case ALG_RSA2048SHA256_PreHash:
+                case ALG_RSA2048SHA256_PSS_PreHash:
+                    signDataPayload = GenDataHash("SHA-256",signDataPayload);
+                    console.log('SHA-256 SignData :', bufToHex(signDataPayload));
+                    break;
+
+                case ALG_RSA2048SHA384_PreHash:
+                case ALG_RSA2048SHA384_PSS_PreHash:
+                    signDataPayload = GenDataHash("SHA-384",signDataPayload);
+                    console.log('SHA-384 SignData :', bufToHex(signDataPayload));
+                    break;
+
+                case ALG_RSA2048SHA512_PreHash:
+                case ALG_RSA2048SHA512_PSS_PreHash:
+                    signDataPayload = GenDataHash("SHA-512",signDataPayload);
+                    console.log('SHA-512 SignData :', bufToHex(signDataPayload));
+                    break;
+                default:
+                    console.log('SignData :', bufToHex(signDataPayload));
+
+            }
+            GTIDEM_SignDataByLabel(bLabel, bToken_sn,selectedAlg, signDataPayload).then((value) => {
+                    if(value.statusCode==CTAP1_ERR_SUCCESS){
+                        var strCert="";
+                        if(value.sn!=undefined){
+                            strCert+="序號:"+ ConverSNFormat(value.sn)+"\n";
+                        }
+                        var str = String.fromCharCode.apply(null, new Uint8Array(value.signature));
+                        strCert+="簽名:" + "\n" + btoa(str);
+
+                        alert(strCert);
+
+                    }else{
+                        alert(showFIDOErrorMessage(value));
+                    }
+                }).catch((error) => {
+                    alert(error)
+                    console.log('FAIL', error)
+                });
+
+            /*
 
             if(isUseHashedData2Sign.checked){
                 crypto.subtle.digest("SHA-256",new Uint8Array(signDataPayload)).
@@ -227,7 +276,7 @@
                     console.log('FAIL', error)
                 });
             }
-
+            */
         })
 
         document.getElementById('form_signdata_index_btn').addEventListener('submit', function (event) {
@@ -242,6 +291,79 @@
                 bToken_sn = hexStringToArrayBuffer(token_sn);  
             }
             GTIDEM_SetName("王天生");
+
+            var selectedAlg;
+            var e = document.getElementById('form_token_sn').value; 
+            switch(e){
+
+                case "1":selectedAlg = ALG_RSA2048SHA1; break;
+                case "2":selectedAlg = ALG_RSA2048SHA256; break;
+                case "3":selectedAlg = ALG_RSA2048SHA384; break;
+                case "4":selectedAlg = ALG_RSA2048SHA512; break;
+                case "5":selectedAlg = ALG_RSA2048SHA1_PreHash; break;
+                case "6":selectedAlg = ALG_RSA2048SHA256_PreHash; break;
+                case "7":selectedAlg = ALG_RSA2048SHA384_PreHash; break;
+                case "8":selectedAlg = ALG_RSA2048SHA512_PreHash; break;
+                case "9":selectedAlg = ALG_RSA2048SHA1_PSS; break;
+                case "10":selectedAlg = ALG_RSA2048SHA256_PSS; break;
+                case "11":selectedAlg = ALG_RSA2048SHA384_PSS; break;
+                case "12":selectedAlg = ALG_RSA2048SHA512_PSS; break;
+                case "13":selectedAlg = ALG_RSA2048SHA1_PSS_PreHash; break;
+                case "14":selectedAlg = ALG_RSA2048SHA256_PSS_PreHash; break;
+                case "15":selectedAlg = ALG_RSA2048SHA384_PSS_PreHash; break;
+                case "16":selectedAlg = ALG_RSA2048SHA512_PSS_PreHash; break;
+            }
+
+
+            switch(selectedAlg){
+
+                case ALG_RSA2048SHA1_PreHash:
+                case ALG_RSA2048SHA1_PSS_PreHash:
+                    signDataPayload = GenDataHash("SHA-1",signDataPayload);
+                    console.log('SHA-1 SignData :', bufToHex(signDataPayload));
+                    break;
+
+                case ALG_RSA2048SHA256_PreHash:
+                case ALG_RSA2048SHA256_PSS_PreHash:
+                    signDataPayload = GenDataHash("SHA-256",signDataPayload);
+                    console.log('SHA-256 SignData :', bufToHex(signDataPayload));
+                    break;
+
+                case ALG_RSA2048SHA384_PreHash:
+                case ALG_RSA2048SHA384_PSS_PreHash:
+                    signDataPayload = GenDataHash("SHA-384",signDataPayload);
+                    console.log('SHA-384 SignData :', bufToHex(signDataPayload));
+                    break;
+
+                case ALG_RSA2048SHA512_PreHash:
+                case ALG_RSA2048SHA512_PSS_PreHash:
+                    signDataPayload = GenDataHash("SHA-512",signDataPayload);
+                    console.log('SHA-512 SignData :', bufToHex(signDataPayload));
+                    break;
+                default:
+                    console.log('SignData :', bufToHex(signDataPayload));
+
+            }
+            GTIDEM_SignDataByLabel(bLabel, bToken_sn,selectedAlg, signDataPayload).then((value) => {
+                    if(value.statusCode==CTAP1_ERR_SUCCESS){
+                        var strCert="";
+                        if(value.sn!=undefined){
+                            strCert+="序號:"+ ConverSNFormat(value.sn)+"\n";
+                        }
+                        var str = String.fromCharCode.apply(null, new Uint8Array(value.signature));
+                        strCert+="簽名:" + "\n" + btoa(str);
+
+                        alert(strCert);
+
+                    }else{
+                        alert(showFIDOErrorMessage(value));
+                    }
+                }).catch((error) => {
+                    alert(error)
+                    console.log('FAIL', error)
+                });
+                
+            /*
             if(isUseHashedData2Sign.checked){
                crypto.subtle.digest("SHA-256",new Uint8Array(signDataPayload)).
                 then(function (signHashedDataPayload) {
@@ -282,7 +404,13 @@
                 });
             }
 
+            */
         })
+
+        async function GenDataHash(alg,signDataPayload){
+
+            return await crypto.subtle.digest(alg,new Uint8Array(signDataPayload));
+        }
     </script>
 
 </body>
