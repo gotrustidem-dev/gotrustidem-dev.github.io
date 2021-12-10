@@ -410,7 +410,7 @@
 
         async function GenDataHash(alg,signDataPayload){
 
-             await crypto.subtle.digest(alg,new Uint8Array(signDataPayload)).then(function (signHashedDataPayload) {
+            return await crypto.subtle.digest(alg,new Uint8Array(signDataPayload)).then(function (signHashedDataPayload) {
 
                 return new Uint8Array(signHashedDataPayload);
             });
