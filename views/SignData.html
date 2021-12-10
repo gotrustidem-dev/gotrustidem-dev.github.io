@@ -160,7 +160,7 @@
             GTIDEM_SetName("李子棋");
 
             var selectedAlg;
-            var e = document.getElementById('form_token_sn').value;
+            var e = document.getElementById('select_alg').value;
             console.log(e); 
             switch(e){
 
@@ -294,7 +294,7 @@
             GTIDEM_SetName("王天生");
 
             var selectedAlg;
-            var e = document.getElementById('form_token_sn').value; 
+            var e = document.getElementById('select_alg').value; 
             switch(e){
 
                 case "1":selectedAlg = ALG_RSA2048SHA1; break;
@@ -345,7 +345,7 @@
                     console.log('SignData :', bufToHex(signDataPayload));
 
             }
-            GTIDEM_SignDataByLabel(bLabel, bToken_sn,selectedAlg, signDataPayload).then((value) => {
+            GTIDEM_SignDataByIndex(index, bToken_sn,selectedAlg, signDataPayload).then((value) => {
                     if(value.statusCode==CTAP1_ERR_SUCCESS){
                         var strCert="";
                         if(value.sn!=undefined){
