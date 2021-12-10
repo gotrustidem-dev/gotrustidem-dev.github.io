@@ -345,9 +345,9 @@
 
                 case ALG_RSA2048SHA256_PreHash:
                 case ALG_RSA2048SHA256_PSS_PreHash:
-                    signDataPayload = GenDataHash("SHA-256",signDataPayload).then(function (signHashedDataPayload) {
+                    GenDataHash("SHA-256",signDataPayload).then(function (signHashedDataPayload) {
                     console.log('SHA-256 SignData  : \n', bufToHex(signHashedDataPayload));
-                        GTIDEM_SignDataByIndex(index, bToken_sn,selectedAlg, signDataPayload).then((value) => {
+                        GTIDEM_SignDataByIndex(index, bToken_sn,selectedAlg, signHashedDataPayload).then((value) => {
                             if(value.statusCode==CTAP1_ERR_SUCCESS){
                                 var strCert="";
                                 if(value.sn!=undefined){
@@ -370,9 +370,9 @@
 
                 case ALG_RSA2048SHA384_PreHash:
                 case ALG_RSA2048SHA384_PSS_PreHash:
-                    signDataPayload = GenDataHash("SHA-384",signDataPayload).then(function (signHashedDataPayload) {
+                   GenDataHash("SHA-384",signDataPayload).then(function (signHashedDataPayload) {
                     console.log('SHA-384 SignData  : \n', bufToHex(signHashedDataPayload));
-                        GTIDEM_SignDataByIndex(index, bToken_sn,selectedAlg, signDataPayload).then((value) => {
+                        GTIDEM_SignDataByIndex(index, bToken_sn,selectedAlg, signHashedDataPayload).then((value) => {
                             if(value.statusCode==CTAP1_ERR_SUCCESS){
                                 var strCert="";
                                 if(value.sn!=undefined){
@@ -395,9 +395,9 @@
 
                 case ALG_RSA2048SHA512_PreHash:
                 case ALG_RSA2048SHA512_PSS_PreHash:
-                    signDataPayload = GenDataHash("SHA-512",signDataPayload).then(function (signHashedDataPayload) {
+                    GenDataHash("SHA-512",signDataPayload).then(function (signHashedDataPayload) {
                     console.log('SHA-512 SignData  : \n', bufToHex(signHashedDataPayload));
-                        GTIDEM_SignDataByIndex(index, bToken_sn,selectedAlg, signDataPayload).then((value) => {
+                        GTIDEM_SignDataByIndex(index, bToken_sn,selectedAlg, signHashedDataPayload).then((value) => {
                             if(value.statusCode==CTAP1_ERR_SUCCESS){
                                 var strCert="";
                                 if(value.sn!=undefined){
