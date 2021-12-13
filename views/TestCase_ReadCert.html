@@ -130,8 +130,10 @@
                                 btoa(String.fromCharCode.apply(null, value.certicficate)) +
                                 "\n-----END CERTIFICATE-----"
                             console.log('憑證 :\n', strCert);
-                            alert(strCert);
-                            // alert("憑證:" + "\n" + strCert);
+                            console.log("test loopCnt: "+ loopCnt); //for StressTest
+                            document.getElementById('label_sopin_retries').innerText = " 已經測試次數: " +loopCnt;
+                            var endTime = performance.now()
+                            console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
                         } else {
                             alert(showFIDOErrorMessage(value));
                             console.log("test loopCnt: " + loopCnt + ", response.statusCode: " + response
