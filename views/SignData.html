@@ -322,7 +322,7 @@
                 case ALG_RSA2048SHA1_PSS_PreHash:
                     signDataPayload = GenDataHash("SHA-1",signDataPayload).then(function (signHashedDataPayload) {
                     console.log('SHA-1 SignData : \n', bufToHex(signHashedDataPayload));
-                        GTIDEM_SignDataByIndex(index, bToken_sn,selectedAlg, signDataPayload).then((value) => {
+                        GTIDEM_SignDataByIndex(index, bToken_sn,selectedAlg, signHashedDataPayload).then((value) => {
                             if(value.statusCode==CTAP1_ERR_SUCCESS){
                                 var strCert="";
                                 if(value.sn!=undefined){
