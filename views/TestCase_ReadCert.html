@@ -50,14 +50,6 @@
                                 <label id="label_token_sn">Token Serial number:</label><br>
                                 <input type="text" name="token_sn" style="width: 342px; height:41px">
                             </p>
-                            <label id="label_token_fw"></label><br>
-                            <label id="label_token_sw"></label><br>
-                            <label id="label_pin_retries"></label><br>
-                            <label id="label_credentials"></label><br>
-                            <label id="label_serial_number"></label><br>
-                            <label id="label_random_number"></label><br>
-                            <label id="label_ecPublic_key"></label><br>
-                            <label id="label_flags"></label><br>
                             <label id="label_sopin_retries"></label><br>
                         </form>
 
@@ -75,8 +67,7 @@
                                             <form style="text-align: center;" id="form_tokeninfo_btn"
                                                 onsubmit="return false">
                                                 <button class="btn btn-primary" action="submit"
-                                                    style="width: 200px; height:34px;background-color: #008CBA;">Get
-                                                    Token Info</button>
+                                                    style="width: 200px; height:34px;background-color: #008CBA;">Read Cert StreeTest</button>
                                             </form>
                                         </p>
 
@@ -136,10 +127,8 @@
                             console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
                         } else {
                             alert(showFIDOErrorMessage(value));
-                            console.log("test loopCnt: " + loopCnt + ", response.statusCode: " + response
-                                .statusCode); //for StressTest
-                            alert("test loopCnt: " + loopCnt + ", response.statusCode: " + response
-                                .statusCode); //for StressTest          
+                            console.log("test loopCnt: " + loopCnt + ", response.statusCode: " + response.statusCode); //for StressTest
+                            alert("test loopCnt: " + loopCnt + ", response.statusCode: " + response.statusCode); //for StressTest          
                             var endTime = performance.now();
                             console.log(`Call to doSomething took ${endTime - startTime} milliseconds`);
                             return; //for StressTest     
