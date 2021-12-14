@@ -2764,12 +2764,11 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
     }
     var idList = [{
         id: pki_buffer,
-        type: "public-key",
-        transports: []
+        type: "public-key"
     }];
 
     getAssertionChallenge.allowCredentials = idList;
-    ////console.log('GetTokenInfo', getAssertionChallenge);
+    console.log('GetTokenInfo', getAssertionChallenge);
 
     return await navigator.credentials.get({
             'publicKey': getAssertionChallenge
