@@ -190,6 +190,7 @@
             window.crypto.getRandomValues(challenge);
             var options = {
                 'challenge': challenge, // will be another value, provided by the relying party server
+                "userVerification": "discouraged",
                 'allowCredentials': [{
                     type: "public-key",
                     id: authDataFromMakeCredential.credID // actually provided by the server
