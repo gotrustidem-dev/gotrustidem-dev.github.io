@@ -145,41 +145,83 @@
             while (loopCnt < maxLoopCnt) { //for StressTest
 
 
+                // try {
+                //     if (isFinished == true) {
+                //         loopCnt = loopCnt + 1; //for StressTest  
+                //         var startTime = performance.now();
+                //         console.log("Start loopCnt: " + loopCnt); //for StressTest
+                //         isFinished = false;
+                //         let response = await GTIDEM_GetTokenInfo(bToken_sn);
+                //         if (response.statusCode == CTAP1_ERR_SUCCESS) {
+
+                //             document.getElementById('label_sopin_retries').innerText = " 已經測試次數: " + loopCnt;
+                //             var endTime = performance.now();
+                //             console.log(`Call to doSomething took ${endTime - startTime} milliseconds`);
+                //             console.log("END loopCnt: " + loopCnt); //for StressTest
+                //             isFinished = true;
+                //         } else {
+                //             alert(showFIDOErrorMessage(response));
+                //             alert("END loopCnt: " + loopCnt + ", response.statusCode: " + response
+                //             .statusCode); //for StressTest          
+                //             var endTime = performance.now();
+                //             console.log(`Call to doSomething took ${endTime - startTime} milliseconds`);
+                //             console.log("END loopCnt: " + loopCnt + ", response.statusCode: " + response
+                //             .statusCode); //for StressTest
+
+                //             return; //for StressTest                      
+                //         }
+                //     }
+                // } catch (error) {
+                //     alert(error);
+                //     console.log('error', error);
+                //     var endTime = performance.now();
+                //     console.log(` catch Call to doSomething took ${endTime - startTime} milliseconds`);
+                //     console.log("END loopCnt: " + loopCnt); //for StressTest
+                //     alert("END loopCnt: " + loopCnt); //for StressTest 
+                //     return; //for StressTest    
+                // }
                 try {
-                    if (isFinished == true) {
-                        loopCnt = loopCnt + 1; //for StressTest  
-                        var startTime = performance.now();
-                        console.log("Start loopCnt: " + loopCnt); //for StressTest
-                        isFinished = false;
-                        let response = await GTIDEM_GetTokenInfo(bToken_sn);
+                    var startTime = performance.now();
+                    let response = await GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
                         if (response.statusCode == CTAP1_ERR_SUCCESS) {
-                       
-                            document.getElementById('label_sopin_retries').innerText = " 已經測試次數: " + loopCnt;
-                            var endTime = performance.now();
-                            console.log(`Call to doSomething took ${endTime - startTime} milliseconds`);
-                            console.log("END loopCnt: " + loopCnt); //for StressTest
-                            isFinished = true;
+                            document.getElementById('label_sopin_retries').innerText = " 已經測試次數: " +
+                            loopCnt;
+                            var endTime = performance.now()
+                            console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
+
                         } else {
                             alert(showFIDOErrorMessage(response));
-                            alert("END loopCnt: " + loopCnt + ", response.statusCode: " + response
-                            .statusCode); //for StressTest          
+                            console.log("test loopCnt: " + loopCnt + ", response.statusCode: " + response
+                                .statusCode); //for StressTest
+                            alert("test loopCnt: " + loopCnt + ", response.statusCode: " + response
+                                .statusCode); //for StressTest          
+
                             var endTime = performance.now();
                             console.log(`Call to doSomething took ${endTime - startTime} milliseconds`);
-                            console.log("END loopCnt: " + loopCnt + ", response.statusCode: " + response
-                            .statusCode); //for StressTest
-
-                            return; //for StressTest                      
+                            document.getElementById('form_tokeninfo_btn').elements[0].readOnly = true;
+                            return; //for StressTest 
                         }
-                    }
+                    }).catch((error) => {
+                        alert(error);
+                        console.log('error', error);
+                        console.log(" error test loopCnt: " + loopCnt); //for StressTest
+                        alert("error test loopCnt: " + loopCnt); //for StressTest 
+                        var endTime = performance.now();
+                        console.log(` catch Call to doSomething took ${endTime - startTime} milliseconds`);
+                        document.getElementById('form_tokeninfo_btn').elements[0].readOnly = true;
+                        return;
+                    });
                 } catch (error) {
                     alert(error);
                     console.log('error', error);
+                    console.log("test loopCnt: " + loopCnt); //for StressTest
+                    alert("test loopCnt: " + loopCnt); //for StressTest 
                     var endTime = performance.now();
                     console.log(` catch Call to doSomething took ${endTime - startTime} milliseconds`);
-                    console.log("END loopCnt: " + loopCnt); //for StressTest
-                    alert("END loopCnt: " + loopCnt); //for StressTest 
+                    document.getElementById('form_tokeninfo_btn').elements[0].readOnly = true;
                     return; //for StressTest    
                 }
+                console.log(`GetTokenInformation_StressTest function finish`);
             }
         }
 
@@ -193,7 +235,6 @@
         //     console.log('world'); //for StressTest
         //     return 'world';
         // }
-
     </script>
 
 </body>
