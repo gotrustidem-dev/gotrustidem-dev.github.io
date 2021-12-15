@@ -217,8 +217,10 @@
                             alert("test loopCnt: " + loopCnt); //for StressTest          
                             var endTime = performance.now();
                             console.log(`Call to doSomething took ${endTime - startTime} milliseconds`);
-                            return; //for StressTest   
+                            return 0; 
                         });
+                    if(response==0)
+                        return;
                 } catch (error) {
                     alert(error);
                     console.log('error', error);
