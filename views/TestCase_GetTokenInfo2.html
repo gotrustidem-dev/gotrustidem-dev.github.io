@@ -104,9 +104,9 @@
 
             }
             if(isFinished){
-                console.log("Start loopCnt: " + ++loopCnt); //for StressTest
+                
                 GetTokenInformation_StressTest(bToken_sn);
-                console.log("END loopCnt: " + loopCnt); //for StressTest
+               
             }
         });
 
@@ -115,6 +115,7 @@
             try {
                 var startTime = performance.now();
                 isFinished = false;
+                console.log("Start loopCnt: " + ++loopCnt); //for StressTest
                 let response = await GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
                     if (response.statusCode == CTAP1_ERR_SUCCESS) {
                         document.getElementById('label_sopin_retries').innerText = " 已經測試次數: " + loopCnt;
@@ -151,7 +152,7 @@
                 return; //for StressTest    
             }
             console.log(`GetTokenInformation_StressTest function finish`);
-
+            console.log("END loopCnt: " + loopCnt); //for StressTest
         }
     </script>
 
