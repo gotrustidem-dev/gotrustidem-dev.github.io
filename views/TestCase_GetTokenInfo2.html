@@ -130,8 +130,8 @@
                 }).catch((error) => {
                     alert(error);
                     console.log('error', error);
-                    console.log("test loopCnt: " + loopCnt); //for StressTest
-                    alert("test loopCnt: " + loopCnt); //for StressTest 
+                    console.log(" error test loopCnt: " + loopCnt); //for StressTest
+                    alert("error test loopCnt: " + loopCnt); //for StressTest 
                     var endTime = performance.now();
                     console.log(` catch Call to doSomething took ${endTime - startTime} milliseconds`);
                     document.getElementById('form_tokeninfo_btn').elements[0].readOnly = true;
