@@ -17,7 +17,7 @@
     <script src="https://gotrustidem-dev.github.io/utils/showMessage.js"></script>
     <script src="https://gotrustidem-dev.github.io/utils/response.js"></script>
     <script src="https://gotrustidem-dev.github.io/utils/PKIoverFIDO.js"></script>
-  
+
     <style>
         table.center {
             margin-left: auto;
@@ -48,7 +48,7 @@
                         <form style="text-align: center;" id="form_token_sn" onsubmit="return false">
                             <p>
                                 <label id="label_token_sn">Token Serial number:</label><br>
-                                <input type="text" name="token_sn"  style="width: 342px; height:41px">
+                                <input type="text" name="token_sn" style="width: 342px; height:41px">
                             </p>
                             <label id="label_token_fw"></label><br>
                             <label id="label_token_sw"></label><br>
@@ -72,10 +72,12 @@
                                     <!--PC side-->
                                     <td style="width: 385px;">
                                         <p>
-                                        <form style="text-align: center;" id="form_tokeninfo_btn" onsubmit="return false">
-                                            <button class="btn btn-primary" id="tokeninfo_btn" action="submit"
-                                                style="width: 200px; height:34px;background-color: #008CBA;">Get Token Info</button>
-                                        </form>
+                                            <form style="text-align: center;" id="form_tokeninfo_btn"
+                                                onsubmit="return false">
+                                                <button class="btn btn-primary" id="tokeninfo_btn" action="submit"
+                                                    style="width: 200px; height:34px;background-color: #008CBA;">Get
+                                                    Token Info</button>
+                                            </form>
                                         </p>
 
                                     </td>
@@ -83,22 +85,22 @@
                             </tbody>
                         </table>
                     </td>
-                    
+
                 </tr>
             </tbody>·
         </table>
     </div>
     <script>
-        let loopCnt = 0;//for StressTest   
+        let loopCnt = 0; //for StressTest   
         document.getElementById('form_tokeninfo_btn').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             console.log(token_sn);
 
             var bToken_sn = undefined;
-            if(token_sn.length!=0){
+            if (token_sn.length != 0) {
                 bToken_sn = hexStringToArrayBuffer(token_sn);
-               
+
             }
             console.log("Start loopCnt: " + ++loopCnt); //for StressTest
             GetTokenInformation_StressTest(bToken_sn);
@@ -106,40 +108,47 @@
         });
 
         async function GetTokenInformation_StressTest(bToken_sn) {
-  
-            try{  
-                    var startTime = performance.now();
-                    let response = await GTIDEM_GetTokenInfo(bToken_sn);      
-                    if(response.statusCode==CTAP1_ERR_SUCCESS){
-                     
-                        document.getElementById('label_sopin_retries').innerText = " 已經測試次數: " +loopCnt;
+
+            try {
+                var startTime = performance.now();
+                let response = await GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
+                    if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                        document.getElementById('label_sopin_retries').innerText = " 已經測試次數: " + loopCnt;
                         var endTime = performance.now()
                         console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
-                    }else{
+
+                    } else {
                         alert(showFIDOErrorMessage(response));
                         console.log("test loopCnt: " + loopCnt + ", response.statusCode: " + response.statusCode); //for StressTest
-                        alert("test loopCnt: " + loopCnt + ", response.statusCode: " + response.statusCode);//for StressTest          
-                                            
+                        alert("test loopCnt: " + loopCnt + ", response.statusCode: " + response.statusCode); //for StressTest          
+
                         var endTime = performance.now();
                         console.log(`Call to doSomething took ${endTime - startTime} milliseconds`);
                         document.getElementById('form_tokeninfo_btn').elements[0].readOnly = true;
-                        return;//for StressTest                      
-                    }    
-                } catch(error) {
+                        return; //for StressTest 
+                        }
+                }).catch((error) => {
                     alert(error);
                     console.log('error', error);
-                    console.log("test loopCnt: "+ loopCnt);//for StressTest
-                    alert("test loopCnt: "+ loopCnt);//for StressTest 
+                    console.log("test loopCnt: " + loopCnt); //for StressTest
+                    alert("test loopCnt: " + loopCnt); //for StressTest 
                     var endTime = performance.now();
-                    console.log(` catch Call to doSomething took ${endTime - startTime} milliseconds`); 
+                    console.log(` catch Call to doSomething took ${endTime - startTime} milliseconds`);
                     document.getElementById('form_tokeninfo_btn').elements[0].readOnly = true;
-                    return;//for StressTest    
-                }
-              
+                    return; 
+                });
+            } catch (error) {
+                alert(error);
+                console.log('error', error);
+                console.log("test loopCnt: " + loopCnt); //for StressTest
+                alert("test loopCnt: " + loopCnt); //for StressTest 
+                var endTime = performance.now();
+                console.log(` catch Call to doSomething took ${endTime - startTime} milliseconds`);
+                document.getElementById('form_tokeninfo_btn').elements[0].readOnly = true;
+                return; //for StressTest    
+            }
+
         }
-
-        
-
     </script>
 
 </body>
