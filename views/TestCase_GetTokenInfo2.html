@@ -100,8 +100,9 @@
                 bToken_sn = hexStringToArrayBuffer(token_sn);
                
             }
+            console.log("Start loopCnt: " + loopCnt++); //for StressTest
             GetTokenInformation_StressTest(bToken_sn);
-
+            console.log("END loopCnt: " + loopCnt); //for StressTest
         });
 
         async function GetTokenInformation_StressTest(bToken_sn) {
@@ -110,7 +111,7 @@
                     var startTime = performance.now();
                     let response = await GTIDEM_GetTokenInfo(bToken_sn);      
                     if(response.statusCode==CTAP1_ERR_SUCCESS){
-                       loopCnt++;
+                     
                         document.getElementById('label_sopin_retries').innerText = " 已經測試次數: " +loopCnt;
                         console.log("test loopCnt: "+ loopCnt); //for StressTest
                         var endTime = performance.now()
