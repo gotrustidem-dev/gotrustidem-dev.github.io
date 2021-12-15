@@ -141,40 +141,38 @@
             let loopCnt = 0;//for StressTest        
             while(loopCnt < maxLoopCnt){ //for StressTest
             loopCnt = loopCnt + 1;//for StressTest  
-            test();
+       
             try{  
-                var startTime = performance.now();
-                let response = await GTIDEM_GetTokenInfo(bToken_sn);      
-                if(response.statusCode==CTAP1_ERR_SUCCESS){
-                    document.getElementById('label_token_fw').innerText = "FW version: " + ConverVersionFormat(response.fw);
-                    document.getElementById('label_token_sw').innerText = "SW version: " + ConverVersionFormat(response.sw);
-                    document.getElementById('label_pin_retries').innerText = "PIN retryies: " + response.pinRetry;
-                    document.getElementById('label_credentials').innerText = "Credentials: " + response.credentialNum;
-                    document.getElementById('label_serial_number').innerText = "Serial number: " + ConverSNFormat(response.sn);
-                    document.getElementById('label_random_number').innerText = "Random number: " +ConverSNFormat(response.rn);
-                    document.getElementById('label_ecPublic_key').innerText = "EC public point: " +ConverSNFormat(response.ecpoint);
-                    document.getElementById('label_flags').innerText = "Flags: " +ConverSNFormat(response.flags);
-                    
-                    document.getElementById('label_sopin_retries').innerText = " 已經測試次數: " +loopCnt;
-                    
-                    console.log("test loopCnt: "+ loopCnt); //for StressTest
-                    var endTime = performance.now()
-                    console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
-                }else{
-                    alert(showFIDOErrorMessage(response));
-                    console.log("test loopCnt: " + loopCnt + ", response.statusCode: " + response.statusCode); //for StressTest
-                    alert("test loopCnt: " + loopCnt + ", response.statusCode: " + response.statusCode);//for StressTest          
-                                        
-                    var endTime = performance.now();
+                    var startTime = performance.now();
+                    let response = await GTIDEM_GetTokenInfo(bToken_sn);      
+                    if(response.statusCode==CTAP1_ERR_SUCCESS){
+                        document.getElementById('label_token_fw').innerText = "FW version: " + ConverVersionFormat(response.fw);
+                        document.getElementById('label_token_sw').innerText = "SW version: " + ConverVersionFormat(response.sw);
+                        document.getElementById('label_pin_retries').innerText = "PIN retryies: " + response.pinRetry;
+                        document.getElementById('label_credentials').innerText = "Credentials: " + response.credentialNum;
+                        document.getElementById('label_serial_number').innerText = "Serial number: " + ConverSNFormat(response.sn);
+                        document.getElementById('label_random_number').innerText = "Random number: " +ConverSNFormat(response.rn);
+                        document.getElementById('label_ecPublic_key').innerText = "EC public point: " +ConverSNFormat(response.ecpoint);
+                        document.getElementById('label_flags').innerText = "Flags: " +ConverSNFormat(response.flags);
+                        
+                        document.getElementById('label_sopin_retries').innerText = " 已經測試次數: " +loopCnt;
+                        
+                        console.log("test loopCnt: "+ loopCnt); //for StressTest
+                        var endTime = performance.now()
+                        console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
+                    }else{
+                        alert(showFIDOErrorMessage(response));
+                        console.log("test loopCnt: " + loopCnt + ", response.statusCode: " + response.statusCode); //for StressTest
+                        alert("test loopCnt: " + loopCnt + ", response.statusCode: " + response.statusCode);//for StressTest          
+                                            
+                        var endTime = performance.now();
 
-                    console.log(`Call to doSomething took ${endTime - startTime} milliseconds`);
-                    return;//for StressTest                      
-                }
-                
+                        console.log(`Call to doSomething took ${endTime - startTime} milliseconds`);
+                        return;//for StressTest                      
+                    }    
                 } catch(error) {
                     alert(error);
                     console.log('error', error);
-                    
                     console.log("test loopCnt: "+ loopCnt);//for StressTest
                     alert("test loopCnt: "+ loopCnt);//for StressTest 
                     var endTime = performance.now();
@@ -183,16 +181,6 @@
                 }
             }   
         }
-
-        async function test() {
-            console.log('start timer');
-            await new Promise(resolve => setTimeout(resolve, 5000));
-            console.log('after 1 second');
-        }
-
-
-
-
     </script>
 
 </body>
