@@ -92,6 +92,7 @@
     </div>
     <script>
         let loopCnt = 0; //for StressTest   
+        var isFinished = true;
         document.getElementById('form_tokeninfo_btn').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
@@ -102,21 +103,24 @@
                 bToken_sn = hexStringToArrayBuffer(token_sn);
 
             }
-            console.log("Start loopCnt: " + ++loopCnt); //for StressTest
-            GetTokenInformation_StressTest(bToken_sn);
-            console.log("END loopCnt: " + loopCnt); //for StressTest
+            if(isFinished){
+                console.log("Start loopCnt: " + ++loopCnt); //for StressTest
+                GetTokenInformation_StressTest(bToken_sn);
+                console.log("END loopCnt: " + loopCnt); //for StressTest
+            }
         });
 
         async function GetTokenInformation_StressTest(bToken_sn) {
 
             try {
                 var startTime = performance.now();
+                isFinished = false;
                 let response = await GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
                     if (response.statusCode == CTAP1_ERR_SUCCESS) {
                         document.getElementById('label_sopin_retries').innerText = " 已經測試次數: " + loopCnt;
                         var endTime = performance.now()
                         console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
-
+                        isFinished = true;
                     } else {
                         alert(showFIDOErrorMessage(response));
                         console.log("test loopCnt: " + loopCnt + ", response.statusCode: " + response.statusCode); //for StressTest
@@ -125,8 +129,8 @@
                         var endTime = performance.now();
                         console.log(`Call to doSomething took ${endTime - startTime} milliseconds`);
                         document.getElementById('form_tokeninfo_btn').elements[0].readOnly = true;
-                        return; //for StressTest 
-                        }
+                        isFinished = true;
+                    }
                 }).catch((error) => {
                     alert(error);
                     console.log('error', error);
@@ -134,7 +138,6 @@
                     alert("error test loopCnt: " + loopCnt); //for StressTest 
                     var endTime = performance.now();
                     console.log(` catch Call to doSomething took ${endTime - startTime} milliseconds`);
-                    document.getElementById('form_tokeninfo_btn').elements[0].readOnly = true;
                     return; 
                 });
             } catch (error) {
