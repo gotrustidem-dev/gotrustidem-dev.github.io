@@ -112,7 +112,7 @@
         async function GetTokenInformation_StressTest(bToken_sn) {
 
             startTime = performance.now();
-            if(((startTime-endTime)<=30)&&(isFinished==true)){ //between 30 ms
+            if(((startTime-endTime)<=30)||(isFinished==false)){ //between 30 ms
                 console.log('Too fast, goto next');
                 return;
             }
