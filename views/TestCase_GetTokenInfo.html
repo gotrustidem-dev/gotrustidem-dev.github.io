@@ -101,7 +101,9 @@
                 bToken_sn = hexStringToArrayBuffer(token_sn);
 
             }
+            console.log('Call GetTokenInformation_StressTest');  
             GetTokenInformation_StressTest(bToken_sn);
+            console.log('Finish GetTokenInformation_StressTest');  
         });
 
         async function GetTokenInformation_StressTest(bToken_sn) {
