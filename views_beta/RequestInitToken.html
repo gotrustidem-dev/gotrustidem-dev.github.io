@@ -67,11 +67,9 @@
                                                     style="width: 342px; height:41px">
                                             </p>
                                         </form>
-
-                                        <form style="text-align: center;" id="form_allow_domain"
-                                            onsubmit="return false">
-                                            <!--<input type="checkbox" id="rpidfilter_checkbox" name="rpidfilter_checkbox" value="rpid_filter"> Enable RPID filter<br><-->
-        
+                                        <input type="checkbox" id="rpidfilter_checkbox" name="rpidfilter_checkbox" value="rpid_filter" onclick="disableRPIDFilter()"> Enable RPID filter<br>
+                                        <form style="text-align: center; display: none" id="form_allow_domain"
+                                            onsubmit="return false">                                
                                             <p>
                                                 <label id="label_allow_domain"> Allow host domain :</label><br>
                                                 <input type="text" name="allowrpid1" style="width: 342px; height:41px"
@@ -98,15 +96,35 @@
                                             </p>
                                         </form>
 
-                                        <form style="text-align: center;" id="form_pin_format" onsubmit="return false">
-                                            <fieldset>      
-                                                <legend>Pin format</legend>      
-                                                <input type="checkbox" name="number" value="number" checked>number<br>      
-                                                <input type="checkbox" name="lowcase" value="lowcase" checked>low case<br>      
-                                                <input type="checkbox" name="highcase" value="highcase">high case<br>      
-                                                <input type="checkbox" name="symbol" value="symbol">Symbol<br>      
-                                                <br>           
-                                            </fieldset>    
+                                        <form style="text-align: left;" id="form_pin_format" onsubmit="return false">
+                                            <fieldset>    
+                                            英文<br>
+                                            <input  type="radio" id="radio_eng_ask" name="eng" value="eng_ask" onclick="clickEngAsk()"  checked>必要
+                                            <input  type="radio" id="radio_eng_allow" name="eng" value="eng_allow" onclick="clickEngAllow()">特殊
+                                            <input  type="radio" id="radio_eng_no"  name="eng" value="eng_no" onclick="clickEngNo()">禁止<br>
+                                         
+                                                大寫英文<br>
+                                                <input  type="radio" id="radio_highcase_ask" name="highcase" value="highcase_ask">必要
+                                                <input  type="radio" id="radio_highcase_allow" name="highcase" value="highcase_allow" checked>允許
+                                                <input  type="radio" id="radio_highcase_no" name="highcase" value="highcase_no" disabled>禁止<br>
+
+                                                小寫英文<br>
+                                                <input  type="radio" id="radio_lowcase_ask" name="lowcase" value="lowcase_ask" >必要
+                                                <input  type="radio" id="radio_lowcase_allow" name="lowcase" value="lowcase_allow" checked>允許
+                                                <input  type="radio" id="radio_lowcase_no" name="lowcase" value="lowcase_no" disabled>禁止<br>
+
+                                         
+                                            數字<br>
+                                            <input  type="radio" id="radio_number_ask" name="number" value="number_ask" checked>必要
+                                            <input  type="radio" id="radio_number_allow" name="number" value="number_allow">允許
+                                            <input  type="radio" id="radio_number_no" name="number" value="number_no">禁止<br>
+
+                                            符號<br>
+                                            <input  type="radio" id="radio_symbol_ask" name="symbol" value="symbol_ask">必要
+                                            <input  type="radio" id="radio_symbol_allow" name="symbol" value="symbol_allow" checked>允許
+                                            <input  type="radio" id="radio_symbol_no" name="symbol" value="symbol_no">禁止<br>
+                                        
+                                        </fieldset>
                                         </form>
 
                                         <p>
@@ -169,7 +187,7 @@
             let so_pin = document.getElementById('form_so_pin').so_pin.value;
             let new_so_pin = document.getElementById('form_new_so_pin').new_so_pin.value;
             let new_user_pin = document.getElementById('form_new_user_pin').new_user_pin.value;
-
+            let form_allow_domain = document.getElementById('form_allow_domain');
             var bToken_sn = undefined;
             if (token_sn.length != 0) {
                 bToken_sn = hexStringToArrayBuffer(token_sn);
@@ -178,22 +196,25 @@
 
             bRandom = hexStringToArrayBuffer(random);
 
-            var AllowHostDomains = [];
+            var AllowHostDomains =  [];
 
 
             //AllowHostDomains = ["*.gotrustid.com","gotrustid.com.tw", "gotrustidem-dev.github.io","ctbc.com","ctbc123.com","test.ctbc.com"];
-            let rpid1 = document.getElementById('form_allow_domain').allowrpid1.value;
-            let rpid2 = document.getElementById('form_allow_domain').allowrpid2.value;
-            let rpid3 = document.getElementById('form_allow_domain').allowrpid3.value;
-            let rpid4 = document.getElementById('form_allow_domain').allowrpid4.value;
-            let rpid5 = document.getElementById('form_allow_domain').allowrpid5.value;
-            let rpid6 = document.getElementById('form_allow_domain').allowrpid6.value;
-            AllowHostDomains.push(rpid1);
-            AllowHostDomains.push(rpid2);
-            AllowHostDomains.push(rpid3);
-            AllowHostDomains.push(rpid4);
-            AllowHostDomains.push(rpid5);
-            AllowHostDomains.push(rpid6);
+            if(form_allow_domain.style.display !="none"){
+                let rpid1 = form_allow_domain.allowrpid1.value;
+                let rpid2 = form_allow_domain.allowrpid2.value;
+                let rpid3 = form_allow_domain.allowrpid3.value;
+                let rpid4 = form_allow_domain.allowrpid4.value;
+                let rpid5 = form_allow_domain.allowrpid5.value;
+                let rpid6 = form_allow_domain.allowrpid6.value;
+                AllowHostDomains.push(rpid1);
+                AllowHostDomains.push(rpid2);
+                AllowHostDomains.push(rpid3);
+                AllowHostDomains.push(rpid4);
+                AllowHostDomains.push(rpid5);
+                AllowHostDomains.push(rpid6);
+            }
+            
             console.log(token_sn);
             console.log(so_pin);
             console.log(new_so_pin);
@@ -221,23 +242,25 @@
        
             
             let PINLevel=0;
+            PINLevel = getPINLevelParam();
 
-            if(document.getElementById('form_pin_format').number.checked){
-                PINLevel|= PIN_FORMAT_NUMBER;
-            }
+            /*
+                if(document.getElementById('form_pin_format').number.checked){
+                    PINLevel|= PIN_FORMAT_NUMBER;
+                }
 
-            if(document.getElementById('form_pin_format').lowcase.checked){
-                PINLevel|= PIN_FORMAT_LOWERCASE;
-            }
+                if(document.getElementById('form_pin_format').lowcase.checked){
+                    PINLevel|= PIN_FORMAT_LOWERCASE;
+                }
 
-            if(document.getElementById('form_pin_format').highcase.checked){
-                PINLevel|= PIN_FORMAT_HIGERCASE;
-            }
+                if(document.getElementById('form_pin_format').highcase.checked){
+                    PINLevel|= PIN_FORMAT_HIGERCASE;
+                }
 
-            if(document.getElementById('form_pin_format').symbol.checked){
-                PINLevel|= PIN_FORMAT_SYMBOL;
-            }
-
+                if(document.getElementById('form_pin_format').symbol.checked){
+                    PINLevel|= PIN_FORMAT_SYMBOL;
+                }
+            */
             var para = buildInitToken(bSOPINArray, bRandom, bToken_sn, bNewSOPINArray, bNewUserPINArray,AllowHostDomains,isPINExpired,PINMaxRetry,sPinMinLen, PINLevel)
                 .then(result => {
                     GTIDEM_InitToken(bToken_sn, result.bEncryptedInitData, result.bHashMacofInitData).then(
@@ -287,7 +310,7 @@
             console.log("IV: "+bufToHex(iv));
             macKey = await computingMacKey(bSOPIN, bRandom);
             console.log("INIT_MAC_KEY: "+bufToHex(macKey));
-            var bHashedDomain = [];
+            var bHashedDomain;
             var initData={};
 
             initData.soPIN = bNewSOPin
@@ -298,7 +321,7 @@
                 bHashedDomain = await convertDomainList2Hash(AllowHostDomains);
                 initData.allowedRPID = bHashedDomain;
             }else{
-                initData.allowedRPID = [];
+                initData.allowedRPID = new Uint8Array(0);
             }
             initData.pinExpired = isPinExpired;
         
@@ -505,6 +528,120 @@
             return hashedDomainList;
 
         }
+
+        function disableRPIDFilter() {
+            // Get the checkbox
+            var checkBox = document.getElementById("rpidfilter_checkbox");
+            // Get the output text
+            var form = document.getElementById("form_allow_domain");
+
+
+            if (checkBox.checked == true){
+                form.style.display = "block";
+            } else {
+                form.style.display = "none";
+            }
+        }
+
+        function clickEngAsk(){
+
+           document.getElementById("radio_highcase_no").disabled  =true;
+           document.getElementById("radio_lowcase_no").disabled  =true;
+           document.getElementById("radio_highcase_ask").disabled = false;
+           document.getElementById("radio_lowcase_ask").disabled = false;
+           document.getElementById("radio_highcase_allow").disabled = false;
+           document.getElementById("radio_lowcase_allow").disabled = false;
+
+
+           document.getElementById("radio_highcase_allow").checked = true;
+           document.getElementById("radio_lowcase_allow").checked = true;
+           
+        }
+        function clickEngAllow(){
+           document.getElementById("radio_highcase_no").disabled  =false;
+           document.getElementById("radio_lowcase_no").disabled  =false;
+           document.getElementById("radio_highcase_ask").disabled = false;
+           document.getElementById("radio_lowcase_ask").disabled = false;
+           document.getElementById("radio_highcase_allow").disabled = true;
+           document.getElementById("radio_lowcase_allow").disabled = true;
+        }
+
+        function clickEngNo(){
+
+            document.getElementById("radio_highcase_ask").disabled  =true;
+            document.getElementById("radio_lowcase_ask").disabled  =true;
+            document.getElementById("radio_highcase_no").disabled = false;
+            document.getElementById("radio_lowcase_no").disabled = false;
+            document.getElementById("radio_highcase_allow").disabled = false;
+            document.getElementById("radio_lowcase_allow").disabled = false;
+
+        }
+
+        function getPINLevelParam(){
+
+            var pinLevel=0;
+
+            if(document.getElementById("radio_eng_ask").checked){
+                pinLevel|=0x80;
+                if(document.getElementById("radio_highcase_ask").checked){
+                    pinLevel|=0x20;
+                }
+                if(document.getElementById("radio_lowcase_ask").checked){
+                    pinLevel|=0x10;
+                }
+
+            }else if(document.getElementById("radio_eng_no").checked){
+                pinLevel|=0x40;
+                if(document.getElementById("radio_highcase_no").checked){
+                    pinLevel|=0x20;
+                }
+                if(document.getElementById("radio_lowcase_no").checked){
+                    pinLevel|=0x10;
+                }
+
+            }else if(document.getElementById("radio_eng_allow").checked){
+                pinLevel|=0xC0;
+
+                if((document.getElementById("radio_highcase_ask").checked)&&(document.getElementById("radio_lowcase_ask").checked)){
+                    pinLevel|=0x80;
+                    pinLevel|=0x30;
+                }
+                
+                if((document.getElementById("radio_highcase_no").checked)&&(document.getElementById("radio_lowcase_no").checked)){
+                    pinLevel|=0x40;
+                    pinLevel|=0x30;
+                }
+
+                if((document.getElementById("radio_highcase_ask").checked)&&(document.getElementById("radio_lowcase_no").checked)){
+                    pinLevel|=0x20;
+                }
+                if((document.getElementById("radio_highcase_no").checked)&&(document.getElementById("radio_lowcase_no").checked)){
+                    pinLevel|=0x10;
+                }
+
+
+            }
+
+
+
+
+
+            if(document.getElementById("radio_number_ask").checked){
+                pinLevel|=0x01;
+            }else if(document.getElementById("radio_number_no").checked){
+                pinLevel|=0x03;
+            }
+
+            if(document.getElementById("radio_symbol_ask").checked){
+                pinLevel|=0x04;
+            }else if(document.getElementById("radio_symbol_no").checked){
+                pinLevel|=0x0C;
+            }
+
+            return pinLevel;
+
+        }
+
     </script>
 
 </body>
