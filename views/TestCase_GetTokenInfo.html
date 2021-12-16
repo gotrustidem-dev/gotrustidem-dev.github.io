@@ -154,7 +154,7 @@
                 }
                 loopCnt = loopCnt + 1;//for StressTest  
                 try {
-                   
+                    console.log("Start test loopCnt: " + loopCnt); //for StressTest
                     let response = await GTIDEM_GetTokenInfo(bToken_sn)
                     if (response.statusCode == CTAP1_ERR_SUCCESS) {
                         document.getElementById('label_token_fw').innerText = "FW version: " + ConverVersionFormat(response.fw);
