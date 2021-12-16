@@ -92,8 +92,8 @@
     </div>
     <script>
         let loopCnt = 0; //for StressTest   
-        var startTime;
-        var endTime;
+        var startTime=0;
+        var endTime=0;
         var isFinished =true;
 
         document.getElementById('form_tokeninfo_btn').addEventListener('submit', function (event) {
@@ -112,6 +112,9 @@
         async function GetTokenInformation_StressTest(bToken_sn) {
 
             startTime = performance.now();
+            //console.log(startTime);
+            //console.log(endTime);
+            //console.log((startTime-endTime));
             if(((startTime-endTime)<=30)||(isFinished==false)){ //between 30 ms
                 console.log('Too fast, goto next'+ (startTime-endTime));
                 return;
