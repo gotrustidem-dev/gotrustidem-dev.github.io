@@ -110,13 +110,13 @@
 
         async function GetTokenInformation_StressTest(bToken_sn) {
 
-         
+            startTime = performance.now();
             if((startTime-endTime)<=30){ //between 30 ms
                 console.log('Too fast, goto next');
                 return;
             }
             try {
-                startTime = performance.now();
+            
                 console.log("Start loopCnt: " + ++loopCnt); //for StressTest
                 let response = await GTIDEM_GetTokenInfo(bToken_sn);
                 if (response.statusCode == CTAP1_ERR_SUCCESS) {
