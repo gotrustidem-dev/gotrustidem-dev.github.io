@@ -141,92 +141,55 @@
         async function GetTokenInformation_StressTest(bToken_sn) {
             const maxLoopCnt = 500; //for StressTest 
             var isFinished = true;
+            var startTime;
+            var endTime;
+            var lastCompleteTile;
             let loopCnt = 0; //for StressTest        
-            while (loopCnt < maxLoopCnt) { //for StressTest
+            while (loopCnt < maxLoopCnt) {   //for StressTest
+               startTime = performance.now();
+              
+                if((startTime-endTime)<=0.1){
+                    console.log('Too fast, goto next');
+                    continue;
+                }
                 loopCnt = loopCnt + 1;//for StressTest  
-
-
-                // try {
-                //     if (isFinished == true) {
-                //         loopCnt = loopCnt + 1; //for StressTest  
-                //         var startTime = performance.now();
-                //         console.log("Start loopCnt: " + loopCnt); //for StressTest
-                //         isFinished = false;
-                //         let response = await GTIDEM_GetTokenInfo(bToken_sn);
-                //         if (response.statusCode == CTAP1_ERR_SUCCESS) {
-
-                //             document.getElementById('label_sopin_retries').innerText = " 已經測試次數: " + loopCnt;
-                //             var endTime = performance.now();
-                //             console.log(`Call to doSomething took ${endTime - startTime} milliseconds`);
-                //             console.log("END loopCnt: " + loopCnt); //for StressTest
-                //             isFinished = true;
-                //         } else {
-                //             alert(showFIDOErrorMessage(response));
-                //             alert("END loopCnt: " + loopCnt + ", response.statusCode: " + response
-                //             .statusCode); //for StressTest          
-                //             var endTime = performance.now();
-                //             console.log(`Call to doSomething took ${endTime - startTime} milliseconds`);
-                //             console.log("END loopCnt: " + loopCnt + ", response.statusCode: " + response
-                //             .statusCode); //for StressTest
-
-                //             return; //for StressTest                      
-                //         }
-                //     }
-                // } catch (error) {
-                //     alert(error);
-                //     console.log('error', error);
-                //     var endTime = performance.now();
-                //     console.log(` catch Call to doSomething took ${endTime - startTime} milliseconds`);
-                //     console.log("END loopCnt: " + loopCnt); //for StressTest
-                //     alert("END loopCnt: " + loopCnt); //for StressTest 
-                //     return; //for StressTest    
-                // }
                 try {
-                    var startTime = performance.now();
-                    let response = await GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
-                        if (response.statusCode == CTAP1_ERR_SUCCESS) {
-                            document.getElementById('label_token_fw').innerText = "FW version: " + ConverVersionFormat(response.fw);
-                            document.getElementById('label_token_sw').innerText = "SW version: " + ConverVersionFormat(response.sw);
-                            document.getElementById('label_pin_retries').innerText = "PIN retryies: " + response.pinRetry;
-                            document.getElementById('label_credentials').innerText = "Credentials: " + response.credentialNum;
-                            document.getElementById('label_serial_number').innerText = "Serial number: " + ConverSNFormat(response.sn);
-                            document.getElementById('label_random_number').innerText = "Random number: " +ConverSNFormat(response.rn);
-                            document.getElementById('label_ecPublic_key').innerText = "EC public point: " +ConverSNFormat(response.ecpoint);
-                            document.getElementById('label_flags').innerText = "Flags: " +ConverSNFormat(response.flags);
-                            document.getElementById('label_sopin_retries').innerText = " 已經測試次數: " +loopCnt;
-                            var endTime = performance.now();
-                            console.log("test loopCnt: " + loopCnt); //for StressTest
-                            console.log(`Call to doSomething took ${endTime - startTime} milliseconds`);
-                            document.getElementById('form_tokeninfo_btn').elements[0].readOnly = true;
-
-                        } else {
-                            alert(showFIDOErrorMessage(response));
-                            console.log("test loopCnt: " + loopCnt + ", response.statusCode: " + response
-                                .statusCode); //for StressTest
-                            alert("test loopCnt: " + loopCnt + ", response.statusCode: " + response
-                                .statusCode); //for StressTest          
-
-                            var endTime = performance.now();
-                            console.log(`Call to doSomething took ${endTime - startTime} milliseconds`);
-                            
-                            return; //for StressTest 
-                        }
-                    }).catch((error) => {
-                        alert(error);
-                        console.log('error', error);
-                        console.log(" error test loopCnt: " + loopCnt); //for StressTest
-                        alert("error test loopCnt: " + loopCnt); //for StressTest 
-                        var endTime = performance.now();
-                        console.log(` catch Call to doSomething took ${endTime - startTime} milliseconds`);
+                   
+                    let response = await GTIDEM_GetTokenInfo(bToken_sn)
+                    if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                        document.getElementById('label_token_fw').innerText = "FW version: " + ConverVersionFormat(response.fw);
+                        document.getElementById('label_token_sw').innerText = "SW version: " + ConverVersionFormat(response.sw);
+                        document.getElementById('label_pin_retries').innerText = "PIN retryies: " + response.pinRetry;
+                        document.getElementById('label_credentials').innerText = "Credentials: " + response.credentialNum;
+                        document.getElementById('label_serial_number').innerText = "Serial number: " + ConverSNFormat(response.sn);
+                        document.getElementById('label_random_number').innerText = "Random number: " +ConverSNFormat(response.rn);
+                        document.getElementById('label_ecPublic_key').innerText = "EC public point: " +ConverSNFormat(response.ecpoint);
+                        document.getElementById('label_flags').innerText = "Flags: " +ConverSNFormat(response.flags);
+                        document.getElementById('label_sopin_retries').innerText = " 已經測試次數: " +loopCnt;
+                        endTime = performance.now();
+                        console.log("test loopCnt: " + loopCnt); //for StressTest
+                        console.log(`Call to doSomething took ${endTime - startTime} milliseconds`);
                         document.getElementById('form_tokeninfo_btn').elements[0].readOnly = true;
-                        return;
-                    });
+
+                    } else {
+                        alert(showFIDOErrorMessage(response));
+                        console.log("test loopCnt: " + loopCnt + ", response.statusCode: " + response
+                            .statusCode); //for StressTest
+                        alert("test loopCnt: " + loopCnt + ", response.statusCode: " + response
+                            .statusCode); //for StressTest          
+
+                        endTime = performance.now();
+                        console.log(`Call to doSomething took ${endTime - startTime} milliseconds`);
+                        
+                        return; //for StressTest 
+                    }
+                  
                 } catch (error) {
                     alert(error);
                     console.log('error', error);
                     console.log("test loopCnt: " + loopCnt); //for StressTest
                     alert("test loopCnt: " + loopCnt); //for StressTest 
-                    var endTime = performance.now();
+                    endTime = performance.now();
                     console.log(` catch Call to doSomething took ${endTime - startTime} milliseconds`);
                     document.getElementById('form_tokeninfo_btn').elements[0].readOnly = true;
                     return; //for StressTest    
