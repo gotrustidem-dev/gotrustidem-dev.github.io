@@ -116,7 +116,7 @@
             //console.log(startTime);
             //console.log(endTime);
             //console.log((startTime-endTime));
-            if(((RequestTime-endTime)<=100)||(isFinished==false)){ //between 30 ms
+            if(((RequestTime-endTime)<=50)||(isFinished==false)){ //between 50 ms
                 console.log('Too fast, goto next');
                 return;
             }
@@ -127,16 +127,17 @@
                 isFinished = false;
                 let response = await GTIDEM_GetTokenInfo(bToken_sn);
                 if (response.statusCode == CTAP1_ERR_SUCCESS) {
-                    document.getElementById('label_token_fw').innerText = "FW version: " + ConverVersionFormat(response.fw);
-                        document.getElementById('label_token_sw').innerText = "SW version: " + ConverVersionFormat(response.sw);
-                        document.getElementById('label_pin_retries').innerText = "PIN retryies: " + response.pinRetry;
-                        document.getElementById('label_credentials').innerText = "Credentials: " + response.credentialNum;
-                        document.getElementById('label_serial_number').innerText = "Serial number: " + ConverSNFormat(response.sn);
-                        document.getElementById('label_random_number').innerText = "Random number: " +ConverSNFormat(response.rn);
-                        document.getElementById('label_ecPublic_key').innerText = "EC public point: " +ConverSNFormat(response.ecpoint);
-                        document.getElementById('label_flags').innerText = "Flags: " +ConverSNFormat(response.flags); 
-                    document.getElementById('label_sopin_retries').innerText = " 已經測試次數: " + loopCnt;
-                    endTime = performance.now()
+                    // document.getElementById('label_token_fw').innerText = "FW version: " + ConverVersionFormat(response.fw);
+                    //     document.getElementById('label_token_sw').innerText = "SW version: " + ConverVersionFormat(response.sw);
+                    //     document.getElementById('label_pin_retries').innerText = "PIN retryies: " + response.pinRetry;
+                    //     document.getElementById('label_credentials').innerText = "Credentials: " + response.credentialNum;
+                    //     document.getElementById('label_serial_number').innerText = "Serial number: " + ConverSNFormat(response.sn);
+                    //     document.getElementById('label_random_number').innerText = "Random number: " +ConverSNFormat(response.rn);
+                    //     document.getElementById('label_ecPublic_key').innerText = "EC public point: " +ConverSNFormat(response.ecpoint);
+                    //     document.getElementById('label_flags').innerText = "Flags: " +ConverSNFormat(response.flags); 
+                    // document.getElementById('label_sopin_retries').innerText = " 已經測試次數: " + loopCnt;
+                    //
+                     endTime = performance.now()
                     console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
                     
                 } else {
