@@ -147,9 +147,8 @@
             let loopCnt = 0; //for StressTest        
             while (loopCnt < maxLoopCnt) {   //for StressTest
                startTime = performance.now();
-              
-                if((startTime-endTime)<=0.1){
-                    console.log('Too fast, goto next');
+                if((startTime-endTime)<=50){ //between 100 ms
+                    console.log('Too fast, goto next'+(startTime-endTime));
                     continue;
                 }
                 loopCnt = loopCnt + 1;//for StressTest  
@@ -169,7 +168,6 @@
                         endTime = performance.now();
                         console.log("test loopCnt: " + loopCnt); //for StressTest
                         console.log(`Call to doSomething took ${endTime - startTime} milliseconds`);
-                        document.getElementById('form_tokeninfo_btn').elements[0].readOnly = true;
 
                     } else {
                         alert(showFIDOErrorMessage(response));
