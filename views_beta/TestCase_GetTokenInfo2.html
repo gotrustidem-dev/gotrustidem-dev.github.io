@@ -92,6 +92,7 @@
     </div>
     <script>
         let loopCnt = 0; //for StressTest   
+        var RequestTime=0;
         var startTime=0;
         var endTime=0;
         var isFinished =true;
@@ -111,17 +112,17 @@
 
         async function GetTokenInformation_StressTest(bToken_sn) {
 
-            startTime = performance.now();
+            RequestTime = performance.now();
             //console.log(startTime);
             //console.log(endTime);
             //console.log((startTime-endTime));
-            if(((startTime-endTime)<=100)||(isFinished==false)){ //between 30 ms
+            if(((RequestTime-endTime)<=100)||(isFinished==false)){ //between 30 ms
                 console.log('Too fast, goto next');
                 return;
             }
-            console.log('Interval Time:'+(startTime-endTime)+'ms');
+            console.log('Interval Time:'+(RequestTime-endTime)+'ms');
             try {
-            
+                startTime = RequestTime;
                 console.log("Start loopCnt: " + ++loopCnt); //for StressTest
                 isFinished = false;
                 let response = await GTIDEM_GetTokenInfo(bToken_sn);
