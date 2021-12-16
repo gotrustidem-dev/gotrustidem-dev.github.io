@@ -113,7 +113,7 @@
          
             if((startTime-endTime)<=30){ //between 30 ms
                 console.log('Too fast, goto next');
-                continue;
+                return;
             }
             try {
                 startTime = performance.now();
