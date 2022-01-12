@@ -2087,7 +2087,7 @@ function GTIDEM_SetName(sName){
  * @param {Number} outformat 指定回傳的資料格式，CSR 或是 RAW 
  * @returns {GTIdemJs} 回傳結果的集合
  */
-async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID, keytype, outformat) {
+async function GTIDEM_GenKeyPair(bSerialNumber,bKeyID, keytype, outformat) {
 
 
  
