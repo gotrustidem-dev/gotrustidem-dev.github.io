@@ -2084,10 +2084,10 @@ function GTIDEM_SetName(sName){
  * @param {Uint8Array｜undefined} bSerialNumber 指定序號序號。若不指定載具序號，則可填入 undefined 或是空陣列
  * @param {Uint8Array｜undefined} bKeyID 用來關聯金鑰對，若是不替換則填入 undefined 或是空陣列。若不使用 KeyID,則載具會產生預設的 KeyHandle。
  * @param {Number} keytype 要使用的金鑰對
- * @param {Number} outformat 指定回傳的資料格式，CSR 或是 RAW 
+ * @param {Number} outputformat 指定回傳的資料格式，CSR 或是 RAW 
  * @returns {GTIdemJs} 回傳結果的集合
  */
-async function GTIDEM_GenKeyPair(bSerialNumber,bKeyID, keytype, outformat) {
+async function GTIDEM_GenKeyPair(bSerialNumber,bKeyID, keytype, outputformat) {
 
 
  
@@ -2125,6 +2125,7 @@ async function GTIDEM_GenKeyPair(bSerialNumber,bKeyID, keytype, outformat) {
      keytype_buf[1] = 0x23;
      keytype_buf[2] = 0x00
      keytype_buf[3] = 0x01;
+     keytype_buf[4] = keytype;
 
      var outputformat_buf;
      outputformat_buf = new Uint8Array(4 + 1);
@@ -2132,7 +2133,7 @@ async function GTIDEM_GenKeyPair(bSerialNumber,bKeyID, keytype, outformat) {
      outputformat_buf[1] = 0x24;
      outputformat_buf[2] = 0x00;
      outputformat_buf[3] = 0x01;
-     outputformat_buf[4] = outformat;
+     outputformat_buf[4] = outputformat;
 
     var payloadLen = keyid_buf.byteLength+sn_buf.byteLength+keytype_buf.length+outputformat_buf.length
  
