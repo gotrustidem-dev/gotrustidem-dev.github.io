@@ -19,6 +19,7 @@ const CMD_REQUESTCSR = 0xEA;
 const CMD_DELEE_CERT= 0xEB;
 const CMD_CLEAR_TOKEN = 0xEC;
 const CMD_INIT_TOKEN = 0xED;
+const CMD_GenKeyPair = 0xEE;
 
 
 
@@ -50,1199 +51,14 @@ const PIN_FORMAT_LOWERCASE =0x02;
 const PIN_FORMAT_HIGERCASE =0x04;
 const PIN_FORMAT_SYMBOL =0x08;
 
+const RSA_2048 = 1;
+const EC_secp256r1 = 2;
+const EC_secp384r1 = 3;
+const EC_secp521r1 = 4;
 
 
-async function requestSignDataByKEYHANDLE(keyhandle, alg_num, plaintext) {
-
-
-    var signDataPayload = plaintext;
-
-    var pki_buffer = [];
-    var challenge = new Uint8Array(32);
-    window.crypto.getRandomValues(challenge);
-    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-    var pki_header = new Uint8Array(3);
-
-    //PKI Command
-    var keyHandle_buf = new Uint8Array(keyhandle.length + 4);
-    keyHandle_buf[0] = 0xDF;
-    keyHandle_buf[1] = 0x19;
-    keyHandle_buf[2] = keyhandle.length >> 8;
-    keyHandle_buf[3] = keyhandle.length;
-    keyHandle_buf.set(new Uint8Array(keyhandle), 4);
-
-    var alg_buf = new Uint8Array(5);
-    alg_buf[0] = 0xDF;
-    alg_buf[1] = 0x03;
-    alg_buf[2] = 0;
-    alg_buf[3] = 1;
-    alg_buf[4] = alg_num;
-
-    var signDataBuf = new Uint8Array(4 + signDataPayload.byteLength);
-    signDataBuf[0] = 0xDF;
-    signDataBuf[1] = 0x06;
-    signDataBuf[2] = signDataPayload.byteLength >> 8;
-    signDataBuf[3] = signDataPayload.byteLength;
-    signDataBuf.set(signDataPayload, 4);
-
-
-
-    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + keyHandle_buf.byteLength +
-        alg_buf.byteLength + signDataBuf.byteLength);
-    var pki_payload_length = keyHandle_buf.byteLength + alg_buf.byteLength + signDataBuf.byteLength;
-    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_header[0] = CMD_Sign;
-    pki_header[1] = pki_payload_length >> 8
-    pki_header[2] = pki_payload_length;
-    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-    pki_buffer.set(new Uint8Array(keyHandle_buf), gtheaderbuffer.byteLength + 3);
-    pki_buffer.set(new Uint8Array(alg_buf), gtheaderbuffer.byteLength + 3 + keyHandle_buf
-        .byteLength);
-    pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + keyHandle_buf
-        .byteLength + alg_buf.byteLength);
-
-    //console.log("sign-keyhandle: " + bufToHex(pki_buffer));
-
-    var getAssertionChallenge = {
-        'challenge': challenge,
-    }
-    var idList = [{
-        id: pki_buffer,
-        type: "public-key"
-    }];
-
-    getAssertionChallenge.allowCredentials = idList;
-    //console.log('List getAssertionChallenge', getAssertionChallenge)
-
-    return await new Promise(resolve => {
-        navigator.credentials.get({
-                'publicKey': getAssertionChallenge
-            })
-            .then((newCredentialInfo) => {
-                //console.log('GetAssertion response', newCredentialInfo);
-                resolve(newCredentialInfo);
-            })
-    });
-
-}
-
-
-async function requirePINVerify() {
-
-    var userpin;
-    var challenge = new Uint8Array(32);
-    window.crypto.getRandomValues(challenge);
-    var local_privateKey;
-    var local_privateKey;
-    var externalECPublicKey;
-    var exportECPublicKeyArray;
-    var pinEncKey;
-    var EncryptedPINArray;
-
-    //Prepare PKI commmand
-    //Header
-    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-    var pki_header = new Uint8Array(3);
-    pki_header[0] = CMD_ReadCertificate;
-    pki_header[1] = 0x00
-    pki_header[2] = 0x00;
-    //PKI Command
-
-
-    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3);
-    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-
-    //console.log(bufToHex(pki_buffer));
-
-    //because pki command : 0xe0 has bug, use randomly id as user id 
-    var userID = 'Kosv9fPtkDoh4Oz7Yq/pVgWHS8HhdlCto5cR0aBoVMw='
-    var id = Uint8Array.from(window.atob(userID), c => c.charCodeAt(0))
-
-    var request_keyagreement = {
-        'challenge': challenge,
-
-        'rp': {
-            'name': 'GoTrustID Inc.',
-        },
-
-        'user': {
-            //'id': pki_buffer,
-            'id': id,
-            'displayName': 'Alice von Wunderland'
-        },
-
-        "authenticatorSelection": {
-            "userVerification": "discouraged",
-            "requireResidentKey": false,
-            "authenticatorAttachment": "cross-platform"
-
-        },
-        'attestation': "direct",
-        'pubKeyCredParams': [{
-                'type': 'public-key',
-                'alg': -7
-            },
-            {
-                'type': 'public-key',
-                'alg': -257
-            }
-        ]
-    }
-    //console.log('Get ECDH Key request', request_keyagreement);
-
-    return await new Promise(resolve => {
-        navigator.credentials.create({
-            'publicKey': request_keyagreement
-        }).then((newCredentialInfo) => {
-            userpin = prompt("Input your PIN", "");
-            if (userpin == null) {
-                return;
-            }
-            //console.log('PIN', userpin);
-
-            let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
-            let authData = parseAuthData(attestationObject.authData);
-            var publicKEy = CBOR.decode(authData.COSEPublicKey.buffer);
-            //console.log('X point: ', bufToHex(Object.values(publicKEy)[3]));
-            //console.log('Y point: ', bufToHex(Object.values(publicKEy)[4]));
-
-            var externalECPublicKeyX = base64EncodeURL(Object.values(publicKEy)[3]);
-            var externalECPublicKeyY = base64EncodeURL(Object.values(publicKEy)[4]);
-            return window.crypto.subtle.importKey(
-                "jwk", //can be "jwk" (public or private), "raw" (public only), "spki" (public only), or "pkcs8" (private only)
-                { //this is an example jwk key, other key types are Uint8Array objects
-                    kty: "EC",
-                    crv: "P-256",
-                    x: externalECPublicKeyX,
-                    y: externalECPublicKeyY,
-                    ext: true,
-                }, { //these are the algorithm options
-                    name: "ECDH",
-                    namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
-                },
-                true, //whether the key is extractable (i.e. can be used in exportKey)
-                [] //"deriveKey" and/or "deriveBits" for private keys only (just put an empty list if importing a public key)
-            );
-
-        }).then(function (external_public) {
-            //returns a privateKey (or publicKey if you are importing a public key)
-            externalECPublicKey = external_public;
-            //console.log("external_public", externalECPublicKey);
-            return window.crypto.subtle.generateKey({
-                    name: "ECDH",
-                    namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
-                },
-                true, //whether the key is extractable (i.e. can be used in exportKey)
-                ["deriveKey",
-                    "deriveBits"
-                ] //can be any combination of "deriveKey" and "deriveBits"
-            );
-        }).then(function (key) { //generate ecdh pair
-
-            var local_publicKey = key.publicKey;
-            var local_privateKey = key.privateKey;
-            window.crypto.subtle.exportKey("raw", local_publicKey).then(
-                function (keydata) {
-                    exportECPublicKeyArray = keydata;
-                    //console.log("exportECPublicKeyArray", bufToHex(exportECPublicKeyArray));
-                }
-            );
-            return window.crypto.subtle.deriveBits({
-                    name: "ECDH",
-                    namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
-                    public: externalECPublicKey, //an ECDH public key from generateKey or importKey
-
-                },
-                local_privateKey, //from generateKey or importKey above
-                256 //the number of bits you want to derive
-            );
-
-        }).then(function (keybits) { //convert share secret to pinEncKey
-            return crypto.subtle.digest(
-                "SHA-256",
-                new Uint8Array(keybits)
-            );
-        }).then(function (pinEncKeyBytes) {
-            //console.log("pinEncKeyBytes", bufToHex(pinEncKeyBytes));
-            return crypto.subtle.importKey("raw",
-                pinEncKeyBytes,
-                "aes-cbc", false, ["encrypt"]);
-
-        }).then(function (importKey) {
-            pinEncKey = importKey;
-            //console.log("pinEncKey ", pinEncKey);
-            const encoder = new TextEncoder();
-            const data = encoder.encode(userpin);
-            return crypto.subtle.digest(
-                "SHA-256",
-                data);
-        }).then(function (userpin_digestBytes) {
-            //console.log("userpin_digestBytes", bufToHex(userpin_digestBytes.slice(0, 16)));
-            var iv = new Uint8Array(16);
-            //console.log("iv .... ", iv);
-
-            return crypto.subtle.encrypt({
-                name: "aes-cbc",
-                iv
-            }, pinEncKey, userpin_digestBytes.slice(0, 16));
-        }).then(function (cipherPIN) { // start get assertion
-
-            EncryptedPINArray = cipherPIN.slice(0, 16);
-            //console.log("EncryptedPINArray", bufToHex(EncryptedPINArray.slice(0, 16)));
-            resolve([EncryptedPINArray, exportECPublicKeyArray]);
-            //return EncryptedPINArray;
-        });
-
-    });
-}
-
-async function requireEncryptedPINandEncryptedNewPIN(oldpin, newpin) {
-
-
-
-    var challenge = new Uint8Array(32);
-    window.crypto.getRandomValues(challenge);
-    var local_privateKey;
-    var local_privateKey;
-    var externalECPublicKey;
-    var exportECPublicKeyArray;
-    var pinEncKey;
-    var EncryptedUserPINArray;
-    var EncryptedNewUserPINArray;
-
-    //Prepare PKI commmand
-    //Header
-    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-    var pki_header = new Uint8Array(3);
-    pki_header[0] = CMD_ReadCertificate;
-    pki_header[1] = 0x00
-    pki_header[2] = 0x00;
-    //PKI Command
-
-
-    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3);
-    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-
-    //console.log(bufToHex(pki_buffer));
-
-    var request_keyagreement = {
-        'challenge': challenge,
-
-        'rp': {
-            'name': 'GoTrustID Inc.',
-        },
-
-        'user': {
-            'id': pki_buffer,
-            'displayName': 'Alice von Wunderland'
-        },
-
-        "authenticatorSelection": {
-            "userVerification": "discouraged",
-            "requireResidentKey": false,
-            "authenticatorAttachment": "cross-platform"
-
-        },
-        'attestation': "direct",
-        'pubKeyCredParams': [{
-                'type': 'public-key',
-                'alg': -7
-            },
-            {
-                'type': 'public-key',
-                'alg': -257
-            }
-        ]
-    }
-    //console.log('Get ECDH Key request', request_keyagreement);
-    return await (new Promise(resolve => {
-        navigator.credentials.create({
-            'publicKey': request_keyagreement
-        }).then((newCredentialInfo) => {
-
-
-            //console.log('oldpin', oldpin);
-            //console.log('newpin', newpin);
-
-            let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
-            let authData = parseAuthData(attestationObject.authData);
-            var publicKEy = CBOR.decode(authData.COSEPublicKey.buffer);
-            //console.log('X point: ', bufToHex(Object.values(publicKEy)[3]));
-            //console.log('Y point: ', bufToHex(Object.values(publicKEy)[4]));
-
-            var externalECPublicKeyX = base64EncodeURL(Object.values(publicKEy)[3]);
-            var externalECPublicKeyY = base64EncodeURL(Object.values(publicKEy)[4]);
-            return window.crypto.subtle.importKey(
-                "jwk", //can be "jwk" (public or private), "raw" (public only), "spki" (public only), or "pkcs8" (private only)
-                { //this is an example jwk key, other key types are Uint8Array objects
-                    kty: "EC",
-                    crv: "P-256",
-                    x: externalECPublicKeyX,
-                    y: externalECPublicKeyY,
-                    ext: true,
-                }, { //these are the algorithm options
-                    name: "ECDH",
-                    namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
-                },
-                true, //whether the key is extractable (i.e. can be used in exportKey)
-                [] //"deriveKey" and/or "deriveBits" for private keys only (just put an empty list if importing a public key)
-            );
-
-        }).then(function (external_public) {
-            //returns a privateKey (or publicKey if you are importing a public key)
-            externalECPublicKey = external_public;
-            //console.log("external_public", externalECPublicKey);
-            return window.crypto.subtle.generateKey({
-                    name: "ECDH",
-                    namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
-                },
-                true, //whether the key is extractable (i.e. can be used in exportKey)
-                ["deriveKey",
-                    "deriveBits"
-                ] //can be any combination of "deriveKey" and "deriveBits"
-            );
-        }).then(function (key) { //generate ecdh pair
-
-            var local_publicKey = key.publicKey;
-            var local_privateKey = key.privateKey;
-            window.crypto.subtle.exportKey("raw", local_publicKey).then(
-                function (keydata) {
-                    exportECPublicKeyArray = keydata;
-                    //console.log("exportECPublicKeyArray", bufToHex(exportECPublicKeyArray));
-                }
-            );
-            return window.crypto.subtle.deriveBits({
-                    name: "ECDH",
-                    namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
-                    public: externalECPublicKey, //an ECDH public key from generateKey or importKey
-
-                },
-                local_privateKey, //from generateKey or importKey above
-                256 //the number of bits you want to derive
-            );
-
-        }).then(function (keybits) { //convert share secret to pinEncKey
-            return crypto.subtle.digest(
-                "SHA-256",
-                new Uint8Array(keybits)
-            );
-        }).then(function (pinEncKeyBytes) {
-            //console.log("pinEncKeyBytes", bufToHex(pinEncKeyBytes));
-            return crypto.subtle.importKey("raw",
-                pinEncKeyBytes,
-                "aes-cbc", false, ["encrypt"]);
-
-        }).then(function (importKey) {
-            pinEncKey = importKey;
-            //console.log("pinEncKey ", pinEncKey);
-            const encoder = new TextEncoder();
-            const data = encoder.encode(oldpin);
-            return crypto.subtle.digest(
-                "SHA-256",
-                data);
-        }).then(function (oldpin_digestBytes) {
-            //console.log("oldpin_digestBytes", bufToHex(oldpin_digestBytes.slice(0, 16)));
-            var iv = new Uint8Array(16);
-            //console.log("iv .... ", iv);
-
-            return crypto.subtle.encrypt({
-                name: "aes-cbc",
-                iv
-            }, pinEncKey, oldpin_digestBytes.slice(0, 16));
-        }).then(function (cipherPIN) {
-            EncryptedUserPINArray = cipherPIN.slice(0, 16);
-            const encoder = new TextEncoder();
-            const data = encoder.encode(newpin);
-            return crypto.subtle.digest(
-                "SHA-256",
-                data);
-        }).then(function (newpin_digestBytes) {
-            //console.log("newpin_digestBytes", bufToHex(newpin_digestBytes.slice(0, 16)));
-            var iv = new Uint8Array(16);
-
-            return crypto.subtle.encrypt({
-                name: "aes-cbc",
-                iv
-            }, pinEncKey, newpin_digestBytes.slice(0, 16));
-        }).then(function (cipherPIN) { // start get assertion
-
-            EncryptedNewUserPINArray = cipherPIN.slice(0, 16);
-
-            //console.log("EncryptedNewUserPINArray", bufToHex(EncryptedNewUserPINArray.slice(0, 16)));
-
-            resolve([EncryptedPINArray, EncryptedNewUserPINArray, exportECPublicKeyArray]);
-        });
-
-    }));
-
-
-
-
-
-}
-
-async function ReadCertByIndex(index) {
-
-
-    var pki_buffer = [];
-
-    var challenge = new Uint8Array(32);
-    window.crypto.getRandomValues(challenge);
-
-    //Prepare PKI commmand
-    //Header
-    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-    var pki_header = new Uint8Array(3);
-
-    //PKI Command
-    var command_bufer = new Uint8Array(5);
-    command_bufer[0] = 0xDF;
-    command_bufer[1] = 0x02;
-    command_bufer[2] = 0x00;
-    command_bufer[3] = 0x01;
-    command_bufer[4] = index;
-
-    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_bufer.byteLength);
-    var pki_payload_length = command_bufer.byteLength;
-    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_header[0] = CMD_ReadCertificate;
-    pki_header[1] = pki_payload_length >> 8
-    pki_header[2] = pki_payload_length;
-    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-    pki_buffer.set(new Uint8Array(command_bufer), 3 + gtheaderbuffer.byteLength);
-
-    //console.log(bufToHex(pki_buffer));
-
-    var publicKey1 = {
-        'challenge': challenge,
-
-        'rp': {
-            'name': 'GoTrustID Inc.',
-        },
-
-        'user': {
-            'id': pki_buffer,
-            'name': sUserName,
-            'displayName': sUserName,
-        },
-
-        "authenticatorSelection": {
-            "requireResidentKey": false,
-            //"userVerification": "discouraged",
-            "authenticatorAttachment": "cross-platform"
-
-        },
-        'attestation': "none",
-        'pubKeyCredParams': [{
-                'type': 'public-key',
-                'alg': -7
-            },
-            {
-                'type': 'public-key',
-                'alg': -257
-            }
-        ]
-    }
-    //console.log('Search_by_Index:', publicKey1)
-
-    return await new Promise(resolve => {
-        navigator.credentials.create({
-                'publicKey': publicKey1
-            })
-            .then((newCredentialInfo) => {
-
-                //console.log('SUCCESS', newCredentialInfo)
-                //console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response.clientDataJSON))
-                let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
-                //console.log('AttestationObject: ', attestationObject)
-                let authData = parseAuthData(attestationObject.authData);
-                //console.log('AuthData: ', authData);
-                //console.log('CredID: ', bufToHex(authData.credID));
-                //console.log('AAGUID: ', bufToHex(authData.aaguid));
-                //console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
-                resolve(new Uint8Array(authData.credID.slice(1, authData.credID.length)));
-            })
-            .catch((error) => {
-                alert(error)
-                //console.log('FAIL', error)
-            })
-    });
-}
-
-async function ReadCertByLable(strLable) {
-    var pki_buffer = [];
-
-    var challenge = new Uint8Array(32);
-    window.crypto.getRandomValues(challenge);
-
-
-    var pki_header = new Uint8Array(3);
-    var command_bufer = new Uint8Array(strLable.length + 4);
-    window.crypto.getRandomValues(command_bufer);
-    command_bufer[0] = 0xDF
-    command_bufer[1] = 0x01;
-    command_bufer[2] = strLable.length >> 8;
-    command_bufer[3] = strLable.length;
-    command_bufer.set(toUTF8Array(strLable), 4);
-
-
-
-    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + pki_header.byteLength + command_bufer
-        .byteLength);
-    var pki_payload_length = command_bufer.byteLength;
-
-    pki_header[0] = CMD_ReadCertificate;
-    pki_header[1] = pki_payload_length >> 8
-    pki_header[2] = pki_payload_length;
-
-    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-    pki_buffer.set(new Uint8Array(command_bufer), gtheaderbuffer.byteLength + pki_header.byteLength);
-
-    //console.log(bufToHex(pki_buffer));
-
-    var publicKey1 = {
-        'challenge': challenge,
-
-        'rp': {
-            'name': 'GoTrustID Inc.',
-        },
-
-        'user': {
-            'id': pki_buffer,
-            'name': sUserName,
-            'displayName': sUserName,
-        },
-
-        "authenticatorSelection": {
-            "requireResidentKey": false,
-            "authenticatorAttachment": "cross-platform"
-
-        },
-        'attestation': "none",
-        'pubKeyCredParams': [{
-                'type': 'public-key',
-                'alg': -7
-            },
-            {
-                'type': 'public-key',
-                'alg': -257
-            }
-        ]
-    }
-    //console.log('List publicKey1', publicKey1)
-
-
-    return await new Promise(resolve => {
-        navigator.credentials.create({
-                'publicKey': publicKey1
-            })
-            .then((newCredentialInfo) => {
-
-                //console.log('SUCCESS', newCredentialInfo)
-                //console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response.clientDataJSON))
-                let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
-                //console.log('AttestationObject: ', attestationObject);
-                let authData = parseAuthData(attestationObject.authData);
-                //console.log('AuthData: ', authData);
-                //console.log('CredID: ', bufToHex(authData.credID));
-                //console.log('AAGUID: ', bufToHex(authData.aaguid));
-                //console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
-                resolve(new Uint8Array(authData.credID.slice(1, authData.credID.length)));
-            })
-            .catch((error) => {
-                alert(error)
-                //console.log('FAIL', error)
-            })
-    });
-}
-
-async function SignDataByIndex(index, alg_number, plain) {
-
-    var pki_buffer = [];
-    let certIndex = document.getElementById('use-index').certIndex.value;
-
-    var challenge = new Uint8Array(32);
-    window.crypto.getRandomValues(challenge);
-    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-    var pki_header = new Uint8Array(3);
-
-    //PKI Command
-    var command_buf = new Uint8Array(5);
-    command_buf[0] = 0xDF;
-    command_buf[1] = 0x02;
-    command_buf[2] = 0x00;
-    command_buf[3] = 0x01;
-    command_buf[4] = index;
-
-    var alg_buf = new Uint8Array(5);
-    alg_buf[0] = 0xDF;
-    alg_buf[1] = 0x03;
-    alg_buf[2] = 0x00;
-    alg_buf[3] = 0x01;
-    alg_buf[4] = alg_number;
-
-    var signDataBuf = new Uint8Array(4 + plain.byteLength);
-    signDataBuf[0] = 0xDF;
-    signDataBuf[1] = 0x06;
-    signDataBuf[2] = plain.length >> 8;
-    signDataBuf[3] = plain.length;
-    signDataBuf.set(plain, 4);
-
-    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_buf.byteLength + alg_buf
-        .byteLength + signDataBuf.byteLength);
-    var pki_payload_length = command_buf.byteLength + alg_buf.byteLength + signDataBuf.byteLength;
-    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_header[0] = CMD_Sign;
-    pki_header[1] = pki_payload_length >> 8
-    pki_header[2] = pki_payload_length;
-    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-    pki_buffer.set(new Uint8Array(command_buf), gtheaderbuffer.byteLength + 3);
-    pki_buffer.set(new Uint8Array(alg_buf), gtheaderbuffer.byteLength + 3 + command_buf.byteLength);
-    pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + command_buf
-        .byteLength + alg_buf.byteLength);
-
-    //console.log("SignDataByIndex", bufToHex(pki_buffer));
-    var getAssertionChallenge = {
-        'challenge': challenge,
-        'rp': {
-            'name': 'GoTrustID Inc.',
-        },
-
-    }
-    var idList = [{
-        id: pki_buffer,
-        type: "public-key"
-    }];
-
-    getAssertionChallenge.allowCredentials = idList;
-    //console.log('SignDataByIndex', getAssertionChallenge)
-
-
-    return await new Promise(resolve => {
-        navigator.credentials.get({
-                'publicKey': getAssertionChallenge
-            })
-            .then((newCredentialInfo) => {
-
-                //console.log('SUCCESS', newCredentialInfo);
-                //console.log("Sign", newCredentialInfo.response.signature);
-
-                const sign = newCredentialInfo.response.signature;
-                resolve(sign);
-            })
-            .catch((error) => {
-                alert(error)
-                //console.log('FAIL', error)
-            })
-
-    });
-
-
-}
-
-
-async function SignDataByIndex2(index, alg_number, plain, serial_number) {
-
-    var pki_buffer = [];
-    let certIndex = document.getElementById('use-index').certIndex.value;
-
-    var challenge = new Uint8Array(32);
-    window.crypto.getRandomValues(challenge);
-    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-    var pki_header = new Uint8Array(3);
-
-    //PKI Command
-    var command_buf = new Uint8Array(5);
-    command_buf[0] = 0xDF;
-    command_buf[1] = 0x02;
-    command_buf[2] = 0x00;
-    command_buf[3] = 0x01;
-    command_buf[4] = index;
-
-    var alg_buf = new Uint8Array(5);
-    alg_buf[0] = 0xDF;
-    alg_buf[1] = 0x03;
-    alg_buf[2] = 0x00;
-    alg_buf[3] = 0x01;
-    alg_buf[4] = alg_number;
-
-    var signDataBuf = new Uint8Array(4 + plain.byteLength);
-    signDataBuf[0] = 0xDF;
-    signDataBuf[1] = 0x06;
-    signDataBuf[2] = plain.length >> 8;
-    signDataBuf[3] = plain.length;
-    signDataBuf.set(plain, 4);
-
-    var sn_Buf = new Uint8Array(4 + serial_number.byteLength);
-    sn_Buf[0] = 0xDF;
-    sn_Buf[1] = 0x20;
-    sn_Buf[2] = 0x00;
-    sn_Buf[3] = 0x09;
-    sn_Buf.set(serial_number, 4);
-
-
-
-    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_buf.byteLength + alg_buf
-        .byteLength + signDataBuf.byteLength + sn_Buf.byteLength);
-    var pki_payload_length = command_buf.byteLength + alg_buf.byteLength + signDataBuf.byteLength + sn_Buf.byteLength;
-    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_header[0] = CMD_Sign;
-    pki_header[1] = pki_payload_length >> 8
-    pki_header[2] = pki_payload_length;
-    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-    pki_buffer.set(new Uint8Array(command_buf), gtheaderbuffer.byteLength + 3);
-    pki_buffer.set(new Uint8Array(alg_buf), gtheaderbuffer.byteLength + 3 + command_buf.byteLength);
-    pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + command_buf.byteLength + alg_buf.byteLength);
-    pki_buffer.set(new Uint8Array(sn_Buf), gtheaderbuffer.byteLength + 3 + command_buf.byteLength + alg_buf.byteLength + signDataBuf.byteLength);
-
-
-    //console.log("SignDataByIndex", bufToHex(pki_buffer));
-    var getAssertionChallenge = {
-        'challenge': challenge,
-        'rp': {
-            'name': 'GoTrustID Inc.',
-        },
-
-    }
-    var idList = [{
-        id: pki_buffer,
-        type: "public-key"
-    }];
-
-    getAssertionChallenge.allowCredentials = idList;
-    //console.log('SignDataByIndex', getAssertionChallenge)
-
-
-    return await new Promise(resolve => {
-        navigator.credentials.get({
-                'publicKey': getAssertionChallenge
-            })
-            .then((newCredentialInfo) => {
-
-                //console.log('SUCCESS', newCredentialInfo);
-                //console.log("Sign", newCredentialInfo.response.signature);
-
-                const sign = newCredentialInfo.response.signature;
-                resolve(sign);
-            })
-            .catch((error) => {
-                alert(error)
-                //console.log('FAIL', error)
-            })
-
-    });
-
-
-}
-
-
-async function SignDataByLabel(label, alg_number, plain) {
-
-    var pki_buffer = [];
-
-    var challenge = new Uint8Array(32);
-    window.crypto.getRandomValues(challenge);
-    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-    var pki_header = new Uint8Array(3);
-
-    //PKI Command
-    var command_bufer = new Uint8Array(label.length + 4);
-    window.crypto.getRandomValues(command_bufer);
-    command_bufer[0] = 0xDF
-    command_bufer[1] = 0x01;
-    command_bufer[2] = label.length >> 8;
-    command_bufer[3] = label.length;
-    command_bufer.set(toUTF8Array(label), 4);
-
-
-    var alg_buf = new Uint8Array(5);
-    alg_buf[0] = 0xDF;
-    alg_buf[1] = 0x03;
-    alg_buf[2] = 0x00;
-    alg_buf[3] = 0x01;
-    alg_buf[4] = alg_number;
-
-    var signDataBuf = new Uint8Array(4 + plain.byteLength);
-    signDataBuf[0] = 0xDF;
-    signDataBuf[1] = 0x06;
-    signDataBuf[2] = plain.length >> 8;
-    signDataBuf[3] = plain.length;
-    signDataBuf.set(plain, 4);
-
-
-    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_bufer.byteLength + alg_buf
-        .byteLength + signDataBuf.byteLength);
-    var pki_payload_length = command_bufer.byteLength + alg_buf.byteLength + signDataBuf.byteLength;
-    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_header[0] = CMD_Sign;
-    pki_header[1] = pki_payload_length >> 8
-    pki_header[2] = pki_payload_length;
-    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-    pki_buffer.set(new Uint8Array(command_bufer), gtheaderbuffer.byteLength + 3);
-    pki_buffer.set(new Uint8Array(alg_buf), gtheaderbuffer.byteLength + 3 + command_bufer.byteLength);
-    pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + command_bufer
-        .byteLength + alg_buf.byteLength);
-
-    //console.log("SignDataByLabel", bufToHex(pki_buffer));
-
-
-    var getAssertionChallenge = {
-        'challenge': challenge,
-    }
-    var idList = [{
-        id: pki_buffer,
-        type: "public-key"
-    }];
-
-    getAssertionChallenge.allowCredentials = idList;
-    //console.log('SignDataByLabel', getAssertionChallenge)
-
-
-    return await new Promise(resolve => {
-        navigator.credentials.get({
-                'publicKey': getAssertionChallenge
-            })
-            .then((newCredentialInfo) => {
-
-                //console.log('SUCCESS', newCredentialInfo)
-                //console.log("Sign", newCredentialInfo.response.signature)
-                const sign = newCredentialInfo.response.signature;
-                resolve(sign);
-
-            })
-            .catch((error) => {
-                alert(error)
-                //console.log('FAIL', error)
-            })
-    });
-}
-
-async function GenRSA2048KeyPair() {
-
-    var pki_buffer = [];
-
-
-    var challenge = new Uint8Array(32);
-    window.crypto.getRandomValues(challenge);
-
-    //Prepare PKI commmand
-    //Header
-    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-    var pki_header = new Uint8Array(3);
-
-    //PKI Command
-    var command_bufer = new Uint8Array(5);
-    command_bufer[0] = 0xDF;
-    command_bufer[1] = 0x16;
-    command_bufer[2] = 0x0;
-    command_bufer[3] = 0x01;
-    command_bufer[4] = 0x02;
-
-    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_bufer.byteLength);
-    var pki_payload_length = command_bufer.byteLength;
-    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_header[0] = 0xE6;
-    pki_header[1] = pki_payload_length >> 8
-    pki_header[2] = pki_payload_length;
-    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-    pki_buffer.set(new Uint8Array(command_bufer), 3 + gtheaderbuffer.byteLength);
-
-    //console.log(bufToHex(pki_buffer));
-
-    var publicKey1 = {
-        'challenge': challenge,
-
-        'rp': {
-            'name': 'GoTrustID Inc.',
-        },
-
-        'user': {
-            'id': pki_buffer,
-            'name': sUserName,
-            'displayName': sUserName,
-        },
-
-        "authenticatorSelection": {
-            "requireResidentKey": false,
-            "authenticatorAttachment": "cross-platform"
-
-        },
-        'attestation': "none",
-        'pubKeyCredParams': [{
-            'type': 'public-key',
-            'alg': -7
-        }]
-    }
-    //console.log('Gen RSA Key Pair:', publicKey1)
-
-
-    return await new Promise(resolve => {
-        navigator.credentials.create({
-                'publicKey': publicKey1
-            })
-            .then((newCredentialInfo) => {
-
-                //console.log('SUCCESS', newCredentialInfo)
-                //console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response.clientDataJSON))
-                let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
-                //console.log('AttestationObject: ', attestationObject)
-                let authData = parseAuthData(attestationObject.authData);
-                //console.log('AuthData: ', authData);
-                //console.log('CredID: ', bufToHex(authData.credID));
-                //console.log('AAGUID: ', bufToHex(authData.aaguid));
-                //console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
-
-                let returnData = showRSAKeyPair(authData.credID);
-
-                resolve(returnData);
-
-
-
-
-            })
-        // .catch((error) => {
-        //     alert(error)
-        //     //console.log('FAIL', error)
-        // })
-    });
-}
-
-async function ImportCertificate(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf) {
-
-    //console.log('key_handle', bufToHex(keyHandleBuf));
-    //console.log('key_id', bufToHex(KeyIDBuf));
-    //console.log('hexCert', bufToHex(ImportedHexCertBuf));
-
-    var pki_buffer = [];
-    var challenge = new Uint8Array(32);
-    window.crypto.getRandomValues(challenge);
-    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-    var pki_header = new Uint8Array(3);
-
-    //PKI Command
-    var cert_buf = new Uint8Array(ImportedHexCertBuf.length + 4);
-    cert_buf[0] = 0xDF
-    cert_buf[1] = 0x17;
-    cert_buf[2] = ImportedHexCertBuf.length >> 8;
-    cert_buf[3] = ImportedHexCertBuf.length;
-    cert_buf.set(ImportedHexCertBuf, 4);
-
-
-    var keyHandle_buf = new Uint8Array(keyHandleBuf.length + 4);
-    keyHandle_buf[0] = 0xDF;
-    keyHandle_buf[1] = 0x19;
-    keyHandle_buf[2] = keyHandleBuf.length >> 8;
-    keyHandle_buf[3] = keyHandleBuf.length;
-    keyHandle_buf.set(new Uint8Array(keyHandleBuf), 4);
-
-
-    var keyId_buf = new Uint8Array(KeyIDBuf.length + 4);
-    keyId_buf[0] = 0xDF;
-    keyId_buf[1] = 0x18;
-    keyId_buf[2] = KeyIDBuf.length >> 8;
-    keyId_buf[3] = KeyIDBuf.length;
-    keyId_buf.set(toUTF8Array(KeyIDBuf), 4);
-
-
-
-    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + cert_buf.byteLength +
-        keyHandle_buf
-        .byteLength + keyId_buf.byteLength);
-
-    var pki_payload_length = cert_buf.byteLength + keyHandle_buf.byteLength + keyId_buf
-        .byteLength;
-    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_header[0] = 0xE7;
-    pki_header[1] = pki_payload_length >> 8
-    pki_header[2] = pki_payload_length;
-
-    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-    pki_buffer.set(new Uint8Array(cert_buf), gtheaderbuffer.byteLength + 3);
-    pki_buffer.set(new Uint8Array(keyId_buf), gtheaderbuffer.byteLength + 3 + cert_buf
-        .byteLength);
-    pki_buffer.set(new Uint8Array(keyHandle_buf), gtheaderbuffer.byteLength + 3 + cert_buf
-        .byteLength +
-        keyId_buf.byteLength);
-
-    //console.log("Import cert command: " + bufToHex(pki_buffer));
-
-    var getAssertionChallenge = {
-        'challenge': challenge,
-        "userVerification": "discouraged"
-    }
-    var idList = [{
-        id: pki_buffer,
-        type: "public-key"
-    }];
-
-    getAssertionChallenge.allowCredentials = idList;
-    //console.log('Import cert command getAssertionChallenge', getAssertionChallenge);
-
-    return await new Promise(resolve => {
-        navigator.credentials.get({
-                'publicKey': getAssertionChallenge
-            })
-            .then((newCredentialInfo) => {
-
-                //console.log('SUCCESS', newCredentialInfo)
-                //console.log("Sign", newCredentialInfo.response.signature)
-                const sign = newCredentialInfo.response.signature;
-                resolve(sign);
-            })
-            .catch((error) => {
-                alert(error)
-                //console.log('FAIL', error)
-            })
-
-    });
-
-}
-
-async function ImportCertificate2(keyHandleBuf, KeyIDBuf, ImportedHexCertBuf) {
-
-    //console.log('key_handle', bufToHex(keyHandleBuf));
-    //console.log('key_id', bufToHex(KeyIDBuf));
-    //console.log('hexCert', bufToHex(ImportedHexCertBuf));
-
-    var pki_buffer = [];
-    var challenge = new Uint8Array(32);
-    window.crypto.getRandomValues(challenge);
-    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-    var pki_header = new Uint8Array(3);
-
-    //PKI Command
-    var cert_buf = new Uint8Array(ImportedHexCertBuf.length + 4);
-    cert_buf[0] = 0xDF
-    cert_buf[1] = 0x17;
-    cert_buf[2] = ImportedHexCertBuf.length >> 8;
-    cert_buf[3] = ImportedHexCertBuf.length;
-    cert_buf.set(ImportedHexCertBuf, 4);
-
-
-    var keyHandle_buf = new Uint8Array(keyHandleBuf.length + 4);
-    keyHandle_buf[0] = 0xDF;
-    keyHandle_buf[1] = 0x19;
-    keyHandle_buf[2] = keyHandleBuf.length >> 8;
-    keyHandle_buf[3] = keyHandleBuf.length;
-    keyHandle_buf.set(new Uint8Array(keyHandleBuf), 4);
-
-
-    var keyId_buf = new Uint8Array(KeyIDBuf.length + 4);
-    keyId_buf[0] = 0xDF;
-    keyId_buf[1] = 0x18;
-    keyId_buf[2] = KeyIDBuf.length >> 8;
-    keyId_buf[3] = KeyIDBuf.length;
-    keyId_buf.set(toUTF8Array(KeyIDBuf), 4);
-
-
-
-    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + cert_buf.byteLength +
-        keyHandle_buf
-        .byteLength + keyId_buf.byteLength);
-
-    var pki_payload_length = cert_buf.byteLength + keyHandle_buf.byteLength + keyId_buf
-        .byteLength;
-    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_header[0] = 0xE7;
-    pki_header[1] = pki_payload_length >> 8
-    pki_header[2] = pki_payload_length;
-
-    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-    pki_buffer.set(new Uint8Array(cert_buf), gtheaderbuffer.byteLength + 3);
-    pki_buffer.set(new Uint8Array(keyId_buf), gtheaderbuffer.byteLength + 3 + cert_buf
-        .byteLength);
-    pki_buffer.set(new Uint8Array(keyHandle_buf), gtheaderbuffer.byteLength + 3 + cert_buf
-        .byteLength +
-        keyId_buf.byteLength);
-
-    //console.log("Import cert command: " + bufToHex(pki_buffer));
-
-    // use randomly id as user id 
-    var userID = 'Kosv9fPtkDoh4Oz7Yq/pVgWHS8HhdlCto5cR0aBoVMw='
-    var id = Uint8Array.from(window.atob(userID), c => c.charCodeAt(0))
-    var createCredentialOptions = {
-        'challenge': challenge,
-        'rp': {
-            'name': 'GoTrustID Inc.',
-        },
-
-        'user': {
-            'id': id,
-            'name': sUserName,
-            'displayName': sUserName,
-        },
-
-        "authenticatorSelection": {
-            "requireResidentKey": false,
-            "userVerification": "required",
-            "authenticatorAttachment": "cross-platform"
-
-        },
-
-        'attestation': "none",
-        'pubKeyCredParams': [{
-                'type': 'public-key',
-                'alg': -7
-            },
-            {
-                'type': 'public-key',
-                'alg': -257
-            }
-        ]
-    }
-    var idList = [{
-        id: pki_buffer,
-        type: "public-key"
-    }];
-
-    createCredentialOptions.excludeCredentials = idList;
-    //console.log('Import cert command createCredentialOptions', createCredentialOptions);
-
-    return await new Promise(resolve => {
-        navigator.credentials.create({
-                'publicKey': createCredentialOptions
-            })
-            .then((newCredentialInfo) => {
-
-                //console.log('SUCCESS', newCredentialInfo)
-                //console.log('ClientDataJSON: ', bufferToString(newCredentialInfo.response.clientDataJSON))
-                let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
-                //console.log('AttestationObject: ', attestationObject)
-                let authData = parseAuthData(attestationObject.authData);
-                //console.log('AuthData: ', authData);
-                //console.log('CredID: ', bufToHex(authData.credID));
-                //console.log('AAGUID: ', bufToHex(authData.aaguid));
-                //console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
-                resolve(authData.credID);
-
-            })
-            .catch((error) => {
-                alert(error)
-                //console.log('FAIL', error)
-            })
-
-    });
-
-}
-
-function base64EncodeURL(byteArray) {
-    return btoa(Array.from(new Uint8Array(byteArray)).map(val => {
-        return String.fromCharCode(val);
-    }).join('')).replace(/\+/g, '-').replace(/\//g, '_').replace(/\=/g, '');
-};
-
+const OutputType_RAW =1;
+const OutputType_CSR =2;
 function toUTF8Array(str) {
 
     var utf8 = [];
@@ -1304,384 +120,56 @@ function hexStringToArrayBuffer(hexString) {
 }
 
 
-var parsePKIoverFIDOResponse = (buffer, cmd) => {
-
-
-    // check directly return 256 bytes which doesn't  include header and status code; 
-    //let testData = CBOR.decode(buffer);
-    ////console.log("check point1",testData)    
-    let status = undefined;
-    let signature = undefined;
-    let retries = undefined;
-
-    //meaning this is directly return signature
-    if (buffer.byteLength == 256) {
-        signature = new Uint8Array(buffer);
-        status = CTAP1_ERR_SUCCESS;
-    } else {
-        let GTheaderBuf = buffer.slice(0, 16);
-        if (String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf)) === GTheaderStr) {
-            buffer = buffer.slice(16);
-            let totalLenBuf = buffer.slice(0, 2);
-            let totalLen = readBE16(new Uint8Array(totalLenBuf));
-            buffer = buffer.slice(2);
-            let statusCodeBuf = buffer.slice(0, 1);
-            let statusCode = new Uint8Array(statusCodeBuf);
-            buffer = buffer.slice(1);
-            status = statusCode;
-
-            if (status[0] === CTAP1_ERR_SUCCESS) {
-                let responseDataBuf = buffer.slice(0, (totalLen - 1));
-                let responseData = CBOR.decode(responseDataBuf);
-                signature = responseData;
-            } else {
-                status = status[0];
-
-            }
-        } else {
-
-            signature = new Uint8Array(buffer);
-            status = CTAP1_ERR_SUCCESS;
-
-
-        }
-    }
-
-
-
-    return {
-        signature,
-        status
-    };
-}
-
-
-async function ReadCertByIndexFunction2(index) {
-
-    var pki_buffer = [];
-
-    var challenge = new Uint8Array(32);
-    window.crypto.getRandomValues(challenge);
-    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-    var pki_header = new Uint8Array(3);
-
-    //PKI Command
-    var command_buf = new Uint8Array(5);
-    command_buf[0] = 0xDF;
-    command_buf[1] = 0x02;
-    command_buf[2] = 0x00;
-    command_buf[3] = 0x01;
-    command_buf[4] = index;
-
-
-
-    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_buf.byteLength);
-    var pki_payload_length = command_buf.byteLength;
-    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_header[0] = CMD_ReadCertificate;
-    pki_header[1] = pki_payload_length >> 8
-    pki_header[2] = pki_payload_length;
-    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-    pki_buffer.set(new Uint8Array(command_buf), gtheaderbuffer.byteLength + 3);
-
-
-    //console.log("SignDataByIndex", bufToHex(pki_buffer));
-    var getAssertionChallenge = {
-        'challenge': challenge,
-        "userVerification": "discouraged",
-    }
-    var idList = [{
-        id: pki_buffer,
-        type: "public-key"
-    }];
-
-    getAssertionChallenge.allowCredentials = idList;
-    //console.log('SignDataByIndex', getAssertionChallenge)
-
-    return await new Promise(resolve => {
-        navigator.credentials.get({
-            'publicKey': getAssertionChallenge
-        }).then((read_cert_response) => {
-            resolve(read_cert_response.response.signature);
-
-        })
-    });
-}
-
-
-async function ReadCertByLableFunction2(strLable) {
-
-    var pki_buffer = [];
-
-    var challenge = new Uint8Array(32);
-    window.crypto.getRandomValues(challenge);
-    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-    var pki_header = new Uint8Array(3);
-
-    //PKI Command
-    var command_bufer = new Uint8Array(strLable.length + 4);
-    command_bufer[0] = 0xDF
-    command_bufer[1] = 0x01;
-    command_bufer[2] = strLable.length >> 8;
-    command_bufer[3] = strLable.length;
-    command_bufer.set(toUTF8Array(strLable), 4);
-
-
-
-    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_bufer.byteLength);
-    var pki_payload_length = command_bufer.byteLength;
-    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_header[0] = CMD_ReadCertificate;
-    pki_header[1] = pki_payload_length >> 8
-    pki_header[2] = pki_payload_length;
-    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-    pki_buffer.set(new Uint8Array(command_bufer), gtheaderbuffer.byteLength + 3);
-
-
-    //console.log("SignDataByIndex", bufToHex(pki_buffer));
-    var getAssertionChallenge = {
-        'challenge': challenge,
-        "userVerification": "discouraged",
-    }
-    var idList = [{
-        id: pki_buffer,
-        type: "public-key"
-    }];
-
-    getAssertionChallenge.allowCredentials = idList;
-    //console.log('SignDataByIndex', getAssertionChallenge)
-
-    return await new Promise(resolve => {
-        navigator.credentials.get({
-            'publicKey': getAssertionChallenge
-        }).then((read_cert_response) => {
-            resolve(read_cert_response.response.signature);
-
-        })
-    });
-}
-
-
-async function GetTokenInfo() {
-
-    var pki_buffer = [];
-
-    var challenge = new Uint8Array(32);
-    window.crypto.getRandomValues(challenge);
-    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-    var pki_header = new Uint8Array(3);
-    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3);
-    var pki_payload_length = 0;
-    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_header[0] = CMD_TokenInfo;
-    pki_header[1] = pki_payload_length >> 8
-    pki_header[2] = pki_payload_length;
-    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-
-
-    //console.log("GetTokenInfo", bufToHex(pki_buffer));
-    var getAssertionChallenge = {
-        'challenge': challenge,
-  
-        "userVerification": "discouraged",
-    }
-    var idList = [{
-        id: pki_buffer,
-        type: "public-key"
-    }];
-
-    getAssertionChallenge.allowCredentials = idList;
-    //console.log('GetTokenInfo', getAssertionChallenge)
-
-    return await new Promise(resolve => {
-        navigator.credentials.get({
-            'publicKey': getAssertionChallenge
-        }).then((read_cert_response) => {
-            resolve(read_cert_response.response.signature);
-
-        })
-    });
-
-
-}
-
-
-
-async function TestExtendsToReadSign(index, plain) {
-
-    var pki_buffer = [];
-    let certIndex = document.getElementById('use-index').certIndex.value;
-
-    var challenge = new Uint8Array(32);
-    window.crypto.getRandomValues(challenge);
-    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-    var pki_header = new Uint8Array(3);
-
-    //PKI Command
-    var command_buf = new Uint8Array(5);
-    command_buf[0] = 0xDF;
-    command_buf[1] = 0x02;
-    command_buf[2] = 0x00;
-    command_buf[3] = 0x01;
-    command_buf[4] = index;
-
-    var alg_buf = new Uint8Array(5);
-    alg_buf[0] = 0xDF;
-    alg_buf[1] = 0x03;
-    alg_buf[2] = 0x00;
-    alg_buf[3] = 0x01;
-    alg_buf[4] = 2;
-
-    var signDataBuf = new Uint8Array(4 + plain.byteLength);
-    signDataBuf[0] = 0xDF;
-    signDataBuf[1] = 0x06;
-    signDataBuf[2] = plain.length >> 8;
-    signDataBuf[3] = plain.length;
-    signDataBuf.set(plain, 4);
-
-
-    var pki_buffer = new Uint8Array(gtheaderbuffer.byteLength + 3 + command_buf.byteLength + alg_buf
-        .byteLength + signDataBuf.byteLength);
-    var pki_payload_length = command_buf.byteLength + alg_buf.byteLength + signDataBuf.byteLength;
-    pki_buffer.set(new Uint8Array(gtheaderbuffer), 0);
-    pki_header[0] = CMD_Sign;
-    pki_header[1] = pki_payload_length >> 8
-    pki_header[2] = pki_payload_length;
-    pki_buffer.set(new Uint8Array(pki_header), gtheaderbuffer.byteLength);
-    pki_buffer.set(new Uint8Array(command_buf), gtheaderbuffer.byteLength + 3);
-    pki_buffer.set(new Uint8Array(alg_buf), gtheaderbuffer.byteLength + 3 + command_buf.byteLength);
-    pki_buffer.set(new Uint8Array(signDataBuf), gtheaderbuffer.byteLength + 3 + command_buf
-        .byteLength + alg_buf.byteLength);
-
-    //console.log("SignDataByIndex", bufToHex(pki_buffer));
-    var getAssertionChallenge = {
-        'challenge': challenge,
-        'extensions': {
-            // An "entry key" identifying the "webauthnExample_foobar" extension, 
-            // whose value is a map with two input parameters:
-            "hmac-secret": {
-                'foo': 42,
-                'bar': "barfoo"
-            }
-        }
-
-    }
-    var idList = [{
-        id: pki_buffer,
-        type: "public-key"
-    }];
-
-    getAssertionChallenge.allowCredentials = idList;
-    //console.log('SignDataByIndex', getAssertionChallenge)
-
-
-    return await new Promise(resolve => {
-        navigator.credentials.get({
-                'publicKey': getAssertionChallenge
-            })
-            .then((newCredentialInfo) => {
-
-                //console.log('SUCCESS', newCredentialInfo);
-                //console.log("Sign", newCredentialInfo.response.signature);
-
-                const sign = newCredentialInfo.response.signature;
-                resolve(sign);
-            })
-            .catch((error) => {
-                alert(error)
-                //console.log('FAIL', error)
-            })
-
-    });
-
-
-}
-
-
-var parsePKIoverFIDOResponse2 = (buffer, cmd) => {
-
-
-
-    let status = undefined;
-    let signature = undefined;
-    let retries = undefined;
-
-
-
-    let GTheaderBuf = buffer.slice(0, 16);
-
-    if (String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf)) === GTheaderStr) {
-
-        buffer = buffer.slice(16);
-        let totalLenBuf = buffer.slice(0, 2);
-        let totalLen = readBE16(new Uint8Array(totalLenBuf));
-        buffer = buffer.slice(2);
-        let statusCodeBuf = buffer.slice(0, 1);
-        let statusCode = new Uint8Array(statusCodeBuf);
-        buffer = buffer.slice(1);
-        status = statusCode;
-
-        if (status[0] === CTAP1_ERR_SUCCESS) {
-            let responseDataBuf = buffer.slice(0, (totalLen - 1));
-            let responseData = CBOR.decode(responseDataBuf);
-
-            switch (cmd) {
-
-                case CMD_KeyAgreement:
-
-                    break;
-                case CMD_ReadCertificate:
-
-                    break;
-                case CMD_TokenInfo:
-                    let FW = ConverVersionFormat(responseData[1]);
-                    let SW = ConverVersionFormat(responseData[2]);
-                    let PINRetries = responseData[3];
-                    let NumOfCredential = responseData[4];
-                    let SN = ConverSNFormat(responseData[5]);
-                    if(responseData[6]!=undefined){
-                        let RN = ConverSNFormat(responseData[6]);
-                        let ECPublic = ConverSNFormat(responseData[7]);
-                        return {
-                            status, FW, SW, PINRetries, NumOfCredential, SN, RN, ECPublic
-                        };
-                    }else{
-                        return {
-                            status, FW, SW, PINRetries, NumOfCredential, SN
-                        };
-                    }
-                
-                    
-                    break;
-                case CMD_Sign:
-
-                    break;
-                case CMD_SignWithPIN:
-
-                    break;
-                case CMD_GenRsaKeyPair:
-
-                    break;
-                case CMD_ImportCertificate:
-
-                default:
-
-            }
-        }
-    } else if (buffer.byteLength == 256) {
-        signature = new Uint8Array(buffer);
-        status = CTAP1_ERR_SUCCESS;
-        return {
-            signature,
-            status
-        };
-    }
-
-}
+// var parsePKIoverFIDOResponse = (buffer, cmd) => {
+
+
+//     // check directly return 256 bytes which doesn't  include header and status code; 
+//     //let testData = CBOR.decode(buffer);
+//     ////console.log("check point1",testData)    
+//     let status = undefined;
+//     let signature = undefined;
+//     let retries = undefined;
+
+//     //meaning this is directly return signature
+//     if (buffer.byteLength == 256) {
+//         signature = new Uint8Array(buffer);
+//         status = CTAP1_ERR_SUCCESS;
+//     } else {
+//         let GTheaderBuf = buffer.slice(0, 16);
+//         if (String.fromCharCode.apply(null, new Uint8Array(GTheaderBuf)) === GTheaderStr) {
+//             buffer = buffer.slice(16);
+//             let totalLenBuf = buffer.slice(0, 2);
+//             let totalLen = readBE16(new Uint8Array(totalLenBuf));
+//             buffer = buffer.slice(2);
+//             let statusCodeBuf = buffer.slice(0, 1);
+//             let statusCode = new Uint8Array(statusCodeBuf);
+//             buffer = buffer.slice(1);
+//             status = statusCode;
+
+//             if (status[0] === CTAP1_ERR_SUCCESS) {
+//                 let responseDataBuf = buffer.slice(0, (totalLen - 1));
+//                 let responseData = CBOR.decode(responseDataBuf);
+//                 signature = responseData;
+//             } else {
+//                 status = status[0];
+
+//             }
+//         } else {
+
+//             signature = new Uint8Array(buffer);
+//             status = CTAP1_ERR_SUCCESS;
+
+
+//         }
+//     }
+
+
+
+//     return {
+//         signature,
+//         status
+//     };
+// }
 
 
 var ConverVersionFormat = (buffer) => {
@@ -1696,8 +184,6 @@ var ConverVersionFormat = (buffer) => {
 
 }
 
-
-
 var ConverSNFormat = (buffer) => {
 
     var result = "";
@@ -1710,7 +196,6 @@ var ConverSNFormat = (buffer) => {
     }
     return result;
 }
-
 
 /**
  * 修改使用者密碼。
@@ -1941,7 +426,6 @@ async function computingSessionKey(bOldPIN, bNewPIN, ecpointXY) {
     return {bExportECPublicKeyArray, bEcryptedOldPINHash, bEncryptedNEWPIN};
 }
 
-
 function checkPINFormatLevel(bNewPIN, pinLevel){
     var localLevel  = 0 ; 
     if(pinLevel == PIN_FORMAT_FREE)
@@ -1965,6 +449,7 @@ function checkPINFormatLevel(bNewPIN, pinLevel){
         return false;
     }
 }
+
 function isAllowedSymbol(value) {
 
     if((value>=33)&&(value<=47)){
@@ -3309,7 +1794,6 @@ function GTIDEM_SetName(sName){
     sUserName = sName;
 }
 
-
 /**
  * 不需要使用者密碼，就讀取特定位址的憑證。
  * 
@@ -3412,14 +1896,6 @@ function GTIDEM_SetName(sName){
 
 
 }
-
-
-
-
-
-
-
-
 
 /**
  * 
@@ -3587,8 +2063,6 @@ function GTIDEM_SetName(sName){
 
 }
 
-
-
 /**
  * Creates a new Uint8Array based on two different ArrayBuffers
  *
@@ -3603,3 +2077,135 @@ function GTIDEM_SetName(sName){
     tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
     return tmp.buffer;
   };
+
+
+  /**
+ * 產生 EC 金鑰對，並回傳 raw data
+ * @param {Uint8Array｜undefined} bSerialNumber 指定序號序號。若不指定載具序號，則可填入 undefined 或是空陣列
+ * @param {Uint8Array｜undefined} bKeyID 用來關聯金鑰對，若是不替換則填入 undefined 或是空陣列。若不使用 KeyID,則載具會產生預設的 KeyHandle。
+ * @param {Number} keytype 要使用的金鑰對
+ * @param {Number} outformat 指定回傳的資料格式，CSR 或是 RAW 
+ * @returns {GTIdemJs} 回傳結果的集合
+ */
+async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID, keytype, outformat) {
+
+
+ 
+    var challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
+ 
+    var sn_buf;
+    if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
+
+        sn_buf = new Uint8Array(0);
+    }else{
+        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+        sn_buf[0] = 0xDF;
+        sn_buf[1] = 0x20;
+        sn_buf[2] = bSerialNumber.byteLength >> 8;
+        sn_buf[3] = bSerialNumber.byteLength;
+        sn_buf.set(bSerialNumber, 4);
+    }
+    var keyid_buf;
+    if((bKeyID==undefined)||(bKeyID.byteLength==0)){
+ 
+         keyid_buf = new Uint8Array(0);
+     }else{
+         keyid_buf = new Uint8Array(4 + bKeyID.byteLength);
+         keyid_buf[0] = 0xDF;
+         keyid_buf[1] = 0x18;
+         keyid_buf[2] = bKeyID.byteLength >> 8;
+         keyid_buf[3] = bKeyID.byteLength;
+         keyid_buf.set(bKeyID, 4);
+     }
+
+     var keytype_buf;
+     keytype_buf = new Uint8Array(4 + 1);
+     keytype_buf[0] = 0xDF;
+     keytype_buf[1] = 0x23;
+     keytype_buf[2] = 0x00
+     keytype_buf[3] = 0x01;
+
+     var outputformat_buf;
+     outputformat_buf = new Uint8Array(4 + 1);
+     outputformat_buf[0] = 0xDF;
+     outputformat_buf[1] = 0x24;
+     outputformat_buf[2] = 0x00;
+     outputformat_buf[3] = 0x01;
+     outputformat_buf[4] = outformat;
+
+    var payloadLen = keyid_buf.byteLength+sn_buf.byteLength+keytype_buf.length+outputformat_buf.length
+ 
+    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+  
+    var pki_header = new Uint8Array(3);
+    pki_header[0] = CMD_GenKeyPair;
+    pki_header[1] = payloadLen>>8
+    pki_header[2] = payloadLen;
+ 
+    var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
+    pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+    pki_buffer = _appendBuffer(pki_buffer,keyid_buf);
+    pki_buffer = _appendBuffer(pki_buffer,keytype_buf);
+    pki_buffer = _appendBuffer(pki_buffer,outputformat_buf);
+ 
+ 
+ 
+    //console.log("Request_command: " + bufToHex(pki_buffer));
+ 
+    var webauth_request = {
+     'challenge': challenge,
+ 
+     'rp': {
+         'name': 'GoTrustID Inc.',
+     },
+ 
+     'user': {
+         'id': pki_buffer,
+         'name': sUserName,
+         'displayName': sUserName,
+     },
+ 
+     "authenticatorSelection": {
+         "userVerification": "required",
+         "requireResidentKey": false,
+         "authenticatorAttachment": "cross-platform"
+ 
+     },
+     'attestation': "direct",
+     'pubKeyCredParams': [{
+             'type': 'public-key',
+             'alg': -7
+         },
+         {
+             'type': 'public-key',
+             'alg': -257
+         }
+     ]
+ }
+    //console.log('webauth_request', webauth_request)
+ 
+    return await navigator.credentials.create({
+         'publicKey': webauth_request
+     }).then((fido) => {
+           
+        let attestationObject = CBOR.decode(fido.response.attestationObject);
+        let authData = parseAuthData(attestationObject.authData);
+        let credID = authData.credID;
+        let bPKIoverFIDOResponse= credID.buffer.slice(credID.byteOffset, credID.byteLength + credID.byteOffset);
+
+        let gtidem = new GTIdemJs();
+        gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse,CMD_GenRsaKeyPair);
+        // if(gtidem.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
+        //     gtidem.sn =token_sn;
+        // }
+
+        return gtidem;
+    }).catch((error) => {
+        ////console.log(error.name);
+        let gtidem = new GTIdemJs();
+        gtidem.ConvertWebError(error.name);
+        return gtidem;
+    });
+ }
+
