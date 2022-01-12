@@ -165,7 +165,7 @@
 
 
             GTIDEM_SetName('Peter Wang');
-            GTIDEM_GenECKeyPair(bToken_sn, bKeyID, ectype,OutputType_RAW).then((response) => {
+            GTIDEM_GenKeyPair(bToken_sn, bKeyID, ectype,OutputType_RAW).then((response) => {
 
 
                 if (response.statusCode == CTAP1_ERR_SUCCESS) {
