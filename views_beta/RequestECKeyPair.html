@@ -208,12 +208,27 @@
             }
             var bKeyHandle = hexStringToArrayBuffer(keyHandle);
 
-            let testSignCSR = Uint8Array.from(window.atob(testBigCertificate), c => c.charCodeAt(0));
+            var ecdsaalg = undefined;
+            var selecteItem = document.getElementById("ecdsaalg");
+            var index = selecteItem.selectedIndex ; 
+
+            if(index==0){
+                ecdsaalg= ALG_ECDSASHA1;
+
+            }else if(index==1){
+                ecdsaalg= ALG_ECDSASHA256;
+            }else if(index==2){
+                ecdsaalg= ALG_ECDSASHA384;
+            }else if(index==3){
+                ecdsaalg= ALG_ECDSASHA512;
+            }
+
+
 
             console.log('testSignCSR', testSignCSR);
             crypto.subtle.digest("SHA-256", new Uint8Array(testSignCSR)).then(function (signHashedDataPayload) {
                 console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
-                GTIDEM_SignDataByLabel(bKeyHandle, bToken_sn, ALG_RSA2048SHA256_PreHash, new Uint8Array(
+                GTIDEM_SignDataByLabel(bKeyHandle, bToken_sn, ecdsaalg, new Uint8Array(
                     signHashedDataPayload)).then((value) => {
                     if (value.statusCode == CTAP1_ERR_SUCCESS) {
                         var str = "";
