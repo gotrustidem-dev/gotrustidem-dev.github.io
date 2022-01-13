@@ -224,7 +224,7 @@
             }
 
 
-
+            let testSignCSR = Uint8Array.from(window.atob(testBigCertificate), c => c.charCodeAt(0));
             console.log('testSignCSR', testSignCSR);
             crypto.subtle.digest("SHA-256", new Uint8Array(testSignCSR)).then(function (signHashedDataPayload) {
                 console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
