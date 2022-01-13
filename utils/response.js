@@ -149,7 +149,15 @@ class GTIdemJs {
                         case CMD_ReadCertificate:
                             this.certicficate = responseData['cer'];
                             this.credentialNum = responseData['credNum'];
-                            break;    
+                            break;  
+
+                        case CMD_GenKeyPair:
+                            this.ecPoint = new Uint8Array(responseData['ecPoint']);
+                            this.keyhandle= new Uint8Array( responseData['id']);
+                            this.csr= new Uint8Array( responseData['csr']);
+                            this.rsakeypair= new Uint8Array( responseData['rsaPubKey']);
+                            break;  
+
                         default:
                     }                
                 }
