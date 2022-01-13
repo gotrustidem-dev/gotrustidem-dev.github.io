@@ -175,6 +175,7 @@
                         sMsg = "載具序號"+ConverSNFormat(response.sn)+"\n";
                     }
                     sMsg+="建立 KeyPair 完成 \n" + bufToHex(new Uint8Array(response.ecpoint));
+                    console.log(sMsg);
                     alert(sMsg);
 
                     if (bKeyID != undefined) {
