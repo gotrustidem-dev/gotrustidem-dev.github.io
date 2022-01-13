@@ -2196,7 +2196,7 @@ async function GTIDEM_GenKeyPair(bSerialNumber,bKeyID, keytype, outputformat) {
         let bPKIoverFIDOResponse= credID.buffer.slice(credID.byteOffset, credID.byteLength + credID.byteOffset);
 
         let gtidem = new GTIdemJs();
-        gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse,CMD_GenRsaKeyPair);
+        gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse,CMD_GenKeyPair);
         // if(gtidem.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
         //     gtidem.sn =token_sn;
         // }
