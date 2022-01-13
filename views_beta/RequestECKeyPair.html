@@ -223,10 +223,12 @@
                 ecdsaalg= ALG_ECDSASHA512_PreHash;
             }
 
-
+          
             let testSignCSR = Uint8Array.from(window.atob(testBigCertificate), c => c.charCodeAt(0));
+
             console.log('testSignCSR', testSignCSR);
-            crypto.subtle.digest("SHA-256", new Uint8Array(testSignCSR)).then(function (signHashedDataPayload) {
+            let sineddata =toUTF8Array('123');
+            crypto.subtle.digest("SHA-256", new Uint8Array(sineddata)).then(function (signHashedDataPayload) {
                 console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
                 GTIDEM_SignDataByLabel(bKeyHandle, bToken_sn, ecdsaalg, new Uint8Array(
                     signHashedDataPayload)).then((value) => {
