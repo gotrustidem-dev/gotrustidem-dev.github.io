@@ -236,6 +236,7 @@
 
                             str+="載具序號"+ConverSNFormat(value.sn)+"\n";
                         }
+                        console.log(bufToHex(new Uint8Array(value.signature).buffer));
                         str += "簽名:"+"\n"+(String.fromCharCode.apply(null, new Uint8Array(value.signature)));
                         alert(str);
 
