@@ -80,6 +80,11 @@
                                                 <option value="secp521r1" >secp521r1</option>
                                             </select>
                                             <br>
+                                            <label >Output type:</label>
+                                            <select id="outtype">
+                                                <option value="raw">RAW</option>
+                                                <option value="csr" >CSR</option>
+                                            </select>
                                             <br>
                                             <button class="btn btn-primary" action="submit"
                                                 style="width: 200px; height:34px;background-color: #008CBA;">GenerateEC KeyPair</button>
@@ -104,11 +109,7 @@
                                                 <option value="ecdsa_sha384" >ECDSA_SHA384</option>
                                                 <option value="ecdsa_sha521" >ECDSA_SHA521</option>
                                             </select>
-                                            <label >Output type:</label>
-                                            <select id="outtype">
-                                                <option value="raw">RAW</option>
-                                                <option value="csr" >CSR</option>
-                                            </select>
+                                            
 
                                                 <button class="btn btn-primary" action="submit"
                                                     style="width: 200px; height:34px;background-color: #008CBA;">Generate
