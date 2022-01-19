@@ -104,6 +104,11 @@
                                                 <option value="ecdsa_sha384" >ECDSA_SHA384</option>
                                                 <option value="ecdsa_sha521" >ECDSA_SHA521</option>
                                             </select>
+                                            <label >Output type:</label>
+                                            <select id="outtype">
+                                                <option value="raw">RAW</option>
+                                                <option value="csr" >CSR</option>
+                                            </select>
 
                                                 <button class="btn btn-primary" action="submit"
                                                     style="width: 200px; height:34px;background-color: #008CBA;">Generate
@@ -162,10 +167,19 @@
             }else if(index==2){
                 ectype= EC_secp521r1;
             }
+            var outtype = undefined;
+            selecteItem = document.getElementById("outtype");
+            var out_index = selecteItem.selectedIndex ;
+            if(out_index==0){
+                outtype= OutputType_RAW;
 
+            }else if(out_index==1){
+                outtype= OutputType_CSR;
+            }
+            
 
             GTIDEM_SetName('Peter Wang');
-            GTIDEM_GenKeyPair(bToken_sn, bKeyID, ectype,OutputType_RAW).then((response) => {
+            GTIDEM_GenKeyPair(bToken_sn, bKeyID, ectype,outtype).then((response) => {
 
 
                 if (response.statusCode == CTAP1_ERR_SUCCESS) {
@@ -174,7 +188,13 @@
                     if(response.sn!=undefined){
                         sMsg = "載具序號"+ConverSNFormat(response.sn)+"\n";
                     }
-                    sMsg+="建立 KeyPair 完成 \n" + bufToHex(new Uint8Array(response.ecpoint));
+                    if(outtype==OutputType_RAW){
+                        sMsg+="建立 KeyPair 完成 \n" + bufToHex(new Uint8Array(response.ecpoint));
+                    }else{
+                        sMsg+="建立 KeyPair 完成 \n" + bufToHex(new Uint8Array(response.csr));
+                    }
+                    
+
                     console.log(sMsg);
                     alert(sMsg);
 
