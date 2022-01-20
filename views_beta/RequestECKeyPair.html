@@ -74,10 +74,11 @@
                                         <form style="text-align: center;" id="form_requestcsr_btn"
                                             onsubmit="return false">
                                             <label >EC Type:</label>
-                                            <select id="ectype">
+                                            <select id="keytype">
                                                 <option value="secp256r1">secp256r1</option>
                                                 <option value="secp384r1" >secp384r1</option>
                                                 <option value="secp521r1" >secp521r1</option>
+                                                <option value="rsa2048" >rsa2048</option>
                                             </select>
                                             <br>
                                             <label >Output type:</label>
@@ -156,17 +157,20 @@
                 bKeyID = toUTF8Array(key_id);
             }
 
-            var ectype = undefined;
-            var selecteItem = document.getElementById("ectype");
+            var keytype = undefined;
+            var selecteItem = document.getElementById("keytype");
             var index = selecteItem.selectedIndex ; 
 
             if(index==0){
-                ectype= EC_secp256r1;
+                keytype= EC_secp256r1;
 
             }else if(index==1){
-                ectype= EC_secp384r1;
+                keytype= EC_secp384r1;
             }else if(index==2){
-                ectype= EC_secp521r1;
+                keytype= EC_secp521r1;
+            }else if(index==3){
+                keytype= RSA_2048;
+
             }
             var outtype = undefined;
             selecteItem = document.getElementById("outtype");
@@ -180,7 +184,7 @@
             
 
             GTIDEM_SetName('Peter Wang');
-            GTIDEM_GenKeyPair(bToken_sn, bKeyID, ectype,outtype).then((response) => {
+            GTIDEM_GenKeyPair(bToken_sn, bKeyID, keytype,outtype).then((response) => {
 
 
                 if (response.statusCode == CTAP1_ERR_SUCCESS) {
