@@ -108,7 +108,11 @@
                                                 <option value="ecdsa_sha">ECDSA_SHA</option>
                                                 <option value="ecdsa_sha256" >ECDSA_SHA256</option>
                                                 <option value="ecdsa_sha384" >ECDSA_SHA384</option>
-                                                <option value="ecdsa_sha521" >ECDSA_SHA521</option>
+                                                <option value="ecdsa_sha521" >ECDSA_SHA512</option>
+                                                <option value="rsa_sha1_prehash" >RSA_SHA1</option>
+                                                <option value="rsa_sha256_prehash" >RSA_SHA256</option>
+                                                <option value="rsa_sha384_prehash" >RSA_SHA384</option>
+                                                <option value="rsa_sha512_prehash" >RSA_SHA512</option>
                                             </select>
                                             
 
@@ -238,14 +242,21 @@
             var index = selecteItem.selectedIndex ; 
 
             if(index==0){
-                ecdsaalg= ALG_ECDSASHA1_PreHash;
-
+                ecdsaalg= ALG_ECDSASHA1;
             }else if(index==1){
-                ecdsaalg= ALG_ECDSASHA256_PreHash;
+                ecdsaalg= ALG_ECDSASHA256;
             }else if(index==2){
-                ecdsaalg= ALG_ECDSASHA384_PreHash;
+                ecdsaalg= ALG_ECDSASHA384;
             }else if(index==3){
-                ecdsaalg= ALG_ECDSASHA512_PreHash;
+                ecdsaalg= ALG_ECDSASHA512;
+            }else if(index==4){
+                ecdsaalg= ALG_RSA2048SHA1;
+            }else if(index==5){
+                ecdsaalg= ALG_RSA2048SHA256;
+            }else if(index==6){
+                ecdsaalg= ALG_RSA2048SHA384;
+            }else if(index==7){
+                ecdsaalg= ALG_RSA2048SHA512;
             }
 
           
