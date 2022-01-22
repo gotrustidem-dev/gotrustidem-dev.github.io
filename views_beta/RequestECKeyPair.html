@@ -198,7 +198,8 @@
                         sMsg = "載具序號"+ConverSNFormat(response.sn)+"\n";
                     }
                     if(outtype==OutputType_RAW){
-                        sMsg+="建立 KeyPair 完成 \n" + bufToHex(new Uint8Array(response.ecpoint));
+                        sMsg+="建立 KeyPair 完成 \n" + bufToHex(new Uint8Array(response.ecpoint))+ bufToHex(new Uint8Array(response.rsakeypair));
+ 
                     }else{
                         sMsg+="建立 KeyPair 完成 \n" + bufToHex(new Uint8Array(response.csr));
                     }
