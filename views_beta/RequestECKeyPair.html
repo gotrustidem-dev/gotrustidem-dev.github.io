@@ -317,8 +317,8 @@
             } else {
                 bKeyID = bKeyHandle;
             }
-
-            GTIDEM_ImportCertificate(bToken_sn, bKeyHandle, bKeyID, bHexCert, undefined).then((response) => {
+            let signHashedDataPayload =toUTF8Array('123');
+            GTIDEM_ImportCertificate(bToken_sn, bKeyHandle, bKeyID, bHexCert, signHashedDataPayload).then((response) => {
                 if (response.statusCode == CTAP1_ERR_SUCCESS) {
                     var msg = "匯入憑證完成\n";
                     if(response.sn!=undefined){
