@@ -136,11 +136,18 @@ var showFIDOErrorMessage = (gtidem) => {
             break;    
         case CTAP2_ERR_VENDOR_ERROR_PIN_REUSE:
             errorMsg += '無法變更為預設密碼'; 
+            break;
+        case CTAP2_ERR_UNSUPPORTED_ALGORITHM:
+            errorMsg += '不支援的演算法'; 
+            break;        
+        case CTAP2_VENDOR_ERROR_LENGTH:
+            errorMsg += '資料長度錯誤'; 
             break;    
             
         case WEB_ERR_UserCancelorTimeout:
             errorMsg += '操作取消';
             break;
+            
         case WEB_ERR_OperationAbort:
             errorMsg += '操作拒絕';
             break;
@@ -162,6 +169,7 @@ var showFIDOErrorMessage = (gtidem) => {
         case SETTING_ERR_USERPIN_LEVEL:
             errorMsg += '新密碼複雜度不合';
            break;   
+           
         default:
             errorMsg += '不能判別的錯誤。';
             break;
