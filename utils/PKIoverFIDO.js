@@ -19,7 +19,7 @@ const CMD_REQUESTCSR = 0xEA;
 const CMD_DELEE_CERT= 0xEB;
 const CMD_CLEAR_TOKEN = 0xEC;
 const CMD_INIT_TOKEN = 0xED;
-
+const CMD_GenKeyPair = 0xEE;
 
 
 var g_encryptedPIN;
