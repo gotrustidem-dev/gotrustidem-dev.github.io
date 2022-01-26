@@ -319,7 +319,7 @@
             }
             let sineddata =toUTF8Array('123');
             crypto.subtle.digest("SHA-256", new Uint8Array(sineddata)).then(function (signHashedDataPayload) {
-            GTIDEM_ImportCertificate(bToken_sn, bKeyHandle, bKeyID, bHexCert, signHashedDataPayload).then((response) => {
+            GTIDEM_ImportCertificate(bToken_sn, bKeyHandle, bKeyID, bHexCert, new Uint8Array(signHashedDataPayload)).then((response) => {
                 if (response.statusCode == CTAP1_ERR_SUCCESS) {
                     var msg = "匯入憑證完成\n";
                     if(response.sn!=undefined){
