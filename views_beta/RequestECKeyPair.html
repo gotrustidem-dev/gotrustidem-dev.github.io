@@ -326,6 +326,7 @@
                         msg += "載具序號"+ConverSNFormat(response.sn)+"\n";
                     }
                     if (response.signature != undefined) {
+                        console.log(bufToHex(new Uint8Array(response.signature).buffer));
                         msg +=  "\n Signature:\n" +btoa(String.fromCharCode.apply(null, new Uint8Array(response.signature)));
                        
                     } 
