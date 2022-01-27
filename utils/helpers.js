@@ -126,4 +126,9 @@ var preformatGetAssertReq = (getAssert) => {
 
     return getAssert
 }
- 
+
+function base64EncodeURL(byteArray) {
+    return btoa(Array.from(new Uint8Array(byteArray)).map(val => {
+        return String.fromCharCode(val);
+    }).join('')).replace(/\+/g, '-').replace(/\//g, '_').replace(/\=/g, '');
+};
