@@ -45,93 +45,20 @@
                                     <!--PC side-->
                                     <td style="width: 385px;">
 
-                                        <form style="text-align: center;" id="form_so_pin" onsubmit="return false">
+                                        <form style="text-align: center;" id="form_reset_key" onsubmit="return false">
                                             <p>
-                                                <label id="label_so_pin"> Old SO PIN:</label><br>
-                                                <input type="text" name="so_pin" style="width: 342px; height:41px">
+                                                <label id="label_reset_key"> Factory Reset Key:</label><br>
+                                                <input type="text" name="reset_key" style="width: 342px; height:41px">
                                             </p>
                                         </form>
 
-                                        <form style="text-align: center;" id="form_new_so_pin" onsubmit="return false">
-                                            <p>
-                                                <label id="label_new_so_pin"> New SO PIN:</label><br>
-                                                <input type="text" name="new_so_pin" style="width: 342px; height:41px">
-                                            </p>
-                                        </form>
-
-                                        <form style="text-align: center;" id="form_new_user_pin"
-                                            onsubmit="return false">
-                                            <p>
-                                                <label id="label_new_user_pin"> New User PIN:</label><br>
-                                                <input type="text" name="new_user_pin"
-                                                    style="width: 342px; height:41px">
-                                            </p>
-                                        </form>
-                                        <input type="checkbox" id="rpidfilter_checkbox" name="rpidfilter_checkbox" value="rpid_filter" onclick="disableRPIDFilter()"> Enable RPID filter<br>
-                                        <form style="text-align: center; display: none" id="form_allow_domain"
-                                            onsubmit="return false">                                
-                                            <p>
-                                                <label id="label_allow_domain"> Allow host domain :</label><br>
-                                                <input type="text" name="allowrpid1" style="width: 342px; height:41px"
-                                                    value="*.gotrustid.com"><br>
-                                                <input type="text" name="allowrpid2" style="width: 342px; height:41px"
-                                                    value="gotrustid.com.tw"><br>
-                                                <input type="text" name="allowrpid3" style="width: 342px; height:41px"
-                                                    value="gotrustidem-dev.github.io"><br>
-                                                <input type="text" name="allowrpid4" style="width: 342px; height:41px"
-                                                    value="ctbc.com"><br>
-                                                <input type="text" name="allowrpid5" style="width: 342px; height:41px"
-                                                    value="ctbc123.com"><br>
-                                                <input type="text" name="allowrpid6" style="width: 342px; height:41px"
-                                                    value="test.ctbc.com"><br>
-                                            </p>
-                                        </form>
-                                        <form style="text-align: center;" id="form_pin_params" onsubmit="return false">
-                                            <input type="checkbox" id="pinexpired_checkbox" name="pinexpired_checkbox" value="pin_expired"> Set PIN Expired<br>
-                                            <p>
-                                                <label id="label_pinretry">PIN Retry Times(1~15):</label>
-                                                <input type="number" name="token_pin_retry" style="width: 342px; height:41px"><br>
-                                                <label id="label_pinminlen">PIN MIN LEN(4~64): </label>
-                                                <input type="number" name="token_pin_min_len" style="width: 342px; height:41px">
-                                            </p>
-                                        </form>
-
-                                        <form style="text-align: left;" id="form_pin_format" onsubmit="return false">
-                                            <fieldset>    
-                                            英文<br>
-                                            <input  type="radio" id="radio_eng_ask" name="eng" value="eng_ask" onclick="clickEngAsk()"  checked>必要
-                                            <input  type="radio" id="radio_eng_allow" name="eng" value="eng_allow" onclick="clickEngAllow()">特殊
-                                            <input  type="radio" id="radio_eng_no"  name="eng" value="eng_no" onclick="clickEngNo()">禁止<br>
-                                         
-                                                大寫英文<br>
-                                                <input  type="radio" id="radio_highcase_ask" name="highcase" value="highcase_ask">必要
-                                                <input  type="radio" id="radio_highcase_allow" name="highcase" value="highcase_allow" checked>允許
-                                                <input  type="radio" id="radio_highcase_no" name="highcase" value="highcase_no" disabled>禁止<br>
-
-                                                小寫英文<br>
-                                                <input  type="radio" id="radio_lowcase_ask" name="lowcase" value="lowcase_ask" >必要
-                                                <input  type="radio" id="radio_lowcase_allow" name="lowcase" value="lowcase_allow" checked>允許
-                                                <input  type="radio" id="radio_lowcase_no" name="lowcase" value="lowcase_no" disabled>禁止<br>
-
-                                         
-                                            數字<br>
-                                            <input  type="radio" id="radio_number_ask" name="number" value="number_ask" checked>必要
-                                            <input  type="radio" id="radio_number_allow" name="number" value="number_allow">允許
-                                            <input  type="radio" id="radio_number_no" name="number" value="number_no">禁止<br>
-
-                                            符號<br>
-                                            <input  type="radio" id="radio_symbol_ask" name="symbol" value="symbol_ask">必要
-                                            <input  type="radio" id="radio_symbol_allow" name="symbol" value="symbol_allow" checked>允許
-                                            <input  type="radio" id="radio_symbol_no" name="symbol" value="symbol_no">禁止<br>
                                         
-                                        </fieldset>
-                                        </form>
 
                                         <p>
-                                        <form style="text-align: center;" id="form_init_btn"
+                                        <form style="text-align: center;" id="form_reset_btn"
                                             onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
-                                                style="width: 200px; height:34px;background-color: #008CBA;">Init
+                                                style="width: 200px; height:34px;background-color: #008CBA;">Reset
                                                 Token</button>
                                         </form>
                                         </p>
@@ -177,81 +104,39 @@
 
         });
 
-        document.getElementById('form_init_btn').addEventListener('submit', function (event) {
+        document.getElementById('form_reset_btn').addEventListener('submit', function (event) {
 
             event.preventDefault();
             let bRandom = [];
 
             let random = document.getElementById('label_random_number').textContent;
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
-            let so_pin = document.getElementById('form_so_pin').so_pin.value;
-            let new_so_pin = document.getElementById('form_new_so_pin').new_so_pin.value;
-            let new_user_pin = document.getElementById('form_new_user_pin').new_user_pin.value;
-            let form_allow_domain = document.getElementById('form_allow_domain');
+            let reset_key = document.getElementById('form_reset_key').reset_key.value;
             var bToken_sn = undefined;
+            var bReset_key = undefined;
             if (token_sn.length != 0) {
                 bToken_sn = hexStringToArrayBuffer(token_sn);
             }
 
-
+            bReset_key = hexStringToArrayBuffer(reset_key);
             bRandom = hexStringToArrayBuffer(random);
 
-            var AllowHostDomains =  [];
-
-
-            //AllowHostDomains = ["*.gotrustid.com","gotrustid.com.tw", "gotrustidem-dev.github.io","ctbc.com","ctbc123.com","test.ctbc.com"];
-            if(form_allow_domain.style.display !="none"){
-                let rpid1 = form_allow_domain.allowrpid1.value;
-                let rpid2 = form_allow_domain.allowrpid2.value;
-                let rpid3 = form_allow_domain.allowrpid3.value;
-                let rpid4 = form_allow_domain.allowrpid4.value;
-                let rpid5 = form_allow_domain.allowrpid5.value;
-                let rpid6 = form_allow_domain.allowrpid6.value;
-                AllowHostDomains.push(rpid1);
-                AllowHostDomains.push(rpid2);
-                AllowHostDomains.push(rpid3);
-                AllowHostDomains.push(rpid4);
-                AllowHostDomains.push(rpid5);
-                AllowHostDomains.push(rpid6);
-            }
             
             console.log(token_sn);
-            console.log(so_pin);
+            console.log(bReset_key);
             console.log(new_so_pin);
-            console.log(new_user_pin);
-            console.log(AllowHostDomains);
-
-            var bSOPINArray = new Uint8Array(so_pin.length);
-            bSOPINArray.set(toUTF8Array(so_pin), 0);
-
-            var bNewSOPINArray = new Uint8Array(new_so_pin.length);
-            bNewSOPINArray.set(toUTF8Array(new_so_pin), 0);
-
-            var bNewUserPINArray = new Uint8Array(new_user_pin.length);
-            bNewUserPINArray.set(toUTF8Array(new_user_pin), 0);
-
 
    
 
 
-            let isPINExpired = document.getElementById('form_pin_params').pinexpired_checkbox.checked;
 
-            let PINMaxRetry = document.getElementById('form_pin_params').token_pin_retry.value;
-          
-            let sPinMinLen= document.getElementById('form_pin_params').token_pin_min_len.value;
-       
-            
-            let PINLevel=0;
-            PINLevel = getPINLevelParam();
-
-
-            var para = buildInitToken(bSOPINArray, bRandom, bToken_sn, bNewSOPINArray, bNewUserPINArray,AllowHostDomains,isPINExpired,PINMaxRetry,sPinMinLen, PINLevel)
+            var para = buildResetResponse(bReset_key, bRandom, bToken_sn)
                 .then(result => {
-                    GTIDEM_InitToken(bToken_sn, result.bEncryptedInitData, result.bHashMacofInitData).then(
+                    GTIDEM_FactoryResetToken(bToken_sn, result.trcr).then(
                         response => {
 
                             if (response.statusCode == CTAP1_ERR_SUCCESS) {
-                                var str = '載具初始化完成';
+                                var str = '載具已回出廠狀態';
                                 if (response.pinRetry != undefined) {
                                     str += '\n剩餘次數為 ' + response.pinRetry;
                                 }
@@ -269,16 +154,11 @@
                 });
         });
 
-        async function buildInitToken(bSOPIN, bRandom, bToken_sn, bNewSOPin, bNewUserPIN, AllowHostDomains, isPinExpired, sPinRetry, sPinMinLen, sPinLevel) {
-            return await prepareInitToken(bSOPIN, bRandom, bToken_sn, bNewSOPin, bNewUserPIN, AllowHostDomains, isPinExpired, sPinRetry, sPinMinLen, sPinLevel);
+        async function buildResetResponse(bReset_key, bRandom, bToken_sn) {
+            return await prepareResetResponse(bReset_key, bRandom, bToken_sn);
         }
 
-        async function buildUnlockToken(bSOPIN, bRandom, bToken_sn, bNewUserPIN) {
-            return await prepareUnloukPIN(bSOPIN, bRandom, bToken_sn, bNewUserPIN);
-        }
-
-
-        async function prepareInitToken(bSOPIN, bRandom, bToken_sn, bNewSOPin, bNewUserPIN, AllowHostDomains, isPinExpired, sPinRetry, sPinMinLen, sPinLevel) {
+        async function prepareResetResponse(bReset_key, bRandom, bToken_sn) {
 
             var sessionKey;
             var iv;
@@ -288,39 +168,15 @@
             var bHashMacofInitData;
 
 
-            sessionKey = await computingSessionKey(bSOPIN, bRandom);
+            sessionKey = await computingSessionKey(bReset_key, bRandom);
             console.log("INIT_SESSION_KEY: "+bufToHex(sessionKey));
+
             iv = await computingIV(bToken_sn);
             console.log("IV: "+bufToHex(iv));
-            macKey = await computingMacKey(bSOPIN, bRandom);
-            console.log("INIT_MAC_KEY: "+bufToHex(macKey));
-            var bHashedDomain;
-            var initData={};
 
-            initData.soPIN = bNewSOPin
-            initData.userPIN =bNewUserPIN;
+            var result={};
 
-            if(AllowHostDomains.length != 0){
-           
-                bHashedDomain = await convertDomainList2Hash(AllowHostDomains);
-                initData.allowedRPID = bHashedDomain;
-            }else{
-                initData.allowedRPID = new Uint8Array(0);
-            }
-            initData.pinExpired = isPinExpired;
-        
-            initData.pinLevel = new Uint8Array([sPinLevel]);
-
-            if(sPinRetry!=""){
-
-                initData.pinRetry = new Uint8Array([sPinRetry]);
-            }
-
-            if(sPinMinLen!=""){
-
-                initData.pinMinLen = new Uint8Array([sPinMinLen]);
-            }
-
+            
             //build init data with cbor 
             var encodedInitData = new Uint8Array(CBOR.encode(initData));
             console.log(encodedInitData);
