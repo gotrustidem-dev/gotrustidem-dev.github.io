@@ -20,7 +20,7 @@ const CMD_DELEE_CERT= 0xEB;
 const CMD_CLEAR_TOKEN = 0xEC;
 const CMD_INIT_TOKEN = 0xED;
 const CMD_GenKeyPair = 0xEE;
-
+const CMD_FactoryReset = 0xEF;
 
 
 var g_encryptedPIN;
@@ -2087,10 +2087,10 @@ function GTIDEM_SetName(sName){
 
 
   /**
- * 產生 EC 金鑰對，並回傳 raw data
+ * 產生非對稱金鑰對，依照要求回傳 RAW 或是 CSR
  * @param {Uint8Array｜undefined} bSerialNumber 指定序號序號。若不指定載具序號，則可填入 undefined 或是空陣列
  * @param {Uint8Array｜undefined} bKeyID 用來關聯金鑰對，若是不替換則填入 undefined 或是空陣列。若不使用 KeyID,則載具會產生預設的 KeyHandle。
- * @param {Number} keytype 要使用的金鑰對
+ * @param {Number} keytype 金鑰類型
  * @param {Number} outputformat 指定回傳的資料格式，CSR 或是 RAW 
  * @returns {GTIdemJs} 回傳結果的集合
  */
@@ -2217,3 +2217,80 @@ async function GTIDEM_GenKeyPair(bSerialNumber,bKeyID, keytype, outputformat) {
     });
  }
 
+
+/**
+ * 
+ * @param {Uint8Array} bSerialNumber 指定序號序號。若不指定載具序號，則可填入 undefined 或是空陣列
+ * @param {Uint8Array} encrypted_InitData 
+ * @param {Uint8Array} HmacValueOfInitData 
+ * @returns 
+ */
+ async function GTIDEM_FactoryResetToken(bSerialNumber, bEncChallenge) {
+
+    var pki_buffer = [];
+    var sn_buf;
+    if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
+        sn_buf = new Uint8Array(0);
+    }else{
+        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+        sn_buf[0] = 0xDF;
+        sn_buf[1] = 0x20;
+        sn_buf[2] = bSerialNumber.byteLength >> 8;
+        sn_buf[3] = bSerialNumber.byteLength;
+        sn_buf.set(bSerialNumber, 4);
+    }
+    
+   var challenge = new Uint8Array(32);
+   window.crypto.getRandomValues(challenge);
+
+   var bEncChallengeBuf = new Uint8Array(4 + bEncChallenge.byteLength);
+   bEncChallengeBuf[0] = 0xDF;
+   bEncChallengeBuf[1] = 0x25;
+   bEncChallengeBuf[2] = bEncChallenge.byteLength >> 8;
+   bEncChallengeBuf[3] = bEncChallenge.byteLength;
+   bEncChallengeBuf.set(new Uint8Array(bEncChallenge), 4);
+
+  
+   var payloadLen = sn_buf.byteLength+bEncChallengeBuf.byteLength;
+
+   var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+ 
+   var pki_header = new Uint8Array(3);
+   pki_header[0] = CMD_FactoryReset;
+   pki_header[1] = payloadLen>>8
+   pki_header[2] = payloadLen;
+
+   var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
+   pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+   pki_buffer = _appendBuffer(pki_buffer,bEncChallengeBuf);
+
+
+
+   //console.log("Token_init_command: " + bufToHex(pki_buffer));
+
+   var getAssertionChallenge = {
+       'challenge': challenge,
+       "userVerification": "discouraged"
+   }
+   var idList = [{
+       id: pki_buffer,
+       type: "public-key"
+   }];
+
+   getAssertionChallenge.allowCredentials = idList;
+
+   return await navigator.credentials.get({
+       'publicKey': getAssertionChallenge
+   }).then((fido) => {
+           
+        let gtidem = new GTIdemJs();
+        gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_CHANGE_PIN);
+        return gtidem;
+    }).catch((error) => {
+        ////console.log(error.name);
+        let gtidem = new GTIdemJs();
+        gtidem.ConvertWebError(error.name);
+        return gtidem;
+    });
+
+}
