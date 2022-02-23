@@ -209,7 +209,7 @@
                 case "12":selectedAlg = ALG_RSA2048SHA512_PSS; break;
             }
 
-
+            console.log(' SignData : \n', bufToHex(signDataPayload));
            
             GTIDEM_SignDataByLabel(bLabel, bToken_sn,selectedAlg, signDataPayload).then((value) => {
                     if(value.statusCode==CTAP1_ERR_SUCCESS){
