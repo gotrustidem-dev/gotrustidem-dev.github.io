@@ -236,7 +236,7 @@
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             let index = document.getElementById('form_index').certIndex.value;
             let isUseHashedData2Sign = document.getElementById('use_hashdata_label');
-            var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
+            var signDataPayload = Uint8Array.from(window.atob(plain), c => c.charCodeAt(0));
 
             var bToken_sn = undefined;
             if(token_sn.length!=0){
