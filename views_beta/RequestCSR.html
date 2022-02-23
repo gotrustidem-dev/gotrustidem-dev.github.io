@@ -183,10 +183,13 @@
             }
     
 
-            crypto.subtle.digest("SHA-256",bHexCert).then(function (signHashedDataPayload) {
+            //crypto.subtle.digest("SHA-256",bHexCert).then(function (signHashedDataPayload) {
                 console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
-                GTIDEM_ImportCertificate(bToken_sn,bKeyHandle,bKeyID,bHexCert,new Uint8Array(signHashedDataPayload)).then((response) => {
-                if(response.statusCode==CTAP1_ERR_SUCCESS){  
+                //GTIDEM_ImportCertificate(bToken_sn,bKeyHandle,bKeyID,bHexCert,new Uint8Array(signHashedDataPayload)).then((response) => {
+                GTIDEM_ImportCertificate(bToken_sn,bKeyHandle,bKeyID,bHexCert,undefined).then((response) => {
+               
+                    
+                    if(response.statusCode==CTAP1_ERR_SUCCESS){  
                     var msg = "匯入憑證完成\n";
                     if(response.sn!=undefined){
                         msg += "載具序號"+ConverSNFormat(response.sn)+"\n";
@@ -205,7 +208,7 @@
                     alert(error)
                     console.log('FAIL', error)
                 });
-            });
+            //});
         })
 
     </script>
