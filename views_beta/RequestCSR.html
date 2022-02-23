@@ -184,7 +184,7 @@
     
 
             //crypto.subtle.digest("SHA-256",bHexCert).then(function (signHashedDataPayload) {
-                console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
+                //console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
                 //GTIDEM_ImportCertificate(bToken_sn,bKeyHandle,bKeyID,bHexCert,new Uint8Array(signHashedDataPayload)).then((response) => {
                 GTIDEM_ImportCertificate(bToken_sn,bKeyHandle,bKeyID,bHexCert,undefined).then((response) => {
                
