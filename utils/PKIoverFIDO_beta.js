@@ -1462,6 +1462,8 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, bPlain)
     command_bufer[3] = bLabel.byteLength;
     command_bufer.set(bLabel, 4);
 
+    var alg_buf;
+    var signDataBuf;
 
     var alg_buf = new Uint8Array(5);
     alg_buf[0] = 0xDF;
@@ -1470,8 +1472,7 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, bPlain)
     alg_buf[3] = 0x01;
     alg_buf[4] = alg_number;
 
-    var alg_buf;
-    var signDataBuf;
+
 
 
     // if(alg_number==ALG_RSA2048SHA256){
@@ -1496,15 +1497,15 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, bPlain)
 
     // }else{
 
-        alg_buf = new Uint8Array(5);
-        alg_buf[0] = 0xDF;
-        alg_buf[1] = 0x03;
-        alg_buf[2] = 0x00;
-        alg_buf[3] = 0x01;
-        alg_buf[4] = alg_number;
+        // alg_buf = new Uint8Array(5);
+        // alg_buf[0] = 0xDF;
+        // alg_buf[1] = 0x03;
+        // alg_buf[2] = 0x00;
+        // alg_buf[3] = 0x01;
+        // alg_buf[4] = alg_number;
     
 
-        signDataBuf = new Uint8Array(4 + bPlain.byteLength);
+    var signDataBuf = new Uint8Array(4 + bPlain.byteLength);
         signDataBuf[0] = 0xDF;
         signDataBuf[1] = 0x06;
         signDataBuf[2] = bPlain.length >> 8;
