@@ -1453,29 +1453,6 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, bPlain)
     }
 
 
-    //var token_sn = undefined;
-    // if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
-    //     var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
-    //         return fido;
-    //    });
-    //    if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
-    //        return gtidem;
-    //    }else{
-    //        token_sn = new Uint8Array(gtidem.sn);
-    //    }
-    // }else{
-    //     token_sn =  new Uint8Array(bSerialNumber);
-    // }
-
-    // sn_buf = new Uint8Array(4 + token_sn.byteLength);
-    // sn_buf[0] = 0xDF;
-    // sn_buf[1] = 0x20;
-    // sn_buf[2] = token_sn.byteLength >> 8;
-    // sn_buf[3] = token_sn.byteLength;
-    // sn_buf.set(token_sn, 4);
-
-
-
     //PKI Command
 
     var command_bufer = new Uint8Array(bLabel.byteLength + 4);
@@ -1495,27 +1472,29 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, bPlain)
 
     var alg_buf;
     var signDataBuf;
-    if(alg_number==ALG_RSA2048SHA256){
-        await crypto.subtle.digest("SHA-256", new Uint8Array(bPlain)).then(function (signHashedDataPayload) {
 
-            alg_buf = new Uint8Array(5);
-            alg_buf[0] = 0xDF;
-            alg_buf[1] = 0x03;
-            alg_buf[2] = 0x00;
-            alg_buf[3] = 0x01;
-            alg_buf[4] = ALG_RSA2048SHA256_PreHash;
 
-            var bHashData = new Uint8Array(signHashedDataPayload)
-            signDataBuf = new Uint8Array(4 + bHashData.byteLength);
-            signDataBuf[0] = 0xDF;
-            signDataBuf[1] = 0x06;
-            signDataBuf[2] = bHashData.length >> 8;
-            signDataBuf[3] = bHashData.length;
-            signDataBuf.set(bHashData, 4);
-            return;
-        });
+    // if(alg_number==ALG_RSA2048SHA256){
+    //     await crypto.subtle.digest("SHA-256", new Uint8Array(bPlain)).then(function (signHashedDataPayload) {
 
-    }else{
+    //         alg_buf = new Uint8Array(5);
+    //         alg_buf[0] = 0xDF;
+    //         alg_buf[1] = 0x03;
+    //         alg_buf[2] = 0x00;
+    //         alg_buf[3] = 0x01;
+    //         alg_buf[4] = ALG_RSA2048SHA256_PreHash;
+
+    //         var bHashData = new Uint8Array(signHashedDataPayload)
+    //         signDataBuf = new Uint8Array(4 + bHashData.byteLength);
+    //         signDataBuf[0] = 0xDF;
+    //         signDataBuf[1] = 0x06;
+    //         signDataBuf[2] = bHashData.length >> 8;
+    //         signDataBuf[3] = bHashData.length;
+    //         signDataBuf.set(bHashData, 4);
+    //         return;
+    //     });
+
+    // }else{
 
         alg_buf = new Uint8Array(5);
         alg_buf[0] = 0xDF;
@@ -1531,7 +1510,7 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, bPlain)
         signDataBuf[2] = bPlain.length >> 8;
         signDataBuf[3] = bPlain.length;
         signDataBuf.set(bPlain, 4);
-    }
+    //}
 
 
 
