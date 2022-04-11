@@ -96,8 +96,8 @@
                                             </p>
                                         </form>
 
-                                        <form style="text-align: left;" id="form_pin_format" onsubmit="return false">
-                                            <fieldset>    
+                                       <form style="text-align: left;" id="form_pin_format" onsubmit="return false">
+                                          <!--  <fieldset>    
                                             英文<br>
                                             <input  type="radio" id="radio_eng_ask" name="eng" value="eng_ask" onclick="clickEngAsk()"  checked>必要
                                             <input  type="radio" id="radio_eng_allow" name="eng" value="eng_allow" onclick="clickEngAllow()">特殊
@@ -115,16 +115,43 @@
 
                                          
                                             數字<br>
+                                           
+                                            符號<br>
+                                           
+                                        </fieldset>--> 
+                                        <fieldset>
+                                            <legend>PIN 複雜度設定</legend>
+                                        <fieldset>
+                                                <legend>英文</legend>
+                                                <input type="radio" id="ckb_eng_ok" name="engselect" onclick="checkBoxEngOK()" >允許
+                                                <input type="radio" id="ckb_eng_ask" name="engselect" onclick="checkBoxEngAsk()"  checked>必要
+                                                <input type="radio" id="ckb_eng_no" name="engselect" onclick="checkBoxEngNo()" >禁止
+                                                <input type="radio" id="ckb_eng_spec" name="engselect" onclick="checkBoxEngSpec()" >特殊
+                                                <fieldset>
+                                                    <legend>case</legend>
+                                                    <input type="radio" id="radio_eng_high" name="engcase" value="eng_high">大寫
+                                                    <input type="radio" id="radio_eng_low"  name="engcase" value="eng_low">小寫
+                                                    <input type="radio" id="radio_eng_both" name="engcase" value="eng_both">兩者
+                                                    <input type="radio" id="radio_eng_alter" name="engcase" value="eng_alter" checked>二擇一<br>
+                                                    <input type="radio" id="radio_eng_highask_lowno" name="engcase" value="eng_highask_lowno">大寫要求小寫禁<br>
+                                                    <input type="radio" id="radio_eng_highno_lowask" name="engcase" value="eng_highno_lowask" >大寫禁小寫要求
+                                                </fieldset>
+                                        </fieldset>
+
+                                        <fieldset>
+                                            <legend>數字</legend>
                                             <input  type="radio" id="radio_number_ask" name="number" value="number_ask" checked>必要
                                             <input  type="radio" id="radio_number_allow" name="number" value="number_allow">允許
                                             <input  type="radio" id="radio_number_no" name="number" value="number_no">禁止<br>
+                                        </fieldset>
 
-                                            符號<br>
+                                        <fieldset>
+                                            <legend>符號</legend>
                                             <input  type="radio" id="radio_symbol_ask" name="symbol" value="symbol_ask">必要
                                             <input  type="radio" id="radio_symbol_allow" name="symbol" value="symbol_allow" checked>允許
                                             <input  type="radio" id="radio_symbol_no" name="symbol" value="symbol_no">禁止<br>
-                                        
                                         </fieldset>
+                                    </fieldset>
                                         </form>
 
                                         <p>
@@ -610,6 +637,125 @@
 
 
 
+            if(document.getElementById("radio_number_ask").checked){
+                pinLevel|=0x01;
+            }else if(document.getElementById("radio_number_no").checked){
+                pinLevel|=0x03;
+            }
+
+            if(document.getElementById("radio_symbol_ask").checked){
+                pinLevel|=0x04;
+            }else if(document.getElementById("radio_symbol_no").checked){
+                pinLevel|=0x0C;
+            }
+
+            return pinLevel;
+
+        }
+
+
+        function checkBoxEngOK(){
+            document.getElementById('ckb_eng_ask').checked = false;
+            document.getElementById('ckb_eng_no').checked = false;
+            document.getElementById('ckb_eng_spec').checked = false;
+
+
+            document.getElementById("radio_eng_high").disabled = true;
+            document.getElementById("radio_eng_low").disabled = true;
+            document.getElementById("radio_eng_both").disabled = true;
+            document.getElementById("radio_eng_alter").disabled = true;
+            document.getElementById("radio_eng_highask_lowno").disabled = true;
+            document.getElementById("radio_eng_highno_lowask").disabled = true;
+        };
+
+        function checkBoxEngAsk(){
+            document.getElementById('ckb_eng_ok').checked = false;
+            document.getElementById('ckb_eng_no').checked = false;
+            document.getElementById('ckb_eng_spec').checked = false;
+            document.getElementById("radio_eng_high").disabled = false;
+            document.getElementById("radio_eng_low").disabled = false;
+            document.getElementById("radio_eng_both").disabled = false;
+            document.getElementById("radio_eng_alter").disabled = false;
+            document.getElementById("radio_eng_alter").checked = true;
+            document.getElementById("radio_eng_highask_lowno").disabled = true;
+            document.getElementById("radio_eng_highno_lowask").disabled = true;
+
+        };
+
+        function checkBoxEngNo(){
+
+            document.getElementById('ckb_eng_ok').checked = false;
+            document.getElementById('ckb_eng_ask').checked = false;
+            document.getElementById('ckb_eng_spec').checked = false;
+            document.getElementById("radio_eng_high").disabled = false;
+            document.getElementById("radio_eng_low").disabled = false;
+            document.getElementById("radio_eng_both").disabled = false;
+            document.getElementById("radio_eng_both").checked = true;
+            document.getElementById("radio_eng_alter").disabled = true;
+            document.getElementById("radio_eng_highask_lowno").disabled = true;
+            document.getElementById("radio_eng_highno_lowask").disabled = true;
+
+        };
+
+        function checkBoxEngSpec(){
+
+            document.getElementById('ckb_eng_ok').checked = false;
+            document.getElementById('ckb_eng_ask').checked = false;
+            document.getElementById('ckb_eng_no').checked = false;
+
+            document.getElementById("radio_eng_high").disabled = true;
+            document.getElementById("radio_eng_low").disabled = true;
+            document.getElementById("radio_eng_both").disabled = true;
+            document.getElementById("radio_eng_alter").disabled = true;
+            document.getElementById("radio_eng_highask_lowno").disabled = false;
+            document.getElementById("radio_eng_highask_lowno").checked = true;
+            document.getElementById("radio_eng_highno_lowask").disabled = false;
+        };
+
+
+        function getPinLevelParamSetup(){
+
+            var pinLevel=0;
+
+            if(document.getElementById("ckb_eng_ok").checked){
+                pinLevel|=0x00;
+            }else if(document.getElementById("ckb_eng_ask").checked){
+                pinLevel|=0x80;
+                if(document.getElementById("radio_eng_high").checked){
+                    pinLevel|=0x20;
+                }
+                if(document.getElementById("radio_eng_low").checked){
+                    pinLevel|=0x10;
+                }
+                if(document.getElementById("radio_eng_both").checked){
+                    pinLevel|=0x30;
+                }
+                if(document.getElementById("radio_eng_alter").checked){
+                    pinLevel|=0x00;
+                }
+
+            }else if(document.getElementById("ckb_eng_no").checked){
+                pinLevel|=0x40;
+                if(document.getElementById("radio_eng_high").checked){
+                    pinLevel|=0x20;
+                }
+                if(document.getElementById("radio_eng_low").checked){
+                    pinLevel|=0x10;
+                }
+                if(document.getElementById("radio_eng_both").checked){
+                    pinLevel|=0x30;
+                }
+
+            }else if(document.getElementById("ckb_eng_spec").checked){
+                pinLevel|=0xC0;
+
+                if(document.getElementById("radio_eng_highask_lowno").checked){
+                    pinLevel|=0x20;
+                }
+                if(document.getElementById("radio_eng_highno_lowask").checked){
+                    pinLevel|=0x10;
+                }
+            }
             if(document.getElementById("radio_number_ask").checked){
                 pinLevel|=0x01;
             }else if(document.getElementById("radio_number_no").checked){
