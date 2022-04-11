@@ -239,6 +239,7 @@
                         if(value.sn!=undefined){
                             strCert+="序號:"+ ConverSNFormat(value.sn)+"\n";
                         }
+                        console.log(bufToHex(new Uint8Array(value.signature).buffer));
                         var str = String.fromCharCode.apply(null, new Uint8Array(value.signature));
                         strCert+="簽名:" + "\n" + btoa(str);
 
@@ -466,6 +467,7 @@
                             if(value.sn!=undefined){
                                 strCert+="序號:"+ ConverSNFormat(value.sn)+"\n";
                             }
+                            console.log(bufToHex(new Uint8Array(value.signature).buffer));
                             var str = String.fromCharCode.apply(null, new Uint8Array(value.signature));
                             strCert+="簽名:" + "\n" + btoa(str);
 
