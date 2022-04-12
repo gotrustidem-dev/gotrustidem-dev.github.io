@@ -269,8 +269,8 @@
        
             
             let PINLevel=0;
-            PINLevel = getPINLevelParam();
-
+            //PINLevel = getPINLevelParam();
+            PINLevel = getPinLevelParamSetup();
 
             var para = buildInitToken(bSOPINArray, bRandom, bToken_sn, bNewSOPINArray, bNewUserPINArray,AllowHostDomains,isPINExpired,PINMaxRetry,sPinMinLen, PINLevel)
                 .then(result => {
@@ -587,7 +587,7 @@
             document.getElementById("radio_lowcase_allow").disabled = false;
 
         }
-
+        /*
         function getPINLevelParam(){
 
             var pinLevel=0;
@@ -652,7 +652,7 @@
             return pinLevel;
 
         }
-
+        */
 
         function checkBoxEngOK(){
             document.getElementById('ckb_eng_ask').checked = false;
