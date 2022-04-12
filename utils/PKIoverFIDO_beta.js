@@ -58,6 +58,25 @@ const PIN_FORMAT_LOWERCASE =0x02;
 const PIN_FORMAT_HIGERCASE =0x04;
 const PIN_FORMAT_SYMBOL =0x08;
 
+const PIN_SETUP_ENG_MASK = 0xf0;
+const PIN_SETUP_ENG_OK = 0x00;
+const PIN_SETUP_ENG_ASK = 0x80;
+const PIN_SETUP_ENG_NO = 0x40;
+const PIN_SETUP_ENG_SPEC = 0xC0;
+
+const PIN_SETUP_ENG_HIGHCASE = 0x20;
+const PIN_SETUP_ENG_LOWCASE = 0x10;
+
+const PIN_SETUP_NUM_MASK = 0x03;
+const PIN_SETUP_NUM_OK = 0x00;
+const PIN_SETUP_NUM_ASK = 0x01;
+const PIN_SETUP_NUM_NO = 0x03;
+
+const PIN_SETUP_SYM_MASK = 0x0C;
+const PIN_SETUP_SYM_OK = 0x00;
+const PIN_SETUP_SYM_ASK = 0x04;
+const PIN_SETUP_SYM_NO = 0x0C;
+
 const RSA_2048 = 1;
 const EC_secp256r1 = 2;
 const EC_secp384r1 = 3;
@@ -432,7 +451,7 @@ async function computingSessionKey(bOldPIN, bNewPIN, ecpointXY) {
     var bEncryptedNEWPIN = new Uint8Array(encryptedNEWPIN).slice(0,64);
     return {bExportECPublicKeyArray, bEcryptedOldPINHash, bEncryptedNEWPIN};
 }
-
+/*
 function checkPINFormatLevel(bNewPIN, pinLevel){
     var localLevel  = 0 ; 
     if(pinLevel == PIN_FORMAT_FREE)
@@ -455,7 +474,7 @@ function checkPINFormatLevel(bNewPIN, pinLevel){
     }else{
         return false;
     }
-}
+}*/
 
 function isAllowedSymbol(value) {
 
