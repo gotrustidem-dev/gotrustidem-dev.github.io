@@ -1956,7 +1956,7 @@ function GTIDEM_SetName(sName){
    }).then((fido) => {
            
         let gtidem = new GTIdemJs();
-        gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_CHANGE_PIN);
+        gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_INIT_TOKEN);
         return gtidem;
     }).catch((error) => {
         ////console.log(error.name);
