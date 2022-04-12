@@ -718,54 +718,55 @@
             var pinLevel=0;
 
             if(document.getElementById("ckb_eng_ok").checked){
-                pinLevel|=0x00;
+                pinLevel|=PIN_SETUP_ENG_OK;
             }else if(document.getElementById("ckb_eng_ask").checked){
-                pinLevel|=0x80;
+                pinLevel|=PIN_SETUP_ENG_ASK;
                 if(document.getElementById("radio_eng_high").checked){
-                    pinLevel|=0x20;
+                    pinLevel|=PIN_SETUP_ENG_HIGHCASE;
                 }
                 if(document.getElementById("radio_eng_low").checked){
-                    pinLevel|=0x10;
+                    pinLevel|=PIN_SETUP_ENG_LOWCASE;
                 }
                 if(document.getElementById("radio_eng_both").checked){
-                    pinLevel|=0x30;
+                    pinLevel|=(PIN_SETUP_ENG_HIGHCASE|PIN_SETUP_ENG_LOWCASE);
                 }
                 if(document.getElementById("radio_eng_alter").checked){
                     pinLevel|=0x00;
                 }
 
             }else if(document.getElementById("ckb_eng_no").checked){
-                pinLevel|=0x40;
+                pinLevel|=PIN_SETUP_ENG_NO;
                 if(document.getElementById("radio_eng_high").checked){
-                    pinLevel|=0x20;
+                    pinLevel|=PIN_SETUP_ENG_HIGHCASE;
                 }
                 if(document.getElementById("radio_eng_low").checked){
-                    pinLevel|=0x10;
+                    pinLevel|=PIN_SETUP_ENG_LOWCASE;
                 }
                 if(document.getElementById("radio_eng_both").checked){
-                    pinLevel|=0x30;
+                    pinLevel|=(PIN_SETUP_ENG_HIGHCASE|PIN_SETUP_ENG_LOWCASE);
                 }
 
             }else if(document.getElementById("ckb_eng_spec").checked){
-                pinLevel|=0xC0;
+                pinLevel|=PIN_SETUP_ENG_SPEC;
 
                 if(document.getElementById("radio_eng_highask_lowno").checked){
-                    pinLevel|=0x20;
+                    pinLevel|=PIN_SETUP_ENG_HIGHCASE;
                 }
                 if(document.getElementById("radio_eng_highno_lowask").checked){
-                    pinLevel|=0x10;
+                    pinLevel|=PIN_SETUP_ENG_LOWCASE;
                 }
             }
+
             if(document.getElementById("radio_number_ask").checked){
-                pinLevel|=0x01;
+                pinLevel|=PIN_SETUP_NUM_ASK;
             }else if(document.getElementById("radio_number_no").checked){
-                pinLevel|=0x03;
+                pinLevel|=PIN_SETUP_NUM_NO;
             }
 
             if(document.getElementById("radio_symbol_ask").checked){
-                pinLevel|=0x04;
+                pinLevel|=PIN_SETUP_SYM_ASK;
             }else if(document.getElementById("radio_symbol_no").checked){
-                pinLevel|=0x0C;
+                pinLevel|=PIN_SETUP_SYM_NO;
             }
 
             return pinLevel;
