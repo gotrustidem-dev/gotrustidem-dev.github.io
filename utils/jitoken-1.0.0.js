@@ -919,26 +919,6 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
         sn_buf[3] = bSerialNumber.byteLength;
         sn_buf.set(bSerialNumber, 4);
     }
-	// var token_sn = undefined;
-    // if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
-    //     var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
-    //         return fido;
-    //    });
-    //    if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
-    //        return gtidem;
-    //    }else{
-    //        token_sn = new Uint8Array(gtidem.sn);
-    //    }
-    // }else{
-    //     token_sn =  new Uint8Array(bSerialNumber);
-    // }
-
-    // sn_buf = new Uint8Array(4 + token_sn.byteLength);
-    // sn_buf[0] = 0xDF;
-    // sn_buf[1] = 0x20;
-    // sn_buf[2] = token_sn.byteLength >> 8;
-    // sn_buf[3] = token_sn.byteLength;
-    // sn_buf.set(token_sn, 4);
 
 
     var keyid_buf;
@@ -1016,10 +996,6 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
 
         let gtidem = new GTIdemJs();
         gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse,CMD_GenRsaKeyPair);
-        // if(gtidem.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
-        //     gtidem.sn =token_sn;
-        // }
-
         return gtidem;
     }).catch((error) => {
         ////console.log(error.name);
@@ -1063,28 +1039,7 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
         sn_buf[3] = bSerialNumber.byteLength;
         sn_buf.set(bSerialNumber, 4);
     }
-/*
-    var token_sn = undefined;
-    if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
-        var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
-            return fido;
-       });
-       if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
-           return gtidem;
-       }else{
-           token_sn = new Uint8Array(gtidem.sn);
-       }
-    }else{
-        token_sn =  new Uint8Array(bSerialNumber);
-    }
 
-    sn_buf = new Uint8Array(4 + token_sn.byteLength);
-    sn_buf[0] = 0xDF;
-    sn_buf[1] = 0x20;
-    sn_buf[2] = token_sn.byteLength >> 8;
-    sn_buf[3] = token_sn.byteLength;
-    sn_buf.set(token_sn, 4);
-*/
     var keyid_buf;
 
     if((bKeyID==undefined)||(bKeyID.byteLength==0)){
@@ -1215,26 +1170,7 @@ async function GTIDEM_DeleteCertByLabel(bLabel, bSerialNumber) {
         sn_buf[3] = bSerialNumber.byteLength;
         sn_buf.set(bSerialNumber, 4);
     }
-    // var token_sn = undefined;
-    // if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
-    //     var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
-    //         return fido;
-    //    });
-    //    if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
-    //        return gtidem;
-    //    }else{
-    //        token_sn = new Uint8Array(gtidem.sn);
-    //    }
-    // }else{
-    //     token_sn =  new Uint8Array(bSerialNumber);
-    // }
-
-    // sn_buf = new Uint8Array(4 + token_sn.byteLength);
-    // sn_buf[0] = 0xDF;
-    // sn_buf[1] = 0x20;
-    // sn_buf[2] = token_sn.byteLength >> 8;
-    // sn_buf[3] = token_sn.byteLength;
-    // sn_buf.set(token_sn, 4);
+    
 
 
    var payloadLen = label_buf.byteLength+sn_buf.byteLength;
@@ -1306,26 +1242,6 @@ async function GTIDEM_ClearToken( bSerialNumber) {
         sn_buf[3] = bSerialNumber.byteLength;
         sn_buf.set(bSerialNumber, 4);
     }
-    // var token_sn = undefined;
-    // if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
-    //     var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
-    //         return fido;
-    //    });
-    //    if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
-    //        return gtidem;
-    //    }else{
-    //        token_sn = new Uint8Array(gtidem.sn);
-    //    }
-    // }else{
-    //     token_sn =  new Uint8Array(bSerialNumber);
-    // }
-
-    // sn_buf = new Uint8Array(4 + token_sn.byteLength);
-    // sn_buf[0] = 0xDF;
-    // sn_buf[1] = 0x20;
-    // sn_buf[2] = token_sn.byteLength >> 8;
-    // sn_buf[3] = token_sn.byteLength;
-    // sn_buf.set(token_sn, 4);
 
 
    var payloadLen = sn_buf.byteLength;
@@ -1481,55 +1397,23 @@ async function GTIDEM_SignDataByIndex(index, bSerialNumber ,alg_number, bPlain) 
     var alg_buf;
     var signDataBuf;
 
-    //check Hash Data Length
-   
-//     const ALG_RSA2048SHA1_PreHash = 0x11;
-// const ALG_RSA2048SHA256_PreHash = 0x12;
-// const ALG_RSA2048SHA384_PreHash = 0x13;
-// const ALG_RSA2048SHA512_PreHash = 0x14;
-// const ALG_RSA2048SHA1_PSS_PreHash = 0x15;
-// const ALG_RSA2048SHA256_PSS_PreHash = 0x16;
-// const ALG_RSA2048SHA384_PSS_PreHash = 0x17;
-// const ALG_RSA2048SHA512_PSS_PreHash = 0x18;
+  
 
-        
-    /*if(alg_number==ALG_RSA2048SHA256){
-        await crypto.subtle.digest("SHA-256", new Uint8Array(bPlain)).then(function (signHashedDataPayload) {
+    alg_buf = new Uint8Array(5);
+    alg_buf[0] = 0xDF;
+    alg_buf[1] = 0x03;
+    alg_buf[2] = 0x00;
+    alg_buf[3] = 0x01;
+    alg_buf[4] = alg_number;
 
-            alg_buf = new Uint8Array(5);
-            alg_buf[0] = 0xDF;
-            alg_buf[1] = 0x03;
-            alg_buf[2] = 0x00;
-            alg_buf[3] = 0x01;
-            alg_buf[4] = ALG_RSA2048SHA256_PreHash;
 
-            var bHashData = new Uint8Array(signHashedDataPayload)
-            signDataBuf = new Uint8Array(4 + bHashData.byteLength);
-            signDataBuf[0] = 0xDF;
-            signDataBuf[1] = 0x06;
-            signDataBuf[2] = bHashData.length >> 8;
-            signDataBuf[3] = bHashData.length;
-            signDataBuf.set(bHashData, 4);
-            return;
-        });
+    signDataBuf = new Uint8Array(4 + bPlain.byteLength);
+    signDataBuf[0] = 0xDF;
+    signDataBuf[1] = 0x06;
+    signDataBuf[2] = bPlain.length >> 8;
+    signDataBuf[3] = bPlain.length;
+    signDataBuf.set(bPlain, 4);
 
-    }else{*/
-
-        alg_buf = new Uint8Array(5);
-        alg_buf[0] = 0xDF;
-        alg_buf[1] = 0x03;
-        alg_buf[2] = 0x00;
-        alg_buf[3] = 0x01;
-        alg_buf[4] = alg_number;
-    
-
-        signDataBuf = new Uint8Array(4 + bPlain.byteLength);
-        signDataBuf[0] = 0xDF;
-        signDataBuf[1] = 0x06;
-        signDataBuf[2] = bPlain.length >> 8;
-        signDataBuf[3] = bPlain.length;
-        signDataBuf.set(bPlain, 4);
-    //}
 
 
     
@@ -1632,38 +1516,6 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, bPlain)
     alg_buf[2] = 0x00;
     alg_buf[3] = 0x01;
     alg_buf[4] = alg_number;
-
-
-
-
-    // if(alg_number==ALG_RSA2048SHA256){
-    //     await crypto.subtle.digest("SHA-256", new Uint8Array(bPlain)).then(function (signHashedDataPayload) {
-
-    //         alg_buf = new Uint8Array(5);
-    //         alg_buf[0] = 0xDF;
-    //         alg_buf[1] = 0x03;
-    //         alg_buf[2] = 0x00;
-    //         alg_buf[3] = 0x01;
-    //         alg_buf[4] = ALG_RSA2048SHA256_PreHash;
-
-    //         var bHashData = new Uint8Array(signHashedDataPayload)
-    //         signDataBuf = new Uint8Array(4 + bHashData.byteLength);
-    //         signDataBuf[0] = 0xDF;
-    //         signDataBuf[1] = 0x06;
-    //         signDataBuf[2] = bHashData.length >> 8;
-    //         signDataBuf[3] = bHashData.length;
-    //         signDataBuf.set(bHashData, 4);
-    //         return;
-    //     });
-
-    // }else{
-
-        // alg_buf = new Uint8Array(5);
-        // alg_buf[0] = 0xDF;
-        // alg_buf[1] = 0x03;
-        // alg_buf[2] = 0x00;
-        // alg_buf[3] = 0x01;
-        // alg_buf[4] = alg_number;
     
 
     var signDataBuf = new Uint8Array(4 + bPlain.byteLength);
@@ -1672,7 +1524,7 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, bPlain)
         signDataBuf[2] = bPlain.length >> 8;
         signDataBuf[3] = bPlain.length;
         signDataBuf.set(bPlain, 4);
-    //}
+
 
 
 
@@ -1743,26 +1595,7 @@ async function GTIDEM_ReadCertByIndexWithoutPIN(index, bSerialNumber) {
         sn_buf[3] = bSerialNumber.byteLength;
         sn_buf.set(bSerialNumber, 4);
     }
-    // var token_sn = undefined;
-    // if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
-    //     var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
-    //         return fido;
-    //    });
-    //    if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
-    //        return gtidem;
-    //    }else{
-    //        token_sn = new Uint8Array(gtidem.sn);
-    //    }
-    // }else{
-    //     token_sn =  new Uint8Array(bSerialNumber);
-    // }
-
-    // sn_buf = new Uint8Array(4 + token_sn.byteLength);
-    // sn_buf[0] = 0xDF;
-    // sn_buf[1] = 0x20;
-    // sn_buf[2] = token_sn.byteLength >> 8;
-    // sn_buf[3] = token_sn.byteLength;
-    // sn_buf.set(token_sn, 4);
+    
 
     var challenge = new Uint8Array(32);
     window.crypto.getRandomValues(challenge);
@@ -1852,31 +1685,7 @@ async function GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSerialNumber) {
         sn_buf[3] = bSerialNumber.byteLength;
         sn_buf.set(bSerialNumber, 4);
     }
-    // var token_sn = undefined;
-    // if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
-    //     var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
-    //         return fido;
-    //    });
-    //    if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
-    //        return gtidem;
-    //    }else{
-    //        token_sn = new Uint8Array(gtidem.sn);
-    //    }
-    // }else{
-    //     token_sn =  new Uint8Array(bSerialNumber);
-    // }
     
-    // sn_buf = new Uint8Array(4 + token_sn.byteLength);
-    // sn_buf[0] = 0xDF;
-    // sn_buf[1] = 0x20;
-    // sn_buf[2] = token_sn.byteLength >> 8;
-    // sn_buf[3] = token_sn.byteLength;
-    // sn_buf.set(token_sn, 4);
-
-
-
-
-
     //PKI Command
 
     var command_bufer = new Uint8Array(bLabel.byteLength + 4);
@@ -1964,26 +1773,7 @@ function GTIDEM_SetName(sName){
         sn_buf[3] = bSerialNumber.byteLength;
         sn_buf.set(bSerialNumber, 4);
     }
-    // var token_sn = undefined;
-    // if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
-    //     var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
-    //         return fido;
-    //    });
-    //    if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
-    //        return gtidem;
-    //    }else{
-    //        token_sn = new Uint8Array(gtidem.sn);
-    //    }
-    // }else{
-    //     token_sn =  new Uint8Array(bSerialNumber);
-    // }
-
-    // sn_buf = new Uint8Array(4 + token_sn.byteLength);
-    // sn_buf[0] = 0xDF;
-    // sn_buf[1] = 0x20;
-    // sn_buf[2] = token_sn.byteLength >> 8;
-    // sn_buf[3] = token_sn.byteLength;
-    // sn_buf.set(token_sn, 4);
+    
 
     var challenge = new Uint8Array(32);
     window.crypto.getRandomValues(challenge);

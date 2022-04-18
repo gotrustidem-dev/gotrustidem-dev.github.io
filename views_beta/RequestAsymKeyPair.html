@@ -199,9 +199,13 @@
                     }
                     if(outtype==OutputType_RAW){
                         sMsg+="建立 KeyPair 完成 \n" + bufToHex(new Uint8Array(response.ecpoint))+ bufToHex(new Uint8Array(response.rsakeypair));
- 
+                      
                     }else{
-                        sMsg+="建立 KeyPair 完成 \n" + bufToHex(new Uint8Array(response.csr));
+                        //sMsg+="建立 KeyPair 完成 \n" + bufToHex(new Uint8Array(response.csr));
+                        sMsg += "建立 KeyPair 完成 CSR:" + "\n"+"-----BEGIN CERTIFICATE REQUEST-----\n" +
+                            btoa(String.fromCharCode.apply(null, new Uint8Array(response.csr))) +
+                            "\n-----END CERTIFICATE REQUEST-----"
+                        //console.log('CSR :\n', strCSR);
                     }
                     
 
@@ -275,6 +279,7 @@
 
                             str+="載具序號"+ConverSNFormat(value.sn)+"\n";
                         }
+                        
                         console.log(bufToHex(new Uint8Array(value.signature).buffer));
                         str += "簽名:"+"\n"+(String.fromCharCode.apply(null, new Uint8Array(value.signature)));
                         alert(str);
