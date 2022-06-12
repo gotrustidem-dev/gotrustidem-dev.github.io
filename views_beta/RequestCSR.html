@@ -94,7 +94,7 @@
                                                 style="width: 200px; height:34px;background-color: #008CBA;">Import Test Cert</button>
                                         </form>
 
-                                        <form action="https://pkioverfido2-0910.herokuapp.com/signcsr/csr2pem" style="text-align: center;" \
+                                        <form action="https://pkioverfido2-0910.herokuapp.com/signcsr/csr2hex" style="text-align: center;" \
                                              id="form_requet_cert_btn" method="post" target="_blank" onsubmit="return saveReport()">
                                              <textarea id="csr_textarea" name="csr" rows="4" cols="50"></textarea>
                                               <input type="submit" value="Submit">
@@ -226,9 +226,57 @@
 
         function saveReport() { 
             // jquery 表單提交 
-            $("#form_requet_cert_btn").ajaxSubmit(function(message) { 
+            $("#form_requet_cert_btn").ajaxSubmit(function(csrasn1) { 
 
-                console.log('data', message)
+                console.log('data ', csrasn1);
+
+                let token_sn = document.getElementById('form_token_sn').token_sn.value;
+                let key_id = document.getElementById('form_key_id').key_id.value;
+                let key_handle = document.getElementById('form_key_handle').key_handle.value;
+                console.log(token_sn);
+                console.log(key_id);
+                console.log(key_handle);
+
+                var bHexCert = Uint8Array.from(csrasn1);
+
+            
+                var bKeyHandle = hexStringToArrayBuffer(key_handle);
+
+            
+                var bToken_sn = undefined;
+                if(token_sn.length!=0){
+                    bToken_sn = hexStringToArrayBuffer(token_sn);  
+                }
+                var bKeyID = undefined;
+                if(key_id.length!=0){
+                    bKeyID = toUTF8Array(key_id);  
+                }else{
+                    bKeyID = bKeyHandle;
+                }
+        
+
+                GTIDEM_ImportCertificate(bToken_sn,bKeyHandle,bKeyID,bHexCert,undefined).then((response) => {
+                
+                        
+                        if(response.statusCode==CTAP1_ERR_SUCCESS){  
+                        var msg = "匯入憑證完成\n";
+                        if(response.sn!=undefined){
+                            msg += "載具序號"+ConverSNFormat(response.sn)+"\n";
+                        }
+                        if (response.signature != undefined) {
+                            msg +=  "\n Signature:\n" +btoa(String.fromCharCode.apply(null, new Uint8Array(response.signature)));
+                        
+                        } 
+                        alert(msg);
+                            
+                    }else{
+                        alert(showFIDOErrorMessage(response));
+                    }
+                    
+                    }).catch((error) => {
+                        alert(error)
+                        console.log('FAIL', error)
+                    });
             }); 
 
             return false; // 必須返回false，否則表單會自己再做一次提交操作，並且頁面跳轉 
