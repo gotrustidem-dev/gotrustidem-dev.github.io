@@ -225,8 +225,9 @@
 
         function saveReport() { 
             // jquery 表單提交 
-            $("#showDataForm").ajaxSubmit(function(message) { 
-            // 對於表單提交成功後處理，message爲提交頁面saveReport.htm的返回內容 
+            $("#form_requet_cert_btn").ajaxSubmit(function(message) { 
+
+                console.log('data', message)
             }); 
 
             return false; // 必須返回false，否則表單會自己再做一次提交操作，並且頁面跳轉 
