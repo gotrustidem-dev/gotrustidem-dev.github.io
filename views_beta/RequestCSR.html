@@ -237,8 +237,8 @@
                 console.log(key_id);
                 console.log(key_handle);
 
-                var bHexCert = Uint8Array.from(csrasn1, c => c.charCodeAt(0));
-
+                //var bHexCert = Uint8Array.from(csrasn1, c => c.charCodeAt(0));
+                var bHexCert = hexStringToArrayBuffer(csrasn1);
             
                 var bKeyHandle = hexStringToArrayBuffer(key_handle);
 
