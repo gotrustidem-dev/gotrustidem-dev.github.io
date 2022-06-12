@@ -130,16 +130,19 @@
 
                 if(response.statusCode==CTAP1_ERR_SUCCESS){    
                         var strCSR="";
-
+                        var msg="";
                         if(response.sn!=undefined){
-                            strCSR+="載具序號"+ConverSNFormat(response.sn)+"\n";
+                            msg+="載具序號"+ConverSNFormat(response.sn)+"\n";
                         }
 
-                        strCSR += "CSR:" + "\n"+"-----BEGIN CERTIFICATE REQUEST-----\n" +
+                        strCSR = "-----BEGIN NEW CERTIFICATE REQUEST-----\n" +
                             btoa(String.fromCharCode.apply(null, new Uint8Array(response.csr))) +
-                            "\n-----END CERTIFICATE REQUEST-----"
-                        console.log('CSR :\n', strCSR);
-                        alert(strCSR);
+                            "\n-----END NEW CERTIFICATE REQUEST-----\n";
+                        msg += "CSR:" + "\n"+strCSR;
+                        console.log('CSR :\n', msg);
+                        document.getElementById('csr_textarea').value = bufToHex(strCSR);
+                        alert(msg);
+
                         if(bKeyID!=undefined){
                             console.log(bufToHex(bKeyID));
                             document.getElementById('form_key_handle').key_handle.value = bufToHex(bKeyID);
