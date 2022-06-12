@@ -32,10 +32,27 @@
         h3 {
             text-align: center;
         }
+        .pemBox {
+            width: 100%;
+            height: 250px;
+            font-size:11px;
+            padding:4px;
+        }
+
     </style>
 </head>
+<script>
+    function load()
+    {
+        let certBox = document.getElementById('certBox');
+        var strCert = "-----BEGIN CERTIFICATE-----\n" +
+                            testBigCertificate+
+                        "\n-----END CERTIFICATE-----"
+        certBox.textContent = strCert;
 
-<body>
+    }
+</script>
+<body onload="load()">
     <div style="overflow-x: scroll;">
         <table style="height: auto; width: 100%;">
             <tbody>
@@ -81,19 +98,14 @@
                                                 <input type="text" name="key_handle"  style="width: 342px; height:41px">
                                             </p>
                                         </form>
-                                           
+                                        <div class="panel-body">
+                                            <textarea id="certBox" class="pemBox" name="cert_text"></textarea>
+                                        </div>
                                         <p>
                                         <form style="text-align: center;" id="form_importcert_btn" onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
-                                                style="width: 200px; height:34px;background-color: #008CBA;">Import Test Cert</button>
+                                                style="width: 200px; height:34px;background-color: #008CBA;">Import Cert</button>
                                         </form>
-
-                                        <form action="https://pkioverfido2-0910.herokuapp.com/signcsr/csr2hex" style="text-align: center;" \
-                                             id="form_requet_cert_btn" method="post" target="_blank">
-                                             <textarea id="csr_textarea" name="csr" rows="4" cols="50"></textarea>
-                                              <input type="submit" value="Submit">
-                                          </form>
-                                          
                                         </p>
 
                                     </td>
@@ -125,21 +137,16 @@
             if(key_id.length!=0){
                 bKeyID = toUTF8Array(key_id);  
             }
-            GTIDEM_SetName('Ann Chen');
+
             GTIDEM_GenRSA2048CSR(bToken_sn,bKeyID).then((response) => {
 
                 if(response.statusCode==CTAP1_ERR_SUCCESS){    
-                        var strCSR="";
-
-                        if(response.sn!=undefined){
-                            strCSR+="載具序號"+ConverSNFormat(response.sn)+"\n";
-                        }
-
-                        strCSR += "CSR:" + "\n"+"-----BEGIN CERTIFICATE REQUEST-----\n" +
+                
+                        var strCSR = "-----BEGIN CERTIFICATE REQUEST-----\n" +
                             btoa(String.fromCharCode.apply(null, new Uint8Array(response.csr))) +
                             "\n-----END CERTIFICATE REQUEST-----"
                         console.log('CSR :\n', strCSR);
-                        alert(strCSR);
+                        alert("CSR:" + "\n" + strCSR);
                         if(bKeyID!=undefined){
                             console.log(bufToHex(bKeyID));
                             document.getElementById('form_key_handle').key_handle.value = bufToHex(bKeyID);
@@ -168,16 +175,17 @@
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             let key_id = document.getElementById('form_key_id').key_id.value;
             let key_handle = document.getElementById('form_key_handle').key_handle.value;
-            console.log(token_sn);
-            console.log(key_id);
-            console.log(key_handle);
 
-            var bHexCert = Uint8Array.from(window.atob(testBigCertificate), c => c.charCodeAt(0));
+            let sCert = document.getElementById('certBox').value;
+            var lines = sCert.split('\n');
+            lines.splice(lines.length-1,lines.length);
+            lines.splice(0,1);
+            sCert = lines.join('\n');
+            console.log(sCert);
 
-         
-            var bKeyHandle = hexStringToArrayBuffer(key_handle);
 
-        
+            var bHexCert = Uint8Array.from(window.atob(testBigCertificate), c => c.charCodeAt(0));         
+            var bKeyHandle = hexStringToArrayBuffer(key_handle);        
             var bToken_sn = undefined;
             if(token_sn.length!=0){
                 bToken_sn = hexStringToArrayBuffer(token_sn);  
@@ -188,24 +196,18 @@
             }else{
                 bKeyID = bKeyHandle;
             }
-    
 
-            //crypto.subtle.digest("SHA-256",bHexCert).then(function (signHashedDataPayload) {
-                //console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
-                //GTIDEM_ImportCertificate(bToken_sn,bKeyHandle,bKeyID,bHexCert,new Uint8Array(signHashedDataPayload)).then((response) => {
-                GTIDEM_ImportCertificate(bToken_sn,bKeyHandle,bKeyID,bHexCert,undefined).then((response) => {
-               
-                    
-                    if(response.statusCode==CTAP1_ERR_SUCCESS){  
-                    var msg = "匯入憑證完成\n";
-                    if(response.sn!=undefined){
-                        msg += "載具序號"+ConverSNFormat(response.sn)+"\n";
+            crypto.subtle.digest("SHA-256",bHexCert).then(function (signHashedDataPayload) {
+                console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
+                GTIDEM_ImportCertificate(bToken_sn,bKeyHandle,bKeyID,bHexCert,new Uint8Array(signHashedDataPayload)).then((response) => {
+                if(response.statusCode==CTAP1_ERR_SUCCESS){  
+                    var msg =  "匯入憑證完成";
+                    if(response.signature != undefined){
+                        var str = String.fromCharCode.apply(null, new Uint8Array(response.signature));
+                        alert(msg +"\n 簽名:\n"+ btoa(str));
+                    } else{
+                        alert(msg);
                     }
-                    if (response.signature != undefined) {
-                        msg +=  "\n Signature:\n" +btoa(String.fromCharCode.apply(null, new Uint8Array(response.signature)));
-                       
-                    } 
-                    alert(msg);
                         
                 }else{
                     alert(showFIDOErrorMessage(response));
@@ -215,7 +217,7 @@
                     alert(error)
                     console.log('FAIL', error)
                 });
-            //});
+            });
         })
 
     </script>
