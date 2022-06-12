@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GoTrustIdem TestPKI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Ensure use of most common Unicode characters -->
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <!-- Considered an "experimental" feature -->
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css" />
+    <!-- Spectre.css icons are used -->
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+
+    <script src="https://gotrustidem-dev.github.io/utils/cbor.js"></script>
+    <script src="https://gotrustidem-dev.github.io/utils/helpers.js"></script>
+    <script src="https://gotrustidem-dev.github.io/utils/showMessage.js"></script>
+    <script src="https://gotrustidem-dev.github.io/utils/response.js"></script>
+    <script src="https://gotrustidem-dev.github.io/utils/PKIoverFIDO_beta.js"></script>
+    <style>
+        table.center {
+            margin-left: auto;
+            margin-right: auto;
+            height: 160px;
+        }
+
+        table td,
+        table td * {
+            vertical-align: top;
+        }
+
+        h3 {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="overflow-x: scroll;">
+        <table style="height: auto; width: 100%;">
+            <tbody>
+
+                <tr>
+                    <td style="width: 100% ;">
+
+
+                        <form style="text-align: center;" id="form_token_sn" onsubmit="return false">
+                            <p>
+                                <label id="label_token_sn">Token Serial number:</label><br>
+                                <input type="text" name="token_sn" style="width: 342px; height:41px">
+                            </p>
+                        </form>
+
+                        <form style="text-align: center;" id="form_clear_certs" onsubmit="return false">
+                            <button class="btn btn-primary" action="submit"
+                                style="width: 162px; height:34px;background-color: #008CBA;">Clear All Certs</button>
+                        </form>
+
+                    </td>
+                </tr>
+
+                <tr>
+                    <td id="pc-td" style="width: 100% ; ">
+                        <table class="center" border="1" width="395">
+                            <tbody>
+                                <tr>
+                                    <!--PC side-->
+                                    <td id="mac-safari-td" style="width: 329px; ">
+
+                                        <table class="center" style="height: 160px;" border="1" width="395">
+                                            <tbody>
+                                                <tr>
+                                                    <td style="width: 385px; ">
+                                                        <p style="text-align: center;">Target Label/KeyID</p>
+
+                                                        <p>
+                                                            <form style="text-align: center;" id="form_label"
+                                                                onsubmit="return false">
+                                                                <input type="text" name="certlabel"
+                                                                    style="width: 342px; height:41px">
+
+                                                            </form>
+                                                        </p>
+
+
+                                                        <form style="text-align: center;" id="form_delete_label_btn"
+                                                            onsubmit="return false">
+                                                            <button class="btn btn-primary" action="submit"
+                                                                style="width: 162px; height:34px;background-color: #008CBA;">Delete
+                                                                cert</button>
+                                                        </form>
+                                                    </td> 
+                                                    <!-- <td style="width: 385px;">
+                                                        <p style="text-align: center;">Target Index</p>
+                                                        <p>
+                                                            <form style="text-align:center" id="form_index"
+                                                                onsubmit="return false">
+                                                                <input type="number" name="certIndex"
+                                                                    style="width: 342px; height:41px">
+                                                            </form>
+                                                        </p>
+                                                        <p>
+                                                            <form style="text-align: center;" id="form_delete_index_btn"
+                                                                onsubmit="return false">
+                                                                <button class="btn btn-primary" action="submit"
+                                                                    style="width: 162px; height:34px;background-color: #008CBA;">Delete
+                                                                    cert</button>
+                                                            </form>
+                                                        </p>
+                                                    </td> -->
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        document.getElementById('form_clear_certs').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+
+            var bToken_sn = undefined;
+            if(token_sn.length!=0){
+                bToken_sn = hexStringToArrayBuffer(token_sn);  
+            }
+
+            GTIDEM_ClearToken(bToken_sn).then((response) => {
+
+               
+                if(response.statusCode==CTAP1_ERR_SUCCESS){  
+                    var strCert="清卡完成";
+                    if(response.sn!=undefined){
+                        strCert+="\n序號:"+ ConverSNFormat(response.sn)+"\n";
+                    }  
+                    alert(strCert);
+                }else{
+                    alert(showFIDOErrorMessage(response));
+                }
+
+                }).catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+                })
+
+        })
+
+
+        document.getElementById('form_delete_label_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            let label = document.getElementById('form_label').certlabel.value;
+           
+            var bToken_sn = undefined;
+            if(token_sn.length!=0){
+                bToken_sn = hexStringToArrayBuffer(token_sn);  
+            }
+            var bLabel = new Uint8Array(label.length);
+            bLabel.set(toUTF8Array(label), 0);
+
+            GTIDEM_DeleteCertByLabel(bLabel, bToken_sn).then((response) => {
+
+                if(response.statusCode==CTAP1_ERR_SUCCESS){    
+                    var strCert="刪除憑證完成";
+                    if(response.sn!=undefined){
+                        strCert+="\n序號:"+ ConverSNFormat(response.sn)+"\n";
+                        strCert+="\n剩餘憑證數量:"+ response.credentialNum+"\n";
+                    }  
+                    alert(strCert);
+                }else{
+                    alert(showFIDOErrorMessage(response));
+                }
+
+            }).catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            })
+
+        })
+
+        // document.getElementById('form_delete_index_btn').addEventListener('submit', function (event) {
+        //     event.preventDefault();
+        //     let token_sn = document.getElementById('form_token_sn').token_sn.value;
+        //     let index = document.getElementById('form_index').certIndex.value;
+
+        //     GTIDEM_DeleteCertByIndex(index, token_sn).then((value) => {
+
+        //         alert("YES");
+        //     }).catch((error) => {
+        //         alert(error)
+        //         console.log('FAIL', error)
+        //     })
+
+        // })
+    </script>
+
+</body>
+
+</html>
