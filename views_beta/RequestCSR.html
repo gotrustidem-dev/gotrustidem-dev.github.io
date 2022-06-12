@@ -12,9 +12,9 @@
     <!-- Spectre.css icons are used -->
     <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
 
-    <script type="text/javascript" src="/js/jquery/jquery.form.js"></script> //必須
-    <script type="text/javascript" src="/js/jquery/jquery-1.8.0.min.js"></script>  //必須
-    <script type="text/javascript" src="/js/jquery/jquery.easyui.min.js"></script>  //非必須
+    <script type="text/javascript" src="/js/jquery/jquery.form.js"></script> 
+    <script type="text/javascript" src="/js/jquery/jquery-1.8.0.min.js"></script> 
+    <script type="text/javascript" src="/js/jquery/jquery.easyui.min.js"></script>  
 
 
     <script src="https://gotrustidem-dev.github.io/utils/cbor.js"></script>
@@ -145,7 +145,7 @@
                             "\n-----END NEW CERTIFICATE REQUEST-----\n";
                         msg += "CSR:" + "\n"+strCSR;
                         console.log('CSR :\n', msg);
-                        document.getElementById('csr_textarea').value = bufToHex(strCSR);
+                        document.getElementById('csr_textarea').value = strCSR;
                         alert(msg);
 
                         if(bKeyID!=undefined){
