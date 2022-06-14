@@ -126,9 +126,21 @@
                                             <form style="text-align: center;" id="form_importcert_btn"
                                                 onsubmit="return false">
                                                 <button class="btn btn-primary" action="submit"
-                                                    style="width: 200px; height:34px;background-color: #008CBA;">Import
+                                                    style="width: 200px; height:34px;background-color: #008CBA;">Import Testing
                                                     Cert</button>
                                             </form>
+                                        </p>
+                                        <p>
+                                        <label>向 https://pkioverfido2-0910.herokuapp.com 申請，將回傳的憑證匯入金鑰。</label>    
+                                        <form action="https://pkioverfido2-0910.herokuapp.com/signcsr/csr2hex" style="text-align: center;" \
+                                             id="form_requet_cert_btn" method="post" target="_blank" onsubmit="return requestRealCert()">
+                                             <label>CSR</label>
+                                             <textarea id="csr_textarea" name="csr" rows="4" cols="50"></textarea>
+                                              <button class="btn btn-primary" action="submit"
+                                              style="width: 200px; height:34px;background-color: #008CBA;">Request Real Cert</button>
+                                     
+                                          </form>
+                                          
                                         </p>
 
                                     </td>
@@ -192,7 +204,7 @@
 
 
                 if (response.statusCode == CTAP1_ERR_SUCCESS) {
-
+                    var strCSR="";
                     var sMsg = '';
                     if(response.sn!=undefined){
                         sMsg = "載具序號"+ConverSNFormat(response.sn)+"\n";
@@ -201,11 +213,18 @@
                         sMsg+="建立 KeyPair 完成 \n" + bufToHex(new Uint8Array(response.ecpoint))+ bufToHex(new Uint8Array(response.rsakeypair));
                       
                     }else{
-                        //sMsg+="建立 KeyPair 完成 \n" + bufToHex(new Uint8Array(response.csr));
-                        sMsg += "建立 KeyPair 完成 CSR:" + "\n"+"-----BEGIN CERTIFICATE REQUEST-----\n" +
+                     
+                        if(response.sn!=undefined){
+                            sMsg+="載具序號"+ConverSNFormat(response.sn)+"\n";
+                        }
+                        strCSR = "-----BEGIN NEW CERTIFICATE REQUEST-----\n" +
                             btoa(String.fromCharCode.apply(null, new Uint8Array(response.csr))) +
-                            "\n-----END CERTIFICATE REQUEST-----"
-                        //console.log('CSR :\n', strCSR);
+                            "\n-----END NEW CERTIFICATE REQUEST-----\n";
+                        sMsg += "CSR:" + "\n"+strCSR;
+                        console.log('CSR :\n', sMsg);
+                        document.getElementById('csr_textarea').value = strCSR;
+                        alert(sMsg);
+
                     }
                     
 
@@ -349,6 +368,65 @@
              });
 
         })
+
+        function requestRealCert() { 
+            // jquery 表單提交 
+            $("#form_requet_cert_btn").ajaxSubmit(function(csrasn1) { 
+
+                console.log('data ', csrasn1);
+
+                let token_sn = document.getElementById('form_token_sn').token_sn.value;
+                let key_id = document.getElementById('form_key_id').key_id.value;
+                let key_handle = document.getElementById('form_key_handle').key_handle.value;
+                console.log(token_sn);
+                console.log(key_id);
+                console.log(key_handle);
+
+                //var bHexCert = Uint8Array.from(csrasn1, c => c.charCodeAt(0));
+                var bHexCert = hexStringToArrayBuffer(csrasn1);
+            
+                var bKeyHandle = hexStringToArrayBuffer(key_handle);
+
+            
+                var bToken_sn = undefined;
+                if(token_sn.length!=0){
+                    bToken_sn = hexStringToArrayBuffer(token_sn);  
+                }
+                var bKeyID = undefined;
+                if(key_id.length!=0){
+                    bKeyID = toUTF8Array(key_id);  
+                }else{
+                    bKeyID = bKeyHandle;
+                }
+        
+
+                GTIDEM_ImportCertificate(bToken_sn,bKeyHandle,bKeyID,bHexCert,undefined).then((response) => {
+                
+                        
+                        if(response.statusCode==CTAP1_ERR_SUCCESS){  
+                        var msg = "匯入憑證完成\n";
+                        if(response.sn!=undefined){
+                            msg += "載具序號"+ConverSNFormat(response.sn)+"\n";
+                        }
+                        if (response.signature != undefined) {
+                            msg +=  "\n Signature:\n" +btoa(String.fromCharCode.apply(null, new Uint8Array(response.signature)));
+                        
+                        } 
+                        alert(msg);
+                            
+                    }else{
+                        alert(showFIDOErrorMessage(response));
+                    }
+                    
+                    }).catch((error) => {
+                        alert(error)
+                        console.log('FAIL', error)
+                    });
+            }); 
+
+            return false; // 必須返回false，否則表單會自己再做一次提交操作，並且頁面跳轉 
+        } 
+        
     </script>
 
 </body>
