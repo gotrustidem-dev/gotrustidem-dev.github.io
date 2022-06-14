@@ -210,7 +210,7 @@
                     }
 
                     //Check PIN policy
-                    if (!checkPINFormatLevel2(bNewPINBuffer, flags[1])) {
+                    if (!checkPINFormatLevel(bNewPINBuffer, flags[1])) {
                         alert("密碼複雜度不符合");
                         return;
                     }
