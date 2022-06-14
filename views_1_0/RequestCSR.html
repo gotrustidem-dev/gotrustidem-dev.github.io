@@ -96,10 +96,14 @@
                                         </form>
                                         </p>
                                         <p>
+                                        <label>向 https://pkioverfido2-0910.herokuapp.com 傳送CSR，將回傳的 </label>    
                                         <form action="https://pkioverfido2-0910.herokuapp.com/signcsr/csr2hex" style="text-align: center;" \
                                              id="form_requet_cert_btn" method="post" target="_blank" onsubmit="return requestRealCert()">
                                              <textarea id="csr_textarea" name="csr" rows="4" cols="50"></textarea>
                                               <input type="submit" value="Request Real Cert." style="width: 200px; height:34px;background-color: #008CBA;">
+                                              <button class="btn btn-primary" action="submit"
+                                              style="width: 200px; height:34px;background-color: #008CBA;">Request Real Cert</button>
+                                     
                                           </form>
                                           
                                         </p>
