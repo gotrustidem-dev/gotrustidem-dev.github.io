@@ -111,6 +111,10 @@ var showFIDOErrorMessage = (gtidem) => {
             errorMsg = "密碼不符合要求";
             break; 
             
+        case CTAP2_ERR_MISSING_PARAMETER:
+            errorMsg = "缺少必要的參數";
+            break; 
+
         case CTAP2_ERR_KEY_STORE_FULL:
             errorMsg +='憑證空間已滿';
             break;
