@@ -12,12 +12,6 @@
     <!-- Spectre.css icons are used -->
     <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
 
-
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script> 
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js"></script> 
-   
-
-
     <script src="https://gotrustidem-dev.github.io/utils/cbor.js"></script>
     <script src="https://gotrustidem-dev.github.io/utils/helpers.js"></script>
     <script src="https://gotrustidem-dev.github.io/utils/showMessage.js"></script>
@@ -79,29 +73,20 @@
                                             <button class="btn btn-primary" action="submit"
                                                 style="width: 200px; height:34px;background-color: #008CBA;">Request CSR</button>
                                         </form>
-
-                                        <p>
+                                       
+            
                                         <form style="text-align: center;" id="form_key_handle" onsubmit="return false">
                                             <p>
                                                 <label id="label_key_handle">Key Handle:</label>
                                                 <input type="text" name="key_handle"  style="width: 342px; height:41px">
                                             </p>
                                         </form>
-                                        </p>
 
                                         <p>
                                         <form style="text-align: center;" id="form_importcert_btn" onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
-                                                style="width: 200px; height:34px;background-color: #008CBA;">Import Testing Cert</button>
+                                                style="width: 200px; height:34px;background-color: #008CBA;">Import Cert</button>
                                         </form>
-                                        </p>
-                                        <p>
-                                        <form action="https://pkioverfido2-0910.herokuapp.com/signcsr/csr2hex" style="text-align: center;" \
-                                             id="form_requet_cert_btn" method="post" target="_blank" onsubmit="return requestRealCert()">
-                                             <textarea id="csr_textarea" name="csr" rows="4" cols="50"></textarea>
-                                              <input type="submit" value="Request Real Cert." style="width: 200px; height:34px;background-color: #008CBA;">
-                                          </form>
-                                          
                                         </p>
 
                                     </td>
@@ -138,19 +123,16 @@
 
                 if(response.statusCode==CTAP1_ERR_SUCCESS){    
                         var strCSR="";
-                        var msg="";
+
                         if(response.sn!=undefined){
-                            msg+="載具序號"+ConverSNFormat(response.sn)+"\n";
+                            strCSR+="載具序號"+ConverSNFormat(response.sn)+"\n";
                         }
 
-                        strCSR = "-----BEGIN NEW CERTIFICATE REQUEST-----\n" +
+                        strCSR += "CSR:" + "\n"+"-----BEGIN CERTIFICATE REQUEST-----\n" +
                             btoa(String.fromCharCode.apply(null, new Uint8Array(response.csr))) +
-                            "\n-----END NEW CERTIFICATE REQUEST-----\n";
-                        msg += "CSR:" + "\n"+strCSR;
-                        console.log('CSR :\n', msg);
-                        document.getElementById('csr_textarea').value = strCSR;
-                        alert(msg);
-
+                            "\n-----END CERTIFICATE REQUEST-----"
+                        console.log('CSR :\n', strCSR);
+                        alert(strCSR);
                         if(bKeyID!=undefined){
                             console.log(bufToHex(bKeyID));
                             document.getElementById('form_key_handle').key_handle.value = bufToHex(bKeyID);
@@ -201,7 +183,10 @@
             }
     
 
-             GTIDEM_ImportCertificate(bToken_sn,bKeyHandle,bKeyID,bHexCert,undefined).then((response) => {
+            //crypto.subtle.digest("SHA-256",bHexCert).then(function (signHashedDataPayload) {
+                //console.log('signHashedDataPayload : \n', bufToHex(signHashedDataPayload));
+                //GTIDEM_ImportCertificate(bToken_sn,bKeyHandle,bKeyID,bHexCert,new Uint8Array(signHashedDataPayload)).then((response) => {
+                GTIDEM_ImportCertificate(bToken_sn,bKeyHandle,bKeyID,bHexCert,undefined).then((response) => {
                
                     
                     if(response.statusCode==CTAP1_ERR_SUCCESS){  
@@ -225,64 +210,6 @@
                 });
             //});
         })
-
-        function requestRealCert() { 
-            // jquery 表單提交 
-            $("#form_requet_cert_btn").ajaxSubmit(function(csrasn1) { 
-
-                console.log('data ', csrasn1);
-
-                let token_sn = document.getElementById('form_token_sn').token_sn.value;
-                let key_id = document.getElementById('form_key_id').key_id.value;
-                let key_handle = document.getElementById('form_key_handle').key_handle.value;
-                console.log(token_sn);
-                console.log(key_id);
-                console.log(key_handle);
-
-                //var bHexCert = Uint8Array.from(csrasn1, c => c.charCodeAt(0));
-                var bHexCert = hexStringToArrayBuffer(csrasn1);
-            
-                var bKeyHandle = hexStringToArrayBuffer(key_handle);
-
-            
-                var bToken_sn = undefined;
-                if(token_sn.length!=0){
-                    bToken_sn = hexStringToArrayBuffer(token_sn);  
-                }
-                var bKeyID = undefined;
-                if(key_id.length!=0){
-                    bKeyID = toUTF8Array(key_id);  
-                }else{
-                    bKeyID = bKeyHandle;
-                }
-        
-
-                GTIDEM_ImportCertificate(bToken_sn,bKeyHandle,bKeyID,bHexCert,undefined).then((response) => {
-                
-                        
-                        if(response.statusCode==CTAP1_ERR_SUCCESS){  
-                        var msg = "匯入憑證完成\n";
-                        if(response.sn!=undefined){
-                            msg += "載具序號"+ConverSNFormat(response.sn)+"\n";
-                        }
-                        if (response.signature != undefined) {
-                            msg +=  "\n Signature:\n" +btoa(String.fromCharCode.apply(null, new Uint8Array(response.signature)));
-                        
-                        } 
-                        alert(msg);
-                            
-                    }else{
-                        alert(showFIDOErrorMessage(response));
-                    }
-                    
-                    }).catch((error) => {
-                        alert(error)
-                        console.log('FAIL', error)
-                    });
-            }); 
-
-            return false; // 必須返回false，否則表單會自己再做一次提交操作，並且頁面跳轉 
-        } 
 
     </script>
 
