@@ -210,15 +210,12 @@
                     }
 
                     //Check PIN policy
-                    if (!checkPINFormatLevel(bNewPINBuffer, flags[1])) {
-                        alert("密碼複雜度不符合");
+                    if (!isValidPIN(bNewPINBuffer, response.flags)) {
+                        alert("密碼不符合要求");
                         return;
                     }
 
-                    if ((bNewPINBuffer.length < flags[2]) || (bNewPINBuffer.length > flags[3])) {
-                        alert("密碼長度不符合");
-                        return;
-                    }
+              
                     alert("密碼可用");
 
                 } else {
