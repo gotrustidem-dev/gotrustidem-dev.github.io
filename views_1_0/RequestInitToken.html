@@ -90,35 +90,14 @@
                                             <input type="checkbox" id="pinexpired_checkbox" name="pinexpired_checkbox" value="pin_expired"> Set PIN Expired<br>
                                             <p>
                                                 <label id="label_pinretry">PIN Retry Times(1~15):</label>
-                                                <input type="number" name="token_pin_retry" style="width: 342px; height:41px"><br>
+                                                <input type="number" value="5" name="token_pin_retry" style="width: 342px; height:41px"><br>
                                                 <label id="label_pinminlen">PIN MIN LEN(4~64): </label>
-                                                <input type="number" name="token_pin_min_len" style="width: 342px; height:41px">
+                                                <input type="number" value="6" name="token_pin_min_len" style="width: 342px; height:41px">
                                             </p>
                                         </form>
 
                                        <form style="text-align: left;" id="form_pin_format" onsubmit="return false">
-                                          <!--  <fieldset>    
-                                            英文<br>
-                                            <input  type="radio" id="radio_eng_ask" name="eng" value="eng_ask" onclick="clickEngAsk()"  checked>必要
-                                            <input  type="radio" id="radio_eng_allow" name="eng" value="eng_allow" onclick="clickEngAllow()">特殊
-                                            <input  type="radio" id="radio_eng_no"  name="eng" value="eng_no" onclick="clickEngNo()">禁止<br>
-                                         
-                                                大寫英文<br>
-                                                <input  type="radio" id="radio_highcase_ask" name="highcase" value="highcase_ask">必要
-                                                <input  type="radio" id="radio_highcase_allow" name="highcase" value="highcase_allow" checked>允許
-                                                <input  type="radio" id="radio_highcase_no" name="highcase" value="highcase_no" disabled>禁止<br>
-
-                                                小寫英文<br>
-                                                <input  type="radio" id="radio_lowcase_ask" name="lowcase" value="lowcase_ask" >必要
-                                                <input  type="radio" id="radio_lowcase_allow" name="lowcase" value="lowcase_allow" checked>允許
-                                                <input  type="radio" id="radio_lowcase_no" name="lowcase" value="lowcase_no" disabled>禁止<br>
-
-                                         
-                                            數字<br>
-                                           
-                                            符號<br>
-                                           
-                                        </fieldset>--> 
+                                          
                                         <fieldset>
                                             <legend>PIN 複雜度設定</legend>
                                         <fieldset>
