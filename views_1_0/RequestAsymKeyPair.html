@@ -137,7 +137,7 @@
                                              <label>CSR</label>
                                              <textarea id="csr_textarea" name="csr" rows="4" cols="50"></textarea>
                                               <button class="btn btn-primary" action="submit"
-                                              style="width: 200px; height:34px;background-color: #008CBA;">Request Real Cert</button>
+                                              style="width: 200px; height:34px;background-color: #008CBA;">Sign CSR(RSA only)</button>
                                      
                                           </form>
                                           
@@ -207,27 +207,22 @@
                     var strCSR="";
                     var sMsg = '';
                     if(response.sn!=undefined){
-                        sMsg = "載具序號"+ConverSNFormat(response.sn)+"\n";
+                        sMsg += "載具序號"+ConverSNFormat(response.sn)+"\n";
                     }
                     if(outtype==OutputType_RAW){
                         sMsg+="建立 KeyPair 完成 \n" + bufToHex(new Uint8Array(response.ecpoint))+ bufToHex(new Uint8Array(response.rsakeypair));
                       
                     }else{
                      
-                        if(response.sn!=undefined){
-                            sMsg+="載具序號"+ConverSNFormat(response.sn)+"\n";
-                        }
                         strCSR = "-----BEGIN NEW CERTIFICATE REQUEST-----\n" +
                             btoa(String.fromCharCode.apply(null, new Uint8Array(response.csr))) +
                             "\n-----END NEW CERTIFICATE REQUEST-----\n";
                         sMsg += "CSR:" + "\n"+strCSR;
-                        console.log('CSR :\n', sMsg);
                         document.getElementById('csr_textarea').value = strCSR;
-                        alert(sMsg);
+                    
 
                     }
                     
-
                     console.log(sMsg);
                     alert(sMsg);
 
@@ -426,7 +421,7 @@
 
             return false; // 必須返回false，否則表單會自己再做一次提交操作，並且頁面跳轉 
         } 
-        
+
     </script>
 
 </body>
