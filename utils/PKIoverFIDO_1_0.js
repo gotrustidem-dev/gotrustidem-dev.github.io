@@ -1223,6 +1223,7 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
         'challenge': challenge,
         "userVerification": "discouraged",
         timeout: 60000,  
+        "transports":['usb','nfc'],
     }
     var idList = [{
         id: pki_buffer,
