@@ -1223,11 +1223,11 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
         'challenge': challenge,
         "userVerification": "discouraged",
         timeout: 60000,  
-        "transports":['usb','nfc'],
     }
     var idList = [{
         id: pki_buffer,
-        type: "public-key"
+        type: "public-key",
+        "transports":['usb','nfc']
     }];
 
     getAssertionChallenge.allowCredentials = idList;
