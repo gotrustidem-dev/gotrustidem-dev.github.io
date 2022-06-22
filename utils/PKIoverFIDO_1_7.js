@@ -7,8 +7,8 @@
 
  'use strict';
 
- const VERSION = "1.0.0"
-
+const VERSION = "1.7.0"
+const DEFAULT_TIMEOUT = 60000
 // Command Header GoTrust-Idem-PKI
 const GTheader = 'R29UcnVzdC1JZGVtLVBLSQ==';
 var sUserName = 'GoTrustID.com';
@@ -1793,7 +1793,8 @@ function GTIDEM_SetName(sName){
 
    var getAssertionChallenge = {
        'challenge': challenge,
-       "userVerification": "discouraged"
+       "userVerification": "discouraged",
+       timeout: 60000,  
    }
    var idList = [{
        id: pki_buffer,
