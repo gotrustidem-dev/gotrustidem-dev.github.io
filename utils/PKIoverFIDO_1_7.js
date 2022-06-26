@@ -420,9 +420,9 @@ function checkPINFormatLevel(bNewPIN, level){
 /**
  * 判別新密碼是否符合載具的密碼要求。
  * @param {Uint8Array} bNewPIN 新的使用者密碼
- * @param {Uint8Array} pinFlag 載具的密碼參數，由 GTIDEM_GetTokenInfo 的 flags 取得
+ * @param {Uint8Array} bPinFlag 載具的密碼參數，由 GTIDEM_GetTokenInfo 的 flags 取得
  */
- function isValidPIN(bNewPIN, pinFlag){
+ function GTIDEM_isValidPIN(bNewPIN, bPinFlag){
 
     if ((bNewPIN.length < pinFlag[2]) || (bNewPIN.length > pinFlag[3])) {
         return false;
@@ -538,8 +538,9 @@ function checkPINFormatLevel(bNewPIN, level){
 
    var getAssertionChallenge = {
        'challenge': challenge,
-       "userVerification": "discouraged"
-       //"userVerification": "required"
+       "userVerification": "discouraged",
+       timeout: DEFAULT_TIMEOUT, 
+       
    }
    var idList = [{
        id: pki_buffer,
@@ -610,26 +611,7 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bKeyID) {
         sn_buf[3] = bSerialNumber.byteLength;
         sn_buf.set(bSerialNumber, 4);
    }
-	// var token_sn = undefined;
-    // if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
-    //     var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
-    //         return fido;
-    //    });
-    //    if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
-    //        return gtidem;
-    //    }else{
-    //        token_sn = new Uint8Array(gtidem.sn);
-    //    }
-    // }else{
-    //     token_sn =  new Uint8Array(bSerialNumber);
-    // }
-
-    // sn_buf = new Uint8Array(4 + token_sn.byteLength);
-    // sn_buf[0] = 0xDF;
-    // sn_buf[1] = 0x20;
-    // sn_buf[2] = token_sn.byteLength >> 8;
-    // sn_buf[3] = token_sn.byteLength;
-    // sn_buf.set(token_sn, 4);
+	
 
 
    var payloadLen = keyid_buf.byteLength+sn_buf.byteLength
@@ -669,6 +651,7 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bKeyID) {
         "authenticatorAttachment": "cross-platform"
 
     },
+    timeout: DEFAULT_TIMEOUT, 
     'attestation': "direct",
     'pubKeyCredParams': [{
             'type': 'public-key',
@@ -802,6 +785,7 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
          "authenticatorAttachment": "cross-platform"
  
      },
+     timeout: DEFAULT_TIMEOUT, 
      'attestation': "direct",
      'pubKeyCredParams': [{
              'type': 'public-key',
@@ -964,7 +948,8 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
 
    var getAssertionChallenge = {
     'challenge': challenge,
-    "userVerification": "required"
+    "userVerification": "required",
+    timeout: DEFAULT_TIMEOUT, 
     }
     var idList = [{
         id: pki_buffer,
@@ -1066,6 +1051,8 @@ async function GTIDEM_DeleteCertByLabel(bLabel, bSerialNumber) {
 
     var getAssertionChallenge = {
         'challenge': challenge,
+        "userVerification": "required",
+        timeout: DEFAULT_TIMEOUT, 
     }
     var idList = [{
         id: pki_buffer,
@@ -1154,7 +1141,10 @@ async function GTIDEM_ClearToken( bSerialNumber) {
 
 
     var getAssertionChallenge = {
-        'challenge': challenge,
+        'challenge': challenge,  
+        "userVerification": "required",
+        timeout: DEFAULT_TIMEOUT, 
+
     }
     var idList = [{
         id: pki_buffer,
@@ -1222,7 +1212,7 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
     var getAssertionChallenge = {
         'challenge': challenge,
         "userVerification": "discouraged",
-        timeout: 60000,  
+        timeout: DEFAULT_TIMEOUT,  
     }
     var idList = [{
         id: pki_buffer,
@@ -1231,7 +1221,7 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
     }];
 
     getAssertionChallenge.allowCredentials = idList;
-    console.log('GetTokenInfo', getAssertionChallenge);
+   ////('GetTokenInfo', getAssertionChallenge);
 
     return await navigator.credentials.get({
             'publicKey': getAssertionChallenge
@@ -1359,7 +1349,9 @@ async function GTIDEM_SignDataByIndex(index, bSerialNumber ,alg_number, bPlain) 
     //console.log("SignDataByIndex", bufToHex(pki_buffer));
     var getAssertionChallenge = {
         'challenge': challenge,
-        "userVerification": "required"
+        "userVerification": "required",
+        timeout: DEFAULT_TIMEOUT, 
+        
 
     }
     var idList = [{
@@ -1502,7 +1494,8 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, bPlain)
     //console.log("SignDataByIndex", bufToHex(pki_buffer));
     var getAssertionChallenge = {
         'challenge': challenge,
-        "userVerification": "required"
+        "userVerification": "required",
+        timeout: DEFAULT_TIMEOUT, 
 
     }
     var idList = [{
@@ -1585,6 +1578,7 @@ async function GTIDEM_ReadCertByIndexWithoutPIN(index, bSerialNumber) {
     var getAssertionChallenge = {
         'challenge': challenge,
         "userVerification": "discouraged",
+        timeout: DEFAULT_TIMEOUT, 
 
     }
     var idList = [{
@@ -1695,6 +1689,7 @@ async function GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSerialNumber) {
     var getAssertionChallenge = {
         'challenge': challenge,
         "userVerification": "discouraged",
+        timeout: DEFAULT_TIMEOUT, 
     }
     var idList = [{
         id: pki_buffer,
@@ -1878,6 +1873,7 @@ function GTIDEM_SetName(sName){
    var getAssertionChallenge = {
        'challenge': challenge,
        "userVerification": "discouraged"
+       timeout: DEFAULT_TIMEOUT, 
    }
    var idList = [{
        id: pki_buffer,
@@ -2005,7 +2001,7 @@ async function GTIDEM_GenKeyPair(bSerialNumber,bKeyID, keytype, outputformat) {
          'name': sUserName,
          'displayName': sUserName,
      },
- 
+     timeout: DEFAULT_TIMEOUT, 
      "authenticatorSelection": {
          "userVerification": "required",
          "requireResidentKey": false,
@@ -2102,7 +2098,8 @@ async function GTIDEM_GenKeyPair(bSerialNumber,bKeyID, keytype, outputformat) {
 
    var getAssertionChallenge = {
        'challenge': challenge,
-       "userVerification": "discouraged"
+       "userVerification": "discouraged",
+       timeout: DEFAULT_TIMEOUT, 
    }
    var idList = [{
        id: pki_buffer,
