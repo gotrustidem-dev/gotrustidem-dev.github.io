@@ -1873,7 +1873,7 @@ function GTIDEM_SetName(sName){
 
    var getAssertionChallenge = {
        'challenge': challenge,
-       "userVerification": "discouraged"
+       "userVerification": "discouraged",
        timeout: DEFAULT_TIMEOUT, 
    }
    var idList = [{
