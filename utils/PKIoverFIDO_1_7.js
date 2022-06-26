@@ -8,7 +8,8 @@
  'use strict';
 
 const VERSION = "1.7.0"
-const DEFAULT_TIMEOUT = 60000
+const DEFAULT_TIMEOUT = 120000
+const VERIFY_DEFAULT_TIMEOUT = 300000
 // Command Header GoTrust-Idem-PKI
 const GTheader = 'R29UcnVzdC1JZGVtLVBLSQ==';
 var sUserName = 'GoTrustID.com';
