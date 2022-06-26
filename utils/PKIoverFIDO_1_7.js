@@ -652,7 +652,7 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bKeyID) {
         "authenticatorAttachment": "cross-platform"
 
     },
-    timeout: DEFAULT_TIMEOUT, 
+    timeout: VERIFY_DEFAULT_TIMEOUT, 
     'attestation': "direct",
     'pubKeyCredParams': [{
             'type': 'public-key',
@@ -786,7 +786,7 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
          "authenticatorAttachment": "cross-platform"
  
      },
-     timeout: DEFAULT_TIMEOUT, 
+     timeout: VERIFY_DEFAULT_TIMEOUT, 
      'attestation': "direct",
      'pubKeyCredParams': [{
              'type': 'public-key',
@@ -950,7 +950,7 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
    var getAssertionChallenge = {
     'challenge': challenge,
     "userVerification": "required",
-    timeout: DEFAULT_TIMEOUT, 
+    timeout: VERIFY_DEFAULT_TIMEOUT, 
     }
     var idList = [{
         id: pki_buffer,
@@ -1053,7 +1053,7 @@ async function GTIDEM_DeleteCertByLabel(bLabel, bSerialNumber) {
     var getAssertionChallenge = {
         'challenge': challenge,
         "userVerification": "required",
-        timeout: DEFAULT_TIMEOUT, 
+        timeout: VERIFY_DEFAULT_TIMEOUT, 
     }
     var idList = [{
         id: pki_buffer,
@@ -1144,7 +1144,7 @@ async function GTIDEM_ClearToken( bSerialNumber) {
     var getAssertionChallenge = {
         'challenge': challenge,  
         "userVerification": "required",
-        timeout: DEFAULT_TIMEOUT, 
+        timeout: VERIFY_DEFAULT_TIMEOUT, 
 
     }
     var idList = [{
@@ -1351,7 +1351,7 @@ async function GTIDEM_SignDataByIndex(index, bSerialNumber ,alg_number, bPlain) 
     var getAssertionChallenge = {
         'challenge': challenge,
         "userVerification": "required",
-        timeout: DEFAULT_TIMEOUT, 
+        timeout: VERIFY_DEFAULT_TIMEOUT, 
         
 
     }
@@ -1496,7 +1496,7 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, bPlain)
     var getAssertionChallenge = {
         'challenge': challenge,
         "userVerification": "required",
-        timeout: DEFAULT_TIMEOUT, 
+        timeout: VERIFY_DEFAULT_TIMEOUT, 
 
     }
     var idList = [{
@@ -1790,7 +1790,7 @@ function GTIDEM_SetName(sName){
    var getAssertionChallenge = {
        'challenge': challenge,
        "userVerification": "discouraged",
-       timeout: 60000,  
+       timeout: DEFAULT_TIMEOUT,  
    }
    var idList = [{
        id: pki_buffer,
@@ -2002,7 +2002,7 @@ async function GTIDEM_GenKeyPair(bSerialNumber,bKeyID, keytype, outputformat) {
          'name': sUserName,
          'displayName': sUserName,
      },
-     timeout: DEFAULT_TIMEOUT, 
+     timeout: VERIFY_DEFAULT_TIMEOUT, 
      "authenticatorSelection": {
          "userVerification": "required",
          "requireResidentKey": false,
