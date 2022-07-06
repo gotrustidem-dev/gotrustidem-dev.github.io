@@ -7,7 +7,7 @@
 
  'use strict';
 
-const VERSION = "1.7.1"
+const VERSION = "1.8.1"
 const DEFAULT_TIMEOUT = 120000
 const VERIFY_DEFAULT_TIMEOUT = 300000
 // Command Header GoTrust-Idem-PKI
@@ -476,6 +476,20 @@ function checkPINFormatLevel(bNewPIN, level){
 
 
     }
+   var prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
+   return await GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN);
+
+}
+
+/**
+ * 修改使用者密碼，使用PINProtocolV1 保護資料
+ * @param {Uint8Array} bOldPIN 舊密碼
+ * @param {Uint8Array} bNewPIN 新密碼
+ * @param {Uint8Array｜undefined} bSerialNumber 指定序號序號。若不指定載具序號，則可填入 undefined 或是空陣列
+ * @returns 
+ */
+ async function GTIDEM_ChangeUserPIN_V1(bSerialNumber, bECPoint,bEcryptedOldPINHash,bEncryptedNEWPIN) {
+
     var sn_buf;
     if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
         sn_buf = new Uint8Array(0);
@@ -487,35 +501,30 @@ function checkPINFormatLevel(bNewPIN, level){
         sn_buf[3] = bSerialNumber.byteLength;
         sn_buf.set(bSerialNumber, 4);
     }
-    //Compution session Key and encrypt oldPIN and new pin.
-   var prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
-   //console.log("exportECPublicKeyArray",bufToHex(prepareUpdate.bExportECPublicKeyArray));
-   //console.log("encryptedOldPINHash",bufToHex(prepareUpdate.bEcryptedOldPINHash));
-   //console.log("encryptedNEWPIN",bufToHex(prepareUpdate.bEncryptedNEWPIN));
 
 
    var challenge = new Uint8Array(32);
    window.crypto.getRandomValues(challenge);
-   var ecpubkey_buf = new Uint8Array(4 + prepareUpdate.bExportECPublicKeyArray.byteLength);
+   var ecpubkey_buf = new Uint8Array(4 + bECPoint.byteLength);
    ecpubkey_buf[0] = 0xDF;
    ecpubkey_buf[1] = 0x04;
-   ecpubkey_buf[2] = prepareUpdate.bExportECPublicKeyArray.byteLength >> 8;
-   ecpubkey_buf[3] = prepareUpdate.bExportECPublicKeyArray.byteLength;
-   ecpubkey_buf.set(new Uint8Array(prepareUpdate.bExportECPublicKeyArray), 4);
+   ecpubkey_buf[2] = bECPoint.byteLength >> 8;
+   ecpubkey_buf[3] = bECPoint.byteLength;
+   ecpubkey_buf.set(new Uint8Array(bECPoint), 4);
 
-   var encryptedOldPINHash_buf = new Uint8Array(4 + prepareUpdate.bEcryptedOldPINHash.byteLength);
+   var encryptedOldPINHash_buf = new Uint8Array(4 +bEcryptedOldPINHash.byteLength);
    encryptedOldPINHash_buf[0] = 0xDF;
    encryptedOldPINHash_buf[1] = 0x05;
-   encryptedOldPINHash_buf[2] = prepareUpdate.bEcryptedOldPINHash.byteLength >> 8;
-   encryptedOldPINHash_buf[3] = prepareUpdate.bEcryptedOldPINHash.byteLength;
-   encryptedOldPINHash_buf.set(new Uint8Array(prepareUpdate.bEcryptedOldPINHash), 4);
+   encryptedOldPINHash_buf[2] = bEcryptedOldPINHash.byteLength >> 8;
+   encryptedOldPINHash_buf[3] = bEcryptedOldPINHash.byteLength;
+   encryptedOldPINHash_buf.set(new Uint8Array(bEcryptedOldPINHash), 4);
   
-   var encryptedNewPIN_buf = new Uint8Array(4 + prepareUpdate.bEncryptedNEWPIN.byteLength);
+   var encryptedNewPIN_buf = new Uint8Array(4 + bEncryptedNEWPIN.byteLength);
    encryptedNewPIN_buf[0] = 0xDF;
    encryptedNewPIN_buf[1] = 0x07;
-   encryptedNewPIN_buf[2] = prepareUpdate.bEncryptedNEWPIN.byteLength >> 8;
-   encryptedNewPIN_buf[3] = prepareUpdate.bEncryptedNEWPIN.byteLength;
-   encryptedNewPIN_buf.set(new Uint8Array(prepareUpdate.bEncryptedNEWPIN), 4);
+   encryptedNewPIN_buf[2] = bEncryptedNEWPIN.byteLength >> 8;
+   encryptedNewPIN_buf[3] = bEncryptedNEWPIN.byteLength;
+   encryptedNewPIN_buf.set(new Uint8Array(bEncryptedNEWPIN), 4);
 
 
     var payloadLen = sn_buf.byteLength+ecpubkey_buf.byteLength+encryptedOldPINHash_buf.byteLength+encryptedNewPIN_buf.byteLength;
@@ -557,10 +566,6 @@ function checkPINFormatLevel(bNewPIN, level){
            
         let gtidem = new GTIdemJs();
         gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_CHANGE_PIN);
-        // if(gtidem.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
-        //     gtidem.sn =token_sn;
-        // };
-
         return gtidem;
     }).catch((error) => {
         ////console.log(error.name);
@@ -568,6 +573,111 @@ function checkPINFormatLevel(bNewPIN, level){
         gtidem.ConvertWebError(error.name);
         return gtidem;
     });
+
+}
+
+/*
+*  修改使用者密碼，使用PINProtocolV2 保護資料。
+* @param {Uint8Array｜undefined} bSerialNumber 指定序號序號。若不指定載具序號，則可填入 undefined 或是空陣列
+* @param {Uint8Array} bNewPIN 新密碼
+* @returns 
+*/
+async function GTIDEM_ChangeUserPIN_V2(bSerialNumber, bECPointP256, bChangePINParam) {
+
+
+  
+   var sn_buf;
+   if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
+       sn_buf = new Uint8Array(0);
+   }else{
+       sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+       sn_buf[0] = 0xDF;
+       sn_buf[1] = 0x20;
+       sn_buf[2] = bSerialNumber.byteLength >> 8;
+       sn_buf[3] = bSerialNumber.byteLength;
+       sn_buf.set(bSerialNumber, 4);
+   }
+   //Compution session Key and encrypt oldPIN and new pin.
+  var prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
+  //console.log("exportECPublicKeyArray",bufToHex(prepareUpdate.bExportECPublicKeyArray));
+  //console.log("encryptedOldPINHash",bufToHex(prepareUpdate.bEcryptedOldPINHash));
+  //console.log("encryptedNEWPIN",bufToHex(prepareUpdate.bEncryptedNEWPIN));
+
+
+  var challenge = new Uint8Array(32);
+  window.crypto.getRandomValues(challenge);
+  var ecpubkey_buf = new Uint8Array(4 + prepareUpdate.bExportECPublicKeyArray.byteLength);
+  ecpubkey_buf[0] = 0xDF;
+  ecpubkey_buf[1] = 0x04;
+  ecpubkey_buf[2] = prepareUpdate.bExportECPublicKeyArray.byteLength >> 8;
+  ecpubkey_buf[3] = prepareUpdate.bExportECPublicKeyArray.byteLength;
+  ecpubkey_buf.set(new Uint8Array(prepareUpdate.bExportECPublicKeyArray), 4);
+
+  var encryptedOldPINHash_buf = new Uint8Array(4 + prepareUpdate.bEcryptedOldPINHash.byteLength);
+  encryptedOldPINHash_buf[0] = 0xDF;
+  encryptedOldPINHash_buf[1] = 0x05;
+  encryptedOldPINHash_buf[2] = prepareUpdate.bEcryptedOldPINHash.byteLength >> 8;
+  encryptedOldPINHash_buf[3] = prepareUpdate.bEcryptedOldPINHash.byteLength;
+  encryptedOldPINHash_buf.set(new Uint8Array(prepareUpdate.bEcryptedOldPINHash), 4);
+ 
+  var encryptedNewPIN_buf = new Uint8Array(4 + prepareUpdate.bEncryptedNEWPIN.byteLength);
+  encryptedNewPIN_buf[0] = 0xDF;
+  encryptedNewPIN_buf[1] = 0x07;
+  encryptedNewPIN_buf[2] = prepareUpdate.bEncryptedNEWPIN.byteLength >> 8;
+  encryptedNewPIN_buf[3] = prepareUpdate.bEncryptedNEWPIN.byteLength;
+  encryptedNewPIN_buf.set(new Uint8Array(prepareUpdate.bEncryptedNEWPIN), 4);
+
+
+   var payloadLen = sn_buf.byteLength+ecpubkey_buf.byteLength+encryptedOldPINHash_buf.byteLength+encryptedNewPIN_buf.byteLength;
+
+  var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+
+  var pki_header = new Uint8Array(3);
+  pki_header[0] = CMD_CHANGE_PIN;
+  pki_header[1] = payloadLen>>8
+  pki_header[2] = payloadLen;
+
+  var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
+  pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+  pki_buffer = _appendBuffer(pki_buffer,ecpubkey_buf);
+  pki_buffer = _appendBuffer(pki_buffer,encryptedOldPINHash_buf);
+  pki_buffer = _appendBuffer(pki_buffer,encryptedNewPIN_buf);
+
+
+
+  //console.log("Change_pin_command: " + bufToHex(pki_buffer));
+
+  var getAssertionChallenge = {
+      'challenge': challenge,
+      "userVerification": "discouraged",
+      timeout: DEFAULT_TIMEOUT, 
+      
+  }
+  var idList = [{
+      id: pki_buffer,
+      type: "public-key"
+  }];
+
+  getAssertionChallenge.allowCredentials = idList;
+  //console.log('List getAssertionChallenge', getAssertionChallenge)
+
+  return await navigator.credentials.get({
+      'publicKey': getAssertionChallenge
+  }).then((fido) => {
+          
+       let gtidem = new GTIdemJs();
+       gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_CHANGE_PIN);
+       // if(gtidem.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
+       //     gtidem.sn =token_sn;
+       // };
+
+       return gtidem;
+   }).catch((error) => {
+       ////console.log(error.name);
+       let gtidem = new GTIdemJs();
+       gtidem.ConvertWebError(error.name);
+       return gtidem;
+   });
 
 }
 
@@ -1011,26 +1121,6 @@ async function GTIDEM_DeleteCertByLabel(bLabel, bSerialNumber) {
         sn_buf[3] = bSerialNumber.byteLength;
         sn_buf.set(bSerialNumber, 4);
     }
-    // var token_sn = undefined;
-    // if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
-    //     var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
-    //         return fido;
-    //    });
-    //    if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
-    //        return gtidem;
-    //    }else{
-    //        token_sn = new Uint8Array(gtidem.sn);
-    //    }
-    // }else{
-    //     token_sn =  new Uint8Array(bSerialNumber);
-    // }
-
-    // sn_buf = new Uint8Array(4 + token_sn.byteLength);
-    // sn_buf[0] = 0xDF;
-    // sn_buf[1] = 0x20;
-    // sn_buf[2] = token_sn.byteLength >> 8;
-    // sn_buf[3] = token_sn.byteLength;
-    // sn_buf.set(token_sn, 4);
 
 
    var payloadLen = label_buf.byteLength+sn_buf.byteLength;
@@ -1104,26 +1194,6 @@ async function GTIDEM_ClearToken( bSerialNumber) {
         sn_buf[3] = bSerialNumber.byteLength;
         sn_buf.set(bSerialNumber, 4);
     }
-    // var token_sn = undefined;
-    // if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
-    //     var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
-    //         return fido;
-    //    });
-    //    if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
-    //        return gtidem;
-    //    }else{
-    //        token_sn = new Uint8Array(gtidem.sn);
-    //    }
-    // }else{
-    //     token_sn =  new Uint8Array(bSerialNumber);
-    // }
-
-    // sn_buf = new Uint8Array(4 + token_sn.byteLength);
-    // sn_buf[0] = 0xDF;
-    // sn_buf[1] = 0x20;
-    // sn_buf[2] = token_sn.byteLength >> 8;
-    // sn_buf[3] = token_sn.byteLength;
-    // sn_buf.set(token_sn, 4);
 
 
    var payloadLen = sn_buf.byteLength;
@@ -1218,7 +1288,7 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
     var idList = [{
         id: pki_buffer,
         type: "public-key"
-    },{}];
+    }];
 
     getAssertionChallenge.allowCredentials = idList;
    ////('GetTokenInfo', getAssertionChallenge);
@@ -1637,31 +1707,7 @@ async function GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSerialNumber) {
         sn_buf[3] = bSerialNumber.byteLength;
         sn_buf.set(bSerialNumber, 4);
     }
-    // var token_sn = undefined;
-    // if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
-    //     var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
-    //         return fido;
-    //    });
-    //    if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
-    //        return gtidem;
-    //    }else{
-    //        token_sn = new Uint8Array(gtidem.sn);
-    //    }
-    // }else{
-    //     token_sn =  new Uint8Array(bSerialNumber);
-    // }
     
-    // sn_buf = new Uint8Array(4 + token_sn.byteLength);
-    // sn_buf[0] = 0xDF;
-    // sn_buf[1] = 0x20;
-    // sn_buf[2] = token_sn.byteLength >> 8;
-    // sn_buf[3] = token_sn.byteLength;
-    // sn_buf.set(token_sn, 4);
-
-
-
-
-
     //PKI Command
 
     var command_bufer = new Uint8Array(bLabel.byteLength + 4);
