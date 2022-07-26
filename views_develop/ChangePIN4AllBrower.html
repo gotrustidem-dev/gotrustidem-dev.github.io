@@ -163,12 +163,13 @@
             }
 
             var bRandom =  hexStringToArrayBuffer(random); 
-            var bEcpoint = hexStringToArrayBuffer(ecpoint); 
+            var bECPointFromToken = hexStringToArrayBuffer(ecpoint); 
 
             var bOldPINArray = new Uint8Array(oldpin.length);
             bOldPINArray.set(toUTF8Array(oldpin), 0);
             var bNewPINArray = new Uint8Array(newpin.length);
             bNewPINArray.set(toUTF8Array(newpin), 0);
+
             var prepareUpdate = computingChangePINParam(bOldPINArray, bNewPINArray, bECPointFromToken);
 
             GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN).then((response) => {
