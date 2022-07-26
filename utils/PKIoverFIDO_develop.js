@@ -582,6 +582,7 @@ function checkPINFormatLevel(bNewPIN, level){
 * @param {Uint8Array} bNewPIN 新密碼
 * @returns 
 */
+/*
 async function GTIDEM_ChangeUserPIN_V2(bSerialNumber, bECPointP256, bChangePINParam) {
 
 
@@ -680,6 +681,7 @@ async function GTIDEM_ChangeUserPIN_V2(bSerialNumber, bECPointP256, bChangePINPa
    });
 
 }
+*/
 
 /**
  * 產生 RSA 2048 金鑰對，會組合成 CSR 格式回傳
@@ -2169,3 +2171,12 @@ async function GTIDEM_GenKeyPair(bSerialNumber,bKeyID, keytype, outputformat) {
     });
 
 }
+/**
+ * 回傳JS library 版本
+ * @returns 
+ */
+
+function GTIDEM_GetJSVersion() {
+
+    return VERSION;
+ }

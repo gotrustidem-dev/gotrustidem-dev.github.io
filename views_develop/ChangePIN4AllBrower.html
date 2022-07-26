@@ -44,12 +44,29 @@
                     <td style="width: 100% ;">
 
 
-                        <form style="text-align: center;" id="form_token_sn" onsubmit="return false">
-                            <p>
-                                <label id="label_token_sn">Token Serial number:</label><br>
-                                <input type="text" name="token_sn"  style="width: 342px; height:41px">
-                            </p>
-                        </form>
+                        <tr>
+                            <td style="width: 100% ;">
+        
+        
+                                <form style="text-align: center;" id="form_token_sn" onsubmit="return false">
+                                    <p>
+                                        <label id="label_token_sn">Token Serial number:</label><br>
+                                        <input type="text" name="token_sn" style="width: 342px; height:41px">
+                                    </p>
+        
+        
+                                </form>
+                                <form style="text-align: center;" id="form_tokeninfo_btn" onsubmit="return false">
+                                    <button class="btn btn-primary" action="submit"
+                                        style="width: 200px; height:34px;background-color: #008CBA;">Get Token Info</button>
+                                    <br><label></label>Random number: <br>
+                                    <br><label id="label_random_number"></label><br>
+                                    <br><label></label>ECDH param: <br>
+                                    <br><label id="label_ecdh_param" name="ecpoint"></label><br>
+
+                                </form>
+                            </td>
+                        </tr>
                     </td>
                 </tr>
 
@@ -94,8 +111,42 @@
     </div>
     <script>
         
+        document.getElementById('form_tokeninfo_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            console.log(token_sn);
+
+            var bToken_sn = undefined;
+            if (token_sn.length != 0) {
+                bToken_sn = hexStringToArrayBuffer(token_sn);
+
+            }
+            GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
+
+                console.log('SUCCESS', response);
+                if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                    document.getElementById('form_token_sn').token_sn.value = ConverSNFormat(response
+                        .sn);
+                    document.getElementById('label_random_number').innerText = ConverSNFormat(response
+                        .rn);
+                    document.getElementById('label_ecdh_param').innerText = ConverSNFormat(response
+                        .ecpoint);    
+
+                } else {
+                    alert(showFIDOErrorMessage(response));
+                }
+            }).catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            });
+
+        });
+
+
         document.getElementById('form_changepin_btn').addEventListener('submit', function (event) {
             event.preventDefault();
+            let random = document.getElementById('label_random_number').textContent;
+            let ecpoint = document.getElementById('label_ecdh_param').ecpoint.value;
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             let oldpin = document.getElementById('form_oldpin_input').currentpin.value;
             let newpin = document.getElementById('form_newpin_input').newpin.value;
@@ -110,14 +161,17 @@
             if(token_sn.length!=0){
                 bToken_sn = hexStringToArrayBuffer(token_sn);  
             }
+
+            var bRandom =  hexStringToArrayBuffer(random); 
+            var bEcpoint = hexStringToArrayBuffer(ecpoint); 
+
             var bOldPINArray = new Uint8Array(oldpin.length);
             bOldPINArray.set(toUTF8Array(oldpin), 0);
-
             var bNewPINBuffer = new Uint8Array(newpin.length);
             bNewPINBuffer.set(toUTF8Array(newpin), 0);
+            var prepareUpdate = computingChangePINParam(bOldPIN, bNewPIN, bECPointFromToken);
 
-
-            GTIDEM_ChangeUserPIN(bOldPINArray, bNewPINBuffer, bToken_sn).then((response) => {
+            GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN).then((response) => {
 
                if(response.statusCode==CTAP1_ERR_SUCCESS){   
                    var str = '密碼變更完成'; 
@@ -141,6 +195,103 @@
             })
 
         })
+        
+        
+        async function computingChangePINParam(bOldPIN, bNewPIN, ecpointXY) {
+
+            //Convert oldPIN to sha256 value
+            var oldPINHash = await crypto.subtle.digest("SHA-256", bOldPIN);
+            //console.log("oldPINHash  ", oldPINHash);
+
+            //During encryption, newPin is padded with trailing 0x00 bytes and is of minimum 64 bytes length. 
+            var newPINBuffer = new Uint8Array(64);
+            newPINBuffer.fill(0);
+            newPINBuffer.set(bNewPIN, 0);
+
+            var iv = new Uint8Array(16);
+            iv.fill(0);
+
+
+            var newPINHash;
+            var ECPublicKey;
+            var EncryptOlDPIN;
+
+            //let ecpoint = hexStringToArrayBuffer(ecpointXY);
+            let ecpoint = ecpointXY;
+            var externalECPublicKeyX = base64EncodeURL(ecpoint.slice(1, 33));
+            var externalECPublicKeyY = base64EncodeURL(ecpoint.slice(33, 65));
+
+            var exportECPublicKeyArray;
+            var encryptedOldPINHash;
+            var encryptedNEWPIN;
+
+
+            var importedECPublicKey = await window.crypto.subtle.importKey(
+                "jwk", //can be "jwk" (public or private), "raw" (public only), "spki" (public only), or "pkcs8" (private only)
+                { //this is an example jwk key, other key types are Uint8Array objects
+                    kty: "EC",
+                    crv: "P-256",
+                    x: externalECPublicKeyX,
+                    y: externalECPublicKeyY,
+                    ext: true,
+                }, { //these are the algorithm options
+                    name: "ECDH",
+                    namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
+                },
+                true, //whether the key is extractable (i.e. can be used in exportKey)
+                [] //"deriveKey" and/or "deriveBits" for private keys only (just put an empty list if importing a public key)
+            );
+
+            var CryptoECKeyPair = await window.crypto.subtle.generateKey({
+                    name: "ECDH",
+                    namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
+                },
+                true, //whether the key is extractable (i.e. can be used in exportKey)
+                ["deriveKey", "deriveBits"] //can be any combination of "deriveKey" and "deriveBits"
+            );
+
+            exportECPublicKeyArray = await window.crypto.subtle.exportKey("raw", CryptoECKeyPair.publicKey);
+
+            //Computing session Key
+            var CryptoSessionKey = await window.crypto.subtle.deriveBits({
+                    name: "ECDH",
+                    namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
+                    public: importedECPublicKey, //an ECDH public key from generateKey or importKey
+
+                },
+                CryptoECKeyPair.privateKey, //from generateKey or importKey above
+                256 //the number of bits you want to derive
+            ).then(function (keybits) { //convert share secret to pinEncKey
+                return crypto.subtle.digest(
+                    "SHA-256",
+                    new Uint8Array(keybits)
+                );
+            }).then(function (sessionKeyBytes) {
+                //console.log("sessionKeyBytes", bufToHex(sessionKeyBytes));
+                return crypto.subtle.importKey("raw",
+                    sessionKeyBytes,
+                    "aes-cbc", false, ["encrypt"]);
+            });
+
+
+            encryptedOldPINHash = await crypto.subtle.encrypt({
+                name: "aes-cbc",
+                iv
+            }, CryptoSessionKey, new Uint8Array(oldPINHash));
+
+
+            encryptedNEWPIN = await crypto.subtle.encrypt({
+                name: "aes-cbc",
+                iv
+            }, CryptoSessionKey, new Uint8Array(newPINBuffer));
+
+            var bExportECPublicKeyArray = new Uint8Array(exportECPublicKeyArray);
+            var bEcryptedOldPINHash = new Uint8Array(encryptedOldPINHash.slice(0,16));
+            var bEncryptedNEWPIN = new Uint8Array(encryptedNEWPIN).slice(0,64);
+            return {bExportECPublicKeyArray, bEcryptedOldPINHash, bEncryptedNEWPIN};
+            }
+    
+    
     </script>
 
 </body>
