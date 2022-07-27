@@ -44,30 +44,30 @@
                     <td style="width: 100% ;">
 
 
-                        <tr>
-                            <td style="width: 100% ;">
-        
-        
-                                <form style="text-align: center;" id="form_token_sn" onsubmit="return false">
-                                    <p>
-                                        <label id="label_token_sn">Token Serial number:</label><br>
-                                        <input type="text" name="token_sn" style="width: 342px; height:41px">
-                                    </p>
-        
-        
-                                </form>
-                                <form style="text-align: center;" id="form_tokeninfo_btn" onsubmit="return false">
-                                    <button class="btn btn-primary" action="submit"
-                                        style="width: 200px; height:34px;background-color: #008CBA;">Get Token Info</button>
-                                    <br><label></label>Random number: <br>
-                                    <br><label id="label_random_number"></label><br>
-                                    <br><label></label>ECDH param: <br>
-                                    <br><label id="label_ecdh_param" name="ecpoint"></label><br>
+                <tr>
+                    <td style="width: 100% ;">
 
-                                </form>
-                            </td>
-                        </tr>
+
+                        <form style="text-align: center;" id="form_token_sn" onsubmit="return false">
+                            <p>
+                                <label id="label_token_sn">Token Serial number:</label><br>
+                                <input type="text" name="token_sn" style="width: 342px; height:41px">
+                            </p>
+
+
+                        </form>
+                        <form style="text-align: center;" id="form_tokeninfo_btn" onsubmit="return false">
+                            <button class="btn btn-primary" action="submit"
+                                style="width: 200px; height:34px;background-color: #008CBA;">Get Token Info</button>
+                            <br><label></label>Random number: <br>
+                            <br><label id="label_random_number"></label><br>
+                            <br><label></label>ECDH param: <br>
+                            <br><label id="label_ecdh_param" name="ecpoint"></label><br>
+
+                        </form>
                     </td>
+                </tr>
+                </td>
                 </tr>
 
                 <tr>
@@ -79,26 +79,32 @@
                                     <td style="width: 385px;">
                                         <p>
                                             <label style="text-align: center;">Current PIN</label><br>
-                                            <form style="text-align: center;" id="form_oldpin_input" onsubmit="return false">
+                                            <form style="text-align: center;" id="form_oldpin_input"
+                                                onsubmit="return false">
                                                 <input type="text" name="currentpin" style="width: 342px; height:41px">
                                             </form>
                                         </p>
-                                     
+
                                         <p>
                                             <label style="text-align: center;">New PIN</label><br>
-                                            <form style="text-align: center;" id="form_newpin_input" onsubmit="return false">
+                                            <form style="text-align: center;" id="form_newpin_input"
+                                                onsubmit="return false">
                                                 <input type="text" name="newpin" style="width: 342px; height:41px">
                                             </form>
                                         </p>
                                         <p>
                                             <label style="text-align: center;">Confirm PIN</label><br>
-                                            <form style="text-align: center;" id="form_newpin_confirm_input" onsubmit="return false">
-                                                <input type="text" name="confirm_newpin" style="width: 342px; height:41px">
+                                            <form style="text-align: center;" id="form_newpin_confirm_input"
+                                                onsubmit="return false">
+                                                <input type="text" name="confirm_newpin"
+                                                    style="width: 342px; height:41px">
                                             </form>
                                         </p>
-                                        <form style="text-align: center;" id="form_changepin_btn" onsubmit="return false">
+                                        <form style="text-align: center;" id="form_changepin_btn"
+                                            onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
-                                                style="width: 200px; height:34px;background-color: #008CBA;">Change PIN</button>
+                                                style="width: 200px; height:34px;background-color: #008CBA;">Change
+                                                PIN</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -110,7 +116,6 @@
         </table>
     </div>
     <script>
-        
         document.getElementById('form_tokeninfo_btn').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
@@ -130,7 +135,7 @@
                     document.getElementById('label_random_number').innerText = ConverSNFormat(response
                         .rn);
                     document.getElementById('label_ecdh_param').innerText = ConverSNFormat(response
-                        .ecpoint);    
+                        .ecpoint);
                     //computing ping hash    
                 } else {
                     alert(showFIDOErrorMessage(response));
@@ -144,60 +149,64 @@
 
 
         document.getElementById('form_changepin_btn').addEventListener('submit', function (event) {
-           
+
             let random = document.getElementById('label_random_number').textContent;
             let ecpoint = document.getElementById('label_ecdh_param').textContent;
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             let oldpin = document.getElementById('form_oldpin_input').currentpin.value;
             let newpin = document.getElementById('form_newpin_input').newpin.value;
             let confirm_newpin = document.getElementById('form_newpin_confirm_input').confirm_newpin.value;
-            
+
             console.log(token_sn);
             console.log(oldpin);
             console.log(newpin);
             console.log(confirm_newpin);
 
             var bToken_sn = undefined;
-            if(token_sn.length!=0){
-                bToken_sn = hexStringToArrayBuffer(token_sn);  
+            if (token_sn.length != 0) {
+                bToken_sn = hexStringToArrayBuffer(token_sn);
             }
 
-            var bRandom =  hexStringToArrayBuffer(random); 
-            var bECPointFromToken = hexStringToArrayBuffer(ecpoint); 
+            var bRandom = hexStringToArrayBuffer(random);
+            var bECPointFromToken = hexStringToArrayBuffer(ecpoint);
 
             var bOldPINArray = new Uint8Array(oldpin.length);
             bOldPINArray.set(toUTF8Array(oldpin), 0);
             var bNewPINArray = new Uint8Array(newpin.length);
             bNewPINArray.set(toUTF8Array(newpin), 0);
 
-            var prepareUpdate = computingChangePINParam(bOldPINArray, bNewPINArray, bECPointFromToken);
+            var prepareUpdate = computingChangePINParam(bOldPINArray, bNewPINArray, bECPointFromToken).then((
+                prepareUpdate) => {
+                GTIDEM_ChangeUserPIN_V1(bToken_sn, prepareUpdate.bExportECPublicKeyArray, prepareUpdate
+                    .bEcryptedOldPINHash, prepareUpdate.bEncryptedNEWPIN).then((response) => {
 
-            GTIDEM_ChangeUserPIN_V1(bToken_sn, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN).then((response) => {
+                    if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                        var str = '密碼變更完成';
+                        if (response.pinRetry != undefined) {
+                            str += '\n剩餘次數為 ' + response.pinRetry;
+                        }
+                        if (response.sn != undefined) {
+                            str += '\n 載具序號為 ' + response.sn;
 
-               if(response.statusCode==CTAP1_ERR_SUCCESS){   
-                   var str = '密碼變更完成'; 
-                   if(response.pinRetry != undefined){
-                     str+= '\n剩餘次數為 '+response.pinRetry;
-                   }
-                   if(response.sn != undefined){
-                        str+= '\n 載具序號為 '+response.sn;
-                    
-                   }
-                   alert(str);
-                   
-                    
-                }else{
-                    alert(showFIDOErrorMessage(response));
-                }
-              
-            }).catch((error) => {
-                alert(error)
-                console.log('FAIL', error)
-            })
+                        }
+                        alert(str);
+
+
+                    } else {
+                        alert(showFIDOErrorMessage(response));
+                    }
+
+                }).catch((error) => {
+                    alert(error)
+                    console.log('FAIL', error)
+                })
+            });
+
+
 
         })
-        
-        
+
+
         async function computingChangePINParam(bOldPIN, bNewPIN, ecpointXY) {
 
             //Convert oldPIN to sha256 value
@@ -287,12 +296,14 @@
             }, CryptoSessionKey, new Uint8Array(newPINBuffer));
 
             var bExportECPublicKeyArray = new Uint8Array(exportECPublicKeyArray);
-            var bEcryptedOldPINHash = new Uint8Array(encryptedOldPINHash.slice(0,16));
-            var bEncryptedNEWPIN = new Uint8Array(encryptedNEWPIN).slice(0,64);
-            return {bExportECPublicKeyArray, bEcryptedOldPINHash, bEncryptedNEWPIN};
-            }
-    
-    
+            var bEcryptedOldPINHash = new Uint8Array(encryptedOldPINHash.slice(0, 16));
+            var bEncryptedNEWPIN = new Uint8Array(encryptedNEWPIN).slice(0, 64);
+            return {
+                bExportECPublicKeyArray,
+                bEcryptedOldPINHash,
+                bEncryptedNEWPIN
+            };
+        }
     </script>
 
 </body>
