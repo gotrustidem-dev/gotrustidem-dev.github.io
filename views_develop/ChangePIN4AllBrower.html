@@ -131,7 +131,7 @@
                         .rn);
                     document.getElementById('label_ecdh_param').innerText = ConverSNFormat(response
                         .ecpoint);    
-
+                    //computing ping hash    
                 } else {
                     alert(showFIDOErrorMessage(response));
                 }
@@ -144,7 +144,7 @@
 
 
         document.getElementById('form_changepin_btn').addEventListener('submit', function (event) {
-            event.preventDefault();
+           
             let random = document.getElementById('label_random_number').textContent;
             let ecpoint = document.getElementById('label_ecdh_param').textContent;
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
@@ -172,7 +172,7 @@
 
             var prepareUpdate = computingChangePINParam(bOldPINArray, bNewPINArray, bECPointFromToken);
 
-            GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN).then((response) => {
+            GTIDEM_ChangeUserPIN_V1(bToken_sn, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN).then((response) => {
 
                if(response.statusCode==CTAP1_ERR_SUCCESS){   
                    var str = '密碼變更完成'; 
