@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GoTrustIdem TestPKI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../utils/cbor.js"></script>
+    <script src="../utils/helpers.js"></script>
+    <script src="../utils/showMessage.js"></script>
+    <script src="../utils/response.js"></script>
+    <script src="../utils/PKIoverFIDO_1_7.js"></script>
+</head>
+
+<body>
+    <div style="overflow-x: scroll;">
+        <table style="height: auto; width: 100%;">
+            <tbody>
+
+                <tr>
+                    <td style="width: 100% ;">
+
+
+                        <form style="text-align: center;" id="form_token_sn" onsubmit="return false">
+                            <p>
+                                <label id="label_token_sn">Token Serial number:</label><br>
+                                <input type="text" name="token_sn" style="width: 342px; height:41px">
+                            </p>
+
+
+                        </form>
+                        <form style="text-align: center;" id="form_tokeninfo_btn" onsubmit="return false">
+                            <button class="btn btn-primary" action="submit"
+                                style="width: 200px; height:34px;background-color: #008CBA;">Get Token Info</button>
+                            <br><label></label>Random number: <br>
+                            <br><label id="label_random_number"></label><br>
+                        </form>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="width: 100% ; ">
+                        <table class="center" border="1" width="100%">
+                            <table>
+                                <tr>
+                                    <!--PC side-->
+                                    <td style="width: 385px;">
+
+                                        <form style="text-align: center;" id="form_reset_key" onsubmit="return false">
+                                            <p>
+                                                <label id="label_reset_key"> Factory Reset Key:</label><br>
+                                                <input type="text" name="reset_key" value="31323334353637383132333435363738" style="width: 342px; height:41px">
+                                            </p>
+                                        </form>
+
+                                        
+
+                                        <p>
+                                        <form style="text-align: center;" id="form_reset_btn" onsubmit="return false">
+                                            <button class="btn btn-primary" action="submit"
+                                                style="width: 200px; height:34px;background-color: #008CBA;">Reset
+                                                Token</button>
+                                        </form>
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </table>
+                    </td>
+
+                </tr>
+            </tbody>·
+        </table>
+    </div>
+    <script>
+
+        var flags = undefined;
+        document.getElementById('form_tokeninfo_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            console.log(token_sn);
+
+            var bToken_sn = undefined;
+            if (token_sn.length != 0) {
+                bToken_sn = hexStringToArrayBuffer(token_sn);
+
+            }
+            GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
+
+                console.log('SUCCESS', response);
+                if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                    document.getElementById('form_token_sn').token_sn.value = ConverSNFormat(response
+                        .sn);
+                    document.getElementById('label_random_number').innerText = ConverSNFormat(response
+                        .rn);
+
+                } else {
+                    alert(showFIDOErrorMessage(response));
+                }
+            }).catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            });
+
+        });
+
+        document.getElementById('form_reset_btn').addEventListener('submit', function (event) {
+
+            event.preventDefault();
+            let bRandom = [];
+
+            let random = document.getElementById('label_random_number').textContent;
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            let reset_key = document.getElementById('form_reset_key').reset_key.value;
+            var bToken_sn = undefined;
+            var bReset_key = undefined;
+
+
+           
+          
+
+
+            if (token_sn.length != 0) {
+                bToken_sn = hexStringToArrayBuffer(token_sn);
+            }
+
+            bReset_key = hexStringToArrayBuffer(reset_key);
+            bRandom = hexStringToArrayBuffer(random);
+            var bRandomNumber =  bRandom.slice(0, 16);
+            var bChallenge =   bRandom.slice(16, 32);
+            
+            console.log(token_sn);
+            console.log(bReset_key);
+
+   
+
+            var result = await prepareResetResponse(bReset_key, bRandomNumber, bToken_sn,bChallenge)
+
+         
+            GTIDEM_FactoryResetToken(bToken_sn, result).then(
+                response => {
+
+                    if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                        var str = '載具已回出廠狀態';
+                        if (response.pinRetry != undefined) {
+                            str += '\n剩餘次數為 ' + response.pinRetry;
+                        }
+                        if (response.sn != undefined) {
+                            str += '\n 載具序號為 ' + response.sn;
+
+                        }
+                        alert(str);
+
+                    } else {
+                        alert(showFIDOErrorMessage(response));
+                    }
+
+                });
+               
+        });
+
+        async function buildResetResponse(bReset_key, bRandom, bToken_sn) {
+            return await prepareResetResponse(bReset_key, bRandom, bToken_sn);
+        }
+
+        async function prepareResetResponse(bReset_key, bRandomNumber, bToken_sn, bChallenge) {
+
+            var sessionKey;
+            var iv;
+            var macKey;
+
+            var bEncryptedInitData;
+            var bHashMacofInitData;
+
+
+            sessionKey = await computingSessionKey(bReset_key, bRandomNumber);
+            console.log("RESET_SESSION_KEY: "+bufToHex(sessionKey));
+
+            iv = await computingIV(bToken_sn);
+            console.log("IV: "+bufToHex(iv));
+
+            var result={};
+
+            
+            bEncryptedChallengeData = await window.crypto.subtle.importKey("raw",
+                    sessionKey,
+                    "aes-cbc", false, ["encrypt"])
+                .then(cryptoKey => {
+                    return crypto.subtle.encrypt({
+                        name: "aes-cbc",
+                        iv
+                    }, cryptoKey, bChallenge);
+
+                });
+            console.log("ENC Challenge : \n" + bufToHex(bEncryptedChallengeData));
+            return  bEncryptedChallengeData;
+            
+        }
+        async function computingSessionKey(key, random) {
+
+
+            var sessionKey;
+
+            var sessionKeyData = new Uint8Array(key.byteLength + random.byteLength + 1);
+            sessionKeyData.set(key, 0);
+            sessionKeyData.set(random, key.byteLength);
+            sessionKeyData.set(new Uint8Array([0x1]), key.byteLength + random.byteLength);
+
+            await window.crypto.subtle.digest(
+                    "SHA-256", sessionKeyData
+                )
+                .then(function (key) {
+
+                    return sessionKey = new Uint8Array(key);
+                });
+
+            return sessionKey;
+
+
+        }
+        async function computingIV(bToken_sn) {
+
+            var hash;
+            await window.crypto.subtle.digest(
+                "SHA-256", bToken_sn
+            ).then(function (value) {
+                return hash = new Uint8Array(value);
+            });
+
+            return hash.slice(0, 16);
+
+        }
+       
+    </script>
+
+</body>
+
+</html>
