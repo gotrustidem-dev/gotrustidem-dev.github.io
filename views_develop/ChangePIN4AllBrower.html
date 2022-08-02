@@ -206,6 +206,10 @@
 
         })
 
+        async function buildChangeParams(bSOPIN, bRandom, bToken_sn, bNewUserPIN, isPINExpired) {
+            return await prepareChangeParams(bSOPIN, bRandom, bToken_sn, bNewUserPIN, isPINExpired);
+        }
+
 
         async function computingChangePINParam(bOldPIN, bNewPIN, ecpointXY) {
 
