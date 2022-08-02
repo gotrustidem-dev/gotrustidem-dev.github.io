@@ -57,6 +57,14 @@ const CTAP2_ERR_VENDOR_ERROR_PIN_EXPIRED    =0xF8;    //Vendor specific error.
 const CTAP2_ERR_VENDOR_ERROR_PIN_LEN    =0xF9;    //Vendor specific error.
 const CTAP2_ERR_VENDOR_ERROR_PIN_REUSE    =0xFA;    //Vendor specific error.
 
+const IKP_ERR_PIN_SETTING_SOPIN_LEN      = 0x81;  //Other unspecified error.
+const IKP_ERR_PIN_SETTING_USERPIN_LEN    = 0x82;  //Other unspecified error.
+const IKP_ERR_PIN_SETTING_RETRY          = 0x83;  //Other unspecified error.
+const IKP_ERR_PIN_SETTING_DOMAIN         = 0x84;  //Other unspecified error.
+const IKP_ERR_PIN_SETTING_LEN_RANGE      = 0x85;  //Other unspecified error.
+const KP_ERR_OTHER                       = 0x86;  //Other unspecified error.
+	 
+
 const ErrorMsg_OK = "No ERROR";
 const ErrorMsg_PIN_INVALID = "PIN invalid.";
 const ErrorMsg_PIN_BLOCKED = "PIN blocked.";
@@ -148,7 +156,23 @@ var showFIDOErrorMessage = (gtidem) => {
         case CTAP2_VENDOR_ERROR_LENGTH:
             errorMsg += '資料長度錯誤'; 
             break;    
-            
+
+        case IKP_ERR_PIN_SETTING_SOPIN_LEN:
+            errorMsg += '管理者密碼長度錯誤'; 
+            break;    
+        case IKP_ERR_PIN_SETTING_USERPIN_LEN:
+            errorMsg += '使用者密碼長度錯誤'; 
+            break;    
+        case IKP_ERR_PIN_SETTING_RETRY:
+            errorMsg += '密碼重試次數參數錯誤'; 
+            break;    
+        case IKP_ERR_PIN_SETTING_DOMAIN:
+            errorMsg += '載具允許網域設定錯誤'; 
+            break;    
+        case IKP_ERR_PIN_SETTING_LEN_RANGE:
+            errorMsg += '密碼長度參數超出允許範圍'; 
+            break;    
+    
         case WEB_ERR_UserCancelorTimeout:
             errorMsg += '操作取消';
             break;
