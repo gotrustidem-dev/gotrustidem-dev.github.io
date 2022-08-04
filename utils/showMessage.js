@@ -62,7 +62,7 @@ const IKP_ERR_PIN_SETTING_USERPIN_LEN    = 0x82;  //Other unspecified error.
 const IKP_ERR_PIN_SETTING_RETRY          = 0x83;  //Other unspecified error.
 const IKP_ERR_PIN_SETTING_DOMAIN         = 0x84;  //Other unspecified error.
 const IKP_ERR_PIN_SETTING_LEN_RANGE      = 0x85;  //Other unspecified error.
-const KP_ERR_OTHER                       = 0x86;  //Other unspecified error.
+const IKP_ERR_OTHER                      = 0x86;  //Other unspecified error.
 	 
 
 const ErrorMsg_OK = "No ERROR";
