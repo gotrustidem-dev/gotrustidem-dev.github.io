@@ -175,42 +175,37 @@
             var bNewPINArray = new Uint8Array(newpin.length);
             bNewPINArray.set(toUTF8Array(newpin), 0);
 
-            var prepareUpdate = computingChangePINParam(bOldPINArray, bNewPINArray, bECPointFromToken).then((
-                prepareUpdate) => {
-                GTIDEM_ChangeUserPIN_V1(bToken_sn, prepareUpdate.bExportECPublicKeyArray, prepareUpdate
-                    .bEcryptedOldPINHash, prepareUpdate.bEncryptedNEWPIN).then((response) => {
 
-                    if (response.statusCode == CTAP1_ERR_SUCCESS) {
-                        var str = '密碼變更完成';
-                        if (response.pinRetry != undefined) {
-                            str += '\n剩餘次數為 ' + response.pinRetry;
-                        }
-                        if (response.sn != undefined) {
-                            str += '\n 載具序號為 ' + response.sn;
+            var prepareUpdate = buildChangeParams(bOldPINArray, bNewPINArray, bECPointFromToken).then((params)=>{
 
-                        }
-                        alert(str);
+                GTIDEM_ChangeUserPIN_V1(bToken_sn, params.bExportECPublicKeyArray, params.bEcryptedOldPINHash, params.bEncryptedNEWPIN).then((response) => {
 
-
-                    } else {
-                        alert(showFIDOErrorMessage(response));
+                if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                    var str = '密碼變更完成';
+                    if (response.pinRetry != undefined) {
+                        str += '\n剩餘次數為 ' + response.pinRetry;
                     }
+                    if (response.sn != undefined) {
+                        str += '\n 載具序號為 ' + response.sn;
 
-                }).catch((error) => {
-                    alert(error)
-                    console.log('FAIL', error)
-                })
-            });
-
+                    }
+                    alert(str);
 
 
+                } else {
+                    alert(showFIDOErrorMessage(response));
+                }
+
+            }).catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            })
+            })
+            
         })
 
-        async function buildChangeParams(bSOPIN, bRandom, bToken_sn, bNewUserPIN, isPINExpired) {
-            return await prepareChangeParams(bSOPIN, bRandom, bToken_sn, bNewUserPIN, isPINExpired);
-        }
-        async function prepareChangeParams(so_pin, bRandom, bToken_sn, bNewUserPIN,isPINExpired) {
-            computingChangePINParam(bOldPINArray, bNewPINArray, bECPointFromToken)
+        async function buildChangeParams(bOldPINArray, bNewPINArray, bECPointFromToken) {
+            return await computingChangePINParam(bOldPINArray, bNewPINArray, bECPointFromToken)
         }
 
         async function computingChangePINParam(bOldPIN, bNewPIN, ecpointXY) {
