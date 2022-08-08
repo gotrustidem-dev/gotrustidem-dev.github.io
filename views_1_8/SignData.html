@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GoTrustIdem TestPKI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Ensure use of most common Unicode characters -->
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <!-- Considered an "experimental" feature -->
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css" />
+    <!-- Spectre.css icons are used -->
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+
+    <script src="../utils/cbor.js"></script>
+    <script src="../utils/helpers.js"></script>
+    <script src="../utils/showMessage.js"></script>
+    <script src="../utils/response.js"></script>
+    <script src="../utils/PKIoverFIDO_1_7.js"></script>
+    <style>
+        table.center {
+            margin-left: auto;
+            margin-right: auto;
+            height: 160px;
+        }
+
+        table td,
+        table td * {
+            vertical-align: top;
+        }
+
+        h3 {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="overflow-x: scroll;">
+        <table style="height: auto; width: 100%;">
+            <tbody>
+
+                <tr>
+                    <td style="width: 100% ;">
+
+
+                        <form style="text-align: center;" id="form_token_sn" onsubmit="return false">
+                            <p>
+                                <label id="label_token_sn">Token Serial number:</label><br>
+                                <input type="text" name="token_sn" style="width: 342px; height:41px">
+                            </p>
+                        </form>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td id="pc-td" style="width: 100% ; ">
+                        <table class="center" border="1" width="395">
+                            <tbody>
+                                <tr>
+                                    <!--PC side-->
+                                    <td id="mac-safari-td" style="width: 329px; ">
+
+                                        <table class="center" style="height: 160px;" border="1" width="395">
+                                            <tbody>
+                                                <tr>
+                                                    <td style="width: 385px; ">
+                                                        <p style="text-align: center;">Target Label/KeyID</p>
+
+                                                        <p>
+                                                            <form style="text-align: center;" id="form_label"
+                                                                onsubmit="return false">
+                                                                <input type="text" name="certlabel"
+                                                                    style="width: 342px; height:41px">
+                                                                    
+                                                            </form>
+                                                        </p>
+                                                        <form style="text-align: center;" id="form_signdata_label_btn"
+                                                            onsubmit="return false">
+                                                            <button class="btn btn-primary" action="submit"
+                                                                style="width: 162px; height:34px;background-color: #008CBA;">Sign Data</button>
+                                                        </form>
+
+                                                        <p></p>
+                                                            <!-- <form style="text-align: center;">
+                                                                <button class="btn btn-primary" style="text-align: center; width: 200px; height:34px;background-color: #008CBA;" onclick="signDataWithInputPIN()">
+                                                                    Sign Data With InputPIN</button>
+                                                            </form> -->
+                                                    </td>
+                                                    <td style="width: 385px;">
+                                                        <p style="text-align: center;">Target Index</p>
+                                                        <p>
+                                                            <form style="text-align:center" id="form_index"
+                                                                onsubmit="return false">
+                                                                <input type="number" name="certIndex"
+                                                                    style="width: 342px; height:41px">
+                                                            </form>
+                                                        </p>
+                                                        <p>
+                                                            <form style="text-align: center;" id="form_signdata_index_btn"
+                                                                onsubmit="return false">
+                                                                <button class="btn btn-primary" action="submit"
+                                                                    style="width: 162px; height:34px;background-color: #008CBA;">Sign Data</button>                                                            
+                                                            </form>
+                                                            <p></p>
+                                                            <!-- <form style="text-align: center;">
+                                                                <button class="btn btn-primary" style="text-align: center; width: 200px; height:34px;background-color: #008CBA;" onclick="signDataWithInputPIN()">
+                                                                    Sign Data With InputPIN</button>
+                                                            </form> -->
+
+                                                            
+                                                        </p>
+                                                    </td>
+
+                                                    <!--<input type="checkbox" id="use_hashdata_label" name="vehicle1" value="Use Hashed Data">
+                                                    <label >Use Hashed Data to Sign </label> -->
+                                                    <select id="select_alg">
+                                                        <option>Select alg</option>
+                                                        <optgroup label="PKCSv1.5">
+                                                            <option value="1">ALG_RSA2048SHA1</option>
+                                                            <option value="2">ALG_RSA2048SHA256</option>
+                                                            <option value="3">ALG_RSA2048SHA384</option>
+                                                            <option value="4">ALG_RSA2048SHA512</option>
+                                                            <option value="5">ALG_RSA2048SHA1_PreHash</option>
+                                                            <option value="6">ALG_RSA2048SHA256_PreHash</option>
+                                                            <option value="7">ALG_RSA2048SHA384_PreHash</option>
+                                                            <option value="8">ALG_RSA2048SHA512_PreHash</option>
+                                                        </optgroup>
+                                                       
+                                                        <optgroup label="PKCS#1 PSS">
+                                                            <option value="9">ALG_RSA2048SHA1_PSS</option>
+                                                            <option value="10">ALG_RSA2048SHA256_PSS</option>
+                                                            <option value="11">ALG_RSA2048SHA384_PSS</option>
+                                                            <option value="12">ALG_RSA2048SHA512_PSS</option>                                                        
+                                                            <option value="13">ALG_RSA2048SHA1_PSS_PreHash</option>
+                                                            <option value="14">ALG_RSA2048SHA256_PSS_PreHash</option>
+                                                            <option value="15">ALG_RSA2048SHA384_PSS_PreHash</option>
+                                                            <option value="16">ALG_RSA2048SHA512_PSS_PreHash</option>
+                                                        </optgroup>
+
+                                                        <optgroup label="ECDSA">
+                                                            <option value="17">ECDSA_SHA</option>
+                                                            <option value="18">ECDSA_SHA256</option>
+                                                            <option value="19">ECDSA_SHA384</option>
+                                                            <option value="20">ECDSA_SHA512</option>                                                        
+                                                        </optgroup>
+
+                                                    </select>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script>
+
+         // signed Data1: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef  
+        var signData =
+            'MTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWYxMjM0NTY3ODkwYWJjZGVmMTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWYxMjM0NTY3ODkwYWJjZGVmMTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWY=';
+
+        //123
+        var plain = "MTIz";    
+
+        //sha1 40bd001563085fc35165329ea1ff5c5ecbdbbeef
+        var signData_sha1 ='QL0AFWMIX8NRZTKeof9cXsvbvu8=';
+
+        //sha256 a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3
+        var signData_sha256 ='pmWkWSBCL51Bfkhn79xPuKBKHz//H6B+mY6G9/eieuM=';
+
+        //sha384 9a0a82f0c0cf31470d7affede3406cc9aa8410671520b727044eda15b4c25532a9b5cd8aaf9cec4919d76255b6bfb00f
+        var signData_sha384 ='mgqC8MDPMUcNev/t40BsyaqEEGcVILcnBE7aFbTCVTKptc2Kr5zsSRnXYlW2v7AP';
+
+        //sha512 3c9909afec25354d551dae21590bb26e38d53f2173b8d3dc3eee4c047e7ab1c1eb8b85103e3be7ba613b31bb5c9c36214dc9f14a42fd7a2fdb84856bca5c44c2
+        var signData_sha512 ='PJkJr+wlNU1VHa4hWQuybjjVPyFzuNPcPu5MBH56scHri4UQPjvnumE7MbtcnDYhTcnxSkL9ei/bhIVrylxEwg==';
+
+        document.getElementById('form_signdata_label_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            let label = document.getElementById('form_label').certlabel.value;
+            let isUseHashedData2Sign = document.getElementById('use_hashdata_label');
+            var signDataPayload = Uint8Array.from(window.atob(plain), c => c.charCodeAt(0));
+
+            var bToken_sn = undefined;
+            if(token_sn.length!=0){
+                bToken_sn = hexStringToArrayBuffer(token_sn);  
+            }
+            var bLabel = new Uint8Array(label.length);
+            bLabel.set(toUTF8Array(label), 0);
+            GTIDEM_SetName("李子棋");
+
+            var selectedAlg;
+            var e = document.getElementById('select_alg').value;
+            console.log(e); 
+            switch(e){
+
+                case "1":selectedAlg = ALG_RSA2048SHA1; break;
+                case "2":selectedAlg = ALG_RSA2048SHA256; break;
+                case "3":selectedAlg = ALG_RSA2048SHA384; break;
+                case "4":selectedAlg = ALG_RSA2048SHA512; break;
+
+                case "5":selectedAlg = ALG_RSA2048SHA1_PreHash; 
+                    signDataPayload = Uint8Array.from(window.atob(signData_sha1), c => c.charCodeAt(0));
+                    break;
+                case "13":selectedAlg = ALG_RSA2048SHA1_PSS_PreHash; 
+                    signDataPayload = Uint8Array.from(window.atob(signData_sha1), c => c.charCodeAt(0));
+                    break;
+
+                case "6":selectedAlg = ALG_RSA2048SHA256_PreHash; 
+                    signDataPayload = Uint8Array.from(window.atob(signData_sha256), c => c.charCodeAt(0));
+                    break;
+                case "14":selectedAlg = ALG_RSA2048SHA256_PSS_PreHash; 
+                    signDataPayload = Uint8Array.from(window.atob(signData_sha256), c => c.charCodeAt(0));
+                    break;
+
+                case "7":selectedAlg = ALG_RSA2048SHA384_PreHash; 
+                    signDataPayload = Uint8Array.from(window.atob(signData_sha384), c => c.charCodeAt(0));
+                    break;
+                case "15":selectedAlg = ALG_RSA2048SHA384_PSS_PreHash; 
+                    signDataPayload = Uint8Array.from(window.atob(signData_sha384), c => c.charCodeAt(0));
+                    break;
+               
+                case "8":selectedAlg = ALG_RSA2048SHA512_PreHash; 
+                    signDataPayload = Uint8Array.from(window.atob(signData_sha512), c => c.charCodeAt(0));
+                    break;
+                case "16":selectedAlg = ALG_RSA2048SHA512_PSS_PreHash;
+
+                    signDataPayload = Uint8Array.from(window.atob(signData_sha512), c => c.charCodeAt(0));
+                    break;
+                case "9":selectedAlg = ALG_RSA2048SHA1_PSS; break;
+                case "10":selectedAlg = ALG_RSA2048SHA256_PSS; break;
+                case "11":selectedAlg = ALG_RSA2048SHA384_PSS; break;
+                case "12":selectedAlg = ALG_RSA2048SHA512_PSS; break;
+
+                case "17":selectedAlg = ALG_ECDSASHA1; break;
+                case "18":selectedAlg = ALG_ECDSASHA256; break;
+                case "19":selectedAlg = ALG_ECDSASHA384; break;
+                case "20":selectedAlg = ALG_ECDSASHA512; break;
+
+            }
+
+            console.log(' SignData : \n', bufToHex(signDataPayload));
+           
+            GTIDEM_SignDataByLabel(bLabel, bToken_sn,selectedAlg, signDataPayload).then((value) => {
+                    if(value.statusCode==CTAP1_ERR_SUCCESS){
+                        var strCert="";
+                        if(value.sn!=undefined){
+                            strCert+="序號:"+ ConverSNFormat(value.sn)+"\n";
+                        }
+                        console.log(bufToHex(new Uint8Array(value.signature).buffer));
+                        var str = String.fromCharCode.apply(null, new Uint8Array(value.signature));
+                        strCert+="簽名:" + "\n" + btoa(str);
+
+                        alert(strCert);
+
+                    }else{
+                        alert(showFIDOErrorMessage(value));
+                    }
+                }).catch((error) => {
+                    alert(error)
+                    console.log('FAIL', error)
+                });
+        })
+
+        document.getElementById('form_signdata_index_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            let index = document.getElementById('form_index').certIndex.value;
+            let isUseHashedData2Sign = document.getElementById('use_hashdata_label');
+            var signDataPayload = Uint8Array.from(window.atob(plain), c => c.charCodeAt(0));
+
+            var bToken_sn = undefined;
+            if(token_sn.length!=0){
+                bToken_sn = hexStringToArrayBuffer(token_sn);  
+            }
+            GTIDEM_SetName("王天生");
+
+            var selectedAlg;
+            var e = document.getElementById('select_alg').value; 
+            switch(e){
+
+                case "1":selectedAlg = ALG_RSA2048SHA1; break;
+                case "2":selectedAlg = ALG_RSA2048SHA256; break;
+                case "3":selectedAlg = ALG_RSA2048SHA384; break;
+                case "4":selectedAlg = ALG_RSA2048SHA512; break;
+
+                case "5":selectedAlg = ALG_RSA2048SHA1_PreHash; 
+                    signDataPayload = Uint8Array.from(window.atob(signData_sha1), c => c.charCodeAt(0));
+                    break;
+                case "13":selectedAlg = ALG_RSA2048SHA1_PSS_PreHash; 
+                    signDataPayload = Uint8Array.from(window.atob(signData_sha1), c => c.charCodeAt(0));
+                    break;
+
+                case "6":selectedAlg = ALG_RSA2048SHA256_PreHash; 
+                    signDataPayload = Uint8Array.from(window.atob(signData_sha256), c => c.charCodeAt(0));
+                    break;
+                case "14":selectedAlg = ALG_RSA2048SHA256_PSS_PreHash; 
+                    signDataPayload = Uint8Array.from(window.atob(signData_sha256), c => c.charCodeAt(0));
+                    break;
+
+                case "7":selectedAlg = ALG_RSA2048SHA384_PreHash; 
+                    signDataPayload = Uint8Array.from(window.atob(signData_sha384), c => c.charCodeAt(0));
+                    break;
+                case "15":selectedAlg = ALG_RSA2048SHA384_PSS_PreHash; 
+                    signDataPayload = Uint8Array.from(window.atob(signData_sha384), c => c.charCodeAt(0));
+                    break;
+
+                case "8":selectedAlg = ALG_RSA2048SHA512_PreHash; 
+                    signDataPayload = Uint8Array.from(window.atob(signData_sha512), c => c.charCodeAt(0));
+                    break;
+                case "16":selectedAlg = ALG_RSA2048SHA512_PSS_PreHash;
+
+                    signDataPayload = Uint8Array.from(window.atob(signData_sha512), c => c.charCodeAt(0));
+                    break;
+                case "9":selectedAlg = ALG_RSA2048SHA1_PSS; break;
+                case "10":selectedAlg = ALG_RSA2048SHA256_PSS; break;
+                case "11":selectedAlg = ALG_RSA2048SHA384_PSS; break;
+                case "12":selectedAlg = ALG_RSA2048SHA512_PSS; break;
+                case "17":selectedAlg = ALG_ECDSASHA1; break;
+                case "18":selectedAlg = ALG_ECDSASHA256; break;
+                case "19":selectedAlg = ALG_ECDSASHA384; break;
+                case "20":selectedAlg = ALG_ECDSASHA512; break;
+            }
+                    console.log('SignData :', bufToHex(signDataPayload));
+                    GTIDEM_SignDataByIndex(index, bToken_sn,selectedAlg, signDataPayload).then((value) => {
+                        if(value.statusCode==CTAP1_ERR_SUCCESS){
+                            var strCert="";
+                            if(value.sn!=undefined){
+                                strCert+="序號:"+ ConverSNFormat(value.sn)+"\n";
+                            }
+                            console.log(bufToHex(new Uint8Array(value.signature).buffer));
+                            var str = String.fromCharCode.apply(null, new Uint8Array(value.signature));
+                            strCert+="簽名:" + "\n" + btoa(str);
+
+                            alert(strCert);
+
+                        }else{
+                            alert(showFIDOErrorMessage(value));
+                        }
+                    }).catch((error) => {
+                        alert(error)
+                        console.log('FAIL', error)
+                    });
+
+                    
+        })
+
+        async function GenDataHash(alg,signDataPayload){
+
+            return await crypto.subtle.digest(alg,new Uint8Array(signDataPayload)).then(function (signHashedDataPayload) {
+
+                return new Uint8Array(signHashedDataPayload);
+            });
+        }
+
+        function signDataWithInputPIN() {
+            event.stopPropagation();
+            let person = prompt("Please enter your name", "12345678");
+            if (person != null) {
+                ecpoint = getGTIDEM_ECDHParam();
+            }
+        }
+
+        async function getGTIDEM_ECDHParam(){
+
+            return await GTIDEM_GetTokenInfo(undefined).then((response) => {
+
+                console.log('SUCCESS', response);            
+                if(response.statusCode==CTAP1_ERR_SUCCESS){
+                    return response.ecpoint;
+                }else{
+                    // alert(showFIDOErrorMessage(response));
+                }
+                }).catch((error) => {
+                    alert(error)
+                    console.log('FAIL', error)
+                });
+        }
+
+        
+    </script>
+
+</body>
+
+</html>
