@@ -203,10 +203,10 @@
             }else{
                 bKeyID = bKeyHandle;
             }
-    
+            var testNewCert = new Uint8Array(1024);
 
-             GTIDEM_ImportCertificate(bToken_sn,bKeyHandle,bKeyID,bHexCert,undefined).then((response) => {
-               
+             //GTIDEM_ImportCertificate(bToken_sn,bKeyHandle,bKeyID,bHexCert,undefined).then((response) => {
+                GTIDEM_ImportCertificate(bToken_sn,bKeyHandle,bKeyID,testNewCert,undefined).then((response) => {  
                     
                     if(response.statusCode==CTAP1_ERR_SUCCESS){  
                     var msg = "匯入憑證完成\n";
