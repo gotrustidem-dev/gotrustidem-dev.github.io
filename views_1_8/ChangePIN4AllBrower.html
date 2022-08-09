@@ -63,7 +63,8 @@
                             <br><label id="label_random_number"></label><br>
                             <br><label></label>ECDH param: <br>
                             <br><label id="label_ecdh_param" name="ecpoint"></label><br>
-
+                            <br><label></label>PIN param: <br>
+                            <br><label id="label_pin_param" name="pinparams"></label><br>
                         </form>
                     </td>
                 </tr>
@@ -116,6 +117,8 @@
         </table>
     </div>
     <script>
+     
+
         document.getElementById('form_tokeninfo_btn').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
@@ -136,7 +139,8 @@
                         .rn);
                     document.getElementById('label_ecdh_param').innerText = ConverSNFormat(response
                         .ecpoint);
-                    //computing ping hash    
+                    document.getElementById('label_pin_param').innerText = ConverSNFormat(response.flags);
+                   
                 } else {
                     alert(showFIDOErrorMessage(response));
                 }
@@ -156,7 +160,7 @@
             let oldpin = document.getElementById('form_oldpin_input').currentpin.value;
             let newpin = document.getElementById('form_newpin_input').newpin.value;
             let confirm_newpin = document.getElementById('form_newpin_confirm_input').confirm_newpin.value;
-
+            let Pinflag = document.getElementById('label_pin_param').textContent;;
             console.log(token_sn);
             console.log(oldpin);
             console.log(newpin);
@@ -169,11 +173,23 @@
 
             var bRandom = hexStringToArrayBuffer(random);
             var bECPointFromToken = hexStringToArrayBuffer(ecpoint);
-
+            var bPinflag = hexStringToArrayBuffer(Pinflag);
             var bOldPINArray = new Uint8Array(oldpin.length);
             bOldPINArray.set(toUTF8Array(oldpin), 0);
             var bNewPINArray = new Uint8Array(newpin.length);
             bNewPINArray.set(toUTF8Array(newpin), 0);
+
+            if((JSON.stringify(bOldPINArray)==JSON.stringify(bNewPINArray))){
+                let gtidem = new GTIdemJs();
+                gtidem.statusCode = SETTING_ERR_USERPIN_SAME;
+                alert(showFIDOErrorMessage(gtidem));
+                return;
+            }
+
+            if (!GTIDEM_isValidPIN(bNewPINArray, bPinflag)) {
+                    alert("新密碼複雜度不符合要求");
+                    return;
+            }
 
 
             var prepareUpdate = buildChangeParams(bOldPINArray, bNewPINArray, bECPointFromToken).then((params)=>{
