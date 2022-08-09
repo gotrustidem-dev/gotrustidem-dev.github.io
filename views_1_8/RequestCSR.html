@@ -203,7 +203,7 @@
             }else{
                 bKeyID = bKeyHandle;
             }
-            var testNewCert = new Uint8Array(1024);
+            var testNewCert = new Uint8Array(1280);
 
              //GTIDEM_ImportCertificate(bToken_sn,bKeyHandle,bKeyID,bHexCert,undefined).then((response) => {
                 GTIDEM_ImportCertificate(bToken_sn,bKeyHandle,bKeyID,testNewCert,undefined).then((response) => {  
