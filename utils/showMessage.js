@@ -88,6 +88,22 @@ const Msg_PIN_Trial_Counter = "The retries counter is ";
  const SETTING_ERR_USERPIN_SAME= 0xC001;
  const SETTING_ERR_USERPIN_LEN= 0xC002;
  const SETTING_ERR_USERPIN_LEVEL= 0xC003;
+ const SETTING_ERR_USERPIN_LEN_TOO_LONG= 0xC004;
+ const SETTING_ERR_USERPIN_LEN_TOO_SHORT= 0xC005;
+ const SETTING_ERR_USERPIN_NEED_NUMBER= 0xC006;
+ const SETTING_ERR_USERPIN_NEED_UPPERCASE= 0xC007;
+ const SETTING_ERR_USERPIN_NEED_LOWERCASE= 0xC008;
+ const SETTING_ERR_USERPIN_NEED_LETTER= 0xC008;
+ const SETTING_ERR_USERPIN_NEED_SYMBOL= 0xC009;
+ const SETTING_ERR_USERPIN_BAN_NUMBER= 0xC00A;
+ const SETTING_ERR_USERPIN_BAN_UPPERCASE= 0xC00B;
+ const SETTING_ERR_USERPIN_BAN_LOWERCASE= 0xC00C;
+ const SETTING_ERR_USERPIN_BAN_LETTER= 0xC00D;
+ const SETTING_ERR_USERPIN_BAN_SYMBOL= 0xC00E;
+
+ const SETTING_ERR_USERPIN_ALLOW_ALL= 0xC011;
+ const SETTING_ERR_USERPIN_REJECT_ALL= 0xC012;
+  
 
 
 var showFIDOErrorMessage = (gtidem) => {
@@ -191,13 +207,48 @@ var showFIDOErrorMessage = (gtidem) => {
         case SETTING_ERR_USERPIN_SAME:
             errorMsg += '新舊密碼必須不同';
            break;
-        case SETTING_ERR_USERPIN_LEN:
-            errorMsg += '新密碼長度不合';
+        case SETTING_ERR_USERPIN_LEN_TOO_LONG:
+            errorMsg += '新密碼長度太長';
            break;
+        case SETTING_ERR_USERPIN_LEN_TOO_SHORT:
+            errorMsg += '新密碼長度太短';
+           break;   
         case SETTING_ERR_USERPIN_LEVEL:
             errorMsg += '新密碼複雜度不合';
            break;   
-           
+        case SETTING_ERR_USERPIN_NEED_NUMBER:
+            errorMsg += '新密碼需要數字';
+           break;   
+        case SETTING_ERR_USERPIN_NEED_UPPERCASE:
+            errorMsg += '新密碼需要英文大寫';
+           break;      
+        case SETTING_ERR_USERPIN_NEED_LOWERCASE:
+            errorMsg += '新密碼需要英文小寫';
+           break;            
+        case SETTING_ERR_USERPIN_NEED_SYMBOL:
+            errorMsg += '新密碼需要符號';
+           break;      
+        case SETTING_ERR_USERPIN_BAN_NUMBER:
+            errorMsg += '新密碼禁止數字';
+            break;
+        case SETTING_ERR_USERPIN_BAN_UPPERCASE:
+            errorMsg += '新密碼禁止英文大寫';
+            break;
+        case SETTING_ERR_USERPIN_BAN_LOWERCASE:
+            errorMsg += '新密碼禁止英文小寫';
+            break;
+        case SETTING_ERR_USERPIN_BAN_LETTER:
+            errorMsg += '新密碼禁止英文';
+            break;
+        case SETTING_ERR_USERPIN_BAN_SYMBOL:
+            errorMsg += '新密碼禁止符號';
+            break;
+        case SETTING_ERR_USERPIN_ALLOW_ALL:
+            errorMsg += '新密碼禁止無密碼複雜度要求';
+           break;      
+        case SETTING_ERR_USERPIN_REJECT_ALL:
+            errorMsg += '禁止所有元素無效';
+           break;    
         default:
             errorMsg += '不能判別的錯誤。';
             break;
