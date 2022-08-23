@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GoTrustIdem TestPKI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Ensure use of most common Unicode characters -->
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <!-- Considered an "experimental" feature -->
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css" />
+    <!-- Spectre.css icons are used -->
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+
+    <script src="../utils/cbor.js"></script>
+    <script src="../utils/helpers.js"></script>
+    <script src="../utils/showMessage.js"></script>
+    <script src="../utils/response.js"></script>
+    <script src="../utils/PKIoverFIDO_1_9.js"></script>
+    <style>
+        table.center {
+            margin-left: auto;
+            margin-right: auto;
+            height: 160px;
+        }
+
+        table td,
+        table td * {
+            vertical-align: top;
+        }
+
+        h3 {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="overflow-x: scroll;">
+        <table style="height: auto; width: 100%;">
+            <tbody>
+
+
+                <tr>
+                    <td id="pc-td" style="width: 100% ; ">
+                        <table class="center" border="1" width="395">
+                            <tbody>
+                                <tr>
+                                    <!--PC side-->
+                                    <td style="width: 385px;">
+                                        <p>
+                                            <br><label></label>PIN policy: <br>
+                                            <br><label id="label_pin_policy"></label><br>
+
+                                            <label style="text-align: center;">New PIN</label><br>
+                                            <form style="text-align: center;" id="form_newpin_input"
+                                                onsubmit="return false">
+                                                <input type="text" name="newpin" style="width: 342px; height:41px">
+                                            </form>
+                                        </p>
+                                        <form style="text-align: center;" id="form_changepin_btn"
+                                            onsubmit="return false">
+                                            <button class="btn btn-primary" action="submit"
+                                                style="width: 200px; height:34px;background-color: #008CBA;">Check
+                                                PIN</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        document.getElementById('form_changepin_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let newpin = document.getElementById('form_newpin_input').newpin.value;
+
+
+            console.log(newpin);
+
+            var bToken_sn = undefined;
+
+            var bNewPINBuffer = new Uint8Array(newpin.length);
+            bNewPINBuffer.set(toUTF8Array(newpin), 0);
+            if(bNewPINBuffer.length==0){
+                alert("新密碼不能為空");
+                return;
+            }
+
+            GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
+
+                console.log('SUCCESS', response);
+                if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                    if (response.flags != undefined) {
+                        flags = response.flags;
+                        var msg = "";
+                        if (response.flags[0] == 1) {
+                            msg += "密碼到期，首次使用需變更\n";
+                        } else {
+                            msg += "密碼不需變更\n";
+                        }
+
+                        /*
+                        if ((response.flags[1] & PIN_FORMAT_NUMBER) == PIN_FORMAT_NUMBER) {
+                            msg += "[0-9]必須, ";
+                        } else {
+                            msg += "[0-9]允許, ";
+                        }
+
+                        if ((response.flags[1] & PIN_FORMAT_LOWERCASE) == PIN_FORMAT_LOWERCASE) {
+                            msg += "[a-z]必須, ";
+                        } else {
+                            msg += "[a-z]允許, ";
+                        }
+
+                        if ((response.flags[1] & PIN_FORMAT_HIGERCASE) == PIN_FORMAT_HIGERCASE) {
+                            msg += "[A-Z]必須, ";
+                        } else {
+                            msg += "[A-Z]允許, ";
+                        }
+
+                        if ((response.flags[1] & PIN_FORMAT_SYMBOL) == PIN_FORMAT_SYMBOL) {
+                            msg += "特殊符號必須\n";
+                        } else {
+                            msg += "特殊符號允許\n";
+                        }
+                        */
+
+                        if ((response.flags[1] & 0xc0) == 0x00) {
+                            msg += "[a-z][A-Z]允許, ";
+                        } 
+
+                        if ((response.flags[1] & 0xc0) == 0x80) {
+
+                            if((response.flags[1] & 0x30) == 0x00){
+                                msg += "英文必要,[a-z][A-Z]都接受, ";
+                            }
+                           
+                            if((response.flags[1] & 0x30) == 0x10){
+                                msg += "英文小寫必要, ";
+                            }
+
+                            if((response.flags[1] & 0x30) == 0x20){
+                                msg += "英文大寫必要, ";
+                            }
+
+                            if((response.flags[1] & 0x30) == 0x30){
+                                msg += "英文大小寫皆必要, ";
+                            }
+                        } 
+
+                        if ((response.flags[1] & 0xc0) == 0x40) {
+
+                            if((response.flags[1] & 0x30) == 0x10){
+                                msg += "英文小寫禁止, ";
+                            }
+
+                            if((response.flags[1] & 0x30) == 0x20){
+                                msg += "英文大寫禁止, ";
+                            }
+
+                            if((response.flags[1] & 0x30) == 0x30){
+                                msg += "英文大小寫皆禁止, ";
+                            }
+                        }
+
+                        if ((response.flags[1] & 0xc0) == 0xc0) {
+
+                            if((response.flags[1] & 0x30) == 0x10){
+                                msg += "英文大寫禁止，小寫必要, ";
+                            }
+
+                            if((response.flags[1] & 0x30) == 0x20){
+                                msg += "英文大寫必要，小寫禁止, ";
+                            }
+                        }
+
+
+                        if ((response.flags[1] & 0x0c) == 0x00) {
+                            msg += "符號允許, ";
+                        }
+
+                        if ((response.flags[1] & 0x0c) == 0x0c) {
+                            msg += "符號禁止, ";
+                        }
+
+                        if ((response.flags[1] & 0x0c) == 0x04) {
+                            msg += "符號必要, ";
+                        }
+
+                        if ((response.flags[1] & 0x03) == 0x00) {
+                            msg += "數字允許, ";
+                        }
+
+                        if ((response.flags[1] & 0x03) == 0x03) {
+                            msg += "數字禁止, ";
+                        }
+
+                        if ((response.flags[1] & 0x03) == 0x01) {
+                            msg += "數字必要, ";
+                        }
+
+
+                        msg += "密碼最小長度" + response.flags[2] + "\n";
+                        msg += "密碼最大長度" + response.flags[3] + "\n";
+                        document.getElementById('label_pin_policy').innerText = msg;
+                    }
+
+                    try{
+                        GTIDEM_isValidPIN_V2(bNewPINBuffer, response.flags);
+                    }catch(e){
+                        alert(showIKPJSExecptionMessage(e.code));
+                        return 
+                    }
+              
+                    alert("密碼可用");
+
+                } else {
+                    alert(showFIDOErrorMessage(response));
+                }
+            }).catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            });
+        })
+    </script>
+
+</body>
+
+</html>

@@ -93,18 +93,29 @@ const Msg_PIN_Trial_Counter = "The retries counter is ";
  const SETTING_ERR_USERPIN_NEED_NUMBER= 0xC006;
  const SETTING_ERR_USERPIN_NEED_UPPERCASE= 0xC007;
  const SETTING_ERR_USERPIN_NEED_LOWERCASE= 0xC008;
- const SETTING_ERR_USERPIN_NEED_LETTER= 0xC008;
- const SETTING_ERR_USERPIN_NEED_SYMBOL= 0xC009;
- const SETTING_ERR_USERPIN_BAN_NUMBER= 0xC00A;
- const SETTING_ERR_USERPIN_BAN_UPPERCASE= 0xC00B;
- const SETTING_ERR_USERPIN_BAN_LOWERCASE= 0xC00C;
- const SETTING_ERR_USERPIN_BAN_LETTER= 0xC00D;
- const SETTING_ERR_USERPIN_BAN_SYMBOL= 0xC00E;
+ const SETTING_ERR_USERPIN_NEED_LETTER= 0xC009;
+ const SETTING_ERR_USERPIN_NEED_SYMBOL= 0xC00a;
+ const SETTING_ERR_USERPIN_BAN_NUMBER= 0xC00b;
+ const SETTING_ERR_USERPIN_BAN_UPPERCASE= 0xC00c;
+ const SETTING_ERR_USERPIN_BAN_LOWERCASE= 0xC00d;
+ const SETTING_ERR_USERPIN_BAN_LETTER= 0xC00e;
+ const SETTING_ERR_USERPIN_BAN_SYMBOL= 0xC00f;
 
- const SETTING_ERR_USERPIN_ALLOW_ALL= 0xC011;
- const SETTING_ERR_USERPIN_REJECT_ALL= 0xC012;
+ const SETTING_ERR_SOPIN_LEN_TOO_LONG= 0xC010;
+ const SETTING_ERR_SOPIN_LEN_TOO_SHORT= 0xC011;
+
+ const SETTING_ERR_USERPIN_ALLOW_ALL= 0xC012;
+ const SETTING_ERR_USERPIN_REJECT_ALL= 0xC013;
   
+ const SETTING_ERR_INVAILD_DOMAINS= 0xC014;
+ const SETTING_ERR_INVAILD_USERPIN_RETRY= 0xC015;
+ const SETTING_ERR_INVAILD_USERPIN_MIN_LEN= 0xC016;
 
+ var showIKPJSExecptionMessage = (status) => {
+    var gtidem = new GTIdemJs();
+    gtidem.statusCode = status;
+    return showFIDOErrorMessage(gtidem);
+ }
 
 var showFIDOErrorMessage = (gtidem) => {
 
@@ -249,6 +260,23 @@ var showFIDOErrorMessage = (gtidem) => {
         case SETTING_ERR_USERPIN_REJECT_ALL:
             errorMsg += '禁止所有元素無效';
            break;    
+
+        case SETTING_ERR_SOPIN_LEN_TOO_LONG:
+            errorMsg += '新SOPIN 長度太長';
+           break;    
+        case SETTING_ERR_SOPIN_LEN_TOO_SHORT:
+            errorMsg += '新SOPIN 長度太短';
+           break;    
+        case SETTING_ERR_INVAILD_DOMAINS:
+            errorMsg += '允許操作的domain不可用';
+        break; 
+           case SETTING_ERR_INVAILD_USERPIN_RETRY:
+            errorMsg += '使用者密碼嘗試次數不可用';
+           break;    
+        case SETTING_ERR_INVAILD_USERPIN_MIN_LEN:
+            errorMsg += '使用者密碼最短長度不可用';
+           break;       
+
         default:
             errorMsg += '不能判別的錯誤。';
             break;
@@ -257,9 +285,7 @@ var showFIDOErrorMessage = (gtidem) => {
     if(gtidem.sn!= undefined){
         errorMsg += '\n該裝置序號為'+ ConverSNFormat(gtidem.sn);
     }  
-
     return errorMsg;
-
 }
 
 

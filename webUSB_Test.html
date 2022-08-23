@@ -59,6 +59,8 @@ let device;
     return navigator.usb.requestDevice({ 'filters': filters }).then(
       device => new serial.Port(device)
     );
+
+    
   }
 
   serial.Port = function(device) {
@@ -137,8 +139,13 @@ window.onload = _ => {
     serial.requestPort().then(selectedPort => {
       port = selectedPort;
       this.style = "visibility: hidden";
-      connect();
+      //connect();
+      return navigator.usb.getDevices().then(devices => {
+        return devices.map(device => new serial.Port(device));
     });
+    });
+
+
   }
 
   document.querySelector("#submit").onclick = () => {
