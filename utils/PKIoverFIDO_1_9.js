@@ -7,7 +7,7 @@
 
  'use strict';
 
-const VERSION = "1.8.2"
+const VERSION = "1.9.1"
 const DEFAULT_TIMEOUT = 120000
 const VERIFY_DEFAULT_TIMEOUT = 300000
 // Command Header GoTrust-Idem-PKI
@@ -95,6 +95,9 @@ const EC_secp521r1 = 4;
 const OutputType_RAW =1;
 const OutputType_CSR =2;
 
+function IKPException(statusCode) {
+    this.code = statusCode;
+ }
 
 
 function toUTF8Array(str) {
@@ -529,13 +532,13 @@ function checkPINFormatLevel_V2(bNewPIN, level){
     //check symbol
     switch(level&0x0C){
         
-        case 0x04: //福號必要
+        case 0x04: //符號必要
             
             if((localLevel&PIN_FORMAT_SYMBOL)!=PIN_FORMAT_SYMBOL){
                     return SETTING_ERR_USERPIN_NEED_SYMBOL; 
             }
             break;
-        case 0x0c: //福號禁止
+        case 0x0c: //符號禁止
         
             if((localLevel&PIN_FORMAT_SYMBOL)==PIN_FORMAT_SYMBOL){
                     return SETTING_ERR_USERPIN_BAN_SYMBOL; 
@@ -547,21 +550,90 @@ function checkPINFormatLevel_V2(bNewPIN, level){
 }
 
 /**
- * 判別新密碼是否符合載具的密碼要求。
- * @param {Uint8Array} bNewPIN 新的使用者密碼
- * @param {Uint8Array} bPinFlag 載具的密碼參數，由 GTIDEM_GetTokenInfo 的 flags 取得
+ * 檢查初始化參數是否符合標準
  */
- function GTIDEM_isValidPIN(bNewPIN, bPinFlag){
+function GTIDEM_isValidTokenParams(bInitToken, commandType){
+  
+    var InitData = (CBOR.decode(bInitToken.buffer));
 
-    if ((bNewPIN.length < bPinFlag[2]) || (bNewPIN.length > bPinFlag[3])) {
-        return false;
-    }
-    if (!checkPINFormatLevel(bNewPIN, bPinFlag[1])) {
-        return false;
-    }
 
-    return true;
+    if(commandType===CMD_INIT_TOKEN){
+        //check must params
+        var pinExpired = false
+
+        if(InitData['pinExpired']!=undefined){
+            pinExpired = InitData['pinExpired'];
+            if (typeof pinExpired !== 'boolean') {
+                throw new IKPException(CTAP2_ERR_MISSING_PARAMETE);
+            }
+        }else{
+            throw new IKPException( CTAP2_ERR_MISSING_PARAMETER)
+        }
+
+        if(InitData['soPIN']!=undefined){
+            if(InitData['soPIN'].byteLength>16){
+                throw new IKPException( SETTING_ERR_SOPIN_LEN_TOO_LONG)
+            }
+
+            if((InitData['soPIN'].byteLength<8)){
+                throw new IKPException( SETTING_ERR_SOPIN_LEN_TOO_SHORT)
+            }
+            
+        }else{
+            throw new IKPException( CTAP2_ERR_MISSING_PARAMETER)
+        }
+
+        if(InitData['userPIN']!=undefined){
+            if(InitData['userPIN'].byteLength<4){
+                throw new IKPException( SETTING_ERR_USERPIN_LEN_TOO_SHORT)
+            }
+
+            if((InitData['userPIN'].byteLength>63)){
+                throw new IKPException( SETTING_ERR_USERPIN_LEN_TOO_LONG)
+            }
+        }else{
+            throw new IKPException(CTAP2_ERR_MISSING_PARAMETER)
+        }
+
+        if(InitData['allowedRPID']!=undefined){
+            if((InitData['allowedRPID'].byteLength%8)!=0){
+                throw new IKPException( SETTING_ERR_INVAILD_DOMAINS)
+            }
+        }else{
+            throw new IKPException( CTAP2_ERR_MISSING_PARAMETER)
+        }
+
+        if(InitData['pinLevel']!=undefined){
+            if(InitData['pinLevel']==PIN_FORMAT_FREE){
+                throw new IKPException(SETTING_ERR_USERPIN_ALLOW_ALL)
+            }
+            if(InitData['pinLevel']==(PIN_SETUP_ENG_NO|PIN_SETUP_ENG_HIGHCASE|PIN_SETUP_ENG_LOWCASE|PIN_SETUP_NUM_NO|PIN_SETUP_SYM_NO)){
+                throw new IKPException(SETTING_ERR_USERPIN_REJECT_ALL)
+            }
+            
+        }else{
+            throw new IKPException(CTAP2_ERR_MISSING_PARAMETER)
+        }
+
+        if(InitData['pinRetry']!=undefined){
+            if((InitData['pinRetry']==0)||(InitData['pinRetry']>15)){
+                throw new IKPException(SETTING_ERR_INVAILD_USERPIN_RETRY)
+            }
+        }else{
+            throw new IKPException(CTAP2_ERR_MISSING_PARAMETER)
+        }
+
+        if(InitData['pinMinLen']!=undefined){
+            if((InitData['pinMinLen']<4)||(InitData['pinMinLen']>63)){
+                throw new IKPException(SETTING_ERR_INVAILD_USERPIN_MIN_LEN)
+            }
+        }else{
+            throw new IKPException(CTAP2_ERR_MISSING_PARAMETER)
+        }
+    }
+    
 }
+
 
 /**
  * 判別新密碼是否符合載具的密碼要求。
@@ -587,34 +659,29 @@ function checkPINFormatLevel_V2(bNewPIN, level){
  */
  function GTIDEM_isValidPIN_V2(bNewPIN, bPinFlag , isPINExpired){
 
-    let gtidem = new GTIdemJs();
-    gtidem.statusCode = CTAP1_ERR_SUCCESS;
+
 
     if(isPINExpired==true){
         if (bNewPIN.length < 4){
-            gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_SHORT;
+            throw new IKPException(SETTING_ERR_USERPIN_LEN_TOO_SHORT)
         }
         if(bNewPIN.length > 63){
-            gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_LONG;
+            throw new IKPException(SETTING_ERR_USERPIN_LEN_TOO_LONG)
         }
     }else{
         if (bNewPIN.length < bPinFlag[2]){
-            gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_SHORT;
+            throw new IKPException(SETTING_ERR_USERPIN_LEN_TOO_SHORT)
         }
         if(bNewPIN.length > bPinFlag[3]){
-            gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_LONG;
+            throw new IKPException(SETTING_ERR_USERPIN_LEN_TOO_LONG)
         }
 
-        if(gtidem.statusCode = checkPINFormatLevel_V2(bNewPIN, bPinFlag[1])){
-
-
-
-        }
-   
-        gtidem 
+        var statusCode = checkPINFormatLevel_V2(bNewPIN, bPinFlag[1])
+        
+        if(statusCode!=CTAP1_ERR_SUCCESS)
+            throw new IKPException(statusCode)
     }
 
-    return gtidem;
 }
 
 /**

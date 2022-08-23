@@ -6,8 +6,10 @@
 class GTIdemJs {
     
 
-    constructor() {
-        this.statusCode = undefined;
+
+
+    constructor(statusCode) {
+        this.statusCode = statusCode;
         this.fw = undefined;
         this.sw = undefined;
         this.pinRetry = undefined;
