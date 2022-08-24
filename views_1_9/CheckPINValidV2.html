@@ -209,12 +209,14 @@
                         document.getElementById('label_pin_policy').innerText = msg;
                     }
 
-                    try{
-                        GTIDEM_isValidPIN_V2(bNewPINBuffer, response.flags);
-                    }catch(e){
-                        alert(showIKPJSExecptionMessage(e.code));
-                        return 
+                
+                    var result = GTIDEM_isValidPIN_V2(bNewPINBuffer, response.flags);
+                        
+                    if(result.statusCode !=CTAP1_ERR_SUCCESS){
+                        alert(showFIDOErrorMessage(result));
+                        return
                     }
+                   
               
                     alert("密碼可用");
 

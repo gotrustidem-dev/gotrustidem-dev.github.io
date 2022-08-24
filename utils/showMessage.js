@@ -88,28 +88,30 @@ const Msg_PIN_Trial_Counter = "The retries counter is ";
  const SETTING_ERR_USERPIN_SAME= 0xC001;
  const SETTING_ERR_USERPIN_LEN= 0xC002;
  const SETTING_ERR_USERPIN_LEVEL= 0xC003;
- const SETTING_ERR_USERPIN_LEN_TOO_LONG= 0xC004;
- const SETTING_ERR_USERPIN_LEN_TOO_SHORT= 0xC005;
- const SETTING_ERR_USERPIN_NEED_NUMBER= 0xC006;
- const SETTING_ERR_USERPIN_NEED_UPPERCASE= 0xC007;
- const SETTING_ERR_USERPIN_NEED_LOWERCASE= 0xC008;
- const SETTING_ERR_USERPIN_NEED_LETTER= 0xC009;
- const SETTING_ERR_USERPIN_NEED_SYMBOL= 0xC00a;
- const SETTING_ERR_USERPIN_BAN_NUMBER= 0xC00b;
- const SETTING_ERR_USERPIN_BAN_UPPERCASE= 0xC00c;
- const SETTING_ERR_USERPIN_BAN_LOWERCASE= 0xC00d;
- const SETTING_ERR_USERPIN_BAN_LETTER= 0xC00e;
- const SETTING_ERR_USERPIN_BAN_SYMBOL= 0xC00f;
+ const SETTING_ERR_CBOR_PARSING= 0xC004;
+ const SETTING_ERR_USERPIN_LEN_TOO_LONG= 0xC005;
+ const SETTING_ERR_USERPIN_LEN_TOO_SHORT= 0xC006;
+ const SETTING_ERR_USERPIN_NEED_NUMBER= 0xC007;
+ const SETTING_ERR_USERPIN_NEED_UPPERCASE= 0xC008;
+ const SETTING_ERR_USERPIN_NEED_LOWERCASE= 0xC009;
+ const SETTING_ERR_USERPIN_NEED_LETTER= 0xC00A;
+ const SETTING_ERR_USERPIN_NEED_SYMBOL= 0xC00B;
+ const SETTING_ERR_USERPIN_BAN_NUMBER= 0xC00C;
+ const SETTING_ERR_USERPIN_BAN_UPPERCASE= 0xC00D;
+ const SETTING_ERR_USERPIN_BAN_LOWERCASE= 0xC00E;
+ const SETTING_ERR_USERPIN_BAN_LETTER= 0xC00F;
+ const SETTING_ERR_USERPIN_BAN_SYMBOL= 0xC010;
 
- const SETTING_ERR_SOPIN_LEN_TOO_LONG= 0xC010;
- const SETTING_ERR_SOPIN_LEN_TOO_SHORT= 0xC011;
+ const SETTING_ERR_SOPIN_LEN_TOO_LONG= 0xC011;
+ const SETTING_ERR_SOPIN_LEN_TOO_SHORT= 0xC012;
 
- const SETTING_ERR_USERPIN_ALLOW_ALL= 0xC012;
- const SETTING_ERR_USERPIN_REJECT_ALL= 0xC013;
+ const SETTING_ERR_USERPIN_ALLOW_ALL= 0xC013;
+ const SETTING_ERR_USERPIN_REJECT_ALL= 0xC014;
   
- const SETTING_ERR_INVAILD_DOMAINS= 0xC014;
- const SETTING_ERR_INVAILD_USERPIN_RETRY= 0xC015;
- const SETTING_ERR_INVAILD_USERPIN_MIN_LEN= 0xC016;
+ const SETTING_ERR_INVAILD_DOMAINS= 0xC015;
+ const SETTING_ERR_INVAILD_USERPIN_RETRY= 0xC016;
+ const SETTING_ERR_INVAILD_USERPIN_MIN_LEN= 0xC017;
+ const SETTING_ERR_CBOR_UNEXPECTED_TYPE= 0xC018;
 
  var showIKPJSExecptionMessage = (status) => {
     var gtidem = new GTIdemJs();
@@ -229,7 +231,10 @@ var showFIDOErrorMessage = (gtidem) => {
            break;   
         case SETTING_ERR_USERPIN_NEED_NUMBER:
             errorMsg += '新密碼需要數字';
-           break;   
+           break;  
+        case SETTING_ERR_USERPIN_NEED_LETTER:
+            errorMsg += '新密碼需要英文';
+           break;    
         case SETTING_ERR_USERPIN_NEED_UPPERCASE:
             errorMsg += '新密碼需要英文大寫';
            break;      
@@ -276,7 +281,14 @@ var showFIDOErrorMessage = (gtidem) => {
         case SETTING_ERR_INVAILD_USERPIN_MIN_LEN:
             errorMsg += '使用者密碼最短長度不可用';
            break;       
+        case SETTING_ERR_CBOR_PARSING:
+            errorMsg += '資料不是CBOR格式';
+        break;        
 
+        case SETTING_ERR_CBOR_UNEXPECTED_TYPE:
+            errorMsg += '出現非預期的資料型態';
+        break;     
+        
         default:
             errorMsg += '不能判別的錯誤。';
             break;
