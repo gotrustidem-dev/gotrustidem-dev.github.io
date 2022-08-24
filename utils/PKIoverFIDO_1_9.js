@@ -7,7 +7,7 @@
 
  'use strict';
 
-const VERSION = "1.9.1"
+const VERSION = "1.9.2"
 const DEFAULT_TIMEOUT = 120000
 const VERIFY_DEFAULT_TIMEOUT = 300000
 // Command Header GoTrust-Idem-PKI
@@ -553,10 +553,16 @@ function checkPINFormatLevel_V2(bNewPIN, level){
  * 檢查初始化參數是否符合標準
  */
 function GTIDEM_isValidTokenParams(bInitToken, commandType){
-  
-    var InitData = (CBOR.decode(bInitToken.buffer));
-
-
+    var InitData ;
+    let gtidem = new GTIdemJs();
+    gtidem.statusCode = CTAP1_ERR_SUCCESS
+    try{
+        InitData = (CBOR.decode(bInitToken.buffer));
+    }catch(e){
+        gtidem.statusCode = SETTING_ERR_CBOR_PARSING
+        return gtidem;
+    }
+     
     if(commandType===CMD_INIT_TOKEN){
         //check must params
         var pinExpired = false
@@ -564,74 +570,120 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
         if(InitData['pinExpired']!=undefined){
             pinExpired = InitData['pinExpired'];
             if (typeof pinExpired !== 'boolean') {
-                throw new IKPException(CTAP2_ERR_MISSING_PARAMETE);
+                gtidem.statusCode = SETTING_ERR_CBOR_UNEXPECTED_TYPE
+                return gtidem;;
             }
         }else{
-            throw new IKPException( CTAP2_ERR_MISSING_PARAMETER)
+            gtidem.statusCode =  CTAP2_ERR_MISSING_PARAMETER
+            return gtidem;;
         }
 
         if(InitData['soPIN']!=undefined){
             if(InitData['soPIN'].byteLength>16){
-                throw new IKPException( SETTING_ERR_SOPIN_LEN_TOO_LONG)
+                gtidem.statusCode =  SETTING_ERR_SOPIN_LEN_TOO_LONG
+                return gtidem;;
             }
 
             if((InitData['soPIN'].byteLength<8)){
-                throw new IKPException( SETTING_ERR_SOPIN_LEN_TOO_SHORT)
+                gtidem.statusCode =  SETTING_ERR_SOPIN_LEN_TOO_SHORT
+                return gtidem;;
             }
             
         }else{
-            throw new IKPException( CTAP2_ERR_MISSING_PARAMETER)
+            gtidem.statusCode =  CTAP2_ERR_MISSING_PARAMETER
+            return gtidem;;
         }
 
         if(InitData['userPIN']!=undefined){
             if(InitData['userPIN'].byteLength<4){
-                throw new IKPException( SETTING_ERR_USERPIN_LEN_TOO_SHORT)
+                gtidem.statusCode =  SETTING_ERR_USERPIN_LEN_TOO_SHORT
+                return gtidem;;
             }
 
             if((InitData['userPIN'].byteLength>63)){
-                throw new IKPException( SETTING_ERR_USERPIN_LEN_TOO_LONG)
+                gtidem.statusCode =   SETTING_ERR_USERPIN_LEN_TOO_LONG
+                return gtidem;;
             }
         }else{
-            throw new IKPException(CTAP2_ERR_MISSING_PARAMETER)
+            gtidem.statusCode =  CTAP2_ERR_MISSING_PARAMETER
+            return;
         }
 
         if(InitData['allowedRPID']!=undefined){
             if((InitData['allowedRPID'].byteLength%8)!=0){
-                throw new IKPException( SETTING_ERR_INVAILD_DOMAINS)
+                gtidem.statusCode =  SETTING_ERR_INVAILD_DOMAINS
+                return;
             }
         }else{
-            throw new IKPException( CTAP2_ERR_MISSING_PARAMETER)
+            gtidem.statusCode =  CTAP2_ERR_MISSING_PARAMETER
+            return gtidem;;
         }
 
         if(InitData['pinLevel']!=undefined){
             if(InitData['pinLevel']==PIN_FORMAT_FREE){
-                throw new IKPException(SETTING_ERR_USERPIN_ALLOW_ALL)
+                gtidem.statusCode = SETTING_ERR_USERPIN_ALLOW_ALL
+                return gtidem;;
             }
             if(InitData['pinLevel']==(PIN_SETUP_ENG_NO|PIN_SETUP_ENG_HIGHCASE|PIN_SETUP_ENG_LOWCASE|PIN_SETUP_NUM_NO|PIN_SETUP_SYM_NO)){
-                throw new IKPException(SETTING_ERR_USERPIN_REJECT_ALL)
+                gtidem.statusCode = SETTING_ERR_USERPIN_REJECT_ALL
+                return gtidem;;
             }
             
         }else{
-            throw new IKPException(CTAP2_ERR_MISSING_PARAMETER)
+            gtidem.statusCode = CTAP2_ERR_MISSING_PARAMETER
+            return gtidem;;
         }
 
         if(InitData['pinRetry']!=undefined){
             if((InitData['pinRetry']==0)||(InitData['pinRetry']>15)){
-                throw new IKPException(SETTING_ERR_INVAILD_USERPIN_RETRY)
+                gtidem.statusCode = SETTING_ERR_INVAILD_USERPIN_RETRY
+                return gtidem;;
             }
         }else{
-            throw new IKPException(CTAP2_ERR_MISSING_PARAMETER)
+            gtidem.statusCode = CTAP2_ERR_MISSING_PARAMETER
+            return gtidem;;
         }
 
         if(InitData['pinMinLen']!=undefined){
             if((InitData['pinMinLen']<4)||(InitData['pinMinLen']>63)){
-                throw new IKPException(SETTING_ERR_INVAILD_USERPIN_MIN_LEN)
+                gtidem.statusCode = SETTING_ERR_INVAILD_USERPIN_MIN_LEN
+                return gtidem;;
             }
         }else{
-            throw new IKPException(CTAP2_ERR_MISSING_PARAMETER)
+            gtidem.statusCode = CTAP2_ERR_MISSING_PARAMETER
+            return gtidem;;
         }
-    }
-    
+        return gtidem;
+    }else if(commandType===CMD_UNLOCK_PIN){
+        var pinExpired = false
+
+        if(InitData['pinExpired']!=undefined){
+            pinExpired = InitData['pinExpired'];
+            if (typeof pinExpired !== 'boolean') {
+                gtidem.statusCode = SETTING_ERR_CBOR_UNEXPECTED_TYPE
+                return gtidem;;
+            }
+        }else{
+            gtidem.statusCode = CTAP2_ERR_MISSING_PARAMETER
+            return gtidem;;
+        }
+
+        if(InitData['userPIN']!=undefined){
+            if(InitData['userPIN'].byteLength<4){
+                gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_SHORT
+                return gtidem;;
+            }
+
+            if((InitData['userPIN'].byteLength>63)){
+                gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_LONG
+                return gtidem;;
+            }
+        }else{
+            gtidem.statusCode = CTAP2_ERR_MISSING_PARAMETER
+            return gtidem;
+        }
+        return gtidem;
+    } 
 }
 
 
@@ -657,30 +709,22 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
  * @param {Uint8Array} bNewPIN 新的使用者密碼
  * @param {Uint8Array} bPinFlag 載具的密碼參數，由 GTIDEM_GetTokenInfo 的 flags 取得
  */
- function GTIDEM_isValidPIN_V2(bNewPIN, bPinFlag , isPINExpired){
+ function GTIDEM_isValidPIN_V2(bNewPIN, bPinFlag){
 
 
+    let gtidem = new GTIdemJs();
+    gtidem.statusCode = CTAP1_ERR_SUCCESS
 
-    if(isPINExpired==true){
-        if (bNewPIN.length < 4){
-            throw new IKPException(SETTING_ERR_USERPIN_LEN_TOO_SHORT)
-        }
-        if(bNewPIN.length > 63){
-            throw new IKPException(SETTING_ERR_USERPIN_LEN_TOO_LONG)
-        }
+   
+    if (bNewPIN.length < bPinFlag[2]){
+        gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_SHORT;
+    }else if(bNewPIN.length > bPinFlag[3]){
+        gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_LONG;
     }else{
-        if (bNewPIN.length < bPinFlag[2]){
-            throw new IKPException(SETTING_ERR_USERPIN_LEN_TOO_SHORT)
-        }
-        if(bNewPIN.length > bPinFlag[3]){
-            throw new IKPException(SETTING_ERR_USERPIN_LEN_TOO_LONG)
-        }
-
-        var statusCode = checkPINFormatLevel_V2(bNewPIN, bPinFlag[1])
-        
-        if(statusCode!=CTAP1_ERR_SUCCESS)
-            throw new IKPException(statusCode)
+        gtidem.statusCode = checkPINFormatLevel_V2(bNewPIN, bPinFlag[1]);
     }
+    
+    return gtidem;
 
 }
 
@@ -713,20 +757,26 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
         return gtidem;
     }
     if(flags!=undefined){
-        if(!checkPINFormatLevel(bNewPIN, flags[1])){
-            gtidem.statusCode = SETTING_ERR_USERPIN_LEVEL;
+
+        var statusCode = checkPINFormatLevel_V2(bNewPIN, flags[1])
+        if(statusCode!=CTAP1_ERR_SUCCESS){
+            gtidem.statusCode = statusCode;
             return gtidem;
         }
-
-        if((bNewPIN.length<flags[2])|| (bNewPIN.length>flags[3])){
-            gtidem.statusCode = SETTING_ERR_USERPIN_LEN;
+        if (bNewPIN.length < flags[2]){
+            gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_SHORT
             return gtidem;
         }
-
-
+        if(bNewPIN.length > flags[3]){
+            gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_LONG
+            return gtidem;
+        }
+    }else{
+        gtidem.statusCode = WEB_ERR_OperationAbort;
+        return gtidem;
     }
-   var prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
-   return await GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN);
+    var prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
+    return await GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN);
 
 }
 

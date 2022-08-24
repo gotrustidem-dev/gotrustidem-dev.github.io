@@ -57,7 +57,10 @@ let device;
       { 'vendorId': 0x32a3}
     ];
     return navigator.usb.requestDevice({ 'filters': filters }).then(
-      device => new serial.Port(device)
+     ( device) => {
+      console.log(device);
+        new serial.Port(device)
+     }
     );
 
     
@@ -141,20 +144,31 @@ window.onload = _ => {
       this.style = "visibility: hidden";
       //connect();
       return navigator.usb.getDevices().then(devices => {
+        console.log(devices);
         return devices.map(device => new serial.Port(device));
     });
     });
-
-
+    // navigator.usb.getDevices().then(devices => {
+    //     return devices.map(device => new serial.Port(device));
+    // });
   }
 
   document.querySelector("#submit").onclick = () => {
     let source = document.querySelector("#editor").value;
     send(source);
   }
+
+  document.querySelector("#list").onclick = () => {
+    return navigator.usb.getDevices().then(devices => {
+        console.log(devices);
+        return devices.map(device => new serial.Port(device));
+    });
+  }
+
 }
 </script>
 <button id="connect" style="visibility: initial">Connect To WebUSB Device</button>
+<button id="list" style="visibility: initial">List To WebUSB Device</button>
 <br><br><label for="title">Sender: </label> <br>
 <textarea id="editor", rows="25" cols="80" id="source">WebUSB!</textarea>
 <br><button id="submit">Send</button>

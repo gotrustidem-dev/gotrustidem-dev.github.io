@@ -272,7 +272,9 @@
                             }
 
                         });
-                });
+                }) .catch((response) => {
+                    alert(showFIDOErrorMessage(response));
+                })
         });
 
         async function buildInitToken(bSOPIN, bRandom, bToken_sn, bNewSOPin, bNewUserPIN, AllowHostDomains, isPinExpired, sPinRetry, sPinMinLen, sPinLevel) {
@@ -329,12 +331,11 @@
 
             //build init data with cbor 
             var encodedInitData = new Uint8Array(CBOR.encode(initData));
+            console.log("INIT_DATA: "+ bufToHex(encodedInitData));
           
-            try{
-                GTIDEM_isValidTokenParams(encodedInitData,CMD_INIT_TOKEN)
-            }catch(e){
-                alert(showIKPJSExecptionMessage(e.code));
-                return;
+            var response = GTIDEM_isValidTokenParams(encodedInitData,CMD_INIT_TOKEN)
+            if(response.statusCode != CTAP1_ERR_SUCCESS){
+                throw response;
             }
             
 
