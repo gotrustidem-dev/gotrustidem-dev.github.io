@@ -7,13 +7,18 @@
 
  'use strict';
 
-const VERSION = "1.9.2"
+const VERSION = "1.9.3"
 const DEFAULT_TIMEOUT = 120000
 const VERIFY_DEFAULT_TIMEOUT = 300000
 // Command Header GoTrust-Idem-PKI
 const GTheader = 'R29UcnVzdC1JZGVtLVBLSQ==';
 var sUserName = 'GoTrustID.com';
 
+const TOKEN_MIN_PIN_LEN = 4;
+const TOKEN_MAX_PIN_LEN = 63;
+
+const  TOKEN_MAX_SOPIN_LEN = 16;
+const  TOKEN_MIN_SOPIN_LEN = 8;
 
 const CMD_KeyAgreement = 0xE0;
 const CMD_ReadCertificate = 0xE1;
@@ -579,12 +584,12 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
         }
 
         if(InitData['soPIN']!=undefined){
-            if(InitData['soPIN'].byteLength>16){
+            if(InitData['soPIN'].byteLength> TOKEN_MAX_SOPIN_LEN){
                 gtidem.statusCode =  SETTING_ERR_SOPIN_LEN_TOO_LONG
                 return gtidem;;
             }
 
-            if((InitData['soPIN'].byteLength<8)){
+            if((InitData['soPIN'].byteLength < TOKEN_MIN_SOPIN_LEN)){
                 gtidem.statusCode =  SETTING_ERR_SOPIN_LEN_TOO_SHORT
                 return gtidem;;
             }
@@ -595,12 +600,12 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
         }
 
         if(InitData['userPIN']!=undefined){
-            if(InitData['userPIN'].byteLength<4){
+            if(InitData['userPIN'].byteLength< TOKEN_MIN_PIN_LEN){
                 gtidem.statusCode =  SETTING_ERR_USERPIN_LEN_TOO_SHORT
                 return gtidem;;
             }
 
-            if((InitData['userPIN'].byteLength>63)){
+            if((InitData['userPIN'].byteLength > TOKEN_MAX_PIN_LEN)){
                 gtidem.statusCode =   SETTING_ERR_USERPIN_LEN_TOO_LONG
                 return gtidem;;
             }
@@ -645,7 +650,7 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
         }
 
         if(InitData['pinMinLen']!=undefined){
-            if((InitData['pinMinLen']<4)||(InitData['pinMinLen']>63)){
+            if((InitData['pinMinLen']< TOKEN_MIN_PIN_LEN )||(InitData['pinMinLen']> TOKEN_MAX_PIN_LEN )){
                 gtidem.statusCode = SETTING_ERR_INVAILD_USERPIN_MIN_LEN
                 return gtidem;;
             }
@@ -669,12 +674,12 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
         }
 
         if(InitData['userPIN']!=undefined){
-            if(InitData['userPIN'].byteLength<4){
+            if(InitData['userPIN'].byteLength<TOKEN_MIN_PIN_LEN){
                 gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_SHORT
                 return gtidem;;
             }
 
-            if((InitData['userPIN'].byteLength>63)){
+            if((InitData['userPIN'].byteLength>TOKEN_MAX_PIN_LEN)){
                 gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_LONG
                 return gtidem;;
             }
@@ -717,9 +722,9 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
 
    
     if (bNewPIN.length < bPinFlag[2]){
-        gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_SHORT;
+        gtidem.statusCode = IKP_ERR_SETTING_USERPIN_LEN;
     }else if(bNewPIN.length > bPinFlag[3]){
-        gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_LONG;
+        gtidem.statusCode = IKP_ERR_SETTING_USERPIN_LEN;
     }else{
         gtidem.statusCode = checkPINFormatLevel_V2(bNewPIN, bPinFlag[1]);
     }

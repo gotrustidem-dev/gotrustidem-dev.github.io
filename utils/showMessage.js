@@ -189,6 +189,7 @@ var showFIDOErrorMessage = (gtidem) => {
             errorMsg += '管理者密碼長度錯誤'; 
             break;    
         case IKP_ERR_SETTING_USERPIN_LEN:
+             
             errorMsg += '使用者密碼長度錯誤'; 
             break;    
         case IKP_ERR_SETTING_RETRY:
