@@ -1,180 +1,142 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>WebUSB API Test (Chrome, edge only)</title>
-
-
-
-
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>WebUSB API Test (Chrome, edge only)</title>
+  <script src="./utils/cbor.js"></script>
+  <script src="./utils/helpers.js"></script>
+  <script src="./utils/showMessage.js"></script>
+  <script src="./utils/response.js"></script>
+  <script src="./utils/PKIoverFIDO_1_9.js"></script>
 </head>
+
 <body>
-    <form style="text-align: center;" id="get_usbinfo" onsubmit="return false">
-        <button class="btn btn-primary" action="submit"
-            style="width: 162px; height:34px;background-color: #008CBA;">Get Idem Key device info</button>  
-             
-    </form>
-    <label id="msg"> </label>
+  <form style="text-align: center;" id="add_devices" onsubmit="return false">
 
+    <label>已配對且插入的 IdemKeyPlus 裝置</label><br>
+    <label id="set_connected_devices"></label><br>
+    <button class="btn btn-primary" action="submit"
+      style="width: 162px; height:34px;background-color: #008CBA;">新增綁定裝置</button>
 
-<script>
-/*
-let device;
-    document.getElementById('get_usbinfo').addEventListener('submit', function (event) {
-            event.preventDefault();
+  </form>
 
-
-          
-            connectIdemKey();
-
-    });
-
-    async function connectIdemKey(){
-
-            device = await  navigator.usb.requestDevice({ filters: [{ vendorId: 0x32a3 }] })
-                .then(device => {
-                    document.getElementById('msg').textContent = device.productName;
-                    navigator.usb.addEventListener('connect', event => {
-                        document.getElementById('msg').textContent += "Connect device OK!";
-                    });
-            })
-          
-    }
-    */
-    var serial = {};
-
-(function() {
-  'use strict';
-
-  serial.getPorts = function() {
-    return navigator.usb.getDevices().then(devices => {
-      return devices.map(device => new serial.Port(device));
-    });
-  };
-
-  serial.requestPort = function() {
-    const filters = [
-      { 'vendorId': 0x32a3}
-    ];
-    return navigator.usb.requestDevice({ 'filters': filters }).then(
-     ( device) => {
-      console.log(device);
-        new serial.Port(device)
-     }
-    );
-
+  <form style="text-align: center;" id="show_info" onsubmit="return false">
     
-  }
+    <input type="checkbox" id="only_connected_devices" name="vehicle1" value="只允許配對過的裝置">
+    <label>只允許使用已綁定的裝置操作取得載具資訊 </label><br>
+    <button class="btn btn-primary" action="submit"
+      style="width: 200px; height:34px;background-color: #008CBA;">取得載具資訊</button><br>
+    <label id="token_info"></label>
+  </form>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      let devices = await navigator.usb.getDevices();
+      if (devices.length == 0) {
+        document.getElementById('set_connected_devices').innerText = '請插入載具或是重新綁定載具'
+      }
+      devices.forEach((device) => {
+        // Add |device| to the UI.
+        var msg = '';
+        if ((device.vendorId == 0x32a3) && (device.productId == 0x3202)) {
+          msg += device.productName + ' ' + device.serialNumber;
+        }
+        if (msg == '') {
+          document.getElementById('set_connected_devices').innerText = '請插入載具或是重新綁定載具'
+        } else {
+          document.getElementById('set_connected_devices').innerText = msg;
+        }
 
-  serial.Port = function(device) {
-    this.device_ = device;
-  };
-
-  serial.Port.prototype.connect = function() {
-    let readLoop = () => {
-      const {
-        endpointNumber
-      } = this.device_.configuration.interfaces[0].alternate.endpoints[0]
-      this.device_.transferIn(endpointNumber, 64).then(result => {
-        this.onReceive(result.data);
-        readLoop();
-      }, error => {
-        this.onReceiveError(error);
       });
-    };
+    });
+    navigator.usb.addEventListener('connect', (event) => {
+      let device = event.device;
+      alert('偵測到已綁定裝置' + device.productName + ' ' + device.serialNumber + '插入');
+      //refresh UI
+      refreshConnectedDevice();
+    });
 
-    return this.device_.open()
-        .then(() => {
-          if (this.device_.configuration === null) {
-            return this.device_.selectConfiguration(1);
-          }
-        })
-        .then(() => this.device_.claimInterface(0))
-        .then(() => {
-          readLoop();
+
+    navigator.usb.addEventListener('disconnect', (event) => {
+      let device = event.device;
+      alert('偵測到已綁定裝置' + device.productName + ' ' + device.serialNumber + '拔除');
+      //refresh UI
+      refreshConnectedDevice();
+    });
+
+    document.getElementById('add_devices').addEventListener('submit', function (event) {
+      const filters = [{
+        'vendorId': 0x32a3,
+        'productId': 0x3202
+      }];
+      navigator.usb.requestDevice({
+        'filters': filters
+      }).then(
+        (device) => {
+          console.log(device);
+          //refresh UI
+          refreshConnectedDevice();
         });
-  };
+    });
 
-  serial.Port.prototype.disconnect = function() {
-    return this.device_.close();
-  };
+    document.getElementById('show_info').addEventListener('submit', async () => {
 
-  serial.Port.prototype.send = function(data) {
-    const {
-      endpointNumber
-    } = this.device_.configuration.interfaces[0].alternate.endpoints[1]
-    return this.device_.transferOut(endpointNumber, data);
-  };
-})();
+      var onlyUseConnectedDevice = document.getElementById('only_connected_devices');
+      var bToken_sn = undefined;
+      if (onlyUseConnectedDevice.checked) {
+        let devices = await navigator.usb.getDevices();
+        if (devices.length == 0) {
+          alert("未偵測到載具，請重新綁定或是插入載具")
+        }
+        if (devices.length > 1) {
+          alert("偵測到多於一隻的已綁定載具插入，請確定載具")
+        }
 
-let port;
+        devices.forEach((device) => {
+          // Add |device| to the UI.
+          bToken_sn = hexStringToArrayBuffer(device.serialNumber);
+        });
+      }
 
-function connect() {
-  port.connect().then(() => {
-    port.onReceive = data => {
-      let textDecoder = new TextDecoder();
-      console.log("Received:", textDecoder.decode(data));
-      document.getElementById('output').value += textDecoder.decode(data);
+
+      GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
+        console.log('SUCCESS', response);
+        if (response.statusCode == CTAP1_ERR_SUCCESS) {
+          document.getElementById('token_info').innerText = "\nFW version: " + ConverVersionFormat(response
+            .fw)
+            +"\nSW version: " + ConverVersionFormat(response.sw)
+            +"\nPIN retryies: " + response.pinRetry
+            +"\nCredentials: " + response.credentialNum
+            +"\nSerial number: " + ConverSNFormat(response.sn)
+        } else {
+          alert(showFIDOErrorMessage(response));
+        }
+      }).catch((error) => {
+        alert(error)
+        console.log('FAIL', error)
+      });
+    });
+
+    function refreshConnectedDevice() {
+      navigator.usb.getDevices().then((devices) => {
+        if (devices.length == 0) {
+          document.getElementById('set_connected_devices').innerText = '請插入IdemKeyPlus或是重新綁定IdemKeyPlus'
+        }
+        devices.forEach((device) => {
+          var msg = '';
+          if ((device.vendorId == 0x32a3) && (device.productId == 0x3202)) {
+            msg += device.productName + ' ' + device.serialNumber;
+          }
+          if (msg == '') {
+            document.getElementById('set_connected_devices').innerText =
+              '請插入IdemKeyPlus或是重新綁定IdemKeyPlus'
+          } else {
+            document.getElementById('set_connected_devices').innerText = msg;
+          }
+        });
+      });
     }
-    port.onReceiveError = error => {
-      console.error(error);
-      document.querySelector("#connect").style = "visibility: initial";
-      port.disconnect();
-    };
-  });
-}
-
-function send(string) {
-  console.log("sending to serial:" + string.length);
-  if (string.length === 0)
-    return;
-  console.log("sending to serial: [" + string +"]\n");
-
-  let view = new TextEncoder('utf-8').encode(string);
-  console.log(view);
-  if (port) {
-    port.send(view);
-  }
-};
-
-window.onload = _ => {
-  document.querySelector("#connect").onclick = function() {
-    serial.requestPort().then(selectedPort => {
-      port = selectedPort;
-      this.style = "visibility: hidden";
-      //connect();
-      return navigator.usb.getDevices().then(devices => {
-        console.log(devices);
-        return devices.map(device => new serial.Port(device));
-    });
-    });
-    // navigator.usb.getDevices().then(devices => {
-    //     return devices.map(device => new serial.Port(device));
-    // });
-  }
-
-  document.querySelector("#submit").onclick = () => {
-    let source = document.querySelector("#editor").value;
-    send(source);
-  }
-
-  document.querySelector("#list").onclick = () => {
-    return navigator.usb.getDevices().then(devices => {
-        console.log(devices);
-        return devices.map(device => new serial.Port(device));
-    });
-  }
-
-}
-</script>
-<button id="connect" style="visibility: initial">Connect To WebUSB Device</button>
-<button id="list" style="visibility: initial">List To WebUSB Device</button>
-<br><br><label for="title">Sender: </label> <br>
-<textarea id="editor", rows="25" cols="80" id="source">WebUSB!</textarea>
-<br><button id="submit">Send</button>
-<br><br>
-<label for="title">Receiver: </label> </br>
-<textarea id="output", rows="25" cols="80" id="source"></textarea>
+  </script>
 </body>
 
 </html>
