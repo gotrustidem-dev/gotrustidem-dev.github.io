@@ -89,9 +89,11 @@
         let devices = await navigator.usb.getDevices();
         if (devices.length == 0) {
           alert("未偵測已綁定載具，請重新綁定或是插入載具")
+          return;
         }
         if (devices.length > 1) {
           alert("偵測到多於一隻的已綁定載具插入，請確定載具")
+          return;
         }
 
         devices.forEach((device) => {
