@@ -35,11 +35,12 @@
       if (devices.length == 0) {
         document.getElementById('set_connected_devices').innerText = '請插入載具或是重新綁定載具'
       }
+      var msg = '';
       devices.forEach((device) => {
         // Add |device| to the UI.
-        var msg = '';
+        
         if ((device.vendorId == 0x32a3) && (device.productId == 0x3202)) {
-          msg += device.productName + ' ' + device.serialNumber;
+          msg += device.productName + ' ' + device.serialNumber+'\n';
         }
         
       });
