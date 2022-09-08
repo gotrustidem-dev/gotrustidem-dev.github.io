@@ -86,7 +86,7 @@
       if (onlyUseConnectedDevice.checked) {
         let devices = await navigator.usb.getDevices();
         if (devices.length == 0) {
-          alert("未偵測到載具，請重新綁定或是插入載具")
+          alert("未偵測已綁定載具，請重新綁定或是插入載具")
         }
         if (devices.length > 1) {
           alert("偵測到多於一隻的已綁定載具插入，請確定載具")
@@ -94,12 +94,12 @@
 
         devices.forEach((device) => {
           // Add |device| to the UI.
-          bToken_sn = hexStringToArrayBuffer(device.serialNumber);
+          //bToken_sn = hexStringToArrayBuffer(device.serialNumber);
         });
       }
 
 
-      GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
+      GTIDEM_GetTokenInfo(undefined).then((response) => {
         console.log('SUCCESS', response);
         if (response.statusCode == CTAP1_ERR_SUCCESS) {
           document.getElementById('token_info').innerText = "\nFW version: " + ConverVersionFormat(response
