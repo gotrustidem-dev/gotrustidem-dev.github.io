@@ -262,7 +262,7 @@
             }
             //var testNewCert = new Uint8Array(parseInt(token_sn));
 
-             v(bToken_sn,bKeyHandle,bKeyID,bHexCert,undefined).then((response) => {
+             GTIDEM_ImportCertificate2(bToken_sn,bKeyHandle,bKeyID,bHexCert,undefined).then((response) => {
                
                     
                     if(response.statusCode==CTAP1_ERR_SUCCESS){  
