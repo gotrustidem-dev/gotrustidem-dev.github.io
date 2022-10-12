@@ -1412,9 +1412,14 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
     return await navigator.credentials.create({
         'publicKey': webauth_request
     }).then((fido) => {
-           
+        let attestationObject = CBOR.decode(fido.response.attestationObject);
+        let authData = parseAuthData(attestationObject.authData);
+        let credID = authData.credID;
+        let bPKIoverFIDOResponse= credID.buffer.slice(credID.byteOffset, credID.byteLength + credID.byteOffset);
+
+        
         let gtidem = new GTIdemJs();
-        gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_ImportCertificate);
+        gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse,CMD_ImportCertificate);
       
         return gtidem;
     }).catch((error) => {
