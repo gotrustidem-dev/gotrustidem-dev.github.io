@@ -920,7 +920,7 @@ async function GTIDEM_GenP256CSR(bSerialNumber,bCommonName){
 	
 
 
-   var payloadLen = keyid_buf.byteLength+sn_buf.byteLength
+   var payloadLen = commonName_buf.byteLength+sn_buf.byteLength
 
    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
  
@@ -1022,7 +1022,7 @@ async function GTIDEM_GenP384CSR(bSerialNumber,bCommonName){
 	
 
 
-   var payloadLen = keyid_buf.byteLength+sn_buf.byteLength
+   var payloadLen = commonName_buf.byteLength+sn_buf.byteLength
 
    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
  
@@ -1124,7 +1124,7 @@ async function GTIDEM_GenP521CSR(bSerialNumber,bCommonName){
 	
 
 
-   var payloadLen = keyid_buf.byteLength+sn_buf.byteLength
+   var payloadLen = commonName_buf.byteLength+sn_buf.byteLength
 
    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
  
