@@ -1238,7 +1238,7 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bCommonName) {
 	
 
 
-   var payloadLen = keyid_buf.byteLength+sn_buf.byteLength
+   var payloadLen = commonName_buf.byteLength+sn_buf.byteLength
 
    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
  
