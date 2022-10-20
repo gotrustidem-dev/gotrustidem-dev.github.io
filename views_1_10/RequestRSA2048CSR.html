@@ -68,19 +68,24 @@
                                     <!--PC side-->
                                     <td style="width: 385px;">
 
-                                        <form style="text-align: center;" id="form_key_id" onsubmit="return false">
+                                        <form style="text-align: center;" id="form_common_name" onsubmit="return false">
                                             <p>
-                                                <label id="label_key_id"> Specify Key ID:</label><br>
-                                                <input type="text" name="key_id"  style="width: 342px; height:41px">
+                                                <label id="label_common_name"> CSR' CN:</label><br>
+                                                <input type="text" name="common_name"  style="width: 342px; height:41px">
                                             </p>
                                         </form>
-
                                         <form style="text-align: center;" id="form_requestcsr_btn" onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
                                                 style="width: 200px; height:34px;background-color: #008CBA;">Request CSR</button>
                                         </form>
 
                                         <p>
+                                        <form style="text-align: center;" id="form_key_id" onsubmit="return false">
+                                            <p>
+                                                <label id="label_key_id"> Specify Key ID:</label><br>
+                                                <input type="text" name="key_id"  style="width: 342px; height:41px">
+                                            </p>
+                                        </form>    
                                         <form style="text-align: center;" id="form_key_handle" onsubmit="return false">
                                             <p>
                                                 <label id="label_key_handle">Key Handle:</label>
@@ -128,21 +133,20 @@
         document.getElementById('form_requestcsr_btn').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
-            let key_id = document.getElementById('form_key_id').key_id.value;
+            let common_name = document.getElementById('form_common_name').common_name.value;
             console.log(token_sn);
-            console.log(key_id);
-
+            console.log(common_name);
             
             var bToken_sn = undefined;
             if(token_sn.length!=0){
                 bToken_sn = hexStringToArrayBuffer(token_sn);  
             }
-            var bKeyID = undefined;
-            if(key_id.length!=0){
-                bKeyID = toUTF8Array(key_id);  
+            var bCommonName = undefined;
+            if(common_name.length!=0){
+                bCommonName = toUTF8Array(common_name);  
             }
             GTIDEM_SetName('Ann Chen');
-            GTIDEM_GenRSA2048CSR(bToken_sn,bKeyID).then((response) => {
+            GTIDEM_GenRSA2048CSR(bToken_sn,bCommonName).then((response) => {
 
                 if(response.statusCode==CTAP1_ERR_SUCCESS){    
                         var strCSR="";

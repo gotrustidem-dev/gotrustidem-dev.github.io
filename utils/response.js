@@ -182,9 +182,6 @@ class GTIdemJs {
                 this.certicficate = bCERTBuf.slice(1);
 
             }}
-
-  
-            
         } else if (buffer.byteLength == 256) {
 
             this.signature = new Uint8Array(buffer);
