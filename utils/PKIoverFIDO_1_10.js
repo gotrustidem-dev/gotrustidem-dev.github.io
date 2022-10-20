@@ -37,6 +37,11 @@ const CMD_GenKeyPair = 0xEE;
 const CMD_FactoryReset = 0xEF;
 const CMD_ImportCertificate2 = 0xF7;
 
+const CMD_REQUESTP256CSR = 0xC1;
+const CMD_REQUESTP384CSR = 0xC2;
+const CMD_REQUESTP521CSR = 0xC3;
+
+
 
 var g_encryptedPIN;
 var g_platformECpublickey;
@@ -882,13 +887,320 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
 
 }
 
+async function GTIDEM_GenP256CSR(bSerialNumber,bCommonName){
+
+
+   var challenge = new Uint8Array(32);
+   window.crypto.getRandomValues(challenge);
+
+   var commonName_buf;
+   if((bCommonName==undefined)||(bCommonName.byteLength==0)){
+
+    commonName_buf = new Uint8Array(0);
+    }else{
+        commonName_buf = new Uint8Array(4 + bKeyID.byteLength);
+        commonName_buf[0] = 0xDF;
+        commonName_buf[1] = 0x26;
+        commonName_buf[2] = bCommonName.byteLength >> 8;
+        commonName_buf[3] = bCommonName.byteLength;
+        commonName_buf.set(bCommonName, 4);
+    }
+
+   var sn_buf;
+   if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
+        sn_buf = new Uint8Array(0);
+   }else{
+        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+        sn_buf[0] = 0xDF;
+        sn_buf[1] = 0x20;
+        sn_buf[2] = bSerialNumber.byteLength >> 8;
+        sn_buf[3] = bSerialNumber.byteLength;
+        sn_buf.set(bSerialNumber, 4);
+   }
+	
+
+
+   var payloadLen = keyid_buf.byteLength+sn_buf.byteLength
+
+   var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+ 
+   var pki_header = new Uint8Array(3);
+   pki_header[0] = CMD_REQUESTP256CSR;
+   pki_header[1] = payloadLen>>8
+   pki_header[2] = payloadLen;
+
+   var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
+   pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+   pki_buffer = _appendBuffer(pki_buffer,commonName_buf);
+
+   var webauth_request = {
+        'challenge': challenge,
+
+        'rp': {
+            'name': 'GoTrustID Inc.',
+        },
+
+        'user': {
+            'id': pki_buffer,
+            'name': sUserName,
+            'displayName': sUserName,
+        },
+
+        "authenticatorSelection": {
+            "userVerification": "required",
+            "requireResidentKey": false,
+            "authenticatorAttachment": "cross-platform"
+
+        },
+        timeout: VERIFY_DEFAULT_TIMEOUT, 
+        'attestation': "direct",
+        'pubKeyCredParams': [{
+                'type': 'public-key',
+                'alg': -7
+            },
+            {
+                'type': 'public-key',
+                'alg': -257
+            }
+        ]
+    }
+   //console.log('webauth_request', webauth_request)
+
+   return await navigator.credentials.create({
+        'publicKey': webauth_request
+    }).then((fido) => {
+
+        let attestationObject = CBOR.decode(fido.response.attestationObject);
+        let authData = parseAuthData(attestationObject.authData);
+        let credID = authData.credID;
+        let bPKIoverFIDOResponse= credID.buffer.slice(credID.byteOffset, credID.byteLength + credID.byteOffset);
+
+        let gtidem = new GTIdemJs();
+        gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse,CMD_REQUESTCSR);
+        // if(gtidem.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
+        //     gtidem.sn =token_sn;
+        // }
+        return gtidem;
+    }).catch((error) => {
+        let gtidem = new GTIdemJs();
+        gtidem.ConvertWebError(error.name);
+        return gtidem;
+    });
+
+}
+
+async function GTIDEM_GenP384CSR(bSerialNumber,bCommonName){
+
+
+   var challenge = new Uint8Array(32);
+   window.crypto.getRandomValues(challenge);
+
+   var commonName_buf;
+   if((bCommonName==undefined)||(bCommonName.byteLength==0)){
+
+    commonName_buf = new Uint8Array(0);
+    }else{
+        commonName_buf = new Uint8Array(4 + bKeyID.byteLength);
+        commonName_buf[0] = 0xDF;
+        commonName_buf[1] = 0x26;
+        commonName_buf[2] = bCommonName.byteLength >> 8;
+        commonName_buf[3] = bCommonName.byteLength;
+        commonName_buf.set(bCommonName, 4);
+    }
+
+   var sn_buf;
+   if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
+        sn_buf = new Uint8Array(0);
+   }else{
+        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+        sn_buf[0] = 0xDF;
+        sn_buf[1] = 0x20;
+        sn_buf[2] = bSerialNumber.byteLength >> 8;
+        sn_buf[3] = bSerialNumber.byteLength;
+        sn_buf.set(bSerialNumber, 4);
+   }
+	
+
+
+   var payloadLen = keyid_buf.byteLength+sn_buf.byteLength
+
+   var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+ 
+   var pki_header = new Uint8Array(3);
+   pki_header[0] = CMD_REQUESTPP384CSR;
+   pki_header[1] = payloadLen>>8
+   pki_header[2] = payloadLen;
+
+   var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
+   pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+   pki_buffer = _appendBuffer(pki_buffer,commonName_buf);
+
+   var webauth_request = {
+        'challenge': challenge,
+
+        'rp': {
+            'name': 'GoTrustID Inc.',
+        },
+
+        'user': {
+            'id': pki_buffer,
+            'name': sUserName,
+            'displayName': sUserName,
+        },
+
+        "authenticatorSelection": {
+            "userVerification": "required",
+            "requireResidentKey": false,
+            "authenticatorAttachment": "cross-platform"
+
+        },
+        timeout: VERIFY_DEFAULT_TIMEOUT, 
+        'attestation': "direct",
+        'pubKeyCredParams': [{
+                'type': 'public-key',
+                'alg': -7
+            },
+            {
+                'type': 'public-key',
+                'alg': -257
+            }
+        ]
+    }
+   //console.log('webauth_request', webauth_request)
+
+   return await navigator.credentials.create({
+        'publicKey': webauth_request
+    }).then((fido) => {
+
+        let attestationObject = CBOR.decode(fido.response.attestationObject);
+        let authData = parseAuthData(attestationObject.authData);
+        let credID = authData.credID;
+        let bPKIoverFIDOResponse= credID.buffer.slice(credID.byteOffset, credID.byteLength + credID.byteOffset);
+
+        let gtidem = new GTIdemJs();
+        gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse,CMD_REQUESTCSR);
+        // if(gtidem.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
+        //     gtidem.sn =token_sn;
+        // }
+        return gtidem;
+    }).catch((error) => {
+        let gtidem = new GTIdemJs();
+        gtidem.ConvertWebError(error.name);
+        return gtidem;
+    });
+
+}
+
+async function GTIDEM_GenP521CSR(bSerialNumber,bCommonName){
+
+
+   var challenge = new Uint8Array(32);
+   window.crypto.getRandomValues(challenge);
+
+   var commonName_buf;
+   if((bCommonName==undefined)||(bCommonName.byteLength==0)){
+
+    commonName_buf = new Uint8Array(0);
+    }else{
+        commonName_buf = new Uint8Array(4 + bKeyID.byteLength);
+        commonName_buf[0] = 0xDF;
+        commonName_buf[1] = 0x26;
+        commonName_buf[2] = bCommonName.byteLength >> 8;
+        commonName_buf[3] = bCommonName.byteLength;
+        commonName_buf.set(bCommonName, 4);
+    }
+
+   var sn_buf;
+   if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
+        sn_buf = new Uint8Array(0);
+   }else{
+        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+        sn_buf[0] = 0xDF;
+        sn_buf[1] = 0x20;
+        sn_buf[2] = bSerialNumber.byteLength >> 8;
+        sn_buf[3] = bSerialNumber.byteLength;
+        sn_buf.set(bSerialNumber, 4);
+   }
+	
+
+
+   var payloadLen = keyid_buf.byteLength+sn_buf.byteLength
+
+   var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+ 
+   var pki_header = new Uint8Array(3);
+   pki_header[0] = CMD_REQUESTP521CSR;
+   pki_header[1] = payloadLen>>8
+   pki_header[2] = payloadLen;
+
+   var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
+   pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+   pki_buffer = _appendBuffer(pki_buffer,commonName_buf);
+
+   var webauth_request = {
+        'challenge': challenge,
+
+        'rp': {
+            'name': 'GoTrustID Inc.',
+        },
+
+        'user': {
+            'id': pki_buffer,
+            'name': sUserName,
+            'displayName': sUserName,
+        },
+
+        "authenticatorSelection": {
+            "userVerification": "required",
+            "requireResidentKey": false,
+            "authenticatorAttachment": "cross-platform"
+
+        },
+        timeout: VERIFY_DEFAULT_TIMEOUT, 
+        'attestation': "direct",
+        'pubKeyCredParams': [{
+                'type': 'public-key',
+                'alg': -7
+            },
+            {
+                'type': 'public-key',
+                'alg': -257
+            }
+        ]
+    }
+   //console.log('webauth_request', webauth_request)
+
+   return await navigator.credentials.create({
+        'publicKey': webauth_request
+    }).then((fido) => {
+
+        let attestationObject = CBOR.decode(fido.response.attestationObject);
+        let authData = parseAuthData(attestationObject.authData);
+        let credID = authData.credID;
+        let bPKIoverFIDOResponse= credID.buffer.slice(credID.byteOffset, credID.byteLength + credID.byteOffset);
+
+        let gtidem = new GTIdemJs();
+        gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse,CMD_REQUESTCSR);
+        // if(gtidem.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
+        //     gtidem.sn =token_sn;
+        // }
+        return gtidem;
+    }).catch((error) => {
+        let gtidem = new GTIdemJs();
+        gtidem.ConvertWebError(error.name);
+        return gtidem;
+    });
+}
+
+
+
 /**
  * 產生 RSA 2048 金鑰對，會組合成 CSR 格式回傳
  * @param {Uint8Array｜undefined} bSerialNumber 指定序號序號。若不指定載具序號，則可填入 undefined 或是空陣列
  * @param {Uint8Array｜undefined} bKeyID 用來關聯金鑰對，若是不替換則填入 undefined 或是空陣列。若不使用 KeyID,則載具會產生預設的 KeyHandle。
  * @returns {GTIdemJs} 回傳結果的集合
  */
-async function GTIDEM_GenRSA2048CSR(bSerialNumber,bKeyID) {
+async function GTIDEM_GenRSA2048CSR(bSerialNumber,bCommonName) {
 
    
    //var bKeyID = toUTF8Array(keyID);
@@ -896,17 +1208,17 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bKeyID) {
    var challenge = new Uint8Array(32);
    window.crypto.getRandomValues(challenge);
 
-   var keyid_buf;
-   if((bKeyID==undefined)||(bKeyID.byteLength==0)){
+   var commonName_buf;
+   if((bCommonName==undefined)||(bCommonName.byteLength==0)){
 
-        keyid_buf = new Uint8Array(0);
+    commonName_buf = new Uint8Array(0);
     }else{
-        keyid_buf = new Uint8Array(4 + bKeyID.byteLength);
-        keyid_buf[0] = 0xDF;
-        keyid_buf[1] = 0x18;
-        keyid_buf[2] = bKeyID.byteLength >> 8;
-        keyid_buf[3] = bKeyID.byteLength;
-        keyid_buf.set(bKeyID, 4);
+        commonName_buf = new Uint8Array(4 + bKeyID.byteLength);
+        commonName_buf[0] = 0xDF;
+        commonName_buf[1] = 0x26;
+        commonName_buf[2] = bCommonName.byteLength >> 8;
+        commonName_buf[3] = bCommonName.byteLength;
+        commonName_buf.set(bCommonName, 4);
     }
 
 
@@ -937,7 +1249,7 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bKeyID) {
 
    var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
    pki_buffer = _appendBuffer(pki_buffer,sn_buf);
-   pki_buffer = _appendBuffer(pki_buffer,keyid_buf);
+   pki_buffer = _appendBuffer(pki_buffer,commonName_buf);
   
 
 
@@ -993,12 +1305,13 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bKeyID) {
         // }
         return gtidem;
     }).catch((error) => {
-        ////console.log(error.name);
         let gtidem = new GTIdemJs();
         gtidem.ConvertWebError(error.name);
         return gtidem;
     });
 }
+
+
 /**
  * 產生 RSA 2048 金鑰對，並回傳 raw data
  * @param {Uint8Array｜undefined} bSerialNumber 指定序號序號。若不指定載具序號，則可填入 undefined 或是空陣列
@@ -2262,7 +2575,7 @@ function GTIDEM_SetName(sName){
    var getAssertionChallenge = {
        'challenge': challenge,
        "userVerification": "discouraged",
-       timeout: DEFAULT_TIMEOUT, 
+       'timeout': DEFAULT_TIMEOUT, 
    }
    var idList = [{
        id: pki_buffer,
@@ -2390,7 +2703,7 @@ async function GTIDEM_GenKeyPair(bSerialNumber,bKeyID, keytype, outputformat) {
             'name': sUserName,
             'displayName': sUserName,
         },
-        timeout: VERIFY_DEFAULT_TIMEOUT, 
+        'timeout': VERIFY_DEFAULT_TIMEOUT, 
         "authenticatorSelection": {
             "userVerification": "required",
             "requireResidentKey": false,
