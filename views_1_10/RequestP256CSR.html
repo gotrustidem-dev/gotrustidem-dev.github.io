@@ -164,14 +164,9 @@
                         document.getElementById('csr_textarea').value = strCSR;
                         alert(msg);
 
-                        if(bKeyID!=undefined){
-                            console.log(bufToHex(bKeyID));
-                            document.getElementById('form_key_handle').key_handle.value = bufToHex(bKeyID);
+                        console.log(bufToHex(new Uint8Array(response.keyhandle).buffer));
+                        document.getElementById('form_key_handle').key_handle.value = bufToHex(new Uint8Array(response.keyhandle).buffer);
                         
-                        }else{
-                            console.log(bufToHex(new Uint8Array(response.keyhandle).buffer));
-                            document.getElementById('form_key_handle').key_handle.value = bufToHex(new Uint8Array(response.keyhandle).buffer);
-                        }
                 }else{
                     alert(showFIDOErrorMessage(response));
                 }
