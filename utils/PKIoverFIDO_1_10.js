@@ -1027,7 +1027,7 @@ async function GTIDEM_GenP384CSR(bSerialNumber,bCommonName){
    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
  
    var pki_header = new Uint8Array(3);
-   pki_header[0] = CMD_REQUESTPP384CSR;
+   pki_header[0] = CMD_REQUESTP384CSR;
    pki_header[1] = payloadLen>>8
    pki_header[2] = payloadLen;
 
