@@ -898,7 +898,7 @@ async function GTIDEM_GenP256CSR(bSerialNumber,bCommonName){
 
     commonName_buf = new Uint8Array(0);
     }else{
-        commonName_buf = new Uint8Array(4 + bKeyID.byteLength);
+        commonName_buf = new Uint8Array(4 + bCommonName.byteLength);
         commonName_buf[0] = 0xDF;
         commonName_buf[1] = 0x26;
         commonName_buf[2] = bCommonName.byteLength >> 8;
@@ -1000,7 +1000,7 @@ async function GTIDEM_GenP384CSR(bSerialNumber,bCommonName){
 
     commonName_buf = new Uint8Array(0);
     }else{
-        commonName_buf = new Uint8Array(4 + bKeyID.byteLength);
+        commonName_buf = new Uint8Array(4 + bCommonName.byteLength);
         commonName_buf[0] = 0xDF;
         commonName_buf[1] = 0x26;
         commonName_buf[2] = bCommonName.byteLength >> 8;
@@ -1102,7 +1102,7 @@ async function GTIDEM_GenP521CSR(bSerialNumber,bCommonName){
 
     commonName_buf = new Uint8Array(0);
     }else{
-        commonName_buf = new Uint8Array(4 + bKeyID.byteLength);
+        commonName_buf = new Uint8Array(4 + bCommonName.byteLength);
         commonName_buf[0] = 0xDF;
         commonName_buf[1] = 0x26;
         commonName_buf[2] = bCommonName.byteLength >> 8;
@@ -1213,7 +1213,7 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bCommonName) {
 
     commonName_buf = new Uint8Array(0);
     }else{
-        commonName_buf = new Uint8Array(4 + bKeyID.byteLength);
+        commonName_buf = new Uint8Array(4 + bCommonName.byteLength);
         commonName_buf[0] = 0xDF;
         commonName_buf[1] = 0x26;
         commonName_buf[2] = bCommonName.byteLength >> 8;
