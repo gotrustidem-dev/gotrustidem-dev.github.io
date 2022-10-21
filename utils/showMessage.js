@@ -112,6 +112,8 @@ const Msg_PIN_Trial_Counter = "The retries counter is ";
  const SETTING_ERR_INVAILD_USERPIN_RETRY= 0xC016;
  const SETTING_ERR_INVAILD_USERPIN_MIN_LEN= 0xC017;
  const SETTING_ERR_CBOR_UNEXPECTED_TYPE= 0xC018;
+ const SETTING_ERR_OVER_BUFFER_LENGTH= 0xC019;
+ 
 
  var showIKPJSExecptionMessage = (status) => {
     var gtidem = new GTIdemJs();
@@ -288,6 +290,9 @@ var showFIDOErrorMessage = (gtidem) => {
 
         case SETTING_ERR_CBOR_UNEXPECTED_TYPE:
             errorMsg += '出現非預期的資料型態';
+        break;     
+        case SETTING_ERR_OVER_BUFFER_LENGTH:
+            errorMsg += '輸入參數超過長度';
         break;     
         
         default:
