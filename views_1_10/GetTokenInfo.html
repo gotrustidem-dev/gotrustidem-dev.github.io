@@ -111,16 +111,16 @@
                     document.getElementById('label_random_number').innerText = "Random number: " +ConverSNFormat(response.rn);
                     document.getElementById('label_ecPublic_key').innerText = "EC public point: " +ConverSNFormat(response.ecpoint);
                     document.getElementById('label_flags').innerText = "Flags: " +ConverSNFormat(response.flags);
-                    if (response.flags[0]&TOKEN_FLAGS_PINEXPIRED == TOKEN_FLAGS_PINEXPIRED) {
-                        document.getElementById('label_flags').innerText  += "密碼到期，首次使用需變更\n";
+                    if (response.flags[0]&TOKEN_FLAGS_PINEXPIRED === TOKEN_FLAGS_PINEXPIRED) {
+                        document.getElementById('label_flags').innerText  += "\n密碼到期，首次使用需變更";
                         } else {
-                            document.getElementById('label_flags').innerText  += "密碼不需變更\n";
+                            document.getElementById('label_flags').innerText  += "\n密碼不需變更";
                         }
 
-                        if (response.flags[0]&TOKEN_FLAGS_INITIALIZED == TOKEN_FLAGS_INITIALIZED) {
-                            document.getElementById('label_flags').innerText  += "載具已經初始化\n";
+                        if (response.flags[0]&TOKEN_FLAGS_INITIALIZED === TOKEN_FLAGS_INITIALIZED) {
+                            document.getElementById('label_flags').innerText  += "\n載具已經初始化";
                         } else {
-                            document.getElementById('label_flags').innerText  += "載具未初始化或是不支援此顯示功能\n";
+                            document.getElementById('label_flags').innerText  += "\n載具未初始化或是不支援此顯示功能";
                         }
                     if(response.sopinRetry!=undefined){
                         document.getElementById('label_sopin_retries').innerText = "SOPIN retryies:: " +response.sopinRetry;
