@@ -97,37 +97,19 @@
                     if (response.flags != undefined) {
                         flags = response.flags;
                         var msg = "";
-                        if (response.flags[0] == 1) {
+                        if (response.flags[0]&TOKEN_FLAGS_PINEXPIRED == TOKEN_FLAGS_PINEXPIRED) {
                             msg += "密碼到期，首次使用需變更\n";
                         } else {
                             msg += "密碼不需變更\n";
                         }
 
-                        /*
-                        if ((response.flags[1] & PIN_FORMAT_NUMBER) == PIN_FORMAT_NUMBER) {
-                            msg += "[0-9]必須, ";
+                        if (response.flags[0]&TOKEN_FLAGS_INITIALIZED == TOKEN_FLAGS_INITIALIZED) {
+                            msg += "載具已經初始化\n";
                         } else {
-                            msg += "[0-9]允許, ";
+                            msg += "載具未初始化或是不支援此顯示功能\n";
                         }
 
-                        if ((response.flags[1] & PIN_FORMAT_LOWERCASE) == PIN_FORMAT_LOWERCASE) {
-                            msg += "[a-z]必須, ";
-                        } else {
-                            msg += "[a-z]允許, ";
-                        }
-
-                        if ((response.flags[1] & PIN_FORMAT_HIGERCASE) == PIN_FORMAT_HIGERCASE) {
-                            msg += "[A-Z]必須, ";
-                        } else {
-                            msg += "[A-Z]允許, ";
-                        }
-
-                        if ((response.flags[1] & PIN_FORMAT_SYMBOL) == PIN_FORMAT_SYMBOL) {
-                            msg += "特殊符號必須\n";
-                        } else {
-                            msg += "特殊符號允許\n";
-                        }
-                        */
+                        
 
                         if ((response.flags[1] & 0xc0) == 0x00) {
                             msg += "[a-z][A-Z]允許, ";

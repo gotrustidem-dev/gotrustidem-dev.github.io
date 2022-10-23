@@ -106,6 +106,10 @@ const EC_secp521r1 = 4;
 const OutputType_RAW =1;
 const OutputType_CSR =2;
 
+
+const TOKEN_FLAGS_PINEXPIRED = 0X1;
+const TOKEN_FLAGS_INITIALIZED = 0X2;
+
 function IKPException(statusCode) {
     this.code = statusCode;
  }
