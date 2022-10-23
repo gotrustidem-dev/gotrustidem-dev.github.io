@@ -97,13 +97,13 @@
                     if (response.flags != undefined) {
                         flags = response.flags;
                         var msg = "";
-                        if (response.flags[0]&TOKEN_FLAGS_PINEXPIRED == TOKEN_FLAGS_PINEXPIRED) {
+                        if ((response.flags[0]&TOKEN_FLAGS_PINEXPIRED )== TOKEN_FLAGS_PINEXPIRED) {
                             msg += "密碼到期，首次使用需變更\n";
                         } else {
                             msg += "密碼不需變更\n";
                         }
 
-                        if (response.flags[0]&TOKEN_FLAGS_INITIALIZED == TOKEN_FLAGS_INITIALIZED) {
+                        if ((response.flags[0]&TOKEN_FLAGS_INITIALIZED )== TOKEN_FLAGS_INITIALIZED) {
                             msg += "載具已經初始化\n";
                         } else {
                             msg += "載具未初始化或是不支援此顯示功能\n";
