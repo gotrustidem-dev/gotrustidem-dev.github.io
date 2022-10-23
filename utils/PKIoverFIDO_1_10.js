@@ -928,6 +928,11 @@ async function GTIDEM_GenP256CSR(bSerialNumber,bCommonName){
         return gtidem;
     }
 
+    if((commonName_buf.byteLength)>40){ //over buffer length
+        let gtidem = new GTIdemJs();
+        gtidem.statusCode = SETTING_ERR_OVER_BUFFER_LENGTH;
+        return gtidem;
+    }
    var payloadLen = commonName_buf.byteLength+sn_buf.byteLength
 
    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
@@ -1034,7 +1039,11 @@ async function GTIDEM_GenP384CSR(bSerialNumber,bCommonName){
         return gtidem;
    }
 
-
+   if((commonName_buf.byteLength)>40){ //over buffer length
+        let gtidem = new GTIdemJs();
+        gtidem.statusCode = SETTING_ERR_OVER_BUFFER_LENGTH;
+        return gtidem;
+    }
    var payloadLen = commonName_buf.byteLength+sn_buf.byteLength
 
    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
@@ -1141,6 +1150,11 @@ async function GTIDEM_GenP521CSR(bSerialNumber,bCommonName){
         return gtidem;
     }
 
+    if((commonName_buf.byteLength)>40){ //over buffer length
+        let gtidem = new GTIdemJs();
+        gtidem.statusCode = SETTING_ERR_OVER_BUFFER_LENGTH;
+        return gtidem;
+    }
    var payloadLen = commonName_buf.byteLength+sn_buf.byteLength
 
    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
@@ -1258,6 +1272,13 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bCommonName) {
         gtidem.statusCode = SETTING_ERR_OVER_BUFFER_LENGTH;
         return gtidem;
     }
+
+    if((commonName_buf.byteLength)>40){ //over buffer length
+        let gtidem = new GTIdemJs();
+        gtidem.statusCode = SETTING_ERR_OVER_BUFFER_LENGTH;
+        return gtidem;
+    }
+
 
    var payloadLen = commonName_buf.byteLength+sn_buf.byteLength
 
