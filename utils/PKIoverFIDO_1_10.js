@@ -928,7 +928,7 @@ async function GTIDEM_GenP256CSR(bSerialNumber,bCommonName){
         return gtidem;
     }
 
-    if((commonName_buf.byteLength)>40){ //over buffer length
+    if((commonName_buf.byteLength)>44){ //over buffer length
         let gtidem = new GTIdemJs();
         gtidem.statusCode = SETTING_ERR_OVER_BUFFER_LENGTH;
         return gtidem;
@@ -1039,7 +1039,7 @@ async function GTIDEM_GenP384CSR(bSerialNumber,bCommonName){
         return gtidem;
    }
 
-   if((commonName_buf.byteLength)>40){ //over buffer length
+   if((commonName_buf.byteLength)>44){ //over buffer length
         let gtidem = new GTIdemJs();
         gtidem.statusCode = SETTING_ERR_OVER_BUFFER_LENGTH;
         return gtidem;
@@ -1150,7 +1150,7 @@ async function GTIDEM_GenP521CSR(bSerialNumber,bCommonName){
         return gtidem;
     }
 
-    if((commonName_buf.byteLength)>40){ //over buffer length
+    if((commonName_buf.byteLength)>44){ //over buffer length
         let gtidem = new GTIdemJs();
         gtidem.statusCode = SETTING_ERR_OVER_BUFFER_LENGTH;
         return gtidem;
@@ -1273,7 +1273,7 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bCommonName) {
         return gtidem;
     }
 
-    if((commonName_buf.byteLength)>40){ //over buffer length
+    if((commonName_buf.byteLength)>44){ //over buffer length
         let gtidem = new GTIdemJs();
         gtidem.statusCode = SETTING_ERR_OVER_BUFFER_LENGTH;
         return gtidem;
