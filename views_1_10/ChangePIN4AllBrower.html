@@ -121,7 +121,7 @@
         </table>
     </div>
     <script>
-        document.getElementById('form_computing_params_btn').addEventListener('submit', function (event) {
+        document.getElementById('form_computing_params_btn').addEventListener('click', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             let oldpin = document.getElementById('form_oldpin_input').currentpin.value;
@@ -196,7 +196,7 @@
                     alert(error)
                     console.log('FAIL', error)
                 })
-            }, 700);
+            }, 1000);
 
         });
 
