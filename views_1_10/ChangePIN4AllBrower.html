@@ -157,7 +157,7 @@
                 console.log('FAIL', error)
             });
 
-            setTimeout(async () => {
+            setTimeout( () => {
                 let encOldPINHash = document.getElementById('label_enc_oldpinhash_param').textContent;
                 let encNewPIN = document.getElementById('label_enc_newpin_number').textContent;
                 let ecdh_param = document.getElementById('label_ecdh_param').textContent;
@@ -172,10 +172,6 @@
                 var bEncOldPINHash = hexStringToArrayBuffer(encOldPINHash);
                 var bEncNewPIN = hexStringToArrayBuffer(encNewPIN);
                 var bEcdh_param = hexStringToArrayBuffer(ecdh_param);
-
-
-
-
 
                 GTIDEM_ChangeUserPIN_V1(bToken_sn, bEcdh_param, bEncOldPINHash,
                     bEncNewPIN).then((response) => {
@@ -200,7 +196,7 @@
                     alert(error)
                     console.log('FAIL', error)
                 })
-            }, 1000);
+            }, 700);
 
         });
 
