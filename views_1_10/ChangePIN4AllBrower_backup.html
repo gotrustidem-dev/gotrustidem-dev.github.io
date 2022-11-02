@@ -90,19 +90,16 @@
                                             </form>
                                         </p>
 
-                                        <form style="text-align: center;" id="form_computing_params_btn"
-                                            onsubmit="return false">
+                                        <form style="text-align: center;" id="form_computing_params_btn" onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
-                                                style="width: 200px; height:34px;background-color: #008CBA;">Computing
-                                                PIN Params</button>
+                                                style="width: 200px; height:34px;background-color: #008CBA;">Computing PIN Params</button>
                                             <br><label></label>Enc OlD PIN Hash: <br>
-                                            <br><label id="label_enc_oldpinhash_param"
-                                                name="enc_oldpinhash"></label><br>
+                                            <br><label id="label_enc_oldpinhash_param" name="enc_oldpinhash"></label><br>
                                             <br><label></label>Enc New PIN Param <br>
                                             <br><label id="label_enc_newpin_number"></label><br>
                                             <br><label></label>ECDH param: <br>
                                             <br><label id="label_ecdh_param" name="ecpoint"></label><br>
-
+                                            
                                         </form>
 
                                         <form style="text-align: center;" id="form_changepin_btn"
@@ -121,38 +118,33 @@
         </table>
     </div>
     <script>
-        document.getElementById('form_computing_params_btn').addEventListener('submit', function (event) {
+     
+
+        document.getElementById('form_tokeninfo_btn').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
-            let oldpin = document.getElementById('form_oldpin_input').currentpin.value;
-            let newpin = document.getElementById('form_newpin_input').newpin.value;
             console.log(token_sn);
-            console.log(oldpin);
-            console.log(newpin);
-            var bOldPINArray = new Uint8Array(oldpin.length);
-            bOldPINArray.set(toUTF8Array(oldpin), 0);
-            var bNewPINArray = new Uint8Array(newpin.length);
-            bNewPINArray.set(toUTF8Array(newpin), 0);
-
 
             var bToken_sn = undefined;
             if (token_sn.length != 0) {
                 bToken_sn = hexStringToArrayBuffer(token_sn);
 
             }
-            GTIDEM_GenPINParams(bToken_sn, bOldPINArray, bNewPINArray).then((response) => {
+            GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
 
                 console.log('SUCCESS', response);
-                    document.getElementById('label_enc_oldpinhash_param').innerText = ConverSNFormat(
-                        response
-                        .bEcryptedOldPINHash);
-                    document.getElementById('label_enc_newpin_number').innerText = ConverSNFormat(
-                        response
-                        .bEncryptedNEWPIN);
+                if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                    document.getElementById('form_token_sn').token_sn.value = ConverSNFormat(response
+                        .sn);
+                    document.getElementById('label_random_number').innerText = ConverSNFormat(response
+                        .rn);
                     document.getElementById('label_ecdh_param').innerText = ConverSNFormat(response
-                        .bExportECPublicKeyArray);
-
-              
+                        .ecpoint);
+                    document.getElementById('label_pin_param').innerText = ConverSNFormat(response.flags);
+                   
+                } else {
+                    alert(showFIDOErrorMessage(response));
+                }
             }).catch((error) => {
                 alert(error)
                 console.log('FAIL', error)
@@ -163,27 +155,47 @@
 
         document.getElementById('form_changepin_btn').addEventListener('submit', function (event) {
 
-            let encOldPINHash = document.getElementById('label_enc_oldpinhash_param').textContent;
-            let encNewPIN = document.getElementById('label_enc_newpin_number').textContent;
-            let ecdh_param = document.getElementById('label_ecdh_param').textContent;
+            let random = document.getElementById('label_random_number').textContent;
+            let ecpoint = document.getElementById('label_ecdh_param').textContent;
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
-
+            let oldpin = document.getElementById('form_oldpin_input').currentpin.value;
+            let newpin = document.getElementById('form_newpin_input').newpin.value;
+            let confirm_newpin = document.getElementById('form_newpin_confirm_input').confirm_newpin.value;
+            let Pinflag = document.getElementById('label_pin_param').textContent;;
+            console.log(token_sn);
+            console.log(oldpin);
+            console.log(newpin);
+            console.log(confirm_newpin);
 
             var bToken_sn = undefined;
             if (token_sn.length != 0) {
                 bToken_sn = hexStringToArrayBuffer(token_sn);
             }
 
-            var bEncOldPINHash = hexStringToArrayBuffer(encOldPINHash);
-            var bEncNewPIN = hexStringToArrayBuffer(encNewPIN);
-            var bEcdh_param = hexStringToArrayBuffer(ecdh_param);
+            var bRandom = hexStringToArrayBuffer(random);
+            var bECPointFromToken = hexStringToArrayBuffer(ecpoint);
+            var bPinflag = hexStringToArrayBuffer(Pinflag);
+            var bOldPINArray = new Uint8Array(oldpin.length);
+            bOldPINArray.set(toUTF8Array(oldpin), 0);
+            var bNewPINArray = new Uint8Array(newpin.length);
+            bNewPINArray.set(toUTF8Array(newpin), 0);
+
+            if((JSON.stringify(bOldPINArray)==JSON.stringify(bNewPINArray))){
+                let gtidem = new GTIdemJs();
+                gtidem.statusCode = SETTING_ERR_USERPIN_SAME;
+                alert(showFIDOErrorMessage(gtidem));
+                return;
+            }
+
+            if (!GTIDEM_isValidPIN(bNewPINArray, bPinflag)) {
+                    alert("新密碼複雜度不符合要求");
+                    return;
+            }
 
 
+            var prepareUpdate = buildChangeParams(bOldPINArray, bNewPINArray, bECPointFromToken).then((params)=>{
 
-
-
-            GTIDEM_ChangeUserPIN_V1(bToken_sn, bEcdh_param, bEncOldPINHash,
-            bEncNewPIN).then((response) => {
+                GTIDEM_ChangeUserPIN_V1(bToken_sn, params.bExportECPublicKeyArray, params.bEcryptedOldPINHash, params.bEncryptedNEWPIN).then((response) => {
 
                 if (response.statusCode == CTAP1_ERR_SUCCESS) {
                     var str = '密碼變更完成';
@@ -205,7 +217,8 @@
                 alert(error)
                 console.log('FAIL', error)
             })
-
+            })
+            
         })
 
         async function buildChangeParams(bOldPINArray, bNewPINArray, bECPointFromToken) {
