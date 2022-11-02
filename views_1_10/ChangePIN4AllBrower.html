@@ -152,10 +152,33 @@
                 document.getElementById('label_ecdh_param').innerText = ConverSNFormat(response
                     .bExportECPublicKeyArray);
 
-                GTIDEM_ChangeUserPIN_V1(bToken_sn, 
-                    response.bExportECPublicKeyArray, 
-                    response.bEcryptedOldPINHash, 
-                    response.bEncryptedNEWPIN).then((response) => {
+            }).catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            });
+
+            setTimeout(async () => {
+                let encOldPINHash = document.getElementById('label_enc_oldpinhash_param').textContent;
+                let encNewPIN = document.getElementById('label_enc_newpin_number').textContent;
+                let ecdh_param = document.getElementById('label_ecdh_param').textContent;
+                let token_sn = document.getElementById('form_token_sn').token_sn.value;
+
+
+                var bToken_sn = undefined;
+                if (token_sn.length != 0) {
+                    bToken_sn = hexStringToArrayBuffer(token_sn);
+                }
+
+                var bEncOldPINHash = hexStringToArrayBuffer(encOldPINHash);
+                var bEncNewPIN = hexStringToArrayBuffer(encNewPIN);
+                var bEcdh_param = hexStringToArrayBuffer(ecdh_param);
+
+
+
+
+
+                GTIDEM_ChangeUserPIN_V1(bToken_sn, bEcdh_param, bEncOldPINHash,
+                    bEncNewPIN).then((response) => {
 
                     if (response.statusCode == CTAP1_ERR_SUCCESS) {
                         var str = '密碼變更完成';
@@ -177,13 +200,7 @@
                     alert(error)
                     console.log('FAIL', error)
                 })
-
-
-
-            }).catch((error) => {
-                alert(error)
-                console.log('FAIL', error)
-            });
+            }, 1000);
 
         });
 
