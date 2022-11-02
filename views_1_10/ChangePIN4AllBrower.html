@@ -143,16 +143,43 @@
             GTIDEM_GenPINParams(bToken_sn, bOldPINArray, bNewPINArray).then((response) => {
 
                 console.log('SUCCESS', response);
-                    document.getElementById('label_enc_oldpinhash_param').innerText = ConverSNFormat(
-                        response
-                        .bEcryptedOldPINHash);
-                    document.getElementById('label_enc_newpin_number').innerText = ConverSNFormat(
-                        response
-                        .bEncryptedNEWPIN);
-                    document.getElementById('label_ecdh_param').innerText = ConverSNFormat(response
-                        .bExportECPublicKeyArray);
+                document.getElementById('label_enc_oldpinhash_param').innerText = ConverSNFormat(
+                    response
+                    .bEcryptedOldPINHash);
+                document.getElementById('label_enc_newpin_number').innerText = ConverSNFormat(
+                    response
+                    .bEncryptedNEWPIN);
+                document.getElementById('label_ecdh_param').innerText = ConverSNFormat(response
+                    .bExportECPublicKeyArray);
 
-              
+                GTIDEM_ChangeUserPIN_V1(bToken_sn, 
+                    response.bExportECPublicKeyArray, 
+                    response.bEcryptedOldPINHash, 
+                    response.bEncryptedNEWPIN).then((response) => {
+
+                    if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                        var str = '密碼變更完成';
+                        if (response.pinRetry != undefined) {
+                            str += '\n剩餘次數為 ' + response.pinRetry;
+                        }
+                        if (response.sn != undefined) {
+                            str += '\n 載具序號為 ' + response.sn;
+
+                        }
+                        alert(str);
+
+
+                    } else {
+                        alert(showFIDOErrorMessage(response));
+                    }
+
+                }).catch((error) => {
+                    alert(error)
+                    console.log('FAIL', error)
+                })
+
+
+
             }).catch((error) => {
                 alert(error)
                 console.log('FAIL', error)
@@ -183,7 +210,7 @@
 
 
             GTIDEM_ChangeUserPIN_V1(bToken_sn, bEcdh_param, bEncOldPINHash,
-            bEncNewPIN).then((response) => {
+                bEncNewPIN).then((response) => {
 
                 if (response.statusCode == CTAP1_ERR_SUCCESS) {
                     var str = '密碼變更完成';
