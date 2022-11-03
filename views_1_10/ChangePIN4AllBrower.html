@@ -173,30 +173,7 @@
                 var bEncNewPIN = hexStringToArrayBuffer(encNewPIN);
                 var bEcdh_param = hexStringToArrayBuffer(ecdh_param);
 
-                GTIDEM_ChangeUserPIN_V1(bToken_sn, bEcdh_param, bEncOldPINHash,
-                    bEncNewPIN).then((response) => {
-
-                    if (response.statusCode == CTAP1_ERR_SUCCESS) {
-                        var str = '密碼變更完成';
-                        if (response.pinRetry != undefined) {
-                            str += '\n剩餘次數為 ' + response.pinRetry;
-                        }
-                        if (response.sn != undefined) {
-                            str += '\n 載具序號為 ' + response.sn;
-
-                        }
-                        alert(str);
-
-
-                    } else {
-                        alert(showFIDOErrorMessage(response));
-                    }
-
-                }).catch((error) => {
-                    alert(error)
-                    console.log('FAIL', error)
-                })
-            }, 1500);
+                
 
         });
 
