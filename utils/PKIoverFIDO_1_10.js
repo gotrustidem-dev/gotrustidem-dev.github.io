@@ -855,7 +855,6 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
 
     let timer_id = setInterval( () => {
         if(prepareUpdate==undefined){
-            console.log('waiting step1 complete');
             return;
         }
         clearTimeout(timer_id);        
