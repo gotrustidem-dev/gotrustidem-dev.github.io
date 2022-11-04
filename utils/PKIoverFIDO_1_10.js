@@ -813,42 +813,50 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
 
     var prepareUpdate = undefined;
     var result = undefined;
-    var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
-        return fido;
-    });
+    // var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
+    //     return fido;
+    // });
+    var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber);
 
     if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
-        return gtidem;
+        return callback(gtidem);
+        clearTimeout(timer_id); 
     }
 
     if(gtidem.pinRetry == 0){
         gtidem.statusCode = CTAP2_ERR_PIN_BLOCKED;
-        return gtidem;
+        clearTimeout(timer_id); 
+        return callback(gtidem);
     }
     var bECPointFromToken = gtidem.ecpoint;
     var flags = gtidem.flags;
     if((JSON.stringify(bOldPIN)==JSON.stringify(bNewPIN))){
         gtidem.statusCode = SETTING_ERR_USERPIN_SAME;
-        return gtidem;
+        clearTimeout(timer_id); 
+        return callback(gtidem);
     }
     if(flags!=undefined){
 
         var statusCode = checkPINFormatLevel_V2(bNewPIN, flags[1])
         if(statusCode!=CTAP1_ERR_SUCCESS){
             gtidem.statusCode = statusCode;
-            return gtidem;
+            clearTimeout(timer_id); 
+            return callback(gtidem);
         }
         if (bNewPIN.length < flags[2]){
             gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_SHORT
-            return gtidem;
+            clearTimeout(timer_id); 
+            return callback(gtidem);
         }
         if(bNewPIN.length > flags[3]){
             gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_LONG
-            return gtidem;
+            clearTimeout(timer_id); 
+            return callback(gtidem);
         }
     }else{
         gtidem.statusCode = WEB_ERR_OperationAbort;
-        return gtidem;
+        clearTimeout(timer_id); 
+        return callback(gtidem);
     }
 
     let timer_id = setInterval( () => {
@@ -856,11 +864,9 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
             console.log('waiting step1 complete');
             return;
         }
-        clearTimeout(timer_id);
-        
-         GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN).then((result) => {
-           
-            callback(result);
+        clearTimeout(timer_id);        
+        GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN).then((result) => {
+            return callback(result);
         });
    
     }, 500);
