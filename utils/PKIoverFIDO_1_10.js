@@ -820,19 +820,16 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
 
     if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
         return callback(gtidem);
-        clearTimeout(timer_id); 
     }
 
     if(gtidem.pinRetry == 0){
         gtidem.statusCode = CTAP2_ERR_PIN_BLOCKED;
-        clearTimeout(timer_id); 
         return callback(gtidem);
     }
     var bECPointFromToken = gtidem.ecpoint;
     var flags = gtidem.flags;
     if((JSON.stringify(bOldPIN)==JSON.stringify(bNewPIN))){
         gtidem.statusCode = SETTING_ERR_USERPIN_SAME;
-        clearTimeout(timer_id); 
         return callback(gtidem);
     }
     if(flags!=undefined){
@@ -840,22 +837,18 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
         var statusCode = checkPINFormatLevel_V2(bNewPIN, flags[1])
         if(statusCode!=CTAP1_ERR_SUCCESS){
             gtidem.statusCode = statusCode;
-            clearTimeout(timer_id); 
             return callback(gtidem);
         }
         if (bNewPIN.length < flags[2]){
             gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_SHORT
-            clearTimeout(timer_id); 
             return callback(gtidem);
         }
         if(bNewPIN.length > flags[3]){
             gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_LONG
-            clearTimeout(timer_id); 
             return callback(gtidem);
         }
     }else{
         gtidem.statusCode = WEB_ERR_OperationAbort;
-        clearTimeout(timer_id); 
         return callback(gtidem);
     }
 
