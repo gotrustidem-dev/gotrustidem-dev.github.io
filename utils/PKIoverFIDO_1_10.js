@@ -751,6 +751,7 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
  * @param {Uint8Array｜undefined} bSerialNumber 指定序號序號。若不指定載具序號，則可填入 undefined 或是空陣列
  * @returns 
  */
+/*
  async function GTIDEM_GenPINParams(bSerialNumber, bOldPIN, bNewPIN) {
 
 
@@ -801,7 +802,7 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
 
     return gtidem;
 }
-
+*/
 /**
  * 修改使用者密碼。
  * @param {Uint8Array} bOldPIN 舊密碼
