@@ -7,7 +7,7 @@
 
  'use strict';
 
-const VERSION = "1.10.2"
+const VERSION = "1.11.1"
 const DEFAULT_TIMEOUT = 120000
 const VERIFY_DEFAULT_TIMEOUT = 300000
 // Command Header GoTrust-Idem-PKI
@@ -793,9 +793,80 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
     }
     var prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
     //return prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN;
-    return prepareUpdate;
+
+    gtidem.statusCode = CTAP1_ERR_SUCCESS;
+    gtidem.encOldPINHashed = prepareUpdate.bEcryptedOldPINHash;
+    gtidem.encNewPIN = prepareUpdate.bEncryptedNEWPIN;
+    gtidem.hostEcpoint = prepareUpdate.bExportECPublicKeyArray;
+
+    return gtidem;
 }
 
+/**
+ * 修改使用者密碼。
+ * @param {Uint8Array} bOldPIN 舊密碼
+ * @param {Uint8Array} bNewPIN 新密碼
+ * @param {Uint8Array｜undefined} bSerialNumber 指定序號序號。若不指定載具序號，則可填入 undefined 或是空陣列
+ * @returns 
+ */
+ async function GTIDEM_ChangeUserPINwithInterval(bOldPIN, bNewPIN, bSerialNumber, callback) {
+
+    var prepareUpdate = undefined;
+    var result = undefined;
+    var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
+        return fido;
+    });
+
+    if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
+        return gtidem;
+    }
+
+    if(gtidem.pinRetry == 0){
+        gtidem.statusCode = CTAP2_ERR_PIN_BLOCKED;
+        return gtidem;
+    }
+    var bECPointFromToken = gtidem.ecpoint;
+    var flags = gtidem.flags;
+    if((JSON.stringify(bOldPIN)==JSON.stringify(bNewPIN))){
+        gtidem.statusCode = SETTING_ERR_USERPIN_SAME;
+        return gtidem;
+    }
+    if(flags!=undefined){
+
+        var statusCode = checkPINFormatLevel_V2(bNewPIN, flags[1])
+        if(statusCode!=CTAP1_ERR_SUCCESS){
+            gtidem.statusCode = statusCode;
+            return gtidem;
+        }
+        if (bNewPIN.length < flags[2]){
+            gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_SHORT
+            return gtidem;
+        }
+        if(bNewPIN.length > flags[3]){
+            gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_LONG
+            return gtidem;
+        }
+    }else{
+        gtidem.statusCode = WEB_ERR_OperationAbort;
+        return gtidem;
+    }
+
+    let timer_id = setInterval( () => {
+        if(prepareUpdate==undefined){
+            console.log('waiting step1 complete');
+            return;
+        }
+        clearTimeout(timer_id);
+        
+         GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN).then((result) => {
+           
+            callback(result);
+        });
+   
+    }, 500);
+    //Generate 
+    prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
+}
 
 /**
  * 修改使用者密碼。
@@ -848,7 +919,6 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
     return await GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN);
 
 }
-
 
 /**
  * 修改使用者密碼，使用PINProtocolV1 保護資料
@@ -1276,8 +1346,6 @@ async function GTIDEM_GenP521CSR(bSerialNumber,bCommonName){
         return gtidem;
     });
 }
-
-
 
 /**
  * 產生 RSA 2048 金鑰對，會組合成 CSR 格式回傳

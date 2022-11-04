@@ -24,6 +24,9 @@ class GTIdemJs {
         this.csr = undefined;
         this.rsakeypair = undefined;
         this.sopinRetry = undefined;
+        this.encOldPINHashed = undefined;
+        this.encNewPIN = undefined;
+        this.hostEcpoint = undefined;
     }
 
     ConvertWebError(error){
