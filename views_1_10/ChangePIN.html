@@ -116,35 +116,36 @@
             var bNewPINBuffer = new Uint8Array(newpin.length);
             bNewPINBuffer.set(toUTF8Array(newpin), 0);
 
-            
-            GTIDEM_ChangeUserPIN(bOldPINArray, bNewPINBuffer, bToken_sn).then((response) => {
+            var browser=get_browser(); // browser.name = 'Chrome'
 
-               if(response.statusCode==CTAP1_ERR_SUCCESS){   
-                   var str = '密碼變更完成'; 
-                   if(response.pinRetry != undefined){
-                     str+= '\n剩餘次數為 '+response.pinRetry;
-                   }
-                   if(response.sn != undefined){
-                        str+= '\n 載具序號為 '+response.sn;
-                    
-                   }
-                   alert(str);
-                   
-                    
-                }else{
-                    alert(showFIDOErrorMessage(response));
-                }
-              
-            }).catch((error) => {
-                alert(error)
-                console.log('FAIL', error)
-            })
-
+            if((browser.name=="Safari")&&(parseInt(browser.version)>=15)){//only for sarari 15+
+                console.log("Brower is Safari 15+");
+                GTIDEM_ChangeUserPINwithInterval(bOldPINArray, bNewPINBuffer, bToken_sn,showReseult);
+            }else{
+                GTIDEM_ChangeUserPIN(bOldPINArray, bNewPINBuffer, bToken_sn).then((response) => {
+                    if(response.statusCode==CTAP1_ERR_SUCCESS){   
+                        var str = '密碼變更完成'; 
+                        if(response.pinRetry != undefined){
+                        str+= '\n剩餘次數為 '+response.pinRetry;
+                        }
+                        if(response.sn != undefined){
+                            str+= '\n 載具序號為 '+response.sn;                        
+                        }
+                        alert(str);
+                    }else{
+                        alert(showFIDOErrorMessage(response));
+                    }
+                }).catch((error) => {
+                    alert(error)
+                    console.log('FAIL', error)
+                })
+            }
         })
 
 
         function get_browser() {
             var ua=navigator.userAgent,tem,M=ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || []; 
+            console.log("Brower data:", M);
             if(/trident/i.test(M[1])){
                 tem=/\brv[ :]+(\d+)/g.exec(ua) || []; 
                 return {name:'IE',version:(tem[1]||'')};
@@ -156,14 +157,26 @@
             M=M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
             if((tem=ua.match(/version\/(\d+)/i))!=null) {M.splice(1,1,tem[1]);}
             return {
-            name: M[0],
-            version: M[1]
+                name: M[0],
+                version: M[1]
             };
         }
 
-        var browser=get_browser(); // browser.name = 'Chrome'
-                                // browser.version = '40'
-        console.log(browser);
+        function showReseult(result){
+                if(result.statusCode==CTAP1_ERR_SUCCESS){   
+                   var str = '密碼變更完成'; 
+                   if(result.pinRetry != undefined){
+                     str+= '\n剩餘次數為 '+result.pinRetry;
+                   }
+                   if(result.sn != undefined){
+                        str+= '\n 載具序號為 '+result.sn;
+                    
+                   }
+                   alert(str); 
+                }else{
+                    alert(showFIDOErrorMessage(result));
+                }
+        }
     </script>
 
 </body>
