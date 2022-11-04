@@ -115,9 +115,6 @@
 
             var bNewPINBuffer = new Uint8Array(newpin.length);
             bNewPINBuffer.set(toUTF8Array(newpin), 0);
-
-
-
             GTIDEM_ChangeUserPINwithInterval(bOldPINArray, bNewPINBuffer, bToken_sn,showReseult);
 
         })
@@ -132,9 +129,7 @@
                         str+= '\n 載具序號為 '+result.sn;
                     
                    }
-                   alert(str);
-                   
-                    
+                   alert(str); 
                 }else{
                     alert(showFIDOErrorMessage(result));
                 }
