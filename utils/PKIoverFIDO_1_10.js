@@ -862,7 +862,7 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
             return callback(result);
         });
    
-    }, 500);
+    }, 200);
     //Generate 
     prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
 }
