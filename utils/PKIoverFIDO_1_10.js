@@ -1755,157 +1755,157 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
  * @param {Uint8Array｜undefined} bPlain 使用匯入的憑證金鑰簽名並用 ALG_RSA2048SHA256_PreHash演算法對填入的資料簽名，所以資料長度必須為32 bytes，可做為確認憑證和金鑰對的匹配。若不需此功能，則可填入 undefined 或是空陣列。
  * @returns {GTIdemJs} 回傳結果的集合
  */
-//  async function GTIDEM_ImportCertificate2(bSerialNumber,keyHandle,keyID,HexCert, bPlain) {
+ async function GTIDEM_ImportCertificate2(bSerialNumber,keyHandle,keyID,HexCert, bPlain) {
 
 
-//     var bKeyID = keyID;
-//     var bKeyHandle = keyHandle;
-//     var bHexCert = HexCert;
-//     //var bHexCert = Uint8Array.from(window.atob(Base64Cert), c => c.charCodeAt(0));
-//     //var bPlainText = toUTF8Array(plaintext);
+    var bKeyID = keyID;
+    var bKeyHandle = keyHandle;
+    var bHexCert = HexCert;
+    //var bHexCert = Uint8Array.from(window.atob(Base64Cert), c => c.charCodeAt(0));
+    //var bPlainText = toUTF8Array(plaintext);
 
-//     var challenge = new Uint8Array(32);
-//     window.crypto.getRandomValues(challenge);
+    var challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
 
-//     var sn_buf;
-//     if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
+    var sn_buf;
+    if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
 
-//         sn_buf = new Uint8Array(0);
-//     }else{
-//         sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
-//         sn_buf[0] = 0xDF;
-//         sn_buf[1] = 0x20;
-//         sn_buf[2] = bSerialNumber.byteLength >> 8;
-//         sn_buf[3] = bSerialNumber.byteLength;
-//         sn_buf.set(bSerialNumber, 4);
-//     }
+        sn_buf = new Uint8Array(0);
+    }else{
+        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+        sn_buf[0] = 0xDF;
+        sn_buf[1] = 0x20;
+        sn_buf[2] = bSerialNumber.byteLength >> 8;
+        sn_buf[3] = bSerialNumber.byteLength;
+        sn_buf.set(bSerialNumber, 4);
+    }
 
-//     var keyid_buf;
+    var keyid_buf;
 
-//     if((bKeyID==undefined)||(bKeyID.byteLength==0)){
+    if((bKeyID==undefined)||(bKeyID.byteLength==0)){
 
-//         keyid_buf = new Uint8Array(4 + bKeyHandle.byteLength);
-//         keyid_buf[0] = 0xDF;
-//         keyid_buf[1] = 0x20;
-//         keyid_buf[2] = bKeyHandle.byteLength >> 8;
-//         keyid_buf[3] = bKeyHandle.byteLength;
-//         keyid_buf.set(bKeyHandle, 4);
-//     }else{
-//         keyid_buf = new Uint8Array(4 + bKeyID.length);
-//         keyid_buf[0] = 0xDF;
-//         keyid_buf[1] = 0x18;
-//         keyid_buf[2] = bKeyID.byteLength >> 8;
-//         keyid_buf[3] = bKeyID.byteLength;
-//         keyid_buf.set(bKeyID, 4);
-//     }
+        keyid_buf = new Uint8Array(4 + bKeyHandle.byteLength);
+        keyid_buf[0] = 0xDF;
+        keyid_buf[1] = 0x20;
+        keyid_buf[2] = bKeyHandle.byteLength >> 8;
+        keyid_buf[3] = bKeyHandle.byteLength;
+        keyid_buf.set(bKeyHandle, 4);
+    }else{
+        keyid_buf = new Uint8Array(4 + bKeyID.length);
+        keyid_buf[0] = 0xDF;
+        keyid_buf[1] = 0x18;
+        keyid_buf[2] = bKeyID.byteLength >> 8;
+        keyid_buf[3] = bKeyID.byteLength;
+        keyid_buf.set(bKeyID, 4);
+    }
 
     
-//     var keyhandle_buf = new Uint8Array(4 + bKeyHandle.length);
-//     keyhandle_buf[0] = 0xDF;
-//     keyhandle_buf[1] = 0x19;
-//     keyhandle_buf[2] = bKeyHandle.byteLength >> 8;
-//     keyhandle_buf[3] = bKeyHandle.byteLength;
-//     keyhandle_buf.set(bKeyHandle, 4);
+    var keyhandle_buf = new Uint8Array(4 + bKeyHandle.length);
+    keyhandle_buf[0] = 0xDF;
+    keyhandle_buf[1] = 0x19;
+    keyhandle_buf[2] = bKeyHandle.byteLength >> 8;
+    keyhandle_buf[3] = bKeyHandle.byteLength;
+    keyhandle_buf.set(bKeyHandle, 4);
     
 
-//     var hexCert_buf = new Uint8Array(4 + bHexCert.length);
-//     hexCert_buf[0] = 0xDF;
-//     hexCert_buf[1] = 0x17;
-//     hexCert_buf[2] = bHexCert.byteLength >> 8;
-//     hexCert_buf[3] = bHexCert.byteLength;
-//     hexCert_buf.set(bHexCert, 4);
+    var hexCert_buf = new Uint8Array(4 + bHexCert.length);
+    hexCert_buf[0] = 0xDF;
+    hexCert_buf[1] = 0x17;
+    hexCert_buf[2] = bHexCert.byteLength >> 8;
+    hexCert_buf[3] = bHexCert.byteLength;
+    hexCert_buf.set(bHexCert, 4);
 
-//     var signDataBuf;
-//     if((bPlain==undefined)||(bPlain.byteLength==0)){
-//         var signDataBuf =  new Uint8Array(0);
-//     }else{
-//         var signDataBuf = new Uint8Array(4 + bPlain.byteLength);
-//         signDataBuf[0] = 0xDF;
-//         signDataBuf[1] = 0x06;
-//         signDataBuf[2] = bPlain.length >> 8;
-//         signDataBuf[3] = bPlain.length;
-//         signDataBuf.set(bPlain, 4);
-//     }
+    var signDataBuf;
+    if((bPlain==undefined)||(bPlain.byteLength==0)){
+        var signDataBuf =  new Uint8Array(0);
+    }else{
+        var signDataBuf = new Uint8Array(4 + bPlain.byteLength);
+        signDataBuf[0] = 0xDF;
+        signDataBuf[1] = 0x06;
+        signDataBuf[2] = bPlain.length >> 8;
+        signDataBuf[3] = bPlain.length;
+        signDataBuf.set(bPlain, 4);
+    }
 
-//    var payloadLen = keyid_buf.byteLength+sn_buf.byteLength+hexCert_buf.length+signDataBuf.byteLength+keyhandle_buf.byteLength;
+   var payloadLen = keyid_buf.byteLength+sn_buf.byteLength+hexCert_buf.length+signDataBuf.byteLength+keyhandle_buf.byteLength;
 
-//    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+   var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
  
-//    var pki_cmd = new Uint8Array(3);
-//    pki_cmd[0] = CMD_ImportCertificate2;
-//    pki_cmd[1] = 0x00
-//    pki_cmd[2] = 0x00;
-//    var pki_cmdBuffer = _appendBuffer(gtheaderbuffer,pki_cmd);
+   var pki_cmd = new Uint8Array(3);
+   pki_cmd[0] = CMD_ImportCertificate2;
+   pki_cmd[1] = 0x00
+   pki_cmd[2] = 0x00;
+   var pki_cmdBuffer = _appendBuffer(gtheaderbuffer,pki_cmd);
 
 
 
-//    var pki_header = new Uint8Array(3);
-//    pki_header[0] = CMD_ImportCertificate2;
-//    pki_header[1] = payloadLen>>8
-//    pki_header[2] = payloadLen;
+   var pki_header = new Uint8Array(3);
+   pki_header[0] = CMD_ImportCertificate2;
+   pki_header[1] = payloadLen>>8
+   pki_header[2] = payloadLen;
 
-//    var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
-//    pki_buffer = _appendBuffer(pki_buffer,sn_buf);
-//    pki_buffer = _appendBuffer(pki_buffer,keyid_buf);
-//    pki_buffer = _appendBuffer(pki_buffer,keyhandle_buf);
-//    pki_buffer = _appendBuffer(pki_buffer,hexCert_buf);
-//    pki_buffer = _appendBuffer(pki_buffer,signDataBuf);
+   var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
+   pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+   pki_buffer = _appendBuffer(pki_buffer,keyid_buf);
+   pki_buffer = _appendBuffer(pki_buffer,keyhandle_buf);
+   pki_buffer = _appendBuffer(pki_buffer,hexCert_buf);
+   pki_buffer = _appendBuffer(pki_buffer,signDataBuf);
 
    
-//    var webauth_request = {
-//         'challenge': challenge,
+   var webauth_request = {
+        'challenge': challenge,
 
-//         'rp': {
-//             'name': 'GoTrustID Inc.',
-//         },
+        'rp': {
+            'name': 'GoTrustID Inc.',
+        },
 
-//         'user': {
-//             'id': pki_cmdBuffer,
-//             'name': sUserName,
-//             'displayName': sUserName,
-//         },
-//         timeout: VERIFY_DEFAULT_TIMEOUT, 
-//         "authenticatorSelection": {
-//             "userVerification": "required",
-//             "requireResidentKey": false,
-//             "authenticatorAttachment": "cross-platform"
+        'user': {
+            'id': pki_cmdBuffer,
+            'name': sUserName,
+            'displayName': sUserName,
+        },
+        timeout: VERIFY_DEFAULT_TIMEOUT, 
+        "authenticatorSelection": {
+            "userVerification": "required",
+            "requireResidentKey": false,
+            "authenticatorAttachment": "cross-platform"
 
-//         },
-//         "excludeCredentials": [
-//             {"id": pki_buffer, "type": "public-key"}
-//         ],
-//         'attestation': "direct",
-//         'pubKeyCredParams': [{
-//                 'type': 'public-key',
-//                 'alg': -7
-//             },
-//             {
-//                 'type': 'public-key',
-//                 'alg': -257
-//             }
-//         ]
-//     }
-//     return await navigator.credentials.create({
-//         'publicKey': webauth_request
-//     }).then((fido) => {
-//         let attestationObject = CBOR.decode(fido.response.attestationObject);
-//         let authData = parseAuthData(attestationObject.authData);
-//         let credID = authData.credID;
-//         let bPKIoverFIDOResponse= credID.buffer.slice(credID.byteOffset, credID.byteLength + credID.byteOffset);
+        },
+        "excludeCredentials": [
+            {"id": pki_buffer, "type": "public-key"}
+        ],
+        'attestation': "direct",
+        'pubKeyCredParams': [{
+                'type': 'public-key',
+                'alg': -7
+            },
+            {
+                'type': 'public-key',
+                'alg': -257
+            }
+        ]
+    }
+    return await navigator.credentials.create({
+        'publicKey': webauth_request
+    }).then((fido) => {
+        let attestationObject = CBOR.decode(fido.response.attestationObject);
+        let authData = parseAuthData(attestationObject.authData);
+        let credID = authData.credID;
+        let bPKIoverFIDOResponse= credID.buffer.slice(credID.byteOffset, credID.byteLength + credID.byteOffset);
 
         
-//         let gtidem = new GTIdemJs();
-//         gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse,CMD_ImportCertificate);
+        let gtidem = new GTIdemJs();
+        gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse,CMD_ImportCertificate);
       
-//         return gtidem;
-//     }).catch((error) => {
-//         ////console.log(error.name);
-//         let gtidem = new GTIdemJs();
-//         gtidem.ConvertWebError(error.name);
-//         return gtidem;
-//     });
+        return gtidem;
+    }).catch((error) => {
+        ////console.log(error.name);
+        let gtidem = new GTIdemJs();
+        gtidem.ConvertWebError(error.name);
+        return gtidem;
+    });
 
-// }
+}
 
 
 /**
