@@ -127,38 +127,6 @@
             console.log(bReset_key);
             var para = prepareResetResponse(bReset_key, bRandomNumber, bToken_sn,bChallenge)
                 .then(result => {
-                    GTIDEM_FactoryResetToken(bToken_sn, result).then(response => {
-
-                            if (response.statusCode == CTAP1_ERR_SUCCESS) {
-                                GTIDEM_GenRSA2048CSR(undefined, undefined).then((response) => {
-
-                                    if (response.statusCode == CTAP1_ERR_SUCCESS) {
-                                        GTIDEM_GetTokenInfo(bToken_sn).then((response) => {         
-                                                if(response.statusCode==CTAP1_ERR_SUCCESS){
-                                                    alert("Test DONE!!")
-                                                }else{
-                                                    alert(showFIDOErrorMessage(response));
-                                                }
-                                            }).catch((error) => {
-                                                alert(error)
-                                                console.log('FAIL', error)
-                                            });
-
-                                    } else {
-                                        alert(showFIDOErrorMessage(response));
-                                    }
-
-                                }).catch((error) => {
-                                alert(error)
-                                console.log('FAIL', error)
-                                });
-
-
-                            } else {
-                                alert(showFIDOErrorMessage(response));
-                            }
-
-                        });
                 });
         });
 
@@ -195,7 +163,24 @@
                     }, cryptoKey, bChallenge);
 
                 });
+
             console.log("ENC Challenge : \n" + bufToHex(bEncryptedChallengeData));
+            var response = await GTIDEM_FactoryResetToken(bToken_sn, bEncryptedChallengeData);
+            
+            if (response.statusCode == CTAP1_ERR_SUCCESS) {
+
+                response = await GTIDEM_GenRSA2048CSR(undefined, undefined);
+                response = await GTIDEM_GetTokenInfo(bToken_sn);
+                if(response.statusCode==CTAP1_ERR_SUCCESS){
+                                            alert("Test DONE!!")
+                    }else{
+                                            alert(showFIDOErrorMessage(response));
+                     }
+                            
+
+                    } else {
+                        alert(showFIDOErrorMessage(response));
+                    }
             return  bEncryptedChallengeData;
             
         }
