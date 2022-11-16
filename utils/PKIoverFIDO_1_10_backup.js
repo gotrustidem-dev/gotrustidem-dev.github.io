@@ -995,8 +995,7 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
    }
    var idList = [{
        id: pki_buffer,
-       type: "public-key",
-       transports:AUTHENTICATOR_TRANSPORTS
+       type: "public-key"
    }];
 
    getAssertionChallenge.allowCredentials = idList;
@@ -1724,8 +1723,7 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
     }
     var idList = [{
         id: pki_buffer,
-        type: "public-key",
-        transports:AUTHENTICATOR_TRANSPORTS
+        type: "public-key"
     }];
 
     getAssertionChallenge.allowCredentials = idList;
@@ -1971,8 +1969,7 @@ async function GTIDEM_DeleteCertByLabel(bLabel, bSerialNumber) {
     }
     var idList = [{
         id: pki_buffer,
-        type: "public-key",
-        transports:AUTHENTICATOR_TRANSPORTS
+        type: "public-key"
     }];
 
     getAssertionChallenge.allowCredentials = idList;
@@ -2044,8 +2041,7 @@ async function GTIDEM_ClearToken( bSerialNumber) {
     }
     var idList = [{
         id: pki_buffer,
-        type: "public-key",
-        transports:AUTHENTICATOR_TRANSPORTS
+        type: "public-key"
     }];
 
     getAssertionChallenge.allowCredentials = idList;
@@ -2114,7 +2110,7 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
     var idList = [{
         id: pki_buffer,
         type: "public-key",
-        transports:AUTHENTICATOR_TRANSPORTS
+        transport:["usb"]
     }];
 
     getAssertionChallenge.allowCredentials = idList;
@@ -2253,8 +2249,7 @@ async function GTIDEM_SignDataByIndex(index, bSerialNumber ,alg_number, bPlain) 
     }
     var idList = [{
         id: pki_buffer,
-        type: "public-key",
-        transports:AUTHENTICATOR_TRANSPORTS
+        type: "public-key"
     }];
 
     getAssertionChallenge.allowCredentials = idList;
@@ -2398,8 +2393,7 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, bPlain)
     }
     var idList = [{
         id: pki_buffer,
-        type: "public-key",
-        transports:AUTHENTICATOR_TRANSPORTS
+        type: "public-key"
     }];
 
     getAssertionChallenge.allowCredentials = idList;
@@ -2482,8 +2476,7 @@ async function GTIDEM_ReadCertByIndexWithoutPIN(index, bSerialNumber) {
     }
     var idList = [{
         id: pki_buffer,
-        type: "public-key",
-        transports:AUTHENTICATOR_TRANSPORTS
+        type: "public-key"
     }];
 
     getAssertionChallenge.allowCredentials = idList;
@@ -2569,8 +2562,7 @@ async function GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSerialNumber) {
     }
     var idList = [{
         id: pki_buffer,
-        type: "public-key",
-        transports:AUTHENTICATOR_TRANSPORTS
+        type: "public-key"
     }];
 
     getAssertionChallenge.allowCredentials = idList;
@@ -2670,8 +2662,7 @@ function GTIDEM_SetName(sName){
    }
    var idList = [{
        id: pki_buffer,
-       type: "public-key",
-        transports:AUTHENTICATOR_TRANSPORTS
+       type: "public-key"
    }];
 
    getAssertionChallenge.allowCredentials = idList;
@@ -2755,8 +2746,7 @@ function GTIDEM_SetName(sName){
    }
    var idList = [{
        id: pki_buffer,
-       type: "public-key",
-        transports:AUTHENTICATOR_TRANSPORTS
+       type: "public-key"
    }];
 
    getAssertionChallenge.allowCredentials = idList;
@@ -2982,8 +2972,7 @@ async function GTIDEM_GenKeyPair(bSerialNumber,bKeyID, keytype, outputformat) {
    }
    var idList = [{
        id: pki_buffer,
-       type: "public-key",
-        transports:AUTHENTICATOR_TRANSPORTS
+       type: "public-key"
    }];
 
    getAssertionChallenge.allowCredentials = idList;
