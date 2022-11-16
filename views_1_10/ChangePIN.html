@@ -118,7 +118,7 @@
 
             var browser=get_browser(); // browser.name = 'Chrome'
 
-            if((browser.name=="Safari")&&(parseInt(browser.version)>=15)){//only for sarari 15+
+            if((browser.name=="Safari")&&(parseInt(browser.version)==15)){//only for sarari 15+
                 console.log("Brower is Safari 15+");
                 GTIDEM_ChangeUserPINwithInterval(bOldPINArray, bNewPINBuffer, bToken_sn,showReseult);
             }else{
