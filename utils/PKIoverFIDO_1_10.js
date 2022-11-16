@@ -880,9 +880,10 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
  async function GTIDEM_ChangeUserPIN(bOldPIN, bNewPIN, bSerialNumber) {
 
 
-    var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
-        return fido;
-    });
+    var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber);
+    //.then((fido) => {
+    //    return fido;
+    //});
 
     if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
         return gtidem;
