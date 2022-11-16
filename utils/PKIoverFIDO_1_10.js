@@ -1472,6 +1472,7 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bCommonName) {
         // }
         return gtidem;
     }).catch((error) => {
+        console.log(error)
         let gtidem = new GTIdemJs();
         gtidem.ConvertWebError(error.name);
         return gtidem;
