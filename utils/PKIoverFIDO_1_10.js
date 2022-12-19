@@ -3014,3 +3014,34 @@ function GTIDEM_GetJSVersion() {
 
     return VERSION;
  }
+
+
+
+
+  async function GTIDEM_GenRSA2048CSRAfterClearCard(bSerialNumber,bCommonName, callback) {
+
+    var gtidem = undefined;
+    let timer_id = setInterval( () => {
+        if(gtidem==undefined){
+            return;
+        }
+
+        if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
+            clearTimeout(timer_id);   
+            return;
+        }
+        clearTimeout(timer_id);        
+        GTIDEM_GenRSA2048CSR(bSerialNumber,bCommonName).then((result) => {
+            return callback(result);
+        });
+   
+    }, 200);
+
+    var gtidem = await GTIDEM_ClearToken(bSerialNumber);
+
+    if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
+        return callback(gtidem);
+    }
+
+
+}

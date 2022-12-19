@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GoTrustIdem TestPKI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Ensure use of most common Unicode characters -->
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <!-- Considered an "experimental" feature -->
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css" />
+    <!-- Spectre.css icons are used -->
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+
+    <script src="../utils/cbor.js"></script>
+    <script src="../utils/helpers.js"></script>
+    <script src="../utils/showMessage.js"></script>
+    <script src="../utils/response.js"></script>
+    <script src="../utils/PKIoverFIDO_1_10.js"></script>
+    <style>
+        table.center {
+            margin-left: auto;
+            margin-right: auto;
+            height: 160px;
+        }
+
+        table td,
+        table td * {
+            vertical-align: top;
+        }
+
+        h3 {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="overflow-x: scroll;">
+        <table style="height: auto; width: 100%;">
+            <tbody>
+
+                <tr>
+                    <td style="width: 100% ;">
+
+
+                        <form style="text-align: center;" id="form_token_sn" onsubmit="return false">
+                            <p>
+                                <label id="label_token_sn">Token Serial number:</label><br>
+                                <input type="text" name="token_sn" style="width: 342px; height:41px">
+                            </p>
+                        </form>
+
+                        <form style="text-align: center;" id="form_case1" onsubmit="return false">
+                            <label">Promise callback</label><br>
+                                <button class="btn btn-primary" action="submit"
+                                    style="width: 162px; height:34px;background-color: #008CBA;">Case1</button>
+                        </form>
+
+                        <form style="text-align: center;" id="form_case2" onsubmit="return false">
+                            <label">setInterval </label><br>
+                                <button class="btn btn-primary" action="submit"
+                                    style="width: 162px; height:34px;background-color: #008CBA;">Case2</button>
+                        </form>
+
+
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        document.getElementById('form_case1').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+
+            var bToken_sn = undefined;
+            if (token_sn.length != 0) {
+                bToken_sn = hexStringToArrayBuffer(token_sn);
+            }
+
+            GTIDEM_ClearToken(bToken_sn).then((response) => {
+
+
+                if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                    var strCert = "清卡完成";
+                    if (response.sn != undefined) {
+                        strCert += "\n序號:" + ConverSNFormat(response.sn) + "\n";
+                    }
+                    GTIDEM_GenRSA2048CSR(bToken_sn, undefined).then((response) => {
+
+                        if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                            var strCSR = "";
+                            var msg = "";
+                            if (response.sn != undefined) {
+                                msg += "載具序號" + ConverSNFormat(response.sn) + "\n";
+                            }
+
+                            strCSR = "-----BEGIN NEW CERTIFICATE REQUEST-----\n" +
+                                btoa(String.fromCharCode.apply(null, new Uint8Array(response
+                                    .csr))) +
+                                "\n-----END NEW CERTIFICATE REQUEST-----\n";
+                            msg += "CSR:" + "\n" + strCSR;
+                            console.log('CSR :\n', msg);
+                            document.getElementById('csr_textarea').value = strCSR;
+                            alert(msg);
+
+                            console.log(bufToHex(new Uint8Array(response.keyhandle).buffer));
+                            document.getElementById('form_key_handle').key_handle.value =
+                                bufToHex(
+                                    new Uint8Array(response.keyhandle).buffer);
+
+                        } else {
+                            alert(showFIDOErrorMessage(response));
+                        }
+
+                    }).catch((error) => {
+                        alert(error)
+                        console.log('FAIL', error)
+                    });
+                    alert(strCert);
+                } else {
+                    alert(showFIDOErrorMessage(response));
+                }
+
+            }).catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            })
+
+        })
+
+
+
+
+        document.getElementById('form_case2').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+
+            var bToken_sn = undefined;
+            if (token_sn.length != 0) {
+                bToken_sn = hexStringToArrayBuffer(token_sn);
+            }
+
+            GTIDEM_GenRSA2048CSRAfterClearCard(bToken_sn, undefined, showReseult);
+
+        });
+
+        function showReseult(result) {
+            if (result.statusCode == CTAP1_ERR_SUCCESS) {
+                var strCSR = "";
+                var msg = "";
+                if (result.sn != undefined) {
+                    msg += "載具序號" + ConverSNFormat(result.sn) + "\n";
+                }
+
+                strCSR = "-----BEGIN NEW CERTIFICATE REQUEST-----\n" +
+                    btoa(String.fromCharCode.apply(null, new Uint8Array(result
+                        .csr))) +
+                    "\n-----END NEW CERTIFICATE REQUEST-----\n";
+                msg += "CSR:" + "\n" + strCSR;
+                console.log('CSR :\n', msg);
+                alert(msg);
+
+                console.log(bufToHex(new Uint8Array(result.keyhandle).buffer));
+            } else {
+                alert(showFIDOErrorMessage(result));
+            
+            }
+        }
+    </script>
+
+</body>
+
+</html>
