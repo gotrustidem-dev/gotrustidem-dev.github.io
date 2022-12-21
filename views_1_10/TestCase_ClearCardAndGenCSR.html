@@ -11,7 +11,8 @@
     <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css" />
     <!-- Spectre.css icons are used -->
     <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
-
+    <link rel="stylesheet" href="busy_indicator.css">
+    <script src="../utils/busy_indicator.js" type="text/javascript"></script>
     <script src="../utils/cbor.js"></script>
     <script src="../utils/helpers.js"></script>
     <script src="../utils/showMessage.js"></script>
@@ -32,6 +33,16 @@
         h3 {
             text-align: center;
         }
+        .bg {
+            display: none;
+            position: fixed;
+            top: 0px;
+            left: 0px;
+            height: 100%;
+            width: 100%;
+            z-index: 100;
+            background-color: rgba(30, 30, 30, 0.5);
+        }
     </style>
 </head>
 
@@ -43,7 +54,7 @@
                 <tr>
                     <td style="width: 100% ;">
 
-                <tr>
+                <!-- <tr>
                     <td>
                         <form style="text-align: center;" id="form_case1" onsubmit="return false">
                             <label>依序呼叫函示</label><br>
@@ -62,43 +73,42 @@
                             <label id="label_case2_msg"></label><br>
                         </form>
                     </td>
-                </tr>
+                </tr> -->
 
                 <tr>
 
                   
                     <td>
-                        <dialog id="dialog">
-                            I'm a dialog.
-                            <button onclick="window.cleartokenDialog.showModal();">open 2nd dialog</button>
-                            <button onclick="window.dialog.close();">close</button>
-                        </dialog>
                         <form style="text-align: center;" id="form_case3" onsubmit="return false">
-                            <label>依序執行產生金鑰操作</label><br>
+                            <h1>使用按鈕產生金鑰和匯入憑證</h1><br>
+                            <p>讀取載具資訊->清卡->產生CSR->匯入憑證</p>
                             <button class="btn btn-primary" action="submit"
-                                style="width: 162px; height:34px;background-color: #008CBA;">建立CSR</button>
+                                style="width: 162px; height:34px;background-color: #008CBA;">開始測試</button>
                         </form>
                     </td>
 
                     <dialog id="getinfoDialog">
-                        顯示載具資訊完成
-
-                        <br><button  id="cleartokenButton">清卡</button>
-                        <button onclick="window.getinfoDialog.close();">取消</button>
+                        <form method="dialog">
+                            <h1>顯示載具資訊</h1>
+                            <label id="label_serial_number"></label><br>
+                            <label id="label_credentials"></label><br>
+                            
+                            <button type="submit" id="cleartokenButton" value="清除憑證!">執行清卡</button>
+                            <button type="submit" value="Canceled!">取消</button>
+                        </form>
                     </dialog>
 
                     <dialog id="cleartokenDialog">
-                        清卡完成
+                        <h1> 清卡完成</h1>
+                        
                         <br><button  id="gencsrButton">產生CSR</button>
                         <button onclick="window.cleartokenDialog.close();">取消</button>
                     </dialog>
 
                     <dialog id="gencsrDialog">
-                        產生CSR完成
                         <br><label id="label_gencsrDialog_msg"></label><br>
                         <button onclick="window.gencsrDialog.close();">關閉</button>
                     </dialog>
-
                 </tr>
                 </td>
                 </tr>
@@ -106,189 +116,189 @@
         </table>
     </div>
     <script>
-        document.getElementById('form_case1').addEventListener('submit', function (event) {
-            event.preventDefault();
+        // document.getElementById('form_case1').addEventListener('submit', function (event) {
+        //     event.preventDefault();
 
-            var bToken_sn = undefined;
+        //     var bToken_sn = undefined;
 
-            GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
+        //     GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
 
-                console.log('SUCCESS', response);
-                if (response.statusCode == CTAP1_ERR_SUCCESS) {
+        //         console.log('SUCCESS', response);
+        //         if (response.statusCode == CTAP1_ERR_SUCCESS) {
 
-                    GTIDEM_ClearToken(bToken_sn).then((response) => {
-
-
-                        if (response.statusCode == CTAP1_ERR_SUCCESS) {
-                            var strCert = "清卡完成";
-                            if (response.sn != undefined) {
-                                strCert += "\n序號:" + ConverSNFormat(response.sn) + "\n";
-                            }
-                            alert(strCert);
-                            GTIDEM_GenRSA2048CSR(bToken_sn, undefined).then((response) => {
-
-                                if (response.statusCode == CTAP1_ERR_SUCCESS) {
-                                    var strCSR = "";
-                                    var msg = "";
-                                    if (response.sn != undefined) {
-                                        msg += "載具序號" + ConverSNFormat(response.sn) +
-                                            "\n";
-                                    }
-                                    strCSR =
-                                        "-----BEGIN NEW CERTIFICATE REQUEST-----\n" +
-                                        btoa(String.fromCharCode.apply(null,
-                                            new Uint8Array(response
-                                                .csr))) +
-                                        "\n-----END NEW CERTIFICATE REQUEST-----\n";
-                                    msg += "CSR:" + "\n" + strCSR;
-                                    console.log('CSR :\n', msg);
-                                    alert(msg);
-                                    console.log(bufToHex(new Uint8Array(response
-                                        .keyhandle).buffer));
-                                } else {
-                                    alert(showFIDOErrorMessage(response));
-                                }
-
-                            }).catch((error) => {
-                                alert(error)
-                                console.log('FAIL', error)
-                            });
-
-                        } else {
-                            alert(showFIDOErrorMessage(response));
-                        }
-
-                    }).catch((error) => {
-                        alert(error)
-                        console.log('FAIL', error)
-                    })
-                } else {
-                    alert(showFIDOErrorMessage(response));
-                }
-            }).catch((error) => {
-                alert(error)
-                console.log('FAIL', error)
-            });
-        })
+        //             GTIDEM_ClearToken(bToken_sn).then((response) => {
 
 
+        //                 if (response.statusCode == CTAP1_ERR_SUCCESS) {
+        //                     var strCert = "清卡完成";
+        //                     if (response.sn != undefined) {
+        //                         strCert += "\n序號:" + ConverSNFormat(response.sn) + "\n";
+        //                     }
+        //                     alert(strCert);
+        //                     GTIDEM_GenRSA2048CSR(bToken_sn, undefined).then((response) => {
 
+        //                         if (response.statusCode == CTAP1_ERR_SUCCESS) {
+        //                             var strCSR = "";
+        //                             var msg = "";
+        //                             if (response.sn != undefined) {
+        //                                 msg += "載具序號" + ConverSNFormat(response.sn) +
+        //                                     "\n";
+        //                             }
+        //                             strCSR =
+        //                                 "-----BEGIN NEW CERTIFICATE REQUEST-----\n" +
+        //                                 btoa(String.fromCharCode.apply(null,
+        //                                     new Uint8Array(response
+        //                                         .csr))) +
+        //                                 "\n-----END NEW CERTIFICATE REQUEST-----\n";
+        //                             msg += "CSR:" + "\n" + strCSR;
+        //                             console.log('CSR :\n', msg);
+        //                             alert(msg);
+        //                             console.log(bufToHex(new Uint8Array(response
+        //                                 .keyhandle).buffer));
+        //                         } else {
+        //                             alert(showFIDOErrorMessage(response));
+        //                         }
 
-        document.getElementById('form_case2').addEventListener('submit', function (event) {
-            event.preventDefault();
+        //                     }).catch((error) => {
+        //                         alert(error)
+        //                         console.log('FAIL', error)
+        //                     });
 
-            var bToken_sn = undefined;
-            var getinfo_response = undefined;
-            var clearToken_response = undefined
+        //                 } else {
+        //                     alert(showFIDOErrorMessage(response));
+        //                 }
 
-            let timer_id_cleartoken = setInterval(() => {
-                if (getinfo_response == undefined) {
-                    return;
-                }
-
-                if (getinfo_response.statusCode != CTAP1_ERR_SUCCESS) {
-                    clearTimeout(timer_id_cleartoken);
-                    clearTimeout(timer_id_gencsr);
-                    return;
-                }
-                clearTimeout(timer_id_cleartoken);
-                GTIDEM_ClearToken(undefined).then((response) => {
-                    clearToken_response = response;
-                    var strCert = "清卡完成";
-                    if (response.sn != undefined) {
-                        strCert += "\n序號:" + ConverSNFormat(response.sn) + "\n";
-                    }
-                    alert(strCert);
-                });
-
-            }, 200);
-
-            let timer_id_gencsr = setInterval(() => {
-                if (clearToken_response == undefined) {
-                    return;
-                }
-
-                if (clearToken_response.statusCode != CTAP1_ERR_SUCCESS) {
-                    clearTimeout(timer_id_gencsr);
-                    return;
-                }
-                clearTimeout(timer_id_gencsr);
-                GTIDEM_GenRSA2048CSR(undefined, undefined).then((response) => {
-
-                    if (response.statusCode == CTAP1_ERR_SUCCESS) {
-                        var strCSR = "";
-                        var msg = "";
-                        if (response.sn != undefined) {
-                            msg += "載具序號" + ConverSNFormat(response.sn) +
-                                "\n";
-                        }
-                        strCSR =
-                            "-----BEGIN NEW CERTIFICATE REQUEST-----\n" +
-                            btoa(String.fromCharCode.apply(null,
-                                new Uint8Array(response
-                                    .csr))) +
-                            "\n-----END NEW CERTIFICATE REQUEST-----\n";
-                        msg += "CSR:" + "\n" + strCSR;
-                        console.log('CSR :\n', msg);
-                        alert(msg);
-                        console.log(bufToHex(new Uint8Array(response
-                            .keyhandle).buffer));
-                    } else {
-                        alert(showFIDOErrorMessage(response));
-                    }
-                });
-
-            }, 200);
-
-
-            GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
-
-                console.log('SUCCESS', response);
-                getinfo_response = response;
-                if (response.statusCode == CTAP1_ERR_SUCCESS) {
-
-
-                } else {
-                    clearTimeout(timer_id_cleartoken);
-                    clearTimeout(timer_id_gencsr);
-                    alert(showFIDOErrorMessage(response));
-                }
-            }).catch((error) => {
-                clearTimeout(timer_id_cleartoken);
-                clearTimeout(timer_id_gencsr);
-                alert(error)
-                console.log('FAIL', error)
-            });
-
-        });
+        //             }).catch((error) => {
+        //                 alert(error)
+        //                 console.log('FAIL', error)
+        //             })
+        //         } else {
+        //             alert(showFIDOErrorMessage(response));
+        //         }
+        //     }).catch((error) => {
+        //         alert(error)
+        //         console.log('FAIL', error)
+        //     });
+        // })
 
 
 
 
+        // document.getElementById('form_case2').addEventListener('submit', function (event) {
+        //     event.preventDefault();
+
+        //     var bToken_sn = undefined;
+        //     var getinfo_response = undefined;
+        //     var clearToken_response = undefined
+
+        //     let timer_id_cleartoken = setInterval(() => {
+        //         if (getinfo_response == undefined) {
+        //             return;
+        //         }
+
+        //         if (getinfo_response.statusCode != CTAP1_ERR_SUCCESS) {
+        //             clearTimeout(timer_id_cleartoken);
+        //             clearTimeout(timer_id_gencsr);
+        //             return;
+        //         }
+        //         clearTimeout(timer_id_cleartoken);
+        //         GTIDEM_ClearToken(undefined).then((response) => {
+        //             clearToken_response = response;
+        //             var strCert = "清卡完成";
+        //             if (response.sn != undefined) {
+        //                 strCert += "\n序號:" + ConverSNFormat(response.sn) + "\n";
+        //             }
+        //             alert(strCert);
+        //         });
+
+        //     }, 200);
+
+        //     let timer_id_gencsr = setInterval(() => {
+        //         if (clearToken_response == undefined) {
+        //             return;
+        //         }
+
+        //         if (clearToken_response.statusCode != CTAP1_ERR_SUCCESS) {
+        //             clearTimeout(timer_id_gencsr);
+        //             return;
+        //         }
+        //         clearTimeout(timer_id_gencsr);
+        //         GTIDEM_GenRSA2048CSR(undefined, undefined).then((response) => {
+
+        //             if (response.statusCode == CTAP1_ERR_SUCCESS) {
+        //                 var strCSR = "";
+        //                 var msg = "";
+        //                 if (response.sn != undefined) {
+        //                     msg += "載具序號" + ConverSNFormat(response.sn) +
+        //                         "\n";
+        //                 }
+        //                 strCSR =
+        //                     "-----BEGIN NEW CERTIFICATE REQUEST-----\n" +
+        //                     btoa(String.fromCharCode.apply(null,
+        //                         new Uint8Array(response
+        //                             .csr))) +
+        //                     "\n-----END NEW CERTIFICATE REQUEST-----\n";
+        //                 msg += "CSR:" + "\n" + strCSR;
+        //                 console.log('CSR :\n', msg);
+        //                 alert(msg);
+        //                 console.log(bufToHex(new Uint8Array(response
+        //                     .keyhandle).buffer));
+        //             } else {
+        //                 alert(showFIDOErrorMessage(response));
+        //             }
+        //         });
+
+        //     }, 200);
 
 
-        function showReseult(result) {
-            if (result.statusCode == CTAP1_ERR_SUCCESS) {
-                var strCSR = "";
-                var msg = "";
-                if (result.sn != undefined) {
-                    msg += "載具序號" + ConverSNFormat(result.sn) + "\n";
-                }
+        //     GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
 
-                strCSR = "-----BEGIN NEW CERTIFICATE REQUEST-----\n" +
-                    btoa(String.fromCharCode.apply(null, new Uint8Array(result
-                        .csr))) +
-                    "\n-----END NEW CERTIFICATE REQUEST-----\n";
-                msg += "CSR:" + "\n" + strCSR;
-                console.log('CSR :\n', msg);
-                alert(msg);
+        //         console.log('SUCCESS', response);
+        //         getinfo_response = response;
+        //         if (response.statusCode == CTAP1_ERR_SUCCESS) {
 
-                console.log(bufToHex(new Uint8Array(result.keyhandle).buffer));
-            } else {
-                alert(showFIDOErrorMessage(result));
 
-            }
-        }
+        //         } else {
+        //             clearTimeout(timer_id_cleartoken);
+        //             clearTimeout(timer_id_gencsr);
+        //             alert(showFIDOErrorMessage(response));
+        //         }
+        //     }).catch((error) => {
+        //         clearTimeout(timer_id_cleartoken);
+        //         clearTimeout(timer_id_gencsr);
+        //         alert(error)
+        //         console.log('FAIL', error)
+        //     });
+
+        // });
+
+
+
+
+
+
+        // function showReseult(result) {
+        //     if (result.statusCode == CTAP1_ERR_SUCCESS) {
+        //         var strCSR = "";
+        //         var msg = "";
+        //         if (result.sn != undefined) {
+        //             msg += "載具序號" + ConverSNFormat(result.sn) + "\n";
+        //         }
+
+        //         strCSR = "-----BEGIN NEW CERTIFICATE REQUEST-----\n" +
+        //             btoa(String.fromCharCode.apply(null, new Uint8Array(result
+        //                 .csr))) +
+        //             "\n-----END NEW CERTIFICATE REQUEST-----\n";
+        //         msg += "CSR:" + "\n" + strCSR;
+        //         console.log('CSR :\n', msg);
+        //         alert(msg);
+
+        //         console.log(bufToHex(new Uint8Array(result.keyhandle).buffer));
+        //     } else {
+        //         alert(showFIDOErrorMessage(result));
+
+        //     }
+        // }
 
 
         document.getElementById('form_case3').addEventListener('submit', function (event) {
@@ -298,12 +308,14 @@
             const getinfodialog = document.getElementById("getinfoDialog");
             const cleartokenButton = document.getElementById("cleartokenButton");
             const gencsrButton = document.getElementById("gencsrButton");
+            const busyDialog = document.getElementById("busyDialog");
             GTIDEM_GetTokenInfo(undefined).then((response) => {
 
                 console.log('SUCCESS', response);
                 getinfo_response = response;
                 if (response.statusCode == CTAP1_ERR_SUCCESS) {
-
+                    document.getElementById('label_serial_number').innerText = "載具序號: " + ConverSNFormat(response.sn);
+                    document.getElementById('label_credentials').innerText = "載具內存憑證數量: " + response.credentialNum;
                     getinfodialog.showModal();
                 } else {
                     alert(showFIDOErrorMessage(response));
@@ -344,6 +356,7 @@
                             "\n-----END NEW CERTIFICATE REQUEST-----\n";
                         msg += "CSR:" + "\n" + strCSR;
                        // alert(msg);
+                       document.getElementById('label_gencsrDialog_msg').innerText = msg;
                 });
             });
         });
