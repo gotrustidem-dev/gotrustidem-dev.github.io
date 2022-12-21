@@ -331,11 +331,17 @@
                 getinfodialog.close();
                 GTIDEM_ClearToken(undefined).then((response) => {
                     console.log('GTIDEM_ClearToken OK')
-                    cleartokenDialog.showModal();
-                    var strCert = "清卡完成";
-                    if (response.sn != undefined) {
-                        strCert += "\n序號:" + ConverSNFormat(response.sn) + "\n";
+                    if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                        cleartokenDialog.showModal();
+                        var strCert = "清卡完成";
+                        if (response.sn != undefined) {
+                            strCert += "\n序號:" + ConverSNFormat(response.sn) + "\n";
+                        }
+                    } else {
+                        alert(showFIDOErrorMessage(response));
                     }
+
+                    
                 });
             });
 
