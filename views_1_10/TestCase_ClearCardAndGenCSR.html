@@ -11,8 +11,7 @@
     <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css" />
     <!-- Spectre.css icons are used -->
     <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
-    <link rel="stylesheet" href="busy_indicator.css">
-    <script src="../utils/busy_indicator.js" type="text/javascript"></script>
+
     <script src="../utils/cbor.js"></script>
     <script src="../utils/helpers.js"></script>
     <script src="../utils/showMessage.js"></script>
@@ -331,6 +330,7 @@
 
                 getinfodialog.close();
                 GTIDEM_ClearToken(undefined).then((response) => {
+                    console.log('GTIDEM_ClearToken OK')
                     cleartokenDialog.showModal();
                     var strCert = "清卡完成";
                     if (response.sn != undefined) {
