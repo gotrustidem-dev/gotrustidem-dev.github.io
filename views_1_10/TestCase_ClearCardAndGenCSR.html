@@ -46,7 +46,7 @@
                 <tr>
                     <td>
                         <form style="text-align: center;" id="form_case1" onsubmit="return false">
-                            <label>Promise Callback</label><br>
+                            <label>依序呼叫函示</label><br>
                             <button class="btn btn-primary" action="submit"
                                 style="width: 162px; height:34px;background-color: #008CBA;">建立CSR</button>
                         </form>
@@ -55,7 +55,7 @@
                 <tr>
                     <td>
                         <form style="text-align: center;" id="form_case2" onsubmit="return false">
-                            <label>輪詢 polling 等待完成</label><br>
+                            <label>輪詢 polling 等待上一個函式完成後執行</label><br>
 
                             <button class="btn btn-primary" action="submit"
                                 style="width: 162px; height:34px;background-color: #008CBA;">建立CSR</button>
@@ -84,19 +84,19 @@
                         顯示載具資訊完成
 
                         <br><button  id="cleartokenButton">清卡</button>
-                        <button onclick="window.getinfoDialog.close();">close</button>
+                        <button onclick="window.getinfoDialog.close();">取消</button>
                     </dialog>
 
                     <dialog id="cleartokenDialog">
                         清卡完成
                         <br><button  id="gencsrButton">產生CSR</button>
-                        <button onclick="window.cleartokenDialog.close();">close</button>
+                        <button onclick="window.cleartokenDialog.close();">取消</button>
                     </dialog>
 
                     <dialog id="gencsrDialog">
                         產生CSR完成
                         <br><label id="label_gencsrDialog_msg"></label><br>
-                        <button onclick="window.gencsrDialog.close();">close</button>
+                        <button onclick="window.gencsrDialog.close();">關閉</button>
                     </dialog>
 
                 </tr>
@@ -306,14 +306,9 @@
 
                     getinfodialog.showModal();
                 } else {
-                    clearTimeout(timer_id_cleartoken);
-                    clearTimeout(timer_id_gencsr);
                     alert(showFIDOErrorMessage(response));
                 }
             }).catch((error) => {
-                clearTimeout(timer_id_cleartoken);
-                clearTimeout(timer_id_gencsr);
-                alert(error)
                 console.log('FAIL', error)
             });
 
@@ -329,7 +324,6 @@
                     if (response.sn != undefined) {
                         strCert += "\n序號:" + ConverSNFormat(response.sn) + "\n";
                     }
-                    alert(strCert);
                 });
             });
 
@@ -349,7 +343,7 @@
                                     .csr))) +
                             "\n-----END NEW CERTIFICATE REQUEST-----\n";
                         msg += "CSR:" + "\n" + strCSR;
-                        alert(msg);
+                       // alert(msg);
                 });
             });
         });
