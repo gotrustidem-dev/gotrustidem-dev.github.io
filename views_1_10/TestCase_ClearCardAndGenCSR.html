@@ -327,7 +327,7 @@
 
             // Update button opens a modal dialog
             cleartokenButton.addEventListener("click", () => {
-
+                console.log('cleartokenButton click');
                 getinfodialog.close();
                 GTIDEM_ClearToken(undefined).then((response) => {
                     console.log('GTIDEM_ClearToken OK')
