@@ -3017,7 +3017,7 @@ function GTIDEM_GetJSVersion() {
 
 
 
-
+/*
   async function GTIDEM_GenRSA2048CSRAfterClearCard(bSerialNumber,bCommonName, callback) {
 
     var gtidem = undefined;
@@ -3045,3 +3045,5 @@ function GTIDEM_GetJSVersion() {
 
 
 }
+
+*/
