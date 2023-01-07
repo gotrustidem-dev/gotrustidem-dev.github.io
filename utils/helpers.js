@@ -136,8 +136,8 @@ function base64EncodeURL(byteArray) {
 
 var get_browser = () => {
     var ua=navigator.userAgent,tem,M=ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || []; 
-    console.log("Brower data:", M);
-    console.log("ua:", ua);
+    //console.log("Brower data:", M);
+    //console.log("ua:", ua);
     if(/trident/i.test(M[1])){
         tem=/\brv[ :]+(\d+)/g.exec(ua) || []; 
         return {name:'IE',version:(tem[1]||'')};
@@ -148,14 +148,14 @@ var get_browser = () => {
         }   
     M=M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
     if((tem=ua.match(/version\/(\d+)\.(\d+)\.*(\d)*/i))!=null) {
-        console.log("tem:", tem);
-        console.log("M:", M);
+       // console.log("tem:", tem);
+        //console.log("M:", M);
         M.splice(1,1,tem[1]);
       }
     return {
         name: M[0],
-        major: M[1],
-        minor: M[2],
-        patch:M[3]
+        major: tem[1],
+        minor: tem[2],
+        patch:tem[3]
     };
 }
