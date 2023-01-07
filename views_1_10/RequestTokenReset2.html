@@ -76,7 +76,7 @@
     </div>
     <script>
         var flags = undefined;
-        var pinparam
+        var result = undefined;
         document.getElementById('form_tokeninfo_btn').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
@@ -95,7 +95,19 @@
                         .sn);
                     document.getElementById('label_random_number').innerText = ConverSNFormat(response
                         .rn);
+                        let reset_key = document.getElementById('form_reset_key').reset_key.value;
+                        bReset_key = hexStringToArrayBuffer(reset_key);
 
+                        let random = document.getElementById('label_random_number').textContent;
+                        bRandom = hexStringToArrayBuffer(random);
+                        var bRandomNumber = bRandom.slice(0, 16);
+                        var bChallenge = bRandom.slice(16, 32);
+                        let token_sn = document.getElementById('form_token_sn').token_sn.value;
+
+                        if (token_sn.length != 0) {
+                            bToken_sn = hexStringToArrayBuffer(token_sn);
+                        }
+                        result = prepareResetResponse(bReset_key, bRandomNumber, bToken_sn, bChallenge);
 
 
                 } else {
@@ -164,8 +176,8 @@
         async function buildResetResponse(bReset_key, bRandom, bToken_sn, bChallenge) {
             console.log("cp6:", event);
             //var para = await prepareResetResponse(bReset_key, bRandom, bToken_sn);
-            var result = await prepareResetResponse(bReset_key, bRandom, bToken_sn, bChallenge);
-            await GTIDEM_FactoryResetToken2(bToken_sn, result).then(
+            //var result = await prepareResetResponse(bReset_key, bRandom, bToken_sn, bChallenge);
+            await GTIDEM_FactoryResetToken2(bToken_sn, new Uint8Array(result)).then(
                 response => {
                     console.log("cp4:", event);
                     if (response.statusCode == CTAP1_ERR_SUCCESS) {
