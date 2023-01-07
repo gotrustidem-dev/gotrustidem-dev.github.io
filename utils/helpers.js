@@ -154,8 +154,8 @@ var get_browser = () => {
       }
     return {
         name: M[0],
-        major_version: M[1],
-        minor_version: M[2],
+        major: M[1],
+        minor: M[2],
         patch:M[3]
     };
 }
