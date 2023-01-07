@@ -118,11 +118,11 @@
 
             var browser=get_browser(); // browser.name = 'Chrome'
 
-
-            
-
-            if((browser.name=="Safari")&&(parseInt(browser.version)>=15)){//only for sarari 15+
+            if((browser.name=="Safari")&&(parseInt(browser.major)>=15)){//only for sarari 15+
                 console.log("Brower is Safari 15+");
+                GTIDEM_ChangeUserPINwithInterval(bOldPINArray, bNewPINBuffer, bToken_sn,showReseult);
+            }else if((browser.name=="Safari")&&(parseInt(browser.major)==14)&&(parseInt(browser.minor)>=1)){
+                console.log("Brower is Safari 14.1+");
                 GTIDEM_ChangeUserPINwithInterval(bOldPINArray, bNewPINBuffer, bToken_sn,showReseult);
             }else{
                 GTIDEM_ChangeUserPIN(bOldPINArray, bNewPINBuffer, bToken_sn).then((response) => {
@@ -146,25 +146,7 @@
         })
 
 
-        function get_browser() {
-            var ua=navigator.userAgent,tem,M=ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || []; 
-            console.log("Brower data:", M);
-            console.log("ua:", ua);
-            if(/trident/i.test(M[1])){
-                tem=/\brv[ :]+(\d+)/g.exec(ua) || []; 
-                return {name:'IE',version:(tem[1]||'')};
-                }   
-            if(M[1]==='Chrome'){
-                tem=ua.match(/\bOPR|Edge\/(\d+)/)
-                if(tem!=null)   {return {name:'Opera', version:tem[1]};}
-                }   
-            M=M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
-            if((tem=ua.match(/version\/(\d+)/i))!=null) {M.splice(1,1,tem[1]);}
-            return {
-                name: M[0],
-                version: M[1]
-            };
-        }
+
 
         function showReseult(result){
                 if(result.statusCode==CTAP1_ERR_SUCCESS){   
