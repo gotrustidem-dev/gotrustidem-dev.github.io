@@ -177,7 +177,7 @@
             console.log("cp6:", event);
             //var para = await prepareResetResponse(bReset_key, bRandom, bToken_sn);
             //var result = await prepareResetResponse(bReset_key, bRandom, bToken_sn, bChallenge);
-            await GTIDEM_FactoryResetToken2(bToken_sn, new Uint8Array(result)).then(
+            await GTIDEM_FactoryResetToken(bToken_sn, new Uint8Array(result)).then(
                 response => {
                     console.log("cp4:", event);
                     if (response.statusCode == CTAP1_ERR_SUCCESS) {
