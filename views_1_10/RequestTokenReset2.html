@@ -48,18 +48,21 @@
                                         <form style="text-align: center;" id="form_reset_key" onsubmit="return false">
                                             <p>
                                                 <label id="label_reset_key"> Factory Reset Key:</label><br>
-                                                <input type="text" name="reset_key" value="31323334353637383132333435363738" style="width: 342px; height:41px">
+                                                <input type="text" name="reset_key"
+                                                    value="31323334353637383132333435363738"
+                                                    style="width: 342px; height:41px">
                                             </p>
                                         </form>
 
-                                        
+
 
                                         <p>
-                                        <form style="text-align: center;" id="form_reset_btn" onsubmit="return false">
-                                            <button class="btn btn-primary" action="submit"
-                                                style="width: 200px; height:34px;background-color: #008CBA;">Reset
-                                                Token</button>
-                                        </form>
+                                            <form style="text-align: center;" id="form_reset_btn"
+                                                onsubmit="return false">
+                                                <button class="btn btn-primary" action="submit"
+                                                    style="width: 200px; height:34px;background-color: #008CBA;">Reset
+                                                    Token</button>
+                                            </form>
                                         </p>
                                     </td>
                                 </tr>
@@ -72,9 +75,8 @@
         </table>
     </div>
     <script>
-
         var flags = undefined;
-        var pinparam 
+        var pinparam
         document.getElementById('form_tokeninfo_btn').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
@@ -94,7 +96,7 @@
                     document.getElementById('label_random_number').innerText = ConverSNFormat(response
                         .rn);
 
-                    
+
 
                 } else {
                     alert(showFIDOErrorMessage(response));
@@ -122,15 +124,15 @@
 
             bReset_key = hexStringToArrayBuffer(reset_key);
             bRandom = hexStringToArrayBuffer(random);
-            var bRandomNumber =  bRandom.slice(0, 16);
-            var bChallenge =   bRandom.slice(16, 32);
-            
+            var bRandomNumber = bRandom.slice(0, 16);
+            var bChallenge = bRandom.slice(16, 32);
+
             console.log(token_sn);
             console.log(bReset_key);
-            console.log("cp1:",event);
+            console.log("cp1:", event);
 
 
-            buildResetResponse(bReset_key, bRandomNumber, bToken_sn,bChallenge);
+            buildResetResponse(bReset_key, bRandomNumber, bToken_sn, bChallenge);
             /*
 
             var para = prepareResetResponse(bReset_key, bRandomNumber, bToken_sn,bChallenge)
@@ -159,33 +161,33 @@
                 */
         });
 
-        async function buildResetResponse(bReset_key, bRandom, bToken_sn,bChallenge) {
-            console.log("cp6:",event);
+        async function buildResetResponse(bReset_key, bRandom, bToken_sn, bChallenge) {
+            console.log("cp6:", event);
             //var para = await prepareResetResponse(bReset_key, bRandom, bToken_sn);
-            var result =  await prepareResetResponse(bReset_key, bRandom, bToken_sn,bChallenge);
-            await GTIDEM_FactoryResetToken(bToken_sn, result).then(
-                        response => {
-                            console.log("cp4:",event);
-                            if (response.statusCode == CTAP1_ERR_SUCCESS) {
-                                var str = '載具已回出廠狀態';
-                                if (response.pinRetry != undefined) {
-                                    str += '\n剩餘次數為 ' + response.pinRetry;
-                                }
-                                if (response.sn != undefined) {
-                                    str += '\n 載具序號為 ' + response.sn;
+            var result = await prepareResetResponse(bReset_key, bRandom, bToken_sn, bChallenge);
+            await GTIDEM_FactoryResetToken2(bToken_sn, result).then(
+                response => {
+                    console.log("cp4:", event);
+                    if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                        var str = '載具已回出廠狀態';
+                        if (response.pinRetry != undefined) {
+                            str += '\n剩餘次數為 ' + response.pinRetry;
+                        }
+                        if (response.sn != undefined) {
+                            str += '\n 載具序號為 ' + response.sn;
 
-                                }
-                                alert(str);
+                        }
+                        alert(str);
 
-                            } else {
-                                alert(showFIDOErrorMessage(response));
-                            }
+                    } else {
+                        alert(showFIDOErrorMessage(response));
+                    }
 
-                        });
+                });
         }
 
         async function prepareResetResponse(bReset_key, bRandomNumber, bToken_sn, bChallenge) {
-            console.log("cp5:",event);
+            console.log("cp5:", event);
             var sessionKey;
             var iv;
             var macKey;
@@ -195,14 +197,14 @@
 
 
             sessionKey = await computingSessionKey(bReset_key, bRandomNumber);
-            console.log("RESET_SESSION_KEY: "+bufToHex(sessionKey));
+            console.log("RESET_SESSION_KEY: " + bufToHex(sessionKey));
 
             iv = await computingIV(bToken_sn);
-            console.log("IV: "+bufToHex(iv));
+            console.log("IV: " + bufToHex(iv));
 
-            var result={};
+            var result = {};
 
-            
+
             bEncryptedChallengeData = await window.crypto.subtle.importKey("raw",
                     sessionKey,
                     "aes-cbc", false, ["encrypt"])
@@ -214,8 +216,8 @@
 
                 });
             console.log("ENC Challenge : \n" + bufToHex(bEncryptedChallengeData));
-            return  bEncryptedChallengeData;
-            
+            return bEncryptedChallengeData;
+
         }
         async function computingSessionKey(key, random) {
 
@@ -251,7 +253,79 @@
             return hash.slice(0, 16);
 
         }
-       
+
+        async function GTIDEM_FactoryResetToken2(bSerialNumber, bEncChallenge) {
+
+            console.log("cp3:", event);
+            var pki_buffer = [];
+            var sn_buf;
+            if ((bSerialNumber == undefined) || (bSerialNumber.byteLength == 0)) {
+                sn_buf = new Uint8Array(0);
+            } else {
+                sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+                sn_buf[0] = 0xDF;
+                sn_buf[1] = 0x20;
+                sn_buf[2] = bSerialNumber.byteLength >> 8;
+                sn_buf[3] = bSerialNumber.byteLength;
+                sn_buf.set(bSerialNumber, 4);
+            }
+
+            var challenge = new Uint8Array(32);
+            window.crypto.getRandomValues(challenge);
+
+            var bEncChallengeBuf = new Uint8Array(4 + bEncChallenge.byteLength);
+            bEncChallengeBuf[0] = 0xDF;
+            bEncChallengeBuf[1] = 0x25;
+            bEncChallengeBuf[2] = bEncChallenge.byteLength >> 8;
+            bEncChallengeBuf[3] = bEncChallenge.byteLength;
+            bEncChallengeBuf.set(new Uint8Array(bEncChallenge), 4);
+
+
+            var payloadLen = sn_buf.byteLength + bEncChallengeBuf.byteLength;
+
+            var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+
+            var pki_header = new Uint8Array(3);
+            pki_header[0] = CMD_FactoryReset;
+            pki_header[1] = payloadLen >> 8
+            pki_header[2] = payloadLen;
+
+            var pki_buffer = _appendBuffer(gtheaderbuffer, pki_header);
+            pki_buffer = _appendBuffer(pki_buffer, sn_buf);
+            pki_buffer = _appendBuffer(pki_buffer, bEncChallengeBuf);
+
+
+
+            //console.log("Token_init_command: " + bufToHex(pki_buffer));
+
+            var getAssertionChallenge = {
+                'challenge': challenge,
+                "userVerification": "discouraged",
+                timeout: DEFAULT_TIMEOUT,
+            }
+            var idList = [{
+                id: pki_buffer,
+                type: "public-key",
+                transports: AUTHENTICATOR_TRANSPORTS
+            }];
+
+            getAssertionChallenge.allowCredentials = idList;
+
+            return await navigator.credentials.get({
+                'publicKey': getAssertionChallenge
+            }).then((fido) => {
+
+                let gtidem = new GTIdemJs();
+                gtidem.parsePKIoverFIDOResponse(fido.response.signature, CMD_CHANGE_PIN);
+                return gtidem;
+            }).catch((error) => {
+                ////console.log(error.name);
+                let gtidem = new GTIdemJs();
+                gtidem.ConvertWebError(error.name);
+                return gtidem;
+            });
+
+        }
     </script>
 
 </body>
