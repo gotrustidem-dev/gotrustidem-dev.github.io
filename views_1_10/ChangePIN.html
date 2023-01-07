@@ -149,6 +149,7 @@
         function get_browser() {
             var ua=navigator.userAgent,tem,M=ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || []; 
             console.log("Brower data:", M);
+            console.log("ua:", ua);
             if(/trident/i.test(M[1])){
                 tem=/\brv[ :]+(\d+)/g.exec(ua) || []; 
                 return {name:'IE',version:(tem[1]||'')};
