@@ -2936,6 +2936,7 @@ async function GTIDEM_GenKeyPair(bSerialNumber,bKeyID, keytype, outputformat) {
  */
  async function GTIDEM_FactoryResetToken(bSerialNumber, bEncChallenge) {
 
+    console.log("cp3:",event);
     var pki_buffer = [];
     var sn_buf;
     if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
