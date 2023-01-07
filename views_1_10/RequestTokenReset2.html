@@ -108,7 +108,6 @@
 
         document.getElementById('form_reset_btn').addEventListener('submit', function (event) {
 
-            event.preventDefault();
             let bRandom = [];
 
             let random = document.getElementById('label_random_number').textContent;
@@ -137,7 +136,7 @@
                     console.log("cp2:",event);
                     GTIDEM_FactoryResetToken(bToken_sn, result).then(
                         response => {
-
+                            console.log("cp4:",event);
                             if (response.statusCode == CTAP1_ERR_SUCCESS) {
                                 var str = '載具已回出廠狀態';
                                 if (response.pinRetry != undefined) {
@@ -158,11 +157,12 @@
         });
 
         async function buildResetResponse(bReset_key, bRandom, bToken_sn) {
+            console.log("cp6:",event);
             return await prepareResetResponse(bReset_key, bRandom, bToken_sn);
         }
 
         async function prepareResetResponse(bReset_key, bRandomNumber, bToken_sn, bChallenge) {
-
+            console.log("cp5:",event);
             var sessionKey;
             var iv;
             var macKey;
