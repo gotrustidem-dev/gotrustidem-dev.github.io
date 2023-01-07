@@ -147,11 +147,15 @@ var get_browser = () => {
         if(tem!=null)   {return {name:'Opera', version:tem[1]};}
         }   
     M=M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
-    if((tem=ua.match(/version\/(\d+)\.(\d+)\.*(\d)*/i))!=null) {M.splice(1,1,tem[1]);}
+    if((tem=s.match(/version\/(\d+)\.(\d+)\.*(\d)*/i))!=null) {
+        console.log("tem:", tem);
+        console.log("M:", M);
+        M.splice(1,1,tem[1]);
+      }
     return {
         name: M[0],
-        major: M[1],
-        minor: M[2],
+        major_version: M[1],
+        minor_version: M[2],
         patch:M[3]
     };
 }
