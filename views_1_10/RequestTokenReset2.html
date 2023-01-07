@@ -130,6 +130,8 @@
             console.log("cp1:",event);
 
 
+            buildResetResponse(bReset_key, bRandomNumber, bToken_sn,bChallenge);
+            /*
 
             var para = prepareResetResponse(bReset_key, bRandomNumber, bToken_sn,bChallenge)
                 .then(result => {
@@ -154,11 +156,32 @@
 
                         });
                 });
+                */
         });
 
-        async function buildResetResponse(bReset_key, bRandom, bToken_sn) {
+        async function buildResetResponse(bReset_key, bRandom, bToken_sn,bChallenge) {
             console.log("cp6:",event);
-            return await prepareResetResponse(bReset_key, bRandom, bToken_sn);
+            //var para = await prepareResetResponse(bReset_key, bRandom, bToken_sn);
+            var result =  await prepareResetResponse(bReset_key, bRandom, bToken_sn,bChallenge);
+            await GTIDEM_FactoryResetToken(bToken_sn, result).then(
+                        response => {
+                            console.log("cp4:",event);
+                            if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                                var str = '載具已回出廠狀態';
+                                if (response.pinRetry != undefined) {
+                                    str += '\n剩餘次數為 ' + response.pinRetry;
+                                }
+                                if (response.sn != undefined) {
+                                    str += '\n 載具序號為 ' + response.sn;
+
+                                }
+                                alert(str);
+
+                            } else {
+                                alert(showFIDOErrorMessage(response));
+                            }
+
+                        });
         }
 
         async function prepareResetResponse(bReset_key, bRandomNumber, bToken_sn, bChallenge) {
