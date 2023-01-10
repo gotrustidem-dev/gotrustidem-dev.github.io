@@ -155,10 +155,11 @@
 
                 console.log('SUCCESS', response);
            
-                if(result.statusCode==CTAP1_ERR_SUCCESS){   
+                if(response.statusCode==CTAP1_ERR_SUCCESS){   
                     params = response; 
                 }else{
-                    alert(showFIDOErrorMessage(result));
+                    clearTimeout(timer_id);  
+                    alert(showFIDOErrorMessage(response));
                 }
             });
 
