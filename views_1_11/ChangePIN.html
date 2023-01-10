@@ -16,7 +16,7 @@
     <script src="../utils/helpers.js"></script>
     <script src="../utils/showMessage.js"></script>
     <script src="../utils/response.js"></script>
-    <script src="../utils/PKIoverFIDO_1_10.js"></script>
+    <script src="../utils/PKIoverFIDO_1_11.js"></script>
     <style>
         table.center {
             margin-left: auto;
@@ -116,31 +116,35 @@
             var bNewPINBuffer = new Uint8Array(newpin.length);
             bNewPINBuffer.set(toUTF8Array(newpin), 0);
 
+           
+            GTIDEM_ChangeUserPIN(bOldPINArray, bNewPINBuffer, bToken_sn,showReseult);
+            // var browser=get_browser(); // browser.name = 'Chrome'
 
-           var browser=get_browser(); // browser.name = 'Chrome'
-
-            if((browser.name=="Safari")&&(parseInt(browser.major)>=15)){//only for sarari 15+
-                console.log("Brower is Safari 15+");
-                GTIDEM_ChangeUserPINwithInterval(bOldPINArray, bNewPINBuffer, bToken_sn,showReseult);
-            }else{
-                GTIDEM_ChangeUserPIN(bOldPINArray, bNewPINBuffer, bToken_sn).then((response) => {
-                    if(response.statusCode==CTAP1_ERR_SUCCESS){   
-                        var str = '密碼變更完成'; 
-                        if(response.pinRetry != undefined){
-                        str+= '\n剩餘次數為 '+response.pinRetry;
-                        }
-                        if(response.sn != undefined){
-                            str+= '\n 載具序號為 '+response.sn;                        
-                        }
-                        alert(str);
-                    }else{
-                        alert(showFIDOErrorMessage(response));
-                    }
-                }).catch((error) => {
-                    alert(error)
-                    console.log('FAIL', error)
-                })
-            }
+            // if((browser.name=="Safari")&&(parseInt(browser.major)>=15)){//only for sarari 15+
+            //     console.log("Brower is Safari 15+");
+            //     GTIDEM_ChangeUserPINwithInterval(bOldPINArray, bNewPINBuffer, bToken_sn,showReseult);
+            // }else if((browser.name=="Safari")&&(parseInt(browser.major)==14)&&(parseInt(browser.minor)>=1)){
+            //     console.log("Brower is Safari 14.1+");
+            //     GTIDEM_ChangeUserPINwithInterval(bOldPINArray, bNewPINBuffer, bToken_sn,showReseult);
+            // }else{
+            //     GTIDEM_ChangeUserPIN(bOldPINArray, bNewPINBuffer, bToken_sn).then((response) => {
+            //         if(response.statusCode==CTAP1_ERR_SUCCESS){   
+            //             var str = '密碼變更完成'; 
+            //             if(response.pinRetry != undefined){
+            //             str+= '\n剩餘次數為 '+response.pinRetry;
+            //             }
+            //             if(response.sn != undefined){
+            //                 str+= '\n 載具序號為 '+response.sn;                        
+            //             }
+            //             alert(str);
+            //         }else{
+            //             alert(showFIDOErrorMessage(response));
+            //         }
+            //     }).catch((error) => {
+            //         alert(error)
+            //         console.log('FAIL', error)
+            //     })
+            // }
         })
 
 
