@@ -134,178 +134,95 @@
             var bNewPINArray = new Uint8Array(newpin.length);
             bNewPINArray.set(toUTF8Array(newpin), 0);
 
+            var params = undefined;
 
             var bToken_sn = undefined;
             if (token_sn.length != 0) {
                 bToken_sn = hexStringToArrayBuffer(token_sn);
 
             }
+            let timer_id = setInterval( () => {
+                if(params==undefined){
+                    return;
+                }
+                clearTimeout(timer_id);        
+                GTIDEM_ChangeUserPIN_V1(bToken_sn, params.hostEcpoint, params.encOldPINHashed,params.encNewPIN).then((result) => {
+                    return showReseult(result);
+                });
+            }, 200);
+
             GTIDEM_GenPINParams(bToken_sn, bOldPINArray, bNewPINArray).then((response) => {
 
-
-                //show change PIN button
-
                 console.log('SUCCESS', response);
-                document.getElementById('label_enc_oldpinhash_param').innerText = ConverSNFormat(
-                    response
-                    .bEcryptedOldPINHash);
-                document.getElementById('label_enc_newpin_number').innerText = ConverSNFormat(
-                    response
-                    .bEncryptedNEWPIN);
-                document.getElementById('label_ecdh_param').innerText = ConverSNFormat(response
-                    .bExportECPublicKeyArray);
-
-            }).catch((error) => {
-                alert(error)
-                console.log('FAIL', error)
+           
+                if(result.statusCode==CTAP1_ERR_SUCCESS){   
+                    params = response; 
+                }else{
+                    alert(showFIDOErrorMessage(result));
+                }
             });
+
 
         });
 
 
-        document.getElementById('form_changepin_btn').addEventListener('submit', function (event) {
+        // document.getElementById('form_changepin_btn').addEventListener('submit', function (event) {
 
-            let encOldPINHash = document.getElementById('label_enc_oldpinhash_param').textContent;
-            let encNewPIN = document.getElementById('label_enc_newpin_number').textContent;
-            let ecdh_param = document.getElementById('label_ecdh_param').textContent;
-            let token_sn = document.getElementById('form_token_sn').token_sn.value;
-
-
-            var bToken_sn = undefined;
-            if (token_sn.length != 0) {
-                bToken_sn = hexStringToArrayBuffer(token_sn);
-            }
-
-            var bEncOldPINHash = hexStringToArrayBuffer(encOldPINHash);
-            var bEncNewPIN = hexStringToArrayBuffer(encNewPIN);
-            var bEcdh_param = hexStringToArrayBuffer(ecdh_param);
-
-            GTIDEM_ChangeUserPIN_V1(bToken_sn, bEcdh_param, bEncOldPINHash,
-                bEncNewPIN).then((response) => {
-
-                if (response.statusCode == CTAP1_ERR_SUCCESS) {
-                    var str = '密碼變更完成';
-                    if (response.pinRetry != undefined) {
-                        str += '\n剩餘次數為 ' + response.pinRetry;
-                    }
-                    if (response.sn != undefined) {
-                        str += '\n 載具序號為 ' + response.sn;
-
-                    }
-                    alert(str);
+        //     let encOldPINHash = document.getElementById('label_enc_oldpinhash_param').textContent;
+        //     let encNewPIN = document.getElementById('label_enc_newpin_number').textContent;
+        //     let ecdh_param = document.getElementById('label_ecdh_param').textContent;
+        //     let token_sn = document.getElementById('form_token_sn').token_sn.value;
 
 
-                } else {
-                    alert(showFIDOErrorMessage(response));
+        //     var bToken_sn = undefined;
+        //     if (token_sn.length != 0) {
+        //         bToken_sn = hexStringToArrayBuffer(token_sn);
+        //     }
+
+        //     var bEncOldPINHash = hexStringToArrayBuffer(encOldPINHash);
+        //     var bEncNewPIN = hexStringToArrayBuffer(encNewPIN);
+        //     var bEcdh_param = hexStringToArrayBuffer(ecdh_param);
+
+        //     GTIDEM_ChangeUserPIN_V1(bToken_sn, bEcdh_param, bEncOldPINHash,
+        //         bEncNewPIN).then((response) => {
+
+        //         if (response.statusCode == CTAP1_ERR_SUCCESS) {
+        //             var str = '密碼變更完成';
+        //             if (response.pinRetry != undefined) {
+        //                 str += '\n剩餘次數為 ' + response.pinRetry;
+        //             }
+        //             if (response.sn != undefined) {
+        //                 str += '\n 載具序號為 ' + response.sn;
+
+        //             }
+        //             alert(str);
+
+
+        //         } else {
+        //             alert(showFIDOErrorMessage(response));
+        //         }
+
+        //     }).catch((error) => {
+        //         alert(error)
+        //         console.log('FAIL', error)
+        //     })
+
+        // })
+
+        function showReseult(result){
+                if(result.statusCode==CTAP1_ERR_SUCCESS){   
+                   var str = '密碼變更完成'; 
+                   if(result.pinRetry != undefined){
+                     str+= '\n剩餘次數為 '+result.pinRetry;
+                   }
+                   if(result.sn != undefined){
+                        str+= '\n 載具序號為 '+result.sn;
+                    
+                   }
+                   alert(str); 
+                }else{
+                    alert(showFIDOErrorMessage(result));
                 }
-
-            }).catch((error) => {
-                alert(error)
-                console.log('FAIL', error)
-            })
-
-        })
-
-        async function buildChangeParams(bOldPINArray, bNewPINArray, bECPointFromToken) {
-            return await computingChangePINParam(bOldPINArray, bNewPINArray, bECPointFromToken)
-        }
-
-        async function computingChangePINParam(bOldPIN, bNewPIN, ecpointXY) {
-
-            //Convert oldPIN to sha256 value
-            var oldPINHash = await crypto.subtle.digest("SHA-256", bOldPIN);
-            //console.log("oldPINHash  ", oldPINHash);
-
-            //During encryption, newPin is padded with trailing 0x00 bytes and is of minimum 64 bytes length. 
-            var newPINBuffer = new Uint8Array(64);
-            newPINBuffer.fill(0);
-            newPINBuffer.set(bNewPIN, 0);
-
-            var iv = new Uint8Array(16);
-            iv.fill(0);
-
-
-            var newPINHash;
-            var ECPublicKey;
-            var EncryptOlDPIN;
-
-            //let ecpoint = hexStringToArrayBuffer(ecpointXY);
-            let ecpoint = ecpointXY;
-            var externalECPublicKeyX = base64EncodeURL(ecpoint.slice(1, 33));
-            var externalECPublicKeyY = base64EncodeURL(ecpoint.slice(33, 65));
-
-            var exportECPublicKeyArray;
-            var encryptedOldPINHash;
-            var encryptedNEWPIN;
-
-
-            var importedECPublicKey = await window.crypto.subtle.importKey(
-                "jwk", //can be "jwk" (public or private), "raw" (public only), "spki" (public only), or "pkcs8" (private only)
-                { //this is an example jwk key, other key types are Uint8Array objects
-                    kty: "EC",
-                    crv: "P-256",
-                    x: externalECPublicKeyX,
-                    y: externalECPublicKeyY,
-                    ext: true,
-                }, { //these are the algorithm options
-                    name: "ECDH",
-                    namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
-                },
-                true, //whether the key is extractable (i.e. can be used in exportKey)
-                [] //"deriveKey" and/or "deriveBits" for private keys only (just put an empty list if importing a public key)
-            );
-
-            var CryptoECKeyPair = await window.crypto.subtle.generateKey({
-                    name: "ECDH",
-                    namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
-                },
-                true, //whether the key is extractable (i.e. can be used in exportKey)
-                ["deriveKey", "deriveBits"] //can be any combination of "deriveKey" and "deriveBits"
-            );
-
-            exportECPublicKeyArray = await window.crypto.subtle.exportKey("raw", CryptoECKeyPair.publicKey);
-
-            //Computing session Key
-            var CryptoSessionKey = await window.crypto.subtle.deriveBits({
-                    name: "ECDH",
-                    namedCurve: "P-256", //can be "P-256", "P-384", or "P-521"
-                    public: importedECPublicKey, //an ECDH public key from generateKey or importKey
-
-                },
-                CryptoECKeyPair.privateKey, //from generateKey or importKey above
-                256 //the number of bits you want to derive
-            ).then(function (keybits) { //convert share secret to pinEncKey
-                return crypto.subtle.digest(
-                    "SHA-256",
-                    new Uint8Array(keybits)
-                );
-            }).then(function (sessionKeyBytes) {
-                //console.log("sessionKeyBytes", bufToHex(sessionKeyBytes));
-                return crypto.subtle.importKey("raw",
-                    sessionKeyBytes,
-                    "aes-cbc", false, ["encrypt"]);
-            });
-
-
-            encryptedOldPINHash = await crypto.subtle.encrypt({
-                name: "aes-cbc",
-                iv
-            }, CryptoSessionKey, new Uint8Array(oldPINHash));
-
-
-            encryptedNEWPIN = await crypto.subtle.encrypt({
-                name: "aes-cbc",
-                iv
-            }, CryptoSessionKey, new Uint8Array(newPINBuffer));
-
-            var bExportECPublicKeyArray = new Uint8Array(exportECPublicKeyArray);
-            var bEcryptedOldPINHash = new Uint8Array(encryptedOldPINHash.slice(0, 16));
-            var bEncryptedNEWPIN = new Uint8Array(encryptedNEWPIN).slice(0, 64);
-            return {
-                bExportECPublicKeyArray,
-                bEcryptedOldPINHash,
-                bEncryptedNEWPIN
-            };
         }
     </script>
 

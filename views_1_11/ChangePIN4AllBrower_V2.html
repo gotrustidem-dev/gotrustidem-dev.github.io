@@ -81,8 +81,21 @@
                                         </p>
                                         <form style="text-align: center;" id="form_changepin_btn" onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
-                                                style="width: 200px; height:34px;background-color: #008CBA;">Change PIN</button>
+                                                style="width: 200px; height:34px;background-color: #008CBA;">開始變更密碼</button>
                                         </form>
+
+                                        <dialog id="changePINDialog">
+                                            <form method="dialog">
+                                                <h1>新密碼檢查完成</h1>
+                                                
+                                                
+                                                <label id="label_serial_number"></label><br>
+                                                <label id="label_credentials"></label><br>
+                                                
+                                                <button type="submit" id="changePinButton" >變更密碼</button>
+                                                <button type="submit" >取消</button>
+                                            </form>
+                                        </dialog>
                                     </td>
                                 </tr>
                             </tbody>
@@ -93,7 +106,8 @@
         </table>
     </div>
     <script>
-        
+         var params = undefined;
+         var bToken_sn = undefined;
         document.getElementById('form_changepin_btn').addEventListener('click', function (event) {
             
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
@@ -106,7 +120,7 @@
             console.log(newpin);
             console.log(confirm_newpin);
 
-            var bToken_sn = undefined;
+       
             if(token_sn.length!=0){
                 bToken_sn = hexStringToArrayBuffer(token_sn);  
             }
@@ -115,7 +129,17 @@
 
             var bNewPINBuffer = new Uint8Array(newpin.length);
             bNewPINBuffer.set(toUTF8Array(newpin), 0);
-            GTIDEM_ChangeUserPINwithInterval(bOldPINArray, bNewPINBuffer, bToken_sn,showReseult);
+            GTIDEM_GenPINParams(bToken_sn, bOldPINArray, bNewPINBuffer).then((response) => {
+
+                console.log('SUCCESS', response);
+
+                if(response.statusCode==CTAP1_ERR_SUCCESS){   
+                    params = response; 
+                    changePINDialog.showModal();
+                }else{
+                    alert(showFIDOErrorMessage(response));
+                }
+            });
 
         })
 
@@ -134,6 +158,15 @@
                     alert(showFIDOErrorMessage(result));
                 }
         }
+
+
+        changePinButton.addEventListener("click", () => {
+                console.log('changePinButton click')    
+                GTIDEM_ChangeUserPIN_V1(bToken_sn, params.hostEcpoint, params.encOldPINHashed,params.encNewPIN).then((result) => {
+                    return showReseult(result);
+                });
+         });
+
     </script>
 
 </body>
