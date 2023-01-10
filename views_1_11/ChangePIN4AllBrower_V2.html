@@ -12,6 +12,11 @@
     <!-- Spectre.css icons are used -->
     <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
 
+    <link rel="stylesheet" href="//apps.bdimg.com/libs/jqueryui/1.10.4/css/jquery-ui.min.css">
+    <script src="//apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="//apps.bdimg.com/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="jqueryui/style.css">
+
     <script src="../utils/cbor.js"></script>
     <script src="../utils/helpers.js"></script>
     <script src="../utils/showMessage.js"></script>
@@ -80,22 +85,15 @@
                                             </form>
                                         </p>
                                         <form style="text-align: center;" id="form_changepin_btn" onsubmit="return false">
-                                            <button class="btn btn-primary" action="submit"
+                                            <button class="btn btn-primary" action="submit" id="opener"
                                                 style="width: 200px; height:34px;background-color: #008CBA;">開始變更密碼</button>
                                         </form>
 
-                                        <dialog id="changePINDialog">
+                                        <div id="changePINDialog" title="新密碼檢查完成">
                                             <form method="dialog">
-                                                <h1>新密碼檢查完成</h1>
-                                                
-                                                
-                                                <label id="label_serial_number"></label><br>
-                                                <label id="label_credentials"></label><br>
-                                                
-                                                <button type="submit" id="changePinButton" >變更密碼</button>
-                                                <button type="submit" >取消</button>
+                                                <h1></h1>
                                             </form>
-                                        </dialog>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -135,7 +133,6 @@
 
                 if(response.statusCode==CTAP1_ERR_SUCCESS){   
                     params = response; 
-                    changePINDialog.showModal();
                 }else{
                     alert(showFIDOErrorMessage(response));
                 }
@@ -160,15 +157,50 @@
         }
 
 
-        changePinButton.addEventListener("click", () => {
-                console.log('changePinButton click')    
-                GTIDEM_ChangeUserPIN_V1(bToken_sn, params.hostEcpoint, params.encOldPINHashed,params.encNewPIN).then((result) => {
-                    return showReseult(result);
+        // changePinButton.addEventListener("click", () => {
+        //         console.log('changePinButton click')    
+        //         GTIDEM_ChangeUserPIN_V1(bToken_sn, params.hostEcpoint, params.encOldPINHashed,params.encNewPIN).then((result) => {
+        //             return showReseult(result);
+        //         });
+        //  });
+
+         $(function() {
+                $( "#changePINDialog" ).dialog({
+                    autoOpen: false,
+                    show: {
+                        effect: "blind",
+                        duration: 1000
+                    },
+                    hide: {
+                        effect: "explode",
+                        duration: 1000
+                    },
+                    buttons:{
+                        "變更密碼":function(){
+                            $( this ).dialog( "close" );
+                            GTIDEM_ChangeUserPIN_V1(bToken_sn, params.hostEcpoint, params.encOldPINHashed,params.encNewPIN).then((result) => {
+                            
+                             return showReseult(result);
+                         });
+                        }, Cancel: function() {
+                            $( this ).dialog( "close" );
+                            }
+
+                    }
+                    
                 });
-         });
+            
+                $( "#opener" ).click(function() {
+                    $( "#changePINDialog" ).dialog( "open" );
+                });
+        });
+
 
     </script>
 
 </body>
+
+
+
 
 </html>
