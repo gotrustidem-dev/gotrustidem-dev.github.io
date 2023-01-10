@@ -152,10 +152,12 @@ var get_browser = () => {
         //console.log("M:", M);
         M.splice(1,1,tem[1]);
       }
+
+
     return {
         name: M[0],
-        major: tem[1],
-        minor: tem[2],
-        patch:tem[3]
+        major: (tem==null?undefined:tem[1]),
+        minor:(tem==null?undefined:tem[2]),
+        patch:(tem==null?undefined:tem[3])
     };
 }
