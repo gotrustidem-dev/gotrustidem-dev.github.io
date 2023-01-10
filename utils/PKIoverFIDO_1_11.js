@@ -1636,125 +1636,129 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
 async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, bPlain) {
 
 
-    var bKeyID = keyID;
-    var bKeyHandle = keyHandle;
-    var bHexCert = HexCert;
-    //var bHexCert = Uint8Array.from(window.atob(Base64Cert), c => c.charCodeAt(0));
-    //var bPlainText = toUTF8Array(plaintext);
+    var browser = get_browser(); // browser.name = 'Chrome'
+     if((browser.name=="Safari")&&(parseInt(browser.major)>=15)){ //only for sarari 15+
+        return await GTIDEM_ImportCertificate2(bToken_sn, bKeyHandle, bKeyID, bHexCert, bPlain);
+    } else {
 
-    var challenge = new Uint8Array(32);
-    window.crypto.getRandomValues(challenge);
+        var bKeyID = keyID;
+        var bKeyHandle = keyHandle;
+        var bHexCert = HexCert;
+       
+    
+        var challenge = new Uint8Array(32);
+        window.crypto.getRandomValues(challenge);
+        var sn_buf;
+        if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
 
-    var sn_buf;
-    if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
+            sn_buf = new Uint8Array(0);
+        }else{
+            sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
+            sn_buf[0] = 0xDF;
+            sn_buf[1] = 0x20;
+            sn_buf[2] = bSerialNumber.byteLength >> 8;
+            sn_buf[3] = bSerialNumber.byteLength;
+            sn_buf.set(bSerialNumber, 4);
+        }
 
-        sn_buf = new Uint8Array(0);
-    }else{
-        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
-        sn_buf[0] = 0xDF;
-        sn_buf[1] = 0x20;
-        sn_buf[2] = bSerialNumber.byteLength >> 8;
-        sn_buf[3] = bSerialNumber.byteLength;
-        sn_buf.set(bSerialNumber, 4);
-    }
+        var keyid_buf;
 
-    var keyid_buf;
+        if((bKeyID==undefined)||(bKeyID.byteLength==0)){
 
-    if((bKeyID==undefined)||(bKeyID.byteLength==0)){
+            keyid_buf = new Uint8Array(4 + bKeyHandle.byteLength);
+            keyid_buf[0] = 0xDF;
+            keyid_buf[1] = 0x20;
+            keyid_buf[2] = bKeyHandle.byteLength >> 8;
+            keyid_buf[3] = bKeyHandle.byteLength;
+            keyid_buf.set(bKeyHandle, 4);
+        }else{
+            keyid_buf = new Uint8Array(4 + bKeyID.length);
+            keyid_buf[0] = 0xDF;
+            keyid_buf[1] = 0x18;
+            keyid_buf[2] = bKeyID.byteLength >> 8;
+            keyid_buf[3] = bKeyID.byteLength;
+            keyid_buf.set(bKeyID, 4);
+        }
 
-        keyid_buf = new Uint8Array(4 + bKeyHandle.byteLength);
-        keyid_buf[0] = 0xDF;
-        keyid_buf[1] = 0x20;
-        keyid_buf[2] = bKeyHandle.byteLength >> 8;
-        keyid_buf[3] = bKeyHandle.byteLength;
-        keyid_buf.set(bKeyHandle, 4);
-    }else{
-        keyid_buf = new Uint8Array(4 + bKeyID.length);
-        keyid_buf[0] = 0xDF;
-        keyid_buf[1] = 0x18;
-        keyid_buf[2] = bKeyID.byteLength >> 8;
-        keyid_buf[3] = bKeyID.byteLength;
-        keyid_buf.set(bKeyID, 4);
-    }
+        
+        var keyhandle_buf = new Uint8Array(4 + bKeyHandle.length);
+        keyhandle_buf[0] = 0xDF;
+        keyhandle_buf[1] = 0x19;
+        keyhandle_buf[2] = bKeyHandle.byteLength >> 8;
+        keyhandle_buf[3] = bKeyHandle.byteLength;
+        keyhandle_buf.set(bKeyHandle, 4);
+        
+
+        var hexCert_buf = new Uint8Array(4 + bHexCert.length);
+        hexCert_buf[0] = 0xDF;
+        hexCert_buf[1] = 0x17;
+        hexCert_buf[2] = bHexCert.byteLength >> 8;
+        hexCert_buf[3] = bHexCert.byteLength;
+        hexCert_buf.set(bHexCert, 4);
+
+        var signDataBuf;
+        if((bPlain==undefined)||(bPlain.byteLength==0)){
+            var signDataBuf =  new Uint8Array(0);
+        }else{
+            var signDataBuf = new Uint8Array(4 + bPlain.byteLength);
+            signDataBuf[0] = 0xDF;
+            signDataBuf[1] = 0x06;
+            signDataBuf[2] = bPlain.length >> 8;
+            signDataBuf[3] = bPlain.length;
+            signDataBuf.set(bPlain, 4);
+        }
+
+    var payloadLen = keyid_buf.byteLength+sn_buf.byteLength+hexCert_buf.length+signDataBuf.byteLength+keyhandle_buf.byteLength;
+
+    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+    
+    var pki_header = new Uint8Array(3);
+    pki_header[0] = CMD_ImportCertificate;
+    pki_header[1] = payloadLen>>8
+    pki_header[2] = payloadLen;
+
+    var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
+    pki_buffer = _appendBuffer(pki_buffer,sn_buf);
+    pki_buffer = _appendBuffer(pki_buffer,keyid_buf);
+    pki_buffer = _appendBuffer(pki_buffer,keyhandle_buf);
+    pki_buffer = _appendBuffer(pki_buffer,hexCert_buf);
+    pki_buffer = _appendBuffer(pki_buffer,signDataBuf);
 
     
-    var keyhandle_buf = new Uint8Array(4 + bKeyHandle.length);
-    keyhandle_buf[0] = 0xDF;
-    keyhandle_buf[1] = 0x19;
-    keyhandle_buf[2] = bKeyHandle.byteLength >> 8;
-    keyhandle_buf[3] = bKeyHandle.byteLength;
-    keyhandle_buf.set(bKeyHandle, 4);
-    
 
-    var hexCert_buf = new Uint8Array(4 + bHexCert.length);
-    hexCert_buf[0] = 0xDF;
-    hexCert_buf[1] = 0x17;
-    hexCert_buf[2] = bHexCert.byteLength >> 8;
-    hexCert_buf[3] = bHexCert.byteLength;
-    hexCert_buf.set(bHexCert, 4);
+    //console.log("Import request_command: " + bufToHex(pki_buffer));
 
-    var signDataBuf;
-    if((bPlain==undefined)||(bPlain.byteLength==0)){
-        var signDataBuf =  new Uint8Array(0);
-    }else{
-        var signDataBuf = new Uint8Array(4 + bPlain.byteLength);
-        signDataBuf[0] = 0xDF;
-        signDataBuf[1] = 0x06;
-        signDataBuf[2] = bPlain.length >> 8;
-        signDataBuf[3] = bPlain.length;
-        signDataBuf.set(bPlain, 4);
+    var getAssertionChallenge = {
+        'challenge': challenge,
+        "userVerification": "required",
+        timeout: VERIFY_DEFAULT_TIMEOUT, 
+        }
+        var idList = [{
+            id: pki_buffer,
+            type: "public-key",
+            transports:AUTHENTICATOR_TRANSPORTS
+        }];
+
+        getAssertionChallenge.allowCredentials = idList;
+        //console.log('List getAssertionChallenge', getAssertionChallenge)
+
+        return await navigator.credentials.get({
+            'publicKey': getAssertionChallenge
+        }).then((fido) => {
+            
+            let gtidem = new GTIdemJs();
+            gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_ImportCertificate);
+            // if(gtidem.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
+            //     gtidem.sn =token_sn;
+            // }
+            return gtidem;
+        }).catch((error) => {
+            ////console.log(error.name);
+            let gtidem = new GTIdemJs();
+            gtidem.ConvertWebError(error.name);
+            return gtidem;
+        });
     }
-
-   var payloadLen = keyid_buf.byteLength+sn_buf.byteLength+hexCert_buf.length+signDataBuf.byteLength+keyhandle_buf.byteLength;
-
-   var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
- 
-   var pki_header = new Uint8Array(3);
-   pki_header[0] = CMD_ImportCertificate;
-   pki_header[1] = payloadLen>>8
-   pki_header[2] = payloadLen;
-
-   var pki_buffer = _appendBuffer(gtheaderbuffer,pki_header);
-   pki_buffer = _appendBuffer(pki_buffer,sn_buf);
-   pki_buffer = _appendBuffer(pki_buffer,keyid_buf);
-   pki_buffer = _appendBuffer(pki_buffer,keyhandle_buf);
-   pki_buffer = _appendBuffer(pki_buffer,hexCert_buf);
-   pki_buffer = _appendBuffer(pki_buffer,signDataBuf);
-
-   
-
-   //console.log("Import request_command: " + bufToHex(pki_buffer));
-
-   var getAssertionChallenge = {
-    'challenge': challenge,
-    "userVerification": "required",
-    timeout: VERIFY_DEFAULT_TIMEOUT, 
-    }
-    var idList = [{
-        id: pki_buffer,
-        type: "public-key",
-        transports:AUTHENTICATOR_TRANSPORTS
-    }];
-
-    getAssertionChallenge.allowCredentials = idList;
-    //console.log('List getAssertionChallenge', getAssertionChallenge)
-
-    return await navigator.credentials.get({
-        'publicKey': getAssertionChallenge
-    }).then((fido) => {
-           
-        let gtidem = new GTIdemJs();
-        gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_ImportCertificate);
-        // if(gtidem.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
-        //     gtidem.sn =token_sn;
-        // }
-        return gtidem;
-    }).catch((error) => {
-        ////console.log(error.name);
-        let gtidem = new GTIdemJs();
-        gtidem.ConvertWebError(error.name);
-        return gtidem;
-    });
 
 }
 
