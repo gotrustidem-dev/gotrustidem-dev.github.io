@@ -1638,7 +1638,7 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
 
     var browser = get_browser(); // browser.name = 'Chrome'
      if((browser.name=="Safari")&&(parseInt(browser.major)>=15)){ //only for sarari 15+
-        return await GTIDEM_ImportCertificate2(bToken_sn, bKeyHandle, bKeyID, bHexCert, bPlain);
+        return await GTIDEM_ImportCertificate2(bSerialNumber, keyHandle, keyID, HexCert, bPlain);
     } else {
 
         var bKeyID = keyID;
