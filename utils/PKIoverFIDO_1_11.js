@@ -823,37 +823,52 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
     var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber);
 
     if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
-        return callback(gtidem);
+        if(callback!=undefined)
+            callback(gtidem);
+        return gtidem;
     }
 
     if(gtidem.pinRetry == 0){
         gtidem.statusCode = CTAP2_ERR_PIN_BLOCKED;
-        return callback(gtidem);
+        if(callback!=undefined)
+            callback(gtidem);
+        return gtidem;
     }
     var bECPointFromToken = gtidem.ecpoint;
     var flags = gtidem.flags;
     if((JSON.stringify(bOldPIN)==JSON.stringify(bNewPIN))){
         gtidem.statusCode = SETTING_ERR_USERPIN_SAME;
-        return callback(gtidem);
+        if(callback!=undefined)
+            callback(gtidem);
+        return gtidem;
     }
     if(flags!=undefined){
 
         var statusCode = checkPINFormatLevel_V2(bNewPIN, flags[1])
         if(statusCode!=CTAP1_ERR_SUCCESS){
             gtidem.statusCode = statusCode;
-            return callback(gtidem);
+            if(callback!=undefined)
+            callback(gtidem);
+        return gtidem;
         }
         if (bNewPIN.length < flags[2]){
             gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_SHORT
-            return callback(gtidem);
+            if(callback!=undefined)
+            callback(gtidem);
+        return gtidem;
         }
         if(bNewPIN.length > flags[3]){
             gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_LONG
-            return callback(gtidem);
+            if(callback!=undefined)
+            callback(gtidem);
+        return gtidem;
         }
     }else{
         gtidem.statusCode = WEB_ERR_OperationAbort;
-        return callback(gtidem);
+       
+        if(callback!=undefined)
+            callback(gtidem);
+        return gtidem;
     }
 
     let timer_id = setInterval( () => {
@@ -891,32 +906,44 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
         var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber);
 
         if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
+            if(callback!=undefined)
+                    callback(gtidem);
             return gtidem;
         }
 
         if(gtidem.pinRetry == 0){
             gtidem.statusCode = CTAP2_ERR_PIN_BLOCKED;
+            if(callback!=undefined)
+                    callback(gtidem);
             return gtidem;
         }
         var bECPointFromToken = gtidem.ecpoint;
         var flags = gtidem.flags;
         if((JSON.stringify(bOldPIN)==JSON.stringify(bNewPIN))){
             gtidem.statusCode = SETTING_ERR_USERPIN_SAME;
-            return gtidem;
+            if(callback!=undefined)
+                    callback(gtidem);
+                return gtidem;
         }
         if(flags!=undefined){
 
             var statusCode = checkPINFormatLevel_V2(bNewPIN, flags[1])
             if(statusCode!=CTAP1_ERR_SUCCESS){
                 gtidem.statusCode = statusCode;
+                if(callback!=undefined)
+                    callback(gtidem);
                 return gtidem;
             }
             if (bNewPIN.length < flags[2]){
                 gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_SHORT
+                if(callback!=undefined)
+                    callback(gtidem);
                 return gtidem;
             }
             if(bNewPIN.length > flags[3]){
                 gtidem.statusCode = SETTING_ERR_USERPIN_LEN_TOO_LONG
+                if(callback!=undefined)
+                    callback(gtidem);
                 return gtidem;
             }
         }else{
