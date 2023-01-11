@@ -862,7 +862,10 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
         }
         clearTimeout(timer_id);        
         GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN).then((result) => {
-            return callback(result);
+            
+            if(callback!=undefined)
+                callback(result);
+            return result;
         });
    
     }, 200);
@@ -922,7 +925,9 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
         }
         var prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
         return await GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN).then((response) => {
-                callback(response);
+                if(callback!=undefined)
+                    callback(response);
+                return response;
             });
     }
     
