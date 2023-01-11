@@ -883,7 +883,7 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
     var browser=get_browser(); // browser.name = 'Chrome'
     if((browser.name=="Safari")&&(parseInt(browser.major)>=15)){
 
-        return await GTIDEM_ChangeUserPINwithInterval(bOldPINArray, bNewPINBuffer, bToken_sn,showReseult);
+        return await GTIDEM_ChangeUserPINwithInterval(bOldPIN, bNewPIN, bSerialNumber,callback);
     }else{
         var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber);
 
