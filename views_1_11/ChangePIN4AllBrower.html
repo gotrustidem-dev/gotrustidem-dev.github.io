@@ -95,22 +95,22 @@
                                             <button class="btn btn-primary" action="submit"
                                                 style="width: 200px; height:34px;background-color: #008CBA;">Computing
                                                 PIN Params</button>
-                                            <br><label></label>Enc OlD PIN Hash: <br>
+                                            <!-- <br><label></label>Enc OlD PIN Hash: <br>
                                             <br><label id="label_enc_oldpinhash_param"
                                                 name="enc_oldpinhash"></label><br>
                                             <br><label></label>Enc New PIN Param <br>
                                             <br><label id="label_enc_newpin_number"></label><br>
                                             <br><label></label>ECDH param: <br>
-                                            <br><label id="label_ecdh_param" name="ecpoint"></label><br>
+                                            <br><label id="label_ecdh_param" name="ecpoint"></label><br> -->
 
                                         </form>
 
-                                        <form style="text-align: center;" id="form_changepin_btn"
+                                        <!-- <form style="text-align: center;" id="form_changepin_btn"
                                             onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
                                                 style="width: 200px; height:34px;background-color: #008CBA;">Change
                                                 PIN</button>
-                                        </form>
+                                        </form> -->
                                     </td>
                                 </tr>
                             </tbody>
@@ -165,51 +165,6 @@
 
 
         });
-
-
-        // document.getElementById('form_changepin_btn').addEventListener('submit', function (event) {
-
-        //     let encOldPINHash = document.getElementById('label_enc_oldpinhash_param').textContent;
-        //     let encNewPIN = document.getElementById('label_enc_newpin_number').textContent;
-        //     let ecdh_param = document.getElementById('label_ecdh_param').textContent;
-        //     let token_sn = document.getElementById('form_token_sn').token_sn.value;
-
-
-        //     var bToken_sn = undefined;
-        //     if (token_sn.length != 0) {
-        //         bToken_sn = hexStringToArrayBuffer(token_sn);
-        //     }
-
-        //     var bEncOldPINHash = hexStringToArrayBuffer(encOldPINHash);
-        //     var bEncNewPIN = hexStringToArrayBuffer(encNewPIN);
-        //     var bEcdh_param = hexStringToArrayBuffer(ecdh_param);
-
-        //     GTIDEM_ChangeUserPIN_V1(bToken_sn, bEcdh_param, bEncOldPINHash,
-        //         bEncNewPIN).then((response) => {
-
-        //         if (response.statusCode == CTAP1_ERR_SUCCESS) {
-        //             var str = '密碼變更完成';
-        //             if (response.pinRetry != undefined) {
-        //                 str += '\n剩餘次數為 ' + response.pinRetry;
-        //             }
-        //             if (response.sn != undefined) {
-        //                 str += '\n 載具序號為 ' + response.sn;
-
-        //             }
-        //             alert(str);
-
-
-        //         } else {
-        //             alert(showFIDOErrorMessage(response));
-        //         }
-
-        //     }).catch((error) => {
-        //         alert(error)
-        //         console.log('FAIL', error)
-        //     })
-
-        // })
-
         function showReseult(result){
                 if(result.statusCode==CTAP1_ERR_SUCCESS){   
                    var str = '密碼變更完成'; 
