@@ -235,31 +235,7 @@
 
             var browser = get_browser(); // browser.name = 'Chrome'
 
-            if ((browser.name == "Safari") && (parseInt(browser.version) >= 15)) { //only for sarari 15+
-
-                GTIDEM_ImportCertificate2(bToken_sn, bKeyHandle, bKeyID, bHexCert, undefined).then((
-                        response) => {
-                        if (response.statusCode == CTAP1_ERR_SUCCESS) {
-                            var msg = "匯入憑證完成\n";
-                            if (response.sn != undefined) {
-                                msg += "載具序號" + ConverSNFormat(response.sn) + "\n";
-                            }
-                            if (response.signature != undefined) {
-                                msg += "\n Signature:\n" + btoa(String.fromCharCode.apply(null,
-                                    new Uint8Array(response.signature)));
-
-                            }
-                            alert(msg);
-
-                        } else {
-                            alert(showFIDOErrorMessage(response));
-                        }
-
-                    }).catch((error) => {
-                        alert(error)
-                        console.log('FAIL', error)
-                    });
-            } else {
+            
 
                 GTIDEM_ImportCertificate(bToken_sn, bKeyHandle, bKeyID, bHexCert, undefined).then((
                 response) => {
@@ -283,7 +259,7 @@
                     alert(error)
                     console.log('FAIL', error)
                 });
-            }
+            
 
 
         })

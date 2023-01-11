@@ -148,8 +148,7 @@ var get_browser = () => {
         }   
     M=M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
     if((tem=ua.match(/version\/(\d+)\.(\d+)\.*(\d)*/i))!=null) {
-       // console.log("tem:", tem);
-        //console.log("M:", M);
+
         M.splice(1,1,tem[1]);
       }
 
