@@ -871,13 +871,13 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
         return gtidem;
     }
 
-    let timer_id = setInterval( () => {
+    let timer_id = setInterval(  async  function () {
         console.log("setInterval:",new Date().getTime());
         if(prepareUpdate==undefined){
             return;
         }
         clearTimeout(timer_id);        
-        GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN).then((result) => {
+        await GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN).then((result) => {
             
             if(callback!=undefined)
                 callback(result);
