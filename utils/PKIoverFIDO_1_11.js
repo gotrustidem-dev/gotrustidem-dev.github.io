@@ -1053,6 +1053,7 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
         gtidem.parsePKIoverFIDOResponse(fido.response.signature,CMD_CHANGE_PIN);
         return gtidem;
     }).catch((error) => {
+        console.log(error.stack);
         ////console.log(error.name);
         let gtidem = new GTIdemJs();
         gtidem.ConvertWebError(error.name);
