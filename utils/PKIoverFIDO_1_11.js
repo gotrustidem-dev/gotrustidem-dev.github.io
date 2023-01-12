@@ -884,7 +884,7 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
             return result;
         });
    
-    }, 250);
+    }, 100);
     //Generate 
     prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
     console.log("computingSessionKey OK:",new Date().getTime());
