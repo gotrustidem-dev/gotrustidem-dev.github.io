@@ -1041,7 +1041,7 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
 
    getAssertionChallenge.allowCredentials = idList;
    //console.log('List getAssertionChallenge', getAssertionChallenge)
-
+   console.log("GTIDEM_ChangeUserPIN_V1:",new Date().getTime());
    return await navigator.credentials.get({
        'publicKey': getAssertionChallenge
    }).then((fido) => {
