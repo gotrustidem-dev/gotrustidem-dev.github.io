@@ -888,11 +888,12 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
     //Generate 
     console.log("computingSessionKey:",new Date().getTime());
     prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken).then((result) => {
-        GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN).then((result) => {
-            
-            if(callback!=undefined)
+        GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash, prepareUpdate.bEncryptedNEWPIN).then((result) => {
+
+            if (callback != undefined)
                 callback(result);
             return result;
+        });
     });
     console.log("computingSessionKey OK:",new Date().getTime());
 }
