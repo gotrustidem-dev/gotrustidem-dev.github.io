@@ -872,7 +872,7 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
     }
 
     let timer_id = setInterval( () => {
-        console.log("setInterval");
+        console.log("setInterval:",new Date().getTime());
         if(prepareUpdate==undefined){
             return;
         }
