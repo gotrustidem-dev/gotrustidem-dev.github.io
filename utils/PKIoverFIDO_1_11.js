@@ -871,25 +871,6 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
         return gtidem;
     }
 
-    // let timer_id = setInterval( () => {
-    //     if(prepareUpdate==undefined){
-    //         return;
-    //     }
-    //     clearTimeout(timer_id);        
-    //     GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN).then((result) => {
-            
-    //         if(callback!=undefined)
-    //             callback(result);
-    //         return result;
-    //     });
-   
-    // }, 200);
-    // //Generate 
-    // prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
-
-
-    //Generate 
-    prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
     let timer_id = setInterval( () => {
         if(prepareUpdate==undefined){
             return;
@@ -902,7 +883,9 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
             return result;
         });
    
-    }, 500);
+    }, 200);
+    //Generate 
+    prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
 }
 
 /**
