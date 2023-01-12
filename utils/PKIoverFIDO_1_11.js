@@ -871,23 +871,25 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
         return gtidem;
     }
 
-    let timer_id = setInterval(  async  function () {
-        console.log("setInterval:",new Date().getTime());
-        if(prepareUpdate==undefined){
-            return;
-        }
-        clearTimeout(timer_id);        
-        await GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN).then((result) => {
+    // let timer_id = setInterval(  async  function () {
+    //     console.log("setInterval:",new Date().getTime());
+    //     if(prepareUpdate==undefined){
+    //         return;
+    //     }
+    //     clearTimeout(timer_id);        
+    //     await GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN).then((result) => {
             
-            if(callback!=undefined)
-                callback(result);
-            return result;
-        });
+    //         if(callback!=undefined)
+    //             callback(result);
+    //         return result;
+    //     });
    
-    }, 20);
+    // }, 20);
     //Generate 
     prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
     console.log("computingSessionKey OK:",new Date().getTime());
+    await GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN).then((result) => {
+        
 }
 
 /**
