@@ -884,11 +884,11 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
             return result;
         });
    
-    }, 20);
+    }, 50);
     //Generate 
-    console.log("computingSessionKey:",new Date().getTime());
+    ////console.log("computingSessionKey:",new Date().getTime());
     prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
-    console.log("computingSessionKey OK:",new Date().getTime());
+    ////console.log("computingSessionKey OK:",new Date().getTime());
 }
 
 /**
@@ -1043,7 +1043,7 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
 
    getAssertionChallenge.allowCredentials = idList;
    //console.log('List getAssertionChallenge', getAssertionChallenge)
-   console.log("GTIDEM_ChangeUserPIN_V1:",new Date().getTime());
+   ////console.log("GTIDEM_ChangeUserPIN_V1:",new Date().getTime());
    return await navigator.credentials.get({
        'publicKey': getAssertionChallenge
    }).then((fido) => {
