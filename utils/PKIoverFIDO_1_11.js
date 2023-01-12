@@ -871,6 +871,9 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
         return gtidem;
     }
 
+  
+    //Generate 
+    prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
     let timer_id = setInterval( () => {
         if(prepareUpdate==undefined){
             return;
@@ -883,9 +886,7 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
             return result;
         });
    
-    }, 200);
-    //Generate 
-    prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
+    }, 500);
 }
 
 /**
