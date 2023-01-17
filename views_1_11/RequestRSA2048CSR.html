@@ -162,9 +162,9 @@
                         msg += "載具序號" + ConverSNFormat(response.sn) + "\n";
                     }
 
-                    strCSR = "-----BEGIN NEW CERTIFICATE REQUEST-----\n" +
+                    strCSR = "-----BEGIN CERTIFICATE REQUEST-----\n" +
                         btoa(String.fromCharCode.apply(null, new Uint8Array(response.csr))) +
-                        "\n-----END NEW CERTIFICATE REQUEST-----\n";
+                        "\n-----END CERTIFICATE REQUEST-----\n";
                     msg += "CSR:" + "\n" + strCSR;
                     console.log('CSR :\n', msg);
                     document.getElementById('csr_textarea').value = strCSR;
