@@ -133,6 +133,7 @@
 
                 if(response.statusCode==CTAP1_ERR_SUCCESS){   
                     params = response; 
+                    $( "#changePINDialog" ).dialog( "open" );
                 }else{
                     alert(showFIDOErrorMessage(response));
                 }
@@ -190,9 +191,9 @@
                     
                 });
             
-                $( "#opener" ).click(function() {
-                    $( "#changePINDialog" ).dialog( "open" );
-                });
+                //`$( "#opener" ).click(function() {
+                //   $( "#changePINDialog" ).dialog( "open" );
+                //});
         });
 
 
