@@ -71,6 +71,7 @@
 
                                         <form style="text-align: center;" id="form_common_name" onsubmit="return false">
                                             <p>
+                                                <label > 指定的Common Name,若不指定將會使用預設值</label><br>
                                                 <label id="label_common_name"> CSR' CN:</label><br>
                                                 <input type="text" name="common_name" style="width: 342px; height:41px"
                                                     value="0123456789-AA-C12345abcdf">
@@ -79,7 +80,7 @@
                                         <form style="text-align: center;" id="form_requestcsr_btn"
                                             onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
-                                                style="width: 200px; height:34px;background-color: #008CBA;">Request
+                                                style="width: 200px; height:34px;background-color: #008CBA;">產生
                                                 CSR</button>
                                         </form>
 
@@ -101,6 +102,7 @@
                                         </p>
 
                                         <p>
+                                            <label>此方式將匯入測試憑證，無法在手機上產生簽名</label> 
                                             <form style="text-align: center;" id="form_importcert_btn"
                                                 onsubmit="return false">
                                                 <button class="btn btn-primary" action="submit"
@@ -110,12 +112,14 @@
                                         
                                         </p>
                                         <p>
-                                            <!-- <label>向 https://pkioverfido2-0910.herokuapp.com 傳送CSR，將回傳的憑證匯入金鑰。</label> -->
+                                            <label>測試手機簽名必須使用正確的憑證，使用下方按鈕申請</label> 
                                             <label>CSR</label>
                                             <form action="https://idemkeyplus-demo.go-trust.com:8585/signcsr/csr2hex"
                                                 style="text-align: center;" \ id="form_requet_cert_btn" method="post"
                                                 target="_blank" onsubmit="return requestRealCert()">
                                                 <textarea id="csr_textarea" name="csr" rows="4" cols="50"></textarea>
+
+                                            <label>向 https://idemkeyplus-demo.go-trust.com 傳送CSR，將回傳的憑證匯入金鑰。</label><br>
                                                  <button class="btn btn-primary" action="submit"
                                                     style="width: 200px; height:34px;background-color: #008CBA;">Sign
                                                     CSR(RSA only)</button> 
