@@ -3,12 +3,32 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>IdemKeyPlus function</title>
+<script src="../utils/helpers.js"></script>
 </head>
 <body>
+    <script>
+        var isSupportBrower = true;
+        window.onload = function () {
+           var browser = get_browser();
+           if((browser.name=="Safari")&&
+               (
+                       ((parseInt(browser.major)==14)&&(parseInt(browser.minor)==0))||
+                       ((parseInt(browser.major)==15)&&(parseInt(browser.minor)==0))||
+                       ((parseInt(browser.major)==15)&&(parseInt(browser.minor)==1))||
+                       ((parseInt(browser.major)==15)&&(parseInt(browser.minor)==2))||
+                       ((parseInt(browser.major)==15)&&(parseInt(browser.minor)==3))
+                       ))
+           {
+                isSupportBrower =false
+                var aaa = document.getElementById("changepin").textContent;
+                document.getElementById("changepin").textContent= aaa+'(此瀏覽器版本無法使用此選項變更密碼,請嘗試下方做法)';
+           }
+       }
+    </script>
     <p><a href="https://gotrustidem-dev.github.io/views_1_11/ReadCertWithoutPIN.html">Read Cert without PIN</a></p>
     <p><a href="https://gotrustidem-dev.github.io/views_1_11/SignData.html">Sign Data</a></p>
     <p><a href="https://gotrustidem-dev.github.io/views_1_11/GetTokenInfo.html">Get Token Information</a></p>
-    <p><a href="https://gotrustidem-dev.github.io/views_1_11/ChangePIN.html">Change PIN</a></p>
+    <p><a href="https://gotrustidem-dev.github.io/views_1_11/ChangePIN.html" id="changepin">Change PIN</a></p>
     <!-- <p><a href="https://gotrustidem-dev.github.io/views_1_11/ChangePIN4AllBrower.html">Change PIN</a></p>-->
     <p><a href="https://gotrustidem-dev.github.io/views_1_11/ChangePIN4AllBrower_V2.html">Change PIN using two steps</a></p> 
     <p><a href="https://gotrustidem-dev.github.io/views_1_11/DeleteCerts.html">Delete cert or clear token</a></p>
