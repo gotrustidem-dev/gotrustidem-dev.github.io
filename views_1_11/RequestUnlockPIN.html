@@ -85,6 +85,24 @@
         </table>
     </div>
     <script>
+
+    window.onload = function () {
+            var browser = get_browser();
+            if((browser.name=="Safari")&&
+                (
+                        ((parseInt(browser.major)==14)&&(parseInt(browser.minor)==1))||
+                        ((parseInt(browser.major)==15)&&(parseInt(browser.minor)==0))||
+                        ((parseInt(browser.major)==15)&&(parseInt(browser.minor)==1))||
+                        ((parseInt(browser.major)==15)&&(parseInt(browser.minor)==2))||
+                        ((parseInt(browser.major)==15)&&(parseInt(browser.minor)==3))
+                        ))
+            {
+                //show alert
+                alert("此瀏覽器版本不支援此方式更換密碼，請使用 ChangePIN using two steps");
+                return;
+            }
+        }
+
         document.getElementById('form_tokeninfo_btn').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
