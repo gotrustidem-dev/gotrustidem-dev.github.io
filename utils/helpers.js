@@ -152,7 +152,6 @@ var get_browser = () => {
         M.splice(1,1,tem[1]);
       }
 
-
     return {
         name: M[0],
         major: (tem==null?undefined:tem[1]),
