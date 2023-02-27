@@ -1481,6 +1481,7 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bCommonName) {
     "authenticatorSelection": {
         "userVerification": "required",
         "requireResidentKey": true,
+        "residentKey": "required",
         "authenticatorAttachment": "cross-platform"
 
     },
