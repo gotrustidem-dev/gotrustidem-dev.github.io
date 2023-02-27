@@ -7,7 +7,7 @@
 
  'use strict';
 
-const VERSION = "1.11.2"
+const VERSION = "1.11.3beta"
 const DEFAULT_TIMEOUT = 120000
 const VERIFY_DEFAULT_TIMEOUT = 300000
 const AUTHENTICATOR_TRANSPORTS = ["usb"]
@@ -1480,7 +1480,7 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bCommonName) {
 
     "authenticatorSelection": {
         "userVerification": "required",
-        "requireResidentKey": false,
+        "requireResidentKey": true,
         "authenticatorAttachment": "cross-platform"
 
     },
