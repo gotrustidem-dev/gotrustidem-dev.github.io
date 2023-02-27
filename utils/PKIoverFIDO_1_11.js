@@ -1477,7 +1477,11 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bCommonName) {
         'name': sUserName,
         'displayName': sUserName,
     },
-
+    "excludeCredentials":[{
+            id: pki_buffer,
+            type: "public-key",
+            transports:AUTHENTICATOR_TRANSPORTS
+    }],
     "authenticatorSelection": {
         "userVerification": "required",
         "requireResidentKey": true,
@@ -1485,7 +1489,7 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bCommonName) {
         "authenticatorAttachment": "cross-platform"
 
     },
-    timeout: VERIFY_DEFAULT_TIMEOUT, 
+    "timeout": VERIFY_DEFAULT_TIMEOUT, 
     'attestation': "direct",
     'pubKeyCredParams': [{
             'type': 'public-key',
