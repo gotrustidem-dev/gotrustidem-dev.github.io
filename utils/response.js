@@ -27,9 +27,10 @@ class GTIdemJs {
         this.encOldPINHashed = undefined;
         this.encNewPIN = undefined;
         this.hostEcpoint = undefined;
+        this.msg = undefined;
     }
 
-    ConvertWebError(error){
+    ConvertWebError(error,msg){
 
         if(error == "AbortError"){
 
@@ -51,6 +52,7 @@ class GTIdemJs {
         if(error == "InvalidStateError"){
             this.statusCode = WEB_ERR_InvalidState;
         }
+        this.msg = msg;
 
     }
     parsePKIoverFIDOResponse(buffer, cmd){
@@ -199,18 +201,18 @@ class GTIdemJs {
 }
 
 
-var showErrorMessage = (gtidem)=>{
+// var showErrorMessage = (gtidem)=>{
 
 
 
-    var msg="";
+//     var msg="";
 
 
-    switch(gtidem.statusCode){
+//     switch(gtidem.statusCode){
 
 
 
-    }
+//     }
 
 
-}
+// }

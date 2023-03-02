@@ -2549,7 +2549,7 @@ async function GTIDEM_ReadCertByIndexWithoutPIN(index, bSerialNumber) {
             }).catch((error) => {
                 ////console.log(error.name);
                 let gtidem = new GTIdemJs();
-                gtidem.ConvertWebError(error.name);
+                gtidem.ConvertWebError(error.name,error.message);
                 return gtidem;
             });
 
