@@ -261,14 +261,66 @@
 
 
         async function listAllCerts() {
-            var credNum =1;
+            var credNum = 1;
             var strCert = "";
+            var i=1;
+            var delayInMilliseconds = 1000; //1 second
+
+
+
+            // return await new Promise(resolve => {
+            //     const interval = setInterval(() => {
+            //     if (condition) {
+            //         resolve('foo');
+            //         clearInterval(interval);
+            //     };
+            //     }, 1000);
+            // });
+            // console.log("setInterval START");
+            // let timer_id = setInterval(async function () {
+
+            //     console.log("run GTIDEM_ReadCertByIndexWithoutPIN START");
+            //     const aaa = await GTIDEM_ReadCertByIndexWithoutPIN(i, undefined).then((value) => {
+            //         console.log("run GTIDEM_ReadCertByIndexWithoutPIN END");
+            //         if (value.statusCode === CTAP1_ERR_SUCCESS) {
+
+            //             if (value.credentialNum != undefined) {
+            //                 if (i == 1) {
+            //                     strCert += "憑證數量 " + value.credentialNum + "<br>";
+            //                     credNum = value.credentialNum;
+            //                 }
+            //             }
+            //             if (value.sn != undefined) {
+            //                 if (i == 1) {
+            //                     strCert += "載具序號" + ConverSNFormat(value.sn) + "<br>";
+            //                 }
+
+            //             }
+            //             strCert += "憑證 " + i + "<br>-----BEGIN CERTIFICATE-----<br>" +
+            //                 btoa(String.fromCharCode.apply(null, value.certicficate)) +
+            //                 "<br>-----END CERTIFICATE-----<br>"
+
+
+            //         } else {
+            //             alert(showFIDOErrorMessage(value));
+            //         }
+            //         return;
+            //     });
+            //     console.log("setInterval END");
+            //     if(i==credNum){
+            //         clearTimeout(timer_id);   
+            //         return;
+            //     }else{
+            //         i++;
+            //     }
+            // }, 1000);
+
             for (var i = 1; i <= credNum; i++) {
-
+                console.log("run GTIDEM_ReadCertByIndexWithoutPIN START");
                 await GTIDEM_ReadCertByIndexWithoutPIN(i, undefined).then((value) => {
-
+                    console.log("run GTIDEM_ReadCertByIndexWithoutPIN OK");
                     if (value.statusCode === CTAP1_ERR_SUCCESS) {
-                        
+
                         if (value.credentialNum != undefined) {
                             if(i==1){
                                 strCert += "憑證數量 " + value.credentialNum + "<br>";
@@ -285,12 +337,13 @@
                             btoa(String.fromCharCode.apply(null, value.certicficate)) +
                             "<br>-----END CERTIFICATE-----<br>"
 
-                      
+
                     } else {
                         alert(showFIDOErrorMessage(value));
                     }
 
                 });
+                console.log("run GTIDEM_ReadCertByIndexWithoutPIN END");
             }
             document.getElementById("certs_list").innerHTML = strCert;
         }
