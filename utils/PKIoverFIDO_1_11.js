@@ -872,7 +872,7 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
     }
 
     let timer_id = setInterval(  async  function () {
-        ////console.log("setInterval:",new Date().getTime());
+        console.log("setInterval start:",new Date().getTime());
         if(prepareUpdate==undefined){
             return;
         }
@@ -886,9 +886,9 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
    
     }, 50);
     //Generate 
-    ////console.log("computingSessionKey:",new Date().getTime());
+    console.log("computingSessionKey:",new Date().getTime());
     prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
-    ////console.log("computingSessionKey OK:",new Date().getTime());
+    console.log("computingSessionKey OK:",new Date().getTime());
 }
 
 /**
