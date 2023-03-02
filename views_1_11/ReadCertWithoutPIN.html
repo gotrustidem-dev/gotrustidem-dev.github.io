@@ -116,6 +116,7 @@
                                                                 Cert</button>
                                                         </form>
                                                     </td>
+
                                                     <td style="width: 385px;">
                                                         <p style="text-align: center;">Target Index</p>
                                                         <p>
@@ -134,6 +135,19 @@
                                                             </form>
                                                         </p>
                                                     </td>
+                                                    <td style="width: 385px;">
+                                                        <p style="text-align: center;">List All certs</p>
+
+                                                        <p>
+                                                            <form style="text-align: center;" id="list_all_certs"
+                                                                onsubmit="return false">
+                                                                <button class="btn btn-primary" action="submit"
+                                                                    style="width: 162px; height:34px;background-color: #008CBA;">Read
+                                                                    All
+                                                                    Cert</button>
+                                                            </form>
+                                                        </p>
+                                                    </td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -146,7 +160,7 @@
             </tbody>
         </table>
     </div>
-    <div id="certs_list"></div>
+    <div id="certs_list" style="word-break: break-all;"></div>
     <script>
         // signed Data1: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef  
         var signData =
@@ -169,22 +183,22 @@
 
             GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bToken_sn).then((value) => {
                 if (value.statusCode === CTAP1_ERR_SUCCESS) {
-                    var strCert="";
-                    if(value.credentialNum!=undefined){
-                        strCert+= "憑證數量 "+value.credentialNum+"\n";
+                    var strCert = "";
+                    if (value.credentialNum != undefined) {
+                        strCert += "憑證數量 " + value.credentialNum + "\n";
 
                     }
-                    if(value.sn!=undefined){
-                        strCert+= "載具序號"+ConverSNFormat(value.sn)+"\n";
+                    if (value.sn != undefined) {
+                        strCert += "載具序號" + ConverSNFormat(value.sn) + "\n";
 
                     }
 
-                    strCert+= "-----BEGIN CERTIFICATE-----\n" +
+                    strCert += "-----BEGIN CERTIFICATE-----\n" +
                         btoa(String.fromCharCode.apply(null, value.certicficate)) +
                         "\n-----END CERTIFICATE-----"
                     console.log('憑證 :\n', strCert);
                     alert(strCert);
-                   // alert("憑證:" + "\n" + strCert);
+                    // alert("憑證:" + "\n" + strCert);
                 } else {
                     alert(showFIDOErrorMessage(value));
                 }
@@ -208,22 +222,22 @@
             GTIDEM_ReadCertByIndexWithoutPIN(index, bToken_sn).then((value) => {
 
                 if (value.statusCode === CTAP1_ERR_SUCCESS) {
-                    var strCert="";
-                    if(value.credentialNum!=undefined){
-                        strCert+= "憑證數量 "+value.credentialNum+"\n";
+                    var strCert = "";
+                    if (value.credentialNum != undefined) {
+                        strCert += "憑證數量 " + value.credentialNum + "\n";
 
                     }
-                    if(value.sn!=undefined){
-                        strCert+= "載具序號"+ConverSNFormat(value.sn)+"\n";
+                    if (value.sn != undefined) {
+                        strCert += "載具序號" + ConverSNFormat(value.sn) + "\n";
 
                     }
 
-                    strCert+= "-----BEGIN CERTIFICATE-----\n" +
+                    strCert += "-----BEGIN CERTIFICATE-----\n" +
                         btoa(String.fromCharCode.apply(null, value.certicficate)) +
                         "\n-----END CERTIFICATE-----"
                     console.log('憑證 :\n', strCert);
                     alert(strCert);
-                   // alert("憑證:" + "\n" + strCert);
+                    // alert("憑證:" + "\n" + strCert);
                 } else {
                     alert(showFIDOErrorMessage(value));
                 }
@@ -231,6 +245,55 @@
             });
 
         })
+
+        document.getElementById('list_all_certs').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
+
+            var bToken_sn = undefined;
+            if (token_sn.length != 0) {
+                bToken_sn = hexStringToArrayBuffer(token_sn);
+            }
+            listAllCerts();
+
+        })
+
+
+        async function listAllCerts() {
+            var credNum =1;
+            var strCert = "";
+            for (var i = 1; i <= credNum; i++) {
+
+                await GTIDEM_ReadCertByIndexWithoutPIN(i, undefined).then((value) => {
+
+                    if (value.statusCode === CTAP1_ERR_SUCCESS) {
+                        
+                        if (value.credentialNum != undefined) {
+                            if(i==1){
+                                strCert += "憑證數量 " + value.credentialNum + "<br>";
+                                credNum = value.credentialNum;
+                            }
+                        }
+                        if (value.sn != undefined) {
+                            if(i==1){
+                             strCert += "載具序號" + ConverSNFormat(value.sn) + "<br>";
+                            }
+
+                        }
+                        strCert += "-----BEGIN CERTIFICATE-----<br>" +
+                            btoa(String.fromCharCode.apply(null, value.certicficate)) +
+                            "<br>-----END CERTIFICATE-----<br>"
+
+                      
+                    } else {
+                        alert(showFIDOErrorMessage(value));
+                    }
+
+                });
+            }
+            document.getElementById("certs_list").innerHTML = strCert;
+        }
     </script>
 
 </body>
