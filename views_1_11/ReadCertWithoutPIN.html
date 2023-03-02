@@ -255,15 +255,15 @@
             if (token_sn.length != 0) {
                 bToken_sn = hexStringToArrayBuffer(token_sn);
             }
-            listAllCerts();
+            listAllCerts(1);
 
         })
+        var strCert = "";
 
-
-        async function listAllCerts() {
+        async function listAllCerts(num) {
             var credNum = 1;
-            var strCert = "";
-            var i=1;
+           
+            var i = num;
             var delayInMilliseconds = 1000; //1 second
 
 
@@ -315,40 +315,10 @@
             //     }
             // }, 1000);
 
-            for (var i = 1; i <= 1; i++) {
+            setTimeout(async function () {
                 console.log("run GTIDEM_ReadCertByIndexWithoutPIN START");
                 await GTIDEM_ReadCertByIndexWithoutPIN(i, undefined).then((value) => {
                     console.log("run GTIDEM_ReadCertByIndexWithoutPIN OK");
-                    if (value.statusCode === CTAP1_ERR_SUCCESS) {
-
-                        if (value.credentialNum != undefined) {
-                            if(i==1){
-                                strCert += "憑證數量 " + value.credentialNum + "<br>";
-                                credNum = value.credentialNum;
-                            }
-                        }
-                        if (value.sn != undefined) {
-                            if(i==1){
-                             strCert += "載具序號" + ConverSNFormat(value.sn) + "<br>";
-                            }
-
-                        }
-                        strCert +="憑證 "+i+ "<br>-----BEGIN CERTIFICATE-----<br>" +
-                            btoa(String.fromCharCode.apply(null, value.certicficate)) +
-                            "<br>-----END CERTIFICATE-----<br>"
-
-                    } else {
-                        alert(showFIDOErrorMessage(value));
-                    }
-
-                });
-                console.log("run GTIDEM_ReadCertByIndexWithoutPIN END");
-
-                let timer_id = setInterval(async function () {
-
-                console.log("run GTIDEM_ReadCertByIndexWithoutPIN  setInterval START");
-                const aaa = await GTIDEM_ReadCertByIndexWithoutPIN(i, undefined).then((value) => {
-                    console.log("run GTIDEM_ReadCertByIndexWithoutPIN setInterval END");
                     if (value.statusCode === CTAP1_ERR_SUCCESS) {
 
                         if (value.credentialNum != undefined) {
@@ -366,24 +336,22 @@
                         strCert += "憑證 " + i + "<br>-----BEGIN CERTIFICATE-----<br>" +
                             btoa(String.fromCharCode.apply(null, value.certicficate)) +
                             "<br>-----END CERTIFICATE-----<br>"
-
-
+                        //enable timeout
+                        if(i<value.credentialNum)
+                            listAllCerts(++i);
+                        else{
+                            document.getElementById("certs_list").innerHTML = strCert;
+                        }    
                     } else {
                         alert(showFIDOErrorMessage(value));
                     }
-                    return;
                 });
-                console.log("setInterval END");
-                if(i==credNum){
-                    clearTimeout(timer_id);   
-                    return;
-                }else{
-                    i++;
-                }
-            }, 1000);
 
-            }
-            document.getElementById("certs_list").innerHTML = strCert;
+            }, 500);
+
+            console.log("run GTIDEM_ReadCertByIndexWithoutPIN END");
+
+            
         }
     </script>
 
