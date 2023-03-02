@@ -1054,7 +1054,7 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
     }).catch((error) => {
         ////console.log(error.name);
         let gtidem = new GTIdemJs();
-        gtidem.ConvertWebError(error.name);
+        gtidem.ConvertWebError(error.name,error.message);
         return gtidem;
     });
 
@@ -1165,7 +1165,7 @@ async function GTIDEM_GenP256CSR(bSerialNumber,bCommonName){
         return gtidem;
     }).catch((error) => {
         let gtidem = new GTIdemJs();
-        gtidem.ConvertWebError(error.name);
+        gtidem.ConvertWebError(error.name,error.message);
         return gtidem;
     });
 
@@ -1276,7 +1276,7 @@ async function GTIDEM_GenP384CSR(bSerialNumber,bCommonName){
         return gtidem;
     }).catch((error) => {
         let gtidem = new GTIdemJs();
-        gtidem.ConvertWebError(error.name);
+        gtidem.ConvertWebError(error.name,error.message);
         return gtidem;
     });
 
@@ -1387,7 +1387,7 @@ async function GTIDEM_GenP521CSR(bSerialNumber,bCommonName){
         return gtidem;
     }).catch((error) => {
         let gtidem = new GTIdemJs();
-        gtidem.ConvertWebError(error.name);
+        gtidem.ConvertWebError(error.name,error.message);
         return gtidem;
     });
 }
@@ -1516,7 +1516,7 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bCommonName) {
     }).catch((error) => {
         console.log(error)
         let gtidem = new GTIdemJs();
-        gtidem.ConvertWebError(error.name);
+        gtidem.ConvertWebError(error.name,error.message);
         return gtidem;
     });
 }
@@ -1653,7 +1653,7 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
     }).catch((error) => {
         ////console.log(error.name);
         let gtidem = new GTIdemJs();
-        gtidem.ConvertWebError(error.name);
+        gtidem.ConvertWebError(error.name,error.message);
         return gtidem;
     });
  }
@@ -1790,7 +1790,7 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
         }).catch((error) => {
             ////console.log(error.name);
             let gtidem = new GTIdemJs();
-            gtidem.ConvertWebError(error.name);
+            gtidem.ConvertWebError(error.name,error.message);
             return gtidem;
         });
     }
@@ -1953,7 +1953,7 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
     }).catch((error) => {
         ////console.log(error.name);
         let gtidem = new GTIdemJs();
-        gtidem.ConvertWebError(error.name);
+        gtidem.ConvertWebError(error.name,error.message);
         return gtidem;
     });
 
@@ -2037,7 +2037,7 @@ async function GTIDEM_DeleteCertByLabel(bLabel, bSerialNumber) {
     }).catch((error) => {
         ////console.log(error.name);
         let gtidem = new GTIdemJs();
-        gtidem.ConvertWebError(error.name);
+        gtidem.ConvertWebError(error.name,error.message);
         return gtidem;
     });
        
@@ -2110,7 +2110,7 @@ async function GTIDEM_ClearToken( bSerialNumber) {
     }).catch((error) => {
         ////console.log(error.name);
         let gtidem = new GTIdemJs();
-        gtidem.ConvertWebError(error.name);
+        gtidem.ConvertWebError(error.name,error.message);
         return gtidem;
     });
        
@@ -2177,7 +2177,7 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
         }).catch((error) => {
             ////console.log(error.name);
             let gtidem = new GTIdemJs();
-            gtidem.ConvertWebError(error.name);
+            gtidem.ConvertWebError(error.name,error.message);
             return gtidem;
         });
 
@@ -2320,7 +2320,7 @@ async function GTIDEM_SignDataByIndex(index, bSerialNumber ,alg_number, bPlain) 
             }).catch((error) => {
                 ////console.log(error.name);
                 let gtidem = new GTIdemJs();
-                gtidem.ConvertWebError(error.name);
+                gtidem.ConvertWebError(error.name,error.message);
                 return gtidem;
             });
 
@@ -2464,7 +2464,7 @@ async function GTIDEM_SignDataByLabel(bLabel, bSerialNumber ,alg_number, bPlain)
             }).catch((error) => {
                 ////console.log(error.name);
                 let gtidem = new GTIdemJs();
-                gtidem.ConvertWebError(error.name);
+                gtidem.ConvertWebError(error.name,error.message);
                 return gtidem;
             });
 
@@ -2636,7 +2636,7 @@ async function GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSerialNumber) {
             }).catch((error) => {
                 ////console.log(error.name);
                 let gtidem = new GTIdemJs();
-                gtidem.ConvertWebError(error.name);
+                gtidem.ConvertWebError(error.name,error.message);
                 return gtidem;
             });
 
@@ -2733,7 +2733,7 @@ function GTIDEM_SetName(sName){
     }).catch((error) => {
         ////console.log(error.name);
         let gtidem = new GTIdemJs();
-        gtidem.ConvertWebError(error.name);
+        gtidem.ConvertWebError(error.name,error.message);
         return gtidem;
     });
 
@@ -2818,7 +2818,7 @@ function GTIDEM_SetName(sName){
     }).catch((error) => {
         ////console.log(error.name);
         let gtidem = new GTIdemJs();
-        gtidem.ConvertWebError(error.name);
+        gtidem.ConvertWebError(error.name,error.message);
         return gtidem;
     });
 
@@ -2966,7 +2966,7 @@ async function GTIDEM_GenKeyPair(bSerialNumber,bKeyID, keytype, outputformat) {
     }).catch((error) => {
         ////console.log(error.name);
         let gtidem = new GTIdemJs();
-        gtidem.ConvertWebError(error.name);
+        gtidem.ConvertWebError(error.name,error.message);
         return gtidem;
     });
  }
@@ -3046,7 +3046,7 @@ async function GTIDEM_GenKeyPair(bSerialNumber,bKeyID, keytype, outputformat) {
     }).catch((error) => {
         ////console.log(error.name);
         let gtidem = new GTIdemJs();
-        gtidem.ConvertWebError(error.name);
+        gtidem.ConvertWebError(error.name,error.message);
         return gtidem;
     });
 
