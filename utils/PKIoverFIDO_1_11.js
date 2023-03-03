@@ -871,6 +871,33 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
         return gtidem;
     }
 
+    // let timer_id = setInterval(  async  function () {
+    //     console.log("setInterval start:",new Date().getTime());
+    //     if(prepareUpdate==undefined){
+    //         return;
+    //     }
+    //     console.log("Has focuse?: "+document.hasFocus());
+    //     console.log("Who Has focuse: "+document.activeElement);
+    //     console.log("Who Has focuse: "+document.activeElement.className);
+    //     console.log("Who Has focuse: "+document.activeElement.id);
+    //     if(!document.hasFocus()){
+    //         document.activeElement.blur();
+    //         window.focus();
+    //         console.log("After focused?: "+document.hasFocus());
+    //     }
+    //     clearInterval(timer_id); 
+    //     await GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN).then((result) => {
+          
+    //         if(callback!=undefined)
+    //             callback(result);
+    //         return result;
+    //     });
+   
+    // }, 100);
+    //Generate 
+    console.log("computingSessionKey:",new Date().getTime());
+    prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
+    console.log("computingSessionKey OK:",new Date().getTime());
     let timer_id = setInterval(  async  function () {
         console.log("setInterval start:",new Date().getTime());
         if(prepareUpdate==undefined){
@@ -885,19 +912,16 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
             window.focus();
             console.log("After focused?: "+document.hasFocus());
         }
-            
+        clearInterval(timer_id); 
         await GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN).then((result) => {
-            clearInterval(timer_id);    
+          
             if(callback!=undefined)
                 callback(result);
             return result;
         });
    
     }, 100);
-    //Generate 
-    console.log("computingSessionKey:",new Date().getTime());
-    prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
-    console.log("computingSessionKey OK:",new Date().getTime());
+    
 }
 
 /**
