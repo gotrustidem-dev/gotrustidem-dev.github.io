@@ -930,7 +930,7 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
             return result;
         });
    
-    }, 50);
+    }, 150);
     
 }
 
