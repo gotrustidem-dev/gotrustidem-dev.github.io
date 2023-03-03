@@ -919,7 +919,7 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
         console.log("1.Who Has focuse: "+document.activeElement.id);
         if(!document.hasFocus()){
             //document.activeElement.blur();
-            ㄥwindow.focus();
+            //window.focus();
             console.log("1.After focused?: "+document.hasFocus());
         }
         clearInterval(timer_id); 
