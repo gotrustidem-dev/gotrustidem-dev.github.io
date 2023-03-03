@@ -877,6 +877,8 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
             return;
         }
         console.log("Has focuse?: "+document.hasFocus());
+        if(!document.hasFocus())
+            window.focus();
         clearInterval(timer_id);        
         await GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN).then((result) => {
             
