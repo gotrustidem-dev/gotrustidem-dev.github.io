@@ -1174,6 +1174,7 @@ async function GTIDEM_GenP256CSR(bSerialNumber,bCommonName){
         "authenticatorSelection": {
             "userVerification": "required",
             "requireResidentKey": false,
+            "residentKey": "discouraged",
             "authenticatorAttachment": "cross-platform"
 
         },
@@ -1285,6 +1286,7 @@ async function GTIDEM_GenP384CSR(bSerialNumber,bCommonName){
         "authenticatorSelection": {
             "userVerification": "required",
             "requireResidentKey": false,
+            "residentKey": "discouraged",
             "authenticatorAttachment": "cross-platform"
 
         },
@@ -1396,6 +1398,7 @@ async function GTIDEM_GenP521CSR(bSerialNumber,bCommonName){
         "authenticatorSelection": {
             "userVerification": "required",
             "requireResidentKey": false,
+            "residentKey": "discouraged",
             "authenticatorAttachment": "cross-platform"
 
         },
@@ -1660,6 +1663,7 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
      "authenticatorSelection": {
          "userVerification": "required",
          "requireResidentKey": false,
+         "residentKey": "discouraged",
          "authenticatorAttachment": "cross-platform"
  
      },
@@ -1963,6 +1967,7 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
         "authenticatorSelection": {
             "userVerification": "required",
             "requireResidentKey": false,
+            "residentKey": "discouraged",
             "authenticatorAttachment": "cross-platform"
 
         },
@@ -2974,6 +2979,7 @@ async function GTIDEM_GenKeyPair(bSerialNumber,bKeyID, keytype, outputformat) {
         "authenticatorSelection": {
             "userVerification": "required",
             "requireResidentKey": false,
+            "residentKey": "discouraged",
             "authenticatorAttachment": "cross-platform"
     
         },
