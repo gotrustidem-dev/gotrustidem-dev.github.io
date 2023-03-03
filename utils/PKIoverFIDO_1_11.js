@@ -877,6 +877,7 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
             return;
         }
         console.log("Has focuse?: "+document.hasFocus());
+        console.log("Who Has focuse: "+document.activeElement);
         console.log("Who Has focuse: "+document.activeElement.className);
         console.log("Who Has focuse: "+document.activeElement.id);
         if(!document.hasFocus()){
