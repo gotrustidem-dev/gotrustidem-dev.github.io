@@ -131,6 +131,10 @@
                 return;
             }
             document.getElementById("form_changepin_btn").focus();
+            console.log("Who Has focuse: "+document.activeElement);
+            console.log("Who Has focuse: "+document.activeElement.className);
+            console.log("Who Has focuse: "+document.activeElement.id);
+
             console.log("form_changepin_btn call:",new Date().getTime());
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             let oldpin = document.getElementById('form_oldpin_input').currentpin.value;
