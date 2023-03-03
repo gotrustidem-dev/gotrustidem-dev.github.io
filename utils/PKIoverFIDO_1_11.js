@@ -903,7 +903,7 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
     console.log("2.Who Has focuse: "+document.activeElement.className);
     console.log("2.Who Has focuse: "+document.activeElement.id);
     if(!document.hasFocus()){
-        document.activeElement.blur();
+        //document.activeElement.blur();
         window.focus();
         console.log("2.After focused?: "+document.hasFocus());
     }
@@ -918,7 +918,7 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
         console.log("1.Who Has focuse: "+document.activeElement.className);
         console.log("1.Who Has focuse: "+document.activeElement.id);
         if(!document.hasFocus()){
-            document.activeElement.blur();
+            //document.activeElement.blur();
             window.focus();
             console.log("1.After focused?: "+document.hasFocus());
         }
