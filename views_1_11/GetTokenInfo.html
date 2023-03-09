@@ -90,7 +90,8 @@
     </div>
     <script>
 
-        window.onload=function(){
+document.addEventListener('DOMContentLoaded', function() {
+
             GTIDEM_GetTokenInfo(undefined).then((response) => {
                 console.log('SUCCESS', response);            
                 if(response.statusCode==CTAP1_ERR_SUCCESS){
@@ -125,7 +126,8 @@
                 console.log('FAIL', error)
                 });
 
-        }
+     // your code here
+}, false);
         document.getElementById('form_tokeninfo_btn').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
