@@ -7,7 +7,7 @@
 
  'use strict';
 
-const VERSION = "1.11.3beta"
+const VERSION = "1.11.3"
 const DEFAULT_TIMEOUT = 120000
 const VERIFY_DEFAULT_TIMEOUT = 300000
 const AUTHENTICATOR_TRANSPORTS = ["usb"]
