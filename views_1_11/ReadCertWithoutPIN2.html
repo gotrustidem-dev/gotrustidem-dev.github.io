@@ -265,8 +265,12 @@
             var delayInMilliseconds = 200; //1 second
             document.getElementById("certs_list").innerHTML=""; 
             var isRead = true;
+            var browser = get_browser();
             var time_id = setInterval(async function () {
                 console.log("Has focuse?: "+document.hasFocus());
+                if((browser.name=="Safari")&&!document.hasFocus()){
+                    return;
+                }
                 if(isRead==false){
                     return;
                 }
