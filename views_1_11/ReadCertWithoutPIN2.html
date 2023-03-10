@@ -266,6 +266,7 @@
             document.getElementById("certs_list").innerHTML=""; 
             var isRead = true;
             var time_id = setInterval(async function () {
+                console.log("Has focuse?: "+document.hasFocus());
                 if(isRead==false){
                     return;
                 }
