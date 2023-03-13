@@ -286,13 +286,13 @@
  
             for(i = num;i< 7;i++){
                 console.log("Has focuse?: "+document.hasFocus());
-                if((browser.name=="Safari")&&!document.hasFocus()){
-                    i--;
-                    continue;
-                }
-                if(isRead==false){
-                    continue;
-                }
+             //   if((browser.name=="Safari")&&!document.hasFocus()){
+              //      i--;
+               //     continue;
+                //}
+                //if(isRead==false){
+               //     continue;
+              //  }
                 isRead = false;
                 console.log("run GTIDEM_ReadCertByIndexWithoutPIN START");
                 await GTIDEM_ReadCertByIndexWithoutPIN(i, undefined).then((value) => {
