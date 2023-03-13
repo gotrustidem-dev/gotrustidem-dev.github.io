@@ -245,19 +245,23 @@
             });
 
         })
+        var mouseStart = false;
+        
+        // document.getElementById('list_all_certs').addEventListener('mousemove', function (event) {
+        //     event.preventDefault();
+        //     let token_sn = document.getElementById('form_token_sn').token_sn.value;
+        //     var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
 
-        document.getElementById('list_all_certs').addEventListener('mousemove', function (event) {
-            event.preventDefault();
-            let token_sn = document.getElementById('form_token_sn').token_sn.value;
-            var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
+        //     var bToken_sn = undefined;
+        //     if (token_sn.length != 0) {
+        //         bToken_sn = hexStringToArrayBuffer(token_sn);
+        //     }
+        //     if(mouseStart==false){
+        //         listAllCerts(1);
+        //         mouseStart = true;
+        //     }
 
-            var bToken_sn = undefined;
-            if (token_sn.length != 0) {
-                bToken_sn = hexStringToArrayBuffer(token_sn);
-            }
-            listAllCerts(1);
-
-        })
+        // })
 
         document.getElementById('list_all_certs').addEventListener('submit', function (event) {
             event.preventDefault();
@@ -279,15 +283,15 @@
             document.getElementById("certs_list").innerHTML=""; 
             var isRead = true;
             var browser = get_browser();
-            var time_id = setInterval(async function () {
-               
-     
+ 
+            for(i = num;i< 7;i++){
                 console.log("Has focuse?: "+document.hasFocus());
                 if((browser.name=="Safari")&&!document.hasFocus()){
-                    return;
+                    i--;
+                    continue;
                 }
                 if(isRead==false){
-                    return;
+                    continue;
                 }
                 isRead = false;
                 console.log("run GTIDEM_ReadCertByIndexWithoutPIN START");
@@ -325,11 +329,9 @@
                     }
                     isRead = true;
                 });
-
-            }, delayInMilliseconds);
-
+            
             console.log("run GTIDEM_ReadCertByIndexWithoutPIN END");
-
+        }
             
         }
     </script>
