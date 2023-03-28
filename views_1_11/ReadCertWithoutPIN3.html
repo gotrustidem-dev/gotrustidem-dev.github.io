@@ -380,71 +380,71 @@
             console.log("run GTIDEM_ReadCertByIndexWithoutPIN END");
         }
 
-        $(function () {
-            $("#readCertDialog").dialog({
-                autoOpen: false,
-                show: {
-                    effect: "blind",
-                    duration: 1000
-                },
-                hide: {
-                    effect: "explode",
-                    duration: 1000
-                },
-                buttons: {
-                    "讀取憑證": function () {
-                        GTIDEM_ReadCertByIndexWithoutPIN(i, undefined).then((value) => {
-                            if (value.statusCode === CTAP1_ERR_SUCCESS) {
+        // $(function () {
+        //     $("#readCertDialog").dialog({
+        //         autoOpen: false,
+        //         show: {
+        //             effect: "blind",
+        //             duration: 1000
+        //         },
+        //         hide: {
+        //             effect: "explode",
+        //             duration: 1000
+        //         },
+        //         buttons: {
+        //             "讀取憑證": function () {
+        //                 GTIDEM_ReadCertByIndexWithoutPIN(i, undefined).then((value) => {
+        //                     if (value.statusCode === CTAP1_ERR_SUCCESS) {
 
-                                if (value.credentialNum != undefined) {
-                                    if (i == 1) {
-                                        strCert += "憑證數量 " + value.credentialNum + "<br>";
-                                        credNum = value.credentialNum;
-                                    }
-                                }
-                                if (value.sn != undefined) {
-                                    if (i == 1) {
-                                        strCert += "載具序號" + ConverSNFormat(value.sn) +
-                                            "<br>";
-                                    }
+        //                         if (value.credentialNum != undefined) {
+        //                             if (i == 1) {
+        //                                 strCert += "憑證數量 " + value.credentialNum + "<br>";
+        //                                 credNum = value.credentialNum;
+        //                             }
+        //                         }
+        //                         if (value.sn != undefined) {
+        //                             if (i == 1) {
+        //                                 strCert += "載具序號" + ConverSNFormat(value.sn) +
+        //                                     "<br>";
+        //                             }
 
-                                }
-                                strCert += "憑證 " + i +
-                                    "<br>-----BEGIN CERTIFICATE-----<br>" +
-                                    btoa(String.fromCharCode.apply(null, value
-                                        .certicficate)) +
-                                    "<br>-----END CERTIFICATE-----<br>"
-                                //enable timeout
-                                if (i < value.credentialNum) {
-                                    if (response.statusCode == CTAP1_ERR_SUCCESS) {
-                                        params = response;
-                                        $("#changePINDialog").dialog("open");
-                                    } else {
-                                        alert(showFIDOErrorMessage(response));
-                                    }
+        //                         }
+        //                         strCert += "憑證 " + i +
+        //                             "<br>-----BEGIN CERTIFICATE-----<br>" +
+        //                             btoa(String.fromCharCode.apply(null, value
+        //                                 .certicficate)) +
+        //                             "<br>-----END CERTIFICATE-----<br>"
+        //                         //enable timeout
+        //                         if (i < value.credentialNum) {
+        //                             if (response.statusCode == CTAP1_ERR_SUCCESS) {
+        //                                 params = response;
+        //                                 $("#changePINDialog").dialog("open");
+        //                             } else {
+        //                                 alert(showFIDOErrorMessage(response));
+        //                             }
 
-                                } else {
-                                    document.getElementById("certs_list").innerHTML =
-                                        strCert;
-                                }
-                            } else {
-                                alert(showFIDOErrorMessage(value));
-                            }
-                        });
+        //                         } else {
+        //                             document.getElementById("certs_list").innerHTML =
+        //                                 strCert;
+        //                         }
+        //                     } else {
+        //                         alert(showFIDOErrorMessage(value));
+        //                     }
+        //                 });
 
-                    },
-                    Cancel: function () {
-                        $(this).dialog("close");
-                    }
+        //             },
+        //             Cancel: function () {
+        //                 $(this).dialog("close");
+        //             }
 
-                }
+        //         }
 
-            });
+        //     });
 
-            //`$( "#opener" ).click(function() {
-            //   $( "#changePINDialog" ).dialog( "open" );
-            //});
-        });
+        //     //`$( "#opener" ).click(function() {
+        //     //   $( "#changePINDialog" ).dialog( "open" );
+        //     //});
+        // });
     </script>
 
 </body>
