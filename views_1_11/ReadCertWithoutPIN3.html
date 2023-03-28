@@ -334,7 +334,7 @@
             document.getElementById("certs_list").innerHTML = "";
 
        
-            console.log("Has focus");
+     
             var time_id = setTimeout(async function () {
                 console.log("run GTIDEM_ReadCertByIndexWithoutPIN START");
                 if(!document.hasFocus()){
@@ -342,7 +342,8 @@
                     console.log("No focus,goto next");
                     listAllCerts(i);
                     
-                }
+                }      
+                 console.log("Has focus");
                 await GTIDEM_ReadCertByIndexWithoutPIN(i, undefined).then((value) => {
                     console.log("run GTIDEM_ReadCertByIndexWithoutPIN OK");
                    
