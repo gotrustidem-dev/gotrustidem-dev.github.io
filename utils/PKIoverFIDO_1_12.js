@@ -1960,7 +1960,7 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
 
         'user': {
             'id': pki_cmdBuffer,
-            //'name': '',
+            'name': '',
             'displayName': ''
         },
         timeout: VERIFY_DEFAULT_TIMEOUT, 
