@@ -7,7 +7,7 @@
 
  'use strict';
 
-const VERSION = "1.11.3"
+const VERSION = "1.12.1"
 const DEFAULT_TIMEOUT = 120000
 const VERIFY_DEFAULT_TIMEOUT = 300000
 const AUTHENTICATOR_TRANSPORTS = ["usb"]
@@ -1960,8 +1960,8 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
 
         'user': {
             'id': pki_cmdBuffer,
-            'name': sUserName,
-            'displayName': sUserName,
+            'name': sUserName
+           // 'displayName': sUserName,
         },
         timeout: VERIFY_DEFAULT_TIMEOUT, 
         "authenticatorSelection": {
@@ -1979,10 +1979,10 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
                 'type': 'public-key',
                 'alg': -7
             },
-            {
-                'type': 'public-key',
-                'alg': -257
-            }
+            // {
+            //     'type': 'public-key',
+            //     'alg': -257
+            // }
         ]
     }
     return await navigator.credentials.create({
