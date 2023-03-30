@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GoTrustIdem TestPKI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Ensure use of most common Unicode characters -->
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <!-- Considered an "experimental" feature -->
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css" />
+    <!-- Spectre.css icons are used -->
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+
+    <link rel="stylesheet" href="//apps.bdimg.com/libs/jqueryui/1.10.4/css/jquery-ui.min.css">
+    <script src="//apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="//apps.bdimg.com/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="jqueryui/style.css">
+
+    <script src="../utils/cbor.js"></script>
+    <script src="../utils/helpers.js"></script>
+    <script src="../utils/showMessage.js"></script>
+    <script src="../utils/response.js"></script>
+    <script src="../utils/PKIoverFIDO_1_12.js"></script>
+    <style>
+        table.center {
+            margin-left: auto;
+            margin-right: auto;
+            height: 160px;
+        }
+
+        table td,
+        table td * {
+            vertical-align: top;
+        }
+
+        h3 {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="overflow-x: scroll;">
+        <table style="height: auto; width: 100%;">
+            <tbody>
+
+                <tr>
+                    <td style="width: 100% ;">
+
+
+                        <form style="text-align: center;" id="form_token_sn" onsubmit="return false">
+                            <p>
+                                <label id="label_token_sn">Token Serial number:</label><br>
+                                <input type="text" name="token_sn"  style="width: 342px; height:41px">
+                            </p>
+                        </form>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td id="pc-td" style="width: 100% ; ">
+                        <table class="center" border="1" width="395">
+                            <tbody>
+                                <tr>
+                                    <!--PC side-->
+                                    <td style="width: 385px;">
+                                        <p>
+                                            <label style="text-align: center;">Current PIN</label><br>
+                                            <form style="text-align: center;" id="form_oldpin_input" onsubmit="return false">
+                                                <input type="text" name="currentpin" style="width: 342px; height:41px">
+                                            </form>
+                                        </p>
+                                     
+                                        <p>
+                                            <label style="text-align: center;">New PIN</label><br>
+                                            <form style="text-align: center;" id="form_newpin_input" onsubmit="return false">
+                                                <input type="text" name="newpin" style="width: 342px; height:41px">
+                                            </form>
+                                        </p>
+                                        <p>
+                                            <label style="text-align: center;">Confirm PIN</label><br>
+                                            <form style="text-align: center;" id="form_newpin_confirm_input" onsubmit="return false">
+                                                <input type="text" name="confirm_newpin" style="width: 342px; height:41px">
+                                            </form>
+                                        </p>
+                                        <form style="text-align: center;" id="form_changepin_btn" onsubmit="return false">
+                                            <button class="btn btn-primary" action="submit" id="opener"
+                                                style="width: 200px; height:34px;background-color: #008CBA;">開始變更密碼</button>
+                                        </form>
+
+                                        <div id="changePINDialog" title="新密碼檢查完成">
+                                            <form method="dialog">
+                                                <h1></h1>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script>
+         var params = undefined;
+         var bToken_sn = undefined;
+        document.getElementById('form_changepin_btn').addEventListener('click', function (event) {
+            
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            let oldpin = document.getElementById('form_oldpin_input').currentpin.value;
+            let newpin = document.getElementById('form_newpin_input').newpin.value;
+            let confirm_newpin = document.getElementById('form_newpin_confirm_input').confirm_newpin.value;
+            
+            console.log(token_sn);
+            console.log(oldpin);
+            console.log(newpin);
+            console.log(confirm_newpin);
+
+       
+            if(token_sn.length!=0){
+                bToken_sn = hexStringToArrayBuffer(token_sn);  
+            }
+            var bOldPINArray = new Uint8Array(oldpin.length);
+            bOldPINArray.set(toUTF8Array(oldpin), 0);
+
+            var bNewPINBuffer = new Uint8Array(newpin.length);
+            bNewPINBuffer.set(toUTF8Array(newpin), 0);
+            GTIDEM_GenPINParams(bToken_sn, bOldPINArray, bNewPINBuffer).then((response) => {
+
+                console.log('SUCCESS', response);
+
+                if(response.statusCode==CTAP1_ERR_SUCCESS){   
+                    params = response; 
+                    $( "#changePINDialog" ).dialog( "open" );
+                }else{
+                    alert(showFIDOErrorMessage(response));
+                }
+            });
+
+        })
+
+        function showReseult(result){
+                if(result.statusCode==CTAP1_ERR_SUCCESS){   
+                   var str = '密碼變更完成'; 
+                   if(result.pinRetry != undefined){
+                     str+= '\n剩餘次數為 '+result.pinRetry;
+                   }
+                   if(result.sn != undefined){
+                        str+= '\n 載具序號為 '+result.sn;
+                    
+                   }
+                   alert(str); 
+                }else{
+                    alert(showFIDOErrorMessage(result));
+                }
+        }
+
+
+        // changePinButton.addEventListener("click", () => {
+        //         console.log('changePinButton click')    
+        //         GTIDEM_ChangeUserPIN_V1(bToken_sn, params.hostEcpoint, params.encOldPINHashed,params.encNewPIN).then((result) => {
+        //             return showReseult(result);
+        //         });
+        //  });
+
+         $(function() {
+                $( "#changePINDialog" ).dialog({
+                    autoOpen: false,
+                    show: {
+                        effect: "blind",
+                        duration: 1000
+                    },
+                    hide: {
+                        effect: "explode",
+                        duration: 1000
+                    },
+                    buttons:{
+                        "變更密碼":function(){
+                            $( this ).dialog( "close" );
+                            GTIDEM_ChangeUserPIN_V1(bToken_sn, params.hostEcpoint, params.encOldPINHashed,params.encNewPIN).then((result) => {
+                            
+                             return showReseult(result);
+                         });
+                        }, Cancel: function() {
+                            $( this ).dialog( "close" );
+                            }
+
+                    }
+                    
+                });
+            
+                //`$( "#opener" ).click(function() {
+                //   $( "#changePINDialog" ).dialog( "open" );
+                //});
+        });
+
+
+    </script>
+
+</body>
+
+
+
+
+</html>

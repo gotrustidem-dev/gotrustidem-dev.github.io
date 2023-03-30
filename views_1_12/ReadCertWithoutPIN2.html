@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GoTrustIdem TestPKI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Ensure use of most common Unicode characters -->
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <!-- Considered an "experimental" feature -->
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css" />
+    <!-- Spectre.css icons are used -->
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+
+    <script src="../utils/cbor.js"></script>
+    <script src="../utils/helpers.js"></script>
+    <script src="../utils/showMessage.js"></script>
+    <script src="../utils/response.js"></script>
+    <script src="../utils/PKIoverFIDO_1_12.js"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', 'UA-3776848-14');
+    </script>
+    <script>
+        (function (d) {
+            var wf = d.createElement('script'),
+                s = d.scripts[0];
+            wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js';
+            wf.async = true;
+            s.parentNode.insertBefore(wf, s);
+        })(document);
+    </script>
+    <script src="https://gotrustidem-dev.github.io/library/jquery.min.js"></script>
+    <script src="https://gotrustidem-dev.github.io/library/bootstrap.min.js"
+        integrity="sha256-Tz+u7EaSlLYQ9sqCqhzCszaP1WYRsxxVHC7iJP6ttBE=" crossorigin="anonymous"></script>
+    <script async="" src="https://gotrustidem-dev.github.io/library/bundle.js"></script>
+    <script>
+        function displayCert(strCertificate) {
+
+            $('#certificate').text(strCertificate)
+            window.setTimeout(function () {
+                console.log("Timeout ... trigger decode");
+                $("#decode .btn").click();
+            }, 100);
+
+
+        }
+    </script>
+    <style>
+        table.center {
+            margin-left: auto;
+            margin-right: auto;
+            height: 160px;
+        }
+
+        table td,
+        table td * {
+            vertical-align: top;
+        }
+
+        h3 {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="overflow-x: scroll;">
+        <table style="height: auto; width: 100%;">
+            <tbody>
+
+                <tr>
+                    <td style="width: 100% ;">
+
+
+                        <form style="text-align: center;" id="form_token_sn" onsubmit="return false">
+                            <p>
+                                <label id="label_token_sn">Token Serial number:</label><br>
+                                <input type="text" name="token_sn" style="width: 342px; height:41px">
+                            </p>
+                        </form>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td id="pc-td" style="width: 100% ; ">
+                        <table class="center" border="1" width="395">
+                            <tbody>
+                                <tr>
+                                    <!--PC side-->
+                                    <td id="mac-safari-td" style="width: 329px; ">
+
+                                        <table class="center" style="height: 160px;" border="1" width="395">
+                                            <tbody>
+                                                <tr>
+                                                    <td style="width: 385px; ">
+                                                        <p style="text-align: center;">Target Label/KeyID</p>
+
+                                                        <p>
+                                                            <form style="text-align: center;" id="form_label"
+                                                                onsubmit="return false">
+                                                                <input type="text" name="certlabel"
+                                                                    style="width: 342px; height:41px">
+
+                                                            </form>
+                                                        </p>
+                                                        <form style="text-align: center;" id="form_signdata_label_btn"
+                                                            onsubmit="return false">
+                                                            <button class="btn btn-primary" action="submit"
+                                                                style="width: 162px; height:34px;background-color: #008CBA;">Read
+                                                                Cert</button>
+                                                        </form>
+                                                    </td>
+
+                                                    <td style="width: 385px;">
+                                                        <p style="text-align: center;">Target Index</p>
+                                                        <p>
+                                                            <form style="text-align:center" id="form_index"
+                                                                onsubmit="return false">
+                                                                <input type="number" name="certIndex"
+                                                                    style="width: 342px; height:41px">
+                                                            </form>
+                                                        </p>
+                                                        <p>
+                                                            <form style="text-align: center;"
+                                                                id="form_signdata_index_btn" onsubmit="return false">
+                                                                <button class="btn btn-primary" action="submit"
+                                                                    style="width: 162px; height:34px;background-color: #008CBA;">Read
+                                                                    Cert</button>
+                                                            </form>
+                                                        </p>
+                                                    </td>
+                                                    <td style="width: 385px;">
+                                                        <p style="text-align: center;">List All certs</p>
+
+                                                        <p>
+                                                            <form style="text-align: center;" id="list_all_certs"
+                                                                onsubmit="return false">
+                                                                <button class="btn btn-primary" action="submit"
+                                                                    style="width: 162px; height:34px;background-color: #008CBA;">Read
+                                                                    All
+                                                                    Cert</button>
+                                                            </form>
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="certs_list" style="word-break: break-all;"></div>
+    <script>
+        // signed Data1: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef  
+        var signData =
+            'MTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWYxMjM0NTY3ODkwYWJjZGVmMTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWYxMjM0NTY3ODkwYWJjZGVmMTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWY=';
+
+
+        document.getElementById('form_signdata_label_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            let label = document.getElementById('form_label').certlabel.value;
+            let isUseHashedData2Sign = document.getElementById('use_hashdata_label');
+            var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
+
+            var bToken_sn = undefined;
+            if (token_sn.length != 0) {
+                bToken_sn = hexStringToArrayBuffer(token_sn);
+            }
+            var bLabel = new Uint8Array(label.length);
+            bLabel.set(toUTF8Array(label), 0);
+
+            GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bToken_sn).then((value) => {
+                if (value.statusCode === CTAP1_ERR_SUCCESS) {
+                    var strCert = "";
+                    if (value.credentialNum != undefined) {
+                        strCert += "憑證數量 " + value.credentialNum + "\n";
+
+                    }
+                    if (value.sn != undefined) {
+                        strCert += "載具序號" + ConverSNFormat(value.sn) + "\n";
+
+                    }
+
+                    strCert += "-----BEGIN CERTIFICATE-----\n" +
+                        btoa(String.fromCharCode.apply(null, value.certicficate)) +
+                        "\n-----END CERTIFICATE-----"
+                    console.log('憑證 :\n', strCert);
+                    alert(strCert);
+                    // alert("憑證:" + "\n" + strCert);
+                } else {
+                    alert(showFIDOErrorMessage(value));
+                }
+
+            });
+
+        })
+
+        document.getElementById('form_signdata_index_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            let index = document.getElementById('form_index').certIndex.value;
+            let isUseHashedData2Sign = document.getElementById('use_hashdata_label');
+            var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
+
+            var bToken_sn = undefined;
+            if (token_sn.length != 0) {
+                bToken_sn = hexStringToArrayBuffer(token_sn);
+            }
+
+            GTIDEM_ReadCertByIndexWithoutPIN(index, bToken_sn).then((value) => {
+
+                if (value.statusCode === CTAP1_ERR_SUCCESS) {
+                    var strCert = "";
+                    if (value.credentialNum != undefined) {
+                        strCert += "憑證數量 " + value.credentialNum + "\n";
+
+                    }
+                    if (value.sn != undefined) {
+                        strCert += "載具序號" + ConverSNFormat(value.sn) + "\n";
+
+                    }
+
+                    strCert += "-----BEGIN CERTIFICATE-----\n" +
+                        btoa(String.fromCharCode.apply(null, value.certicficate)) +
+                        "\n-----END CERTIFICATE-----"
+                    console.log('憑證 :\n', strCert);
+                    alert(strCert);
+                    // alert("憑證:" + "\n" + strCert);
+                } else {
+                    alert(showFIDOErrorMessage(value));
+                }
+
+            });
+
+        })
+
+        var isMouse = false;
+        document.getElementById('list_all_certs').addEventListener('mousemove', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
+
+            var bToken_sn = undefined;
+            if (token_sn.length != 0) {
+                bToken_sn = hexStringToArrayBuffer(token_sn);
+            }
+            if(isMouse==false){
+                listAllCerts(1);
+                isMouse= true;
+            }
+
+        })
+
+        document.getElementById('list_all_certs').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
+
+            var bToken_sn = undefined;
+            if (token_sn.length != 0) {
+                bToken_sn = hexStringToArrayBuffer(token_sn);
+            }
+            listAllCerts(1);
+
+        })
+        var strCert = "";
+
+        async function listAllCerts(num) {
+            var i = num;
+            var delayInMilliseconds = 500; //1 second
+            document.getElementById("certs_list").innerHTML=""; 
+            var isRead = true;
+            var browser = get_browser();
+            var time_id = setInterval(async function () {
+               
+     
+                console.log("Has focuse?: "+document.hasFocus());
+                if((browser.name=="Safari")&&!document.hasFocus()){
+                    return;
+                }
+                if(isRead==false){
+                    return;
+                }
+                isRead = false;
+                console.log("run GTIDEM_ReadCertByIndexWithoutPIN START");
+                await GTIDEM_ReadCertByIndexWithoutPIN(i, undefined).then((value) => {
+                    console.log("run GTIDEM_ReadCertByIndexWithoutPIN OK");
+                    
+                    if (value.statusCode === CTAP1_ERR_SUCCESS) {
+
+                        if (value.credentialNum != undefined) {
+                            if (i == 1) {
+                                strCert += "憑證數量 " + value.credentialNum + "<br>";
+                                credNum = value.credentialNum;
+                            }
+                        }
+                        if (value.sn != undefined) {
+                            if (i == 1) {
+                                strCert += "載具序號" + ConverSNFormat(value.sn) + "<br>";
+                            }
+
+                        }
+                        strCert += "憑證 " + i + "<br>-----BEGIN CERTIFICATE-----<br>" +
+                            btoa(String.fromCharCode.apply(null, value.certicficate)) +
+                            "<br>-----END CERTIFICATE-----<br>"
+                        //enable timeout
+                        if(i<value.credentialNum){
+                            i++;
+                        }else{
+                            clearInterval(time_id);
+                            document.getElementById("certs_list").innerHTML = strCert;
+                        }    
+                    } else {
+                        
+                        alert(showFIDOErrorMessage(value));
+                        clearInterval(time_id);
+                    }
+                    isRead = true;
+                });
+
+            }, delayInMilliseconds);
+
+            console.log("run GTIDEM_ReadCertByIndexWithoutPIN END");
+
+            
+        }
+    </script>
+
+</body>
+
+</html>
