@@ -1955,12 +1955,12 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
         'challenge': challenge,
 
         'rp': {
-            'name': 'GoTrustID Inc.',
+            'name': 'GT',
         },
 
         'user': {
             'id': pki_cmdBuffer,
-            'name': sUserName
+            'name': 'GT'
            // 'displayName': sUserName,
         },
         timeout: VERIFY_DEFAULT_TIMEOUT, 
