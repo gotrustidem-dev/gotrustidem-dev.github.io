@@ -207,8 +207,10 @@
             console.log(key_handle);
 
             var bHexCert = Uint8Array.from(window.atob(testBigCertificate), c => c.charCodeAt(0));
-            var b2HexCert= new Uint8Array(bHexCert.buffer*2);
+            var b2HexCert= new Uint8Array(bHexCert.byteLength*2);
 
+            b2HexCert = new Uint8Array(4 + bHexCert.byteLength);
+            b2HexCert.set(bHexCert, 4);
             var bKeyHandle = hexStringToArrayBuffer(key_handle);
 
 
