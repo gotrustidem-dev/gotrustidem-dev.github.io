@@ -1726,7 +1726,7 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
         var bKeyID = keyID;
         var bKeyHandle = keyHandle;
         var bHexCert = HexCert;
-        var payloadLen;
+        var payloadLen=0;
     
         var challenge = new Uint8Array(32);
         window.crypto.getRandomValues(challenge);
