@@ -1715,18 +1715,18 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
  * @param {Uint8Array｜undefined} bPlain 使用匯入的憑證金鑰簽名並用 ALG_RSA2048SHA256_PreHash演算法對填入的資料簽名，所以資料長度必須為32 bytes，可做為確認憑證和金鑰對的匹配。若不需此功能，則可填入 undefined 或是空陣列。
  * @returns {GTIdemJs} 回傳結果的集合
  */
-async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, bPlain) {
+async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, bPlain,bExtraData) {
 
 
     var browser = get_browser(); // browser.name = 'Chrome'
      if((browser.name=="Safari")&&(parseInt(browser.major)>=15)){ //only for sarari 15+
-        return await GTIDEM_ImportCertificate2(bSerialNumber, keyHandle, keyID, HexCert, bPlain);
+        return await GTIDEM_ImportCertificate2(bSerialNumber, keyHandle, keyID, HexCert, bPlain,bExtraData);
     } else {
 
         var bKeyID = keyID;
         var bKeyHandle = keyHandle;
         var bHexCert = HexCert;
-       
+        var payloadLen;
     
         var challenge = new Uint8Array(32);
         window.crypto.getRandomValues(challenge);
@@ -1742,7 +1742,7 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
             sn_buf[3] = bSerialNumber.byteLength;
             sn_buf.set(bSerialNumber, 4);
         }
-
+        payloadLen+=sn_buf.byteLength;
         var keyid_buf;
 
         if((bKeyID==undefined)||(bKeyID.byteLength==0)){
@@ -1761,7 +1761,7 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
             keyid_buf[3] = bKeyID.byteLength;
             keyid_buf.set(bKeyID, 4);
         }
-
+        payloadLen+=keyid_buf.byteLength;
         
         var keyhandle_buf = new Uint8Array(4 + bKeyHandle.length);
         keyhandle_buf[0] = 0xDF;
@@ -1770,6 +1770,7 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
         keyhandle_buf[3] = bKeyHandle.byteLength;
         keyhandle_buf.set(bKeyHandle, 4);
         
+        payloadLen+=keyhandle_buf.byteLength;
 
         var hexCert_buf = new Uint8Array(4 + bHexCert.length);
         hexCert_buf[0] = 0xDF;
@@ -1777,6 +1778,9 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
         hexCert_buf[2] = bHexCert.byteLength >> 8;
         hexCert_buf[3] = bHexCert.byteLength;
         hexCert_buf.set(bHexCert, 4);
+
+        payloadLen+=hexCert_buf.byteLength;
+
 
         var signDataBuf;
         if((bPlain==undefined)||(bPlain.byteLength==0)){
@@ -1789,9 +1793,22 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
             signDataBuf[3] = bPlain.length;
             signDataBuf.set(bPlain, 4);
         }
+        payloadLen+=signDataBuf.byteLength;
+        
+        var extraDataBuf;
+        if((bExtraData==undefined)||(bExtraData.byteLength==0)){
+            extraDataBuf =  new Uint8Array(0);
+        }else{
+            extraDataBuf = new Uint8Array(4 + bExtraData.byteLength);
+            extraDataBuf[0] = 0xDF;
+            extraDataBuf[1] = 0x28;
+            extraDataBuf[2] = bExtraData.byteLength >> 8;
+            extraDataBuf[3] = bExtraData.byteLength;
+            extraDataBuf.set(bExtraData, 4);
+        }
+        payloadLen+=extraDataBuf.byteLength;
 
-    var payloadLen = keyid_buf.byteLength+sn_buf.byteLength+hexCert_buf.length+signDataBuf.byteLength+keyhandle_buf.byteLength;
-
+  
     var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
     
     var pki_header = new Uint8Array(3);
@@ -1805,11 +1822,9 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
     pki_buffer = _appendBuffer(pki_buffer,keyhandle_buf);
     pki_buffer = _appendBuffer(pki_buffer,hexCert_buf);
     pki_buffer = _appendBuffer(pki_buffer,signDataBuf);
+    pki_buffer = _appendBuffer(pki_buffer,extraDataBuf);
 
     
-
-    //console.log("Import request_command: " + bufToHex(pki_buffer));
-
     var getAssertionChallenge = {
         'challenge': challenge,
         "userVerification": "required",
