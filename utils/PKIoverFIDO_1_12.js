@@ -40,7 +40,7 @@ const CMD_GenKeyPair = 0xEE;
 const CMD_FactoryReset = 0xEF;
 const CMD_ImportCertificate2 = 0xF7;
 
-const CMD_GetCertExtras = 0xB7;
+const CMD_GetCertExtras = 0xB2;
 
 const CMD_REQUESTP256CSR = 0xC1;
 const CMD_REQUESTP384CSR = 0xC2;
