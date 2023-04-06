@@ -158,6 +158,13 @@
                                                                     All
                                                                     Cert</button>
                                                             </form>
+
+                                                            <form style="text-align: center;" id="list_all_certextras"
+                                                            onsubmit="return false">
+                                                            <button class="btn btn-primary" action="submit"
+                                                                style="width: 162px; height:34px;background-color: #008CBA;">Read All Cert Extra data</button>
+                                                        </form>
+
                                                         </p>
                                                     </td>
                                                     <!-- <td style="width: 385px;">
@@ -194,8 +201,8 @@
         // signed Data1: 1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef  
         var signData =
             'MTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWYxMjM0NTY3ODkwYWJjZGVmMTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWYxMjM0NTY3ODkwYWJjZGVmMTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWY=';
-
-
+        var strCert = "";
+        var strCerts = "";
         document.getElementById('form_signdata_label_btn').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
@@ -235,7 +242,7 @@
             });
 
         })
-
+        
         document.getElementById('form_extradata_label_btn').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
@@ -261,11 +268,13 @@
                         strCert += "載具序號" + ConverSNFormat(value.sn) + "\n";
 
                     }
-
-                    strCert += "-----BEGIN CERTIFICATE-----\n" +
-                        btoa(String.fromCharCode.apply(null, value.certicficate)) +
-                        "\n-----END CERTIFICATE-----"
-                    console.log('憑證 :\n', strCert);
+                    strCert += "憑證附加資訊："+ "\n";
+                    if(value.certExtrsa[0].length==0){
+                        strCert += "無附加資料"
+                    }else{
+                        strCert += new TextDecoder().decode(value.certExtrsa[0]);
+                    }
+                    document.getElementById("certs_list").innerHTML = strCert;
                     alert(strCert);
                     // alert("憑證:" + "\n" + strCert);
                 } else {
@@ -339,11 +348,13 @@
                         strCert += "載具序號" + ConverSNFormat(value.sn) + "\n";
 
                     }
-
-                    strCert += "-----BEGIN CERTIFICATE-----\n" +
-                        btoa(String.fromCharCode.apply(null, value.certicficate)) +
-                        "\n-----END CERTIFICATE-----"
-                    console.log('憑證 :\n', strCert);
+                    strCert += "憑證附加資訊："+ "\n";
+                    if(value.certExtrsa[0].length==0){
+                        strCert += "無附加資料"
+                    }else{
+                        strCert += new TextDecoder().decode(value.certExtrsa[0]);
+                    }
+                    document.getElementById("certs_list").innerHTML = strCert;
                     alert(strCert);
                     // alert("憑證:" + "\n" + strCert);
                 } else {
@@ -354,7 +365,51 @@
 
         })
 
-        var strCerts = "";
+        document.getElementById('list_all_certextras').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            let index = document.getElementById('form_index').certIndex.value;
+            let isUseHashedData2Sign = document.getElementById('use_hashdata_label');
+            var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
+
+            var bToken_sn = undefined;
+            if (token_sn.length != 0) {
+                bToken_sn = hexStringToArrayBuffer(token_sn);
+            }
+
+            GTIDEM_ReadAllCertExtra(bToken_sn).then((value) => {
+
+                if (value.statusCode === CTAP1_ERR_SUCCESS) {
+                    var strCert = "";
+                    if (value.credentialNum != undefined) {
+                        strCert += "憑證數量 " + value.credentialNum + "\n";
+
+                    }
+                    if (value.sn != undefined) {
+                        strCert += "載具序號" + ConverSNFormat(value.sn) + "\n";
+
+                    }
+                    strCert += "憑證附加資訊："+ "\n";
+                    for(var i=1;i<=value.certExtrsas.length;i++){
+                        if(value.certExtrsa[0].length==0){
+                            strCert += "無附加資料"+ "\n";
+                        }else{
+                            strCert += new TextDecoder().decode(value.certExtrsa[i])+ "\n";
+                        }
+
+                    }
+                    document.getElementById("certs_list").innerHTML = strCert;
+                    alert(strCert);
+                    // alert("憑證:" + "\n" + strCert);
+                } else {
+                    alert(showFIDOErrorMessage(value));
+                }
+
+            });
+
+        })
+
+    
        /* document.getElementById('list_all_certs_use_btn').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
@@ -418,7 +473,7 @@
             listAllCerts(1);
 
         })
-        var strCert = "";
+       
 
         async function listAllCerts(num) {
             var i = num;
