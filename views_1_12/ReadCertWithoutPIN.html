@@ -115,6 +115,12 @@
                                                                 style="width: 162px; height:34px;background-color: #008CBA;">Read
                                                                 Cert</button>
                                                         </form>
+                                                        <form style="text-align: center;" id="form_extradata_label_btn"
+                                                            onsubmit="return false">
+                                                            <button class="btn btn-primary" action="submit"
+                                                                style="width: 162px; height:34px;background-color: #008CBA;">Read
+                                                                Ｅxtra Data</button>
+                                                        </form>
                                                     </td>
 
                                                     <td style="width: 385px;">
@@ -132,6 +138,12 @@
                                                                 <button class="btn btn-primary" action="submit"
                                                                     style="width: 162px; height:34px;background-color: #008CBA;">Read
                                                                     Cert</button>
+                                                            </form>
+                                                            <form style="text-align: center;" id="form_extradata_index_btn"
+                                                            onsubmit="return false">
+                                                            <button class="btn btn-primary" action="submit"
+                                                                style="width: 162px; height:34px;background-color: #008CBA;">Read
+                                                                Ｅxtra Data</button>
                                                             </form>
                                                         </p>
                                                     </td>
@@ -224,6 +236,46 @@
 
         })
 
+        document.getElementById('form_extradata_label_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            let label = document.getElementById('form_label').certlabel.value;
+            let isUseHashedData2Sign = document.getElementById('use_hashdata_label');
+            var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
+
+            var bToken_sn = undefined;
+            if (token_sn.length != 0) {
+                bToken_sn = hexStringToArrayBuffer(token_sn);
+            }
+            var bLabel = new Uint8Array(label.length);
+            bLabel.set(toUTF8Array(label), 0);
+
+            GTIDEM_ReadCertExtraWithLabel(bLabel, bToken_sn).then((value) => {
+                if (value.statusCode === CTAP1_ERR_SUCCESS) {
+                    var strCert = "";
+                    if (value.credentialNum != undefined) {
+                        strCert += "憑證數量 " + value.credentialNum + "\n";
+
+                    }
+                    if (value.sn != undefined) {
+                        strCert += "載具序號" + ConverSNFormat(value.sn) + "\n";
+
+                    }
+
+                    strCert += "-----BEGIN CERTIFICATE-----\n" +
+                        btoa(String.fromCharCode.apply(null, value.certicficate)) +
+                        "\n-----END CERTIFICATE-----"
+                    console.log('憑證 :\n', strCert);
+                    alert(strCert);
+                    // alert("憑證:" + "\n" + strCert);
+                } else {
+                    alert(showFIDOErrorMessage(value));
+                }
+
+            });
+
+        })
+
         document.getElementById('form_signdata_index_btn').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
@@ -262,6 +314,46 @@
             });
 
         })
+
+        document.getElementById('form_extradata_index_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            let index = document.getElementById('form_index').certIndex.value;
+            let isUseHashedData2Sign = document.getElementById('use_hashdata_label');
+            var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
+
+            var bToken_sn = undefined;
+            if (token_sn.length != 0) {
+                bToken_sn = hexStringToArrayBuffer(token_sn);
+            }
+
+            GTIDEM_ReadCertExtraWithIndex(index, bToken_sn).then((value) => {
+
+                if (value.statusCode === CTAP1_ERR_SUCCESS) {
+                    var strCert = "";
+                    if (value.credentialNum != undefined) {
+                        strCert += "憑證數量 " + value.credentialNum + "\n";
+
+                    }
+                    if (value.sn != undefined) {
+                        strCert += "載具序號" + ConverSNFormat(value.sn) + "\n";
+
+                    }
+
+                    strCert += "-----BEGIN CERTIFICATE-----\n" +
+                        btoa(String.fromCharCode.apply(null, value.certicficate)) +
+                        "\n-----END CERTIFICATE-----"
+                    console.log('憑證 :\n', strCert);
+                    alert(strCert);
+                    // alert("憑證:" + "\n" + strCert);
+                } else {
+                    alert(showFIDOErrorMessage(value));
+                }
+
+            });
+
+        })
+
         var strCerts = "";
        /* document.getElementById('list_all_certs_use_btn').addEventListener('submit', function (event) {
             event.preventDefault();
