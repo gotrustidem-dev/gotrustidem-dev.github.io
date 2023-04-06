@@ -28,6 +28,7 @@ class GTIdemJs {
         this.encNewPIN = undefined;
         this.hostEcpoint = undefined;
         this.msg = undefined;
+        this.certExtras = undefined;
     }
 
     ConvertWebError(error,msg){
@@ -165,6 +166,10 @@ class GTIdemJs {
                             this.rsakeypair= new Uint8Array( responseData['rsaPubKey']);
                             break;  
 
+                        case CMD_GetCertExtras:
+                            this.credentialNum = responseData['credNum'];
+                            this.certExtras = responseData['cerExtras'];
+                            break;  
                         default:
                     }                
                 }
