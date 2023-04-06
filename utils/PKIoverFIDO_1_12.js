@@ -3137,7 +3137,7 @@ function GTIDEM_GetJSVersion() {
  }
 
 
- async function GTIDEM_ReadCertExtras(bSerialNumber) {
+ async function GTIDEM_ReadAllCertExtra(bSerialNumber) {
 
     return await _GTIDEM_ReadCertExtras(undefined,undefined,bSerialNumber);
  }
