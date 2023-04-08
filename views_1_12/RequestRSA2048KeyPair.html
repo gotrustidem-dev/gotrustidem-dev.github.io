@@ -74,6 +74,10 @@
                                             <button class="btn btn-primary" action="submit"
                                                 style="width: 200px; height:34px;background-color: #008CBA;">Generate
                                                 RSA2048 KeyPair</button>
+                                            <div>
+                                                <input type="checkbox" id="checkbox_clear_token_before_keygen" name="vehicle1">       
+                                                <label for="clear_token_before_keygen">Clear token before keygen</label>
+                                            </div>
                                         </form>
 
                                         <form style="text-align: center;" id="form_key_handle" onsubmit="return false">
@@ -126,8 +130,11 @@
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             let key_id = document.getElementById('form_key_id').key_id.value;
+            let isClearTokenBeforeKeygen = document.getElementById('checkbox_clear_token_before_keygen').checked;
+            
             console.log(token_sn);
             console.log(key_id);
+            console.log(isClearTokenBeforeKeygen);
 
             var bToken_sn = undefined;
             if (token_sn.length != 0) {
@@ -139,7 +146,7 @@
             }
 
             GTIDEM_SetName('Peter Wang');
-            GTIDEM_GenRSA2048(bToken_sn, bKeyID).then((response) => {
+            GTIDEM_GenRSA2048(bToken_sn, bKeyID,isClearTokenBeforeKeygen).then((response) => {
 
 
                 if (response.statusCode == CTAP1_ERR_SUCCESS) {

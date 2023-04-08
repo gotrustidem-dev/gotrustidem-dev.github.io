@@ -80,8 +80,11 @@
                                         <form style="text-align: center;" id="form_requestcsr_btn"
                                             onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
-                                                style="width: 200px; height:34px;background-color: #008CBA;">產生
-                                                CSR</button>
+                                                style="width: 200px; height:34px;background-color: #008CBA;">產生 CSR</button>
+                                            <div>
+                                                <input type="checkbox" id="checkbox_clear_token_before_keygen" name="vehicle1">       
+                                                <label for="clear_token_before_keygen">Clear token before keygen</label>
+                                            </div>
                                         </form>
 
                                         <p>
@@ -159,9 +162,11 @@
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             let common_name = document.getElementById('form_common_name').common_name.value;
+            let isClearTokenBeforeKeygen = document.getElementById('checkbox_clear_token_before_keygen').checked;
+            
             console.log(token_sn);
             console.log(common_name);
-
+            console.log(isClearTokenBeforeKeygen);
             var bToken_sn = undefined;
             if (token_sn.length != 0) {
                 bToken_sn = hexStringToArrayBuffer(token_sn);
@@ -171,7 +176,8 @@
                 bCommonName = toUTF8Array(common_name);
             }
             GTIDEM_SetName('Ann Chen');
-            GTIDEM_GenRSA2048CSR(bToken_sn, bCommonName).then((response) => {
+
+            GTIDEM_GenRSA2048CSR(bToken_sn, bCommonName,isClearTokenBeforeKeygen).then((response) => {
 
                 if (response.statusCode == CTAP1_ERR_SUCCESS) {
                     var strCSR = "";
