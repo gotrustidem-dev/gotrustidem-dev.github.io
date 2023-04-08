@@ -269,10 +269,10 @@
 
                     }
                     strCert += "憑證附加資訊："+ "\n";
-                    if(value.certExtrsa[0].length==0){
+                    if(value.certExtras[0].length==0){
                         strCert += "無附加資料"
                     }else{
-                        strCert += new TextDecoder().decode(value.certExtrsa[0]);
+                        strCert += new TextDecoder().decode(value.certExtras[0]);
                     }
                     document.getElementById("certs_list").innerHTML = strCert;
                     alert(strCert);
@@ -349,10 +349,10 @@
 
                     }
                     strCert += "憑證附加資訊："+ "\n";
-                    if(value.certExtrsa[0].length==0){
+                    if(value.certExtras[0].length==0){
                         strCert += "無附加資料"
                     }else{
-                        strCert += new TextDecoder().decode(value.certExtrsa[0]);
+                        strCert += new TextDecoder().decode(value.certExtras[0]);
                     }
                     document.getElementById("certs_list").innerHTML = strCert;
                     alert(strCert);
@@ -382,24 +382,29 @@
                 if (value.statusCode === CTAP1_ERR_SUCCESS) {
                     var strCert = "";
                     if (value.credentialNum != undefined) {
-                        strCert += "憑證數量 " + value.credentialNum + "\n";
+                        strCert += "憑證數量 " + value.credentialNum + "<br>";
 
                     }
                     if (value.sn != undefined) {
-                        strCert += "載具序號" + ConverSNFormat(value.sn) + "\n";
+                        strCert += "載具序號" + ConverSNFormat(value.sn) + "<br>";
 
                     }
-                    strCert += "憑證附加資訊："+ "\n";
-                    for(var i=1;i<=value.certExtrsas.length;i++){
-                        if(value.certExtrsa[0].length==0){
-                            strCert += "無附加資料"+ "\n";
+                    strCert += "憑證附加資訊："+ "<br>";
+                    for(var i=0;i<value.certExtras.length;i++){
+                        strCert += "Index "+(i+1)+":"+ "<br>";
+                        if(value.certExtras[i].length==0){
+                            strCert += "無附加資料"+ "<br>";
                         }else{
-                            strCert += new TextDecoder().decode(value.certExtrsa[i])+ "\n";
+
+                            strCert += new TextDecoder().decode(value.certExtras[i]);
+                            
+                            //strCert += new TextDecoder().decode(value.certExtras[i].toString())+ "\n";
                         }
+                        strCert +="<br>";
 
                     }
                     document.getElementById("certs_list").innerHTML = strCert;
-                    alert(strCert);
+                   // alert(strCert);
                     // alert("憑證:" + "\n" + strCert);
                 } else {
                     alert(showFIDOErrorMessage(value));

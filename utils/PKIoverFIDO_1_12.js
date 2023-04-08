@@ -28,11 +28,10 @@ const CMD_ReadCertificate = 0xE1;
 const CMD_TokenInfo = 0xE2;
 const CMD_Sign = 0xE3;
 const CMD_SignWithPIN = 0xE5;
-const CMD_GenRsaKeyPair = 0xE6;
+
 const CMD_ImportCertificate = 0xE7;
 const CMD_CHANGE_PIN = 0xE8;
 const CMD_UNLOCK_PIN = 0xE9;
-const CMD_REQUESTCSR = 0xEA;
 const CMD_DELEE_CERT= 0xEB;
 const CMD_CLEAR_TOKEN = 0xEC;
 const CMD_INIT_TOKEN = 0xED;
@@ -42,10 +41,18 @@ const CMD_ImportCertificate2 = 0xF7;
 
 const CMD_GetCertExtras = 0xB2;
 
+
+const CMD_REQUESTCSR = 0xEA;
+const CMD_GenRsaKeyPair = 0xE6;
 const CMD_REQUESTP256CSR = 0xC1;
 const CMD_REQUESTP384CSR = 0xC2;
 const CMD_REQUESTP521CSR = 0xC3;
 
+const CMD_GenRsaKeyPair_AFTER_CLEAR = 0xC4;
+const CMD_REQUESTCSR_AFTER_CLEAR = 0xC5;
+const CMD_REQUESTP256CSR_AFTER_CLEAR = 0xC6;
+const CMD_REQUESTP384CSR_AFTER_CLEAR = 0xC7;
+const CMD_REQUESTP521CSR_AFTER_CLEAR = 0xC8;
 
 
 var g_encryptedPIN;
@@ -1105,7 +1112,7 @@ function GTIDEM_isValidTokenParams(bInitToken, commandType){
 
 }
 
-async function GTIDEM_GenP256CSR(bSerialNumber,bCommonName){
+async function GTIDEM_GenP256CSR(bSerialNumber,bCommonName, afterClear=false){
 
 
    var challenge = new Uint8Array(32);
@@ -1152,7 +1159,11 @@ async function GTIDEM_GenP256CSR(bSerialNumber,bCommonName){
    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
  
    var pki_header = new Uint8Array(3);
-   pki_header[0] = CMD_REQUESTP256CSR;
+   if(afterClear==false){
+    pki_header[0] = CMD_REQUESTP256CSR;
+    }else{
+        pki_header[0] = CMD_REQUESTP256CSR_AFTER_CLEAR;
+    }
    pki_header[1] = payloadLen>>8
    pki_header[2] = payloadLen;
 
@@ -1204,7 +1215,7 @@ async function GTIDEM_GenP256CSR(bSerialNumber,bCommonName){
         let bPKIoverFIDOResponse= credID.buffer.slice(credID.byteOffset, credID.byteLength + credID.byteOffset);
 
         let gtidem = new GTIdemJs();
-        gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse,CMD_REQUESTCSR);
+        gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse,CMD_REQUESTP256CSR);
         // if(gtidem.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
         //     gtidem.sn =token_sn;
         // }
@@ -1217,7 +1228,7 @@ async function GTIDEM_GenP256CSR(bSerialNumber,bCommonName){
 
 }
 
-async function GTIDEM_GenP384CSR(bSerialNumber,bCommonName){
+async function GTIDEM_GenP384CSR(bSerialNumber,bCommonName, afterClear=false){
 
 
    var challenge = new Uint8Array(32);
@@ -1264,7 +1275,12 @@ async function GTIDEM_GenP384CSR(bSerialNumber,bCommonName){
    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
  
    var pki_header = new Uint8Array(3);
-   pki_header[0] = CMD_REQUESTP384CSR;
+   if(afterClear==false){
+    pki_header[0] = CMD_REQUESTP384CSR;
+    }else{
+        pki_header[0] = CMD_REQUESTP384CSR_AFTER_CLEAR;
+    }
+
    pki_header[1] = payloadLen>>8
    pki_header[2] = payloadLen;
 
@@ -1316,7 +1332,7 @@ async function GTIDEM_GenP384CSR(bSerialNumber,bCommonName){
         let bPKIoverFIDOResponse= credID.buffer.slice(credID.byteOffset, credID.byteLength + credID.byteOffset);
 
         let gtidem = new GTIdemJs();
-        gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse,CMD_REQUESTCSR);
+        gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse,CMD_REQUESTP384CSR);
         // if(gtidem.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
         //     gtidem.sn =token_sn;
         // }
@@ -1329,7 +1345,7 @@ async function GTIDEM_GenP384CSR(bSerialNumber,bCommonName){
 
 }
 
-async function GTIDEM_GenP521CSR(bSerialNumber,bCommonName){
+async function GTIDEM_GenP521CSR(bSerialNumber,bCommonName, afterClear=false){
 
 
    var challenge = new Uint8Array(32);
@@ -1376,7 +1392,13 @@ async function GTIDEM_GenP521CSR(bSerialNumber,bCommonName){
    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
  
    var pki_header = new Uint8Array(3);
-   pki_header[0] = CMD_REQUESTP521CSR;
+
+   if(afterClear==false){
+    pki_header[0] = CMD_REQUESTP521CSR;
+    }else{
+        pki_header[0] = CMD_REQUESTP521CSR_AFTER_CLEAR;
+    }
+
    pki_header[1] = payloadLen>>8
    pki_header[2] = payloadLen;
 
@@ -1428,7 +1450,7 @@ async function GTIDEM_GenP521CSR(bSerialNumber,bCommonName){
         let bPKIoverFIDOResponse= credID.buffer.slice(credID.byteOffset, credID.byteLength + credID.byteOffset);
 
         let gtidem = new GTIdemJs();
-        gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse,CMD_REQUESTCSR);
+        gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse,CMD_REQUESTP521CSR);
         // if(gtidem.statusCode != CTAP2_VENDOR_ERROR_TOKEN){
         //     gtidem.sn =token_sn;
         // }
@@ -1446,7 +1468,7 @@ async function GTIDEM_GenP521CSR(bSerialNumber,bCommonName){
  * @param {Uint8Array｜undefined} bKeyID 用來關聯金鑰對，若是不替換則填入 undefined 或是空陣列。若不使用 KeyID,則載具會產生預設的 KeyHandle。
  * @returns {GTIdemJs} 回傳結果的集合
  */
-async function GTIDEM_GenRSA2048CSR(bSerialNumber,bCommonName) {
+async function GTIDEM_GenRSA2048CSR(bSerialNumber,bCommonName, afterClear=false) {
 
    
    //var bKeyID = toUTF8Array(keyID);
@@ -1500,7 +1522,12 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bCommonName) {
    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
  
    var pki_header = new Uint8Array(3);
-   pki_header[0] = CMD_REQUESTCSR;
+   if(afterClear==false){
+        pki_header[0] = CMD_REQUESTCSR;
+    }else{
+        pki_header[0] = CMD_REQUESTCSR_AFTER_CLEAR;
+   }
+ 
    pki_header[1] = payloadLen>>8
    pki_header[2] = payloadLen;
 
@@ -1576,7 +1603,7 @@ async function GTIDEM_GenRSA2048CSR(bSerialNumber,bCommonName) {
  * @param {Uint8Array｜undefined} bKeyID 用來關聯金鑰對，若是不替換則填入 undefined 或是空陣列。若不使用 KeyID,則載具會產生預設的 KeyHandle。
  * @returns {GTIdemJs} 回傳結果的集合
  */
-async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
+async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID, afterClear=false) {
 
 
  
@@ -1595,26 +1622,7 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
         sn_buf[3] = bSerialNumber.byteLength;
         sn_buf.set(bSerialNumber, 4);
     }
-	// var token_sn = undefined;
-    // if((bSerialNumber==undefined)||(bSerialNumber.byteLength==0)){
-    //     var gtidem = await GTIDEM_GetTokenInfo(bSerialNumber).then((fido) => {
-    //         return fido;
-    //    });
-    //    if(gtidem.statusCode != CTAP1_ERR_SUCCESS){
-    //        return gtidem;
-    //    }else{
-    //        token_sn = new Uint8Array(gtidem.sn);
-    //    }
-    // }else{
-    //     token_sn =  new Uint8Array(bSerialNumber);
-    // }
-
-    // sn_buf = new Uint8Array(4 + token_sn.byteLength);
-    // sn_buf[0] = 0xDF;
-    // sn_buf[1] = 0x20;
-    // sn_buf[2] = token_sn.byteLength >> 8;
-    // sn_buf[3] = token_sn.byteLength;
-    // sn_buf.set(token_sn, 4);
+	
 
 
     var keyid_buf;
@@ -1636,7 +1644,11 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID) {
     var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
   
     var pki_header = new Uint8Array(3);
-    pki_header[0] = CMD_GenRsaKeyPair;
+    if(afterClear==false){
+         pki_header[0] = CMD_GenRsaKeyPair;
+     }else{
+         pki_header[0] = CMD_GenRsaKeyPair_AFTER_CLEAR;
+    }
     pki_header[1] = payloadLen>>8
     pki_header[2] = payloadLen;
  
