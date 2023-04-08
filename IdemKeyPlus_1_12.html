@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>IdemKeyPlus function</title>
+<script src="../utils/helpers.js"></script>
+</head>
+<body>
+    <script>
+        var isSupportBrower = true;
+        window.onload = function () {
+           var browser = get_browser();
+           if((browser.name=="Safari")&&
+               (
+                       ((parseInt(browser.major)==14)&&(parseInt(browser.minor)==1))||
+                       ((parseInt(browser.major)==15)&&(parseInt(browser.minor)==0))||
+                       ((parseInt(browser.major)==15)&&(parseInt(browser.minor)==1))||
+                       ((parseInt(browser.major)==15)&&(parseInt(browser.minor)==2))||
+                       ((parseInt(browser.major)==15)&&(parseInt(browser.minor)==3))
+                       ))
+           {
+                isSupportBrower =false
+                var aaa = document.getElementById("changepin").textContent;
+                document.getElementById("changepin").textContent= aaa+'(此瀏覽器版本無法使用此選項變更密碼,請嘗試下方做法)';
+           }
+       }
+    </script>
+    <p><a href="https://gotrustidem-dev.github.io/views_1_12/ReadCertWithoutPIN.html">Read Cert without PIN</a></p>
+    <p><a href="https://gotrustidem-dev.github.io/views_1_12/SignData.html">Sign Data</a></p>
+    <p><a href="https://gotrustidem-dev.github.io/views_1_12/GetTokenInfo.html">Get Token Information</a></p>
+    <p><a href="https://gotrustidem-dev.github.io/views_1_12/ChangePIN.html" id="changepin">Change PIN</a></p>
+    <!-- <p><a href="https://gotrustidem-dev.github.io/views_1_12/ChangePIN4AllBrower.html">Change PIN</a></p>-->
+    <p><a href="https://gotrustidem-dev.github.io/views_1_12/ChangePIN4AllBrower_V2.html">Change PIN using two steps</a></p> 
+    <p><a href="https://gotrustidem-dev.github.io/views_1_12/DeleteCerts.html">Delete cert or clear token</a></p>
+    <p><a href="https://gotrustidem-dev.github.io/views_1_12/RequestRSA2048CSR.html">Request RSA2048 CSR(測試手機簽名請使用此選項產生憑證)</a></p>
+    <p><a href="https://gotrustidem-dev.github.io/views_1_12/RequestRSA2048KeyPair.html">Request RSA 2048 Key Pair.</a></p>
+    <p><a href="https://gotrustidem-dev.github.io/views_1_12/RequestP256CSR.html">Request P256 CSR</a></p>
+    <p><a href="https://gotrustidem-dev.github.io/views_1_12/RequestP384CSR.html">Request P384 CSR</a></p>
+    <p><a href="https://gotrustidem-dev.github.io/views_1_12/RequestP521CSR.html">Request P521 CSR</a></p>
+    <p><a href="https://gotrustidem-dev.github.io/views_1_12/RequestInitToken.html">Request Init Token</a></p>
+    <p><a href="https://gotrustidem-dev.github.io/views_1_12/RequestUnlockPIN.html">Request unlock PIN</a></p>
+    <p><a href="https://gotrustidem-dev.github.io/views_1_12/RequestAsymKeyPair.html">Request Asymmetric Key pair</a></p>
+    <p><a href="https://gotrustidem-dev.github.io/views_1_12/RequestTokenReset.html">Request Token Reset</a></p>
+    <p><a href="https://gotrustidem-dev.github.io/views_1_12/CheckPINValid.html">Example Check PIN valid</a></p>
+    <p><a href="https://gotrustidem-dev.github.io/views_1_12/CheckPINValidV2.html">Example Check PIN valid Version 2</a></p>
+   
+</body>
+
+</html>
