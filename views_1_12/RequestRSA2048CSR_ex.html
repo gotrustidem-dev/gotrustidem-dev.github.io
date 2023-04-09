@@ -249,7 +249,7 @@
 
 
 
-            GTIDEM_ImportCertificate2(bToken_sn, bKeyHandle, bKeyID, bHexCert, undefined,bExtraData).then((
+            GTIDEM_ImportCertificate(bToken_sn, bKeyHandle, bKeyID, bHexCert, undefined,bExtraData).then((
                 response) => {
                 if (response.statusCode == CTAP1_ERR_SUCCESS) {
                     var msg = "匯入憑證完成\n";
