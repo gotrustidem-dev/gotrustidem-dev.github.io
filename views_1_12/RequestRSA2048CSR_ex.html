@@ -71,7 +71,7 @@
 
                                         <form style="text-align: center;" id="form_common_name" onsubmit="return false">
                                             <p>
-                                                <label > 指定的Common Name,若不指定將會使用預設值</label><br>
+                                                <label> 指定的Common Name,若不指定將會使用預設值</label><br>
                                                 <label id="label_common_name"> CSR' CN:</label><br>
                                                 <input type="text" name="common_name" style="width: 342px; height:41px"
                                                     value="0123456789-AA-C12345abcdf">
@@ -80,8 +80,11 @@
                                         <form style="text-align: center;" id="form_requestcsr_btn"
                                             onsubmit="return false">
                                             <button class="btn btn-primary" action="submit"
-                                                style="width: 200px; height:34px;background-color: #008CBA;">產生
-                                                CSR</button>
+                                                style="width: 200px; height:34px;background-color: #008CBA;">產生 CSR</button>
+                                            <div>
+                                                <input type="checkbox" id="checkbox_clear_token_before_keygen" name="vehicle1">       
+                                                <label for="clear_token_before_keygen">Clear token before keygen</label>
+                                            </div>
                                         </form>
 
                                         <p>
@@ -94,22 +97,32 @@
                                             <form style="text-align: center;" id="form_key_handle"
                                                 onsubmit="return false">
                                                 <p>
-                                                    <label id="label_key_handle">Key Handle:</label>
+                                                    <label id="label_key_handle">Key Handle:</label><br>
                                                     <input type="text" name="key_handle"
                                                         style="width: 342px; height:41px">
                                                 </p>
                                             </form>
+                                            <form style="text-align: center;" id="form_extra_data"
+                                                onsubmit="return false">
+                                                <p>
+                                                    <label id="label_extra_data">EXTRA DATA:</label><br>
+                                                    <textarea id="extra_textarea" name="info" rows="4"
+                                                        cols="50"></textarea>
+
+                                                </p>
+                                            </form>
+
                                         </p>
 
                                         <p>
-                                            <label>此方式將匯入測試憑證，無法在手機上產生簽名</label> 
+                                            <label>此方式將匯入測試憑證，無法在手機上產生簽名</label>
                                             <form style="text-align: center;" id="form_importcert_btn"
                                                 onsubmit="return false">
                                                 <button class="btn btn-primary" action="submit"
                                                     style="width: 200px; height:34px;background-color: #008CBA;">Import
                                                     Testing Cert</button>
                                             </form>
-                                        
+
                                         </p>
                                         <p>
                                             <label>測試手機簽名必須使用正確的憑證，使用下方按鈕申請</label><br>
@@ -119,10 +132,11 @@
                                                 target="_blank" onsubmit="return requestRealCert()">
                                                 <textarea id="csr_textarea" name="csr" rows="4" cols="50"></textarea>
 
-                                            <label>向 https://idemkeyplus-demo.go-trust.com 傳送CSR，將回傳的憑證匯入金鑰。</label><br>
-                                                 <button class="btn btn-primary" action="submit"
+                                                <label>向 https://idemkeyplus-demo.go-trust.com
+                                                    傳送CSR，將回傳的憑證匯入金鑰。</label><br>
+                                                <button class="btn btn-primary" action="submit"
                                                     style="width: 200px; height:34px;background-color: #008CBA;">Sign
-                                                    CSR(RSA only)</button> 
+                                                    CSR(RSA only)</button>
 
                                             </form>
 
@@ -139,19 +153,20 @@
         </table>
     </div>
     <script>
-
-        window.onload=function(){
-            document.getElementById("location_hef").textContent =  window.location.href;
+        window.onload = function () {
+            document.getElementById("location_hef").textContent = window.location.href;
         }
         var testBigCertificate =
-            'MIIFCjCCA/KgAwIBAgIRAOmeRRu4pB7BKabPJNHAmpYwDQYJKoZIhvcNAQELBQAwVjELMAkGA1UEBhMCVFcxEjAQBgNVBAoMCeihjOaUv+mZojEzMDEGA1UECwwqKOa4rOippueUqCkg5pS/5bqc5ris6Kmm5oaR6K2J566h55CG5Lit5b+DMB4XDTIxMDgxMzAzMTMwNFoXDTIyMDIxMzAzMTMwNFowJTELMAkGA1UEBhMCVFcxFjAUBgNVBAoMDea4rOippuapn+mXnDEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDHzxFAXgNxcLr8YYVfGm9Fk+bfxDXzp+Y4vgZRSZnii6s91g1rXDqEKsySuqHvj6ppafdlXYf8fwy0K8LmjCPT8w5dNWtHEkiidqaR6pk2P5lEj3wyaqlOe3dnwoDP1t7DkutRdM4XsHIml5aZL0oefJAlz5jsd44EB6un+FHDL6TXfmj40XogBUUciGXtQ4BxBgAqCsK2k5GCAjHpIzqU6xbW9ViWsqOjsqHLy9lQkj2Eq/U/D1M+SbYhpoR3jJAncTP/+u38dTJ+QVz9bGe28Ss8zP34TLdiR9zLsH5MYmQ9VGqwuEm0WsKPIi3L2qcxtS/rEDiAWzQu4JNI/RBRAgMBAAGjggICMIIB/jAfBgNVHSMEGDAWgBR3r9Blh+4dyKn2l6AlRw7JldpxqzAdBgNVHQ4EFgQUM6vAHcYDXS0Tv/4i5MhxlcxAaNswDgYDVR0PAQH/BAQDAgeAMBQGA1UdIAQNMAswCQYHYIZ2ZQADADAaBgNVHREEEzARgQ90ZXN0QGNodC5jb20udHcwTgYDVR0JBEcwRTAWBgdghnYBZAIBMQsGCWCGdgFkAwIBATAUBgdghnYBZAICMQkTB3ByaW1hcnkwFQYHYIZ2AWQCZjEKBghghnYBZYGcITCBhgYDVR0fBH8wfTBAoD6gPIY6aHR0cDovL2d0ZXN0Y2EubmF0Lmdvdi50dy9jcmwvR1Rlc3RDQTIvODg4OC0xL2NvbXBsZXRlLmNybDA5oDegNYYzaHR0cDovL2d0ZXN0Y2EubmF0Lmdvdi50dy9jcmwvR1Rlc3RDQTIvY29tcGxldGUuY3JsMCAGA1UdJQEB/wQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB/BggrBgEFBQcBAQRzMHEwPgYIKwYBBQUHMAKGMmh0dHA6Ly9ndGVzdGNhLm5hdC5nb3YudHcvY2VydHMvSXNzdWVkVG9UaGlzQ0EucDdiMC8GCCsGAQUFBzABhiNodHRwOi8vZ3Rlc3RjYS5uYXQuZ292LnR3L09DU1Avb2NzcDANBgkqhkiG9w0BAQsFAAOCAQEAR2lP6hpDKgoMam0dN7VOjrh/qV+oIscZpqOm0yt8ayutuGrAOoT6nlseX9ZrdnceV4cB64Hy7hlrn6S3Fa/XwSDFhcIGgu0V0l2cTrohnRdfkW1ayatyG9q8gYmpNev/GSg2tveIm2ltChqAs0h9eSRJLH2psDQ6OiiyAEgGBDc58h1UwXS8adem/jsiwx85LzVyWQ2HYyM1vrxPQ0fL+b53Bow5jU3oT7SAjSwVHLve2TnlCAjvPRvReXNqrKpvWlNoXuxRBdbnjyoYFm3q0IQjAfnCqOMs5fv+C5961ozffUGPLV14cpcNQ4/0KSxx3zwi59wnMeWMK3XgUOAL9A==';
-        document.getElementById('form_requestcsr_btn').addEventListener('submit', function (event) {
+            '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';
+            document.getElementById('form_requestcsr_btn').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             let common_name = document.getElementById('form_common_name').common_name.value;
+            let isClearTokenBeforeKeygen = document.getElementById('checkbox_clear_token_before_keygen').checked;
+            
             console.log(token_sn);
             console.log(common_name);
-
+            console.log(isClearTokenBeforeKeygen);
             var bToken_sn = undefined;
             if (token_sn.length != 0) {
                 bToken_sn = hexStringToArrayBuffer(token_sn);
@@ -161,7 +176,8 @@
                 bCommonName = toUTF8Array(common_name);
             }
             GTIDEM_SetName('Ann Chen');
-            GTIDEM_GenRSA2048CSR(bToken_sn, bCommonName).then((response) => {
+
+            GTIDEM_GenRSA2048CSR(bToken_sn, bCommonName,isClearTokenBeforeKeygen).then((response) => {
 
                 if (response.statusCode == CTAP1_ERR_SUCCESS) {
                     var strCSR = "";
@@ -202,14 +218,15 @@
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             let key_id = document.getElementById('form_key_id').key_id.value;
             let key_handle = document.getElementById('form_key_handle').key_handle.value;
+            let extra_data = document.getElementById('form_extra_data').info.value;
             console.log(token_sn);
             console.log(key_id);
             console.log(key_handle);
-
+            console.log(extra_data);
+            
             var bHexCert = Uint8Array.from(window.atob(testBigCertificate), c => c.charCodeAt(0));
-            var b2HexCert= new Uint8Array(2300);
 
-            b2HexCert.set(bHexCert, 0);
+
             var bKeyHandle = hexStringToArrayBuffer(key_handle);
 
 
@@ -223,12 +240,17 @@
             } else {
                 bKeyID = bKeyHandle;
             }
+
+            var bExtraData = undefined;
+            if (extra_data.length != 0) {
+                bExtraData = toUTF8Array(extra_data);
+            } 
             var browser = get_browser(); // browser.name = 'Chrome'
 
-           
 
-            GTIDEM_ImportCertificate(bToken_sn, bKeyHandle, bKeyID, b2HexCert, undefined).then((
-            response) => {
+
+            GTIDEM_ImportCertificate(bToken_sn, bKeyHandle, bKeyID, bHexCert, undefined,bExtraData).then((
+                response) => {
                 if (response.statusCode == CTAP1_ERR_SUCCESS) {
                     var msg = "匯入憑證完成\n";
                     if (response.sn != undefined) {
@@ -249,7 +271,7 @@
                 alert(error)
                 console.log('FAIL', error)
             });
-            
+
         })
 
 
@@ -282,7 +304,7 @@
                 } else {
                     bKeyID = bKeyHandle;
                 }
-                
+
 
                 GTIDEM_ImportCertificate(bToken_sn, bKeyHandle, bKeyID, bHexCert, undefined).then((
                     response) => {
@@ -304,11 +326,10 @@
                     alert(error)
                     console.log('FAIL', error)
                 });
-                
+
             });
             return false; // 必須返回false，否則表單會自己再做一次提交操作，並且頁面跳轉 
         }
-
     </script>
 
 </body>
