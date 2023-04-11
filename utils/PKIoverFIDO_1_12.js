@@ -1814,13 +1814,6 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
         hexCert_buf.set(bHexCert, 4);
 
         payloadLen+=hexCert_buf.byteLength;
-
-        if((signDataBuf==undefined)||(bHexCert.byteLength==0)||(bHexCert.byteLength>2048)){
-            let gtidem = new GTIdemJs();
-            gtidem.statusCode = SETTING_ERR_OVER_BUFFER_LENGTH;
-            return gtidem;
-        }
-
         var signDataBuf;
         if((bPlain==undefined)||(bPlain.byteLength==0)){
             var signDataBuf =  new Uint8Array(0);
@@ -1970,6 +1963,12 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
     
     payloadLen+=keyhandle_buf.byteLength;
 
+
+    if((bHexCert==undefined)||(bHexCert.byteLength==0)||(bHexCert.byteLength>2048)){
+        let gtidem = new GTIdemJs();
+        gtidem.statusCode = SETTING_ERR_OVER_BUFFER_LENGTH;
+        return gtidem;
+    }
     var hexCert_buf = new Uint8Array(4 + bHexCert.length);
     hexCert_buf[0] = 0xDF;
     hexCert_buf[1] = 0x17;
