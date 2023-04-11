@@ -102,12 +102,20 @@
                                                         <p style="text-align: center;">Target Label/KeyID</p>
 
                                                         <p>
+                                                            <label>String:</label>
                                                             <form style="text-align: center;" id="form_label"
                                                                 onsubmit="return false">
                                                                 <input type="text" name="certlabel"
                                                                     style="width: 342px; height:41px">
-
                                                             </form>
+                                                            <label>Hex String:</label>
+                                                            <form style="text-align: center;" id="form_label_hex"
+                                                            onsubmit="return false">
+                                                            <p>
+                                                                <input type="text" name="certlabelhex"
+                                                                    style="width: 342px; height:41px">
+                                                            </p>
+                                                        </form>
                                                         </p>
                                                         <form style="text-align: center;" id="form_signdata_label_btn"
                                                             onsubmit="return false">
@@ -209,13 +217,22 @@
             let label = document.getElementById('form_label').certlabel.value;
             let isUseHashedData2Sign = document.getElementById('use_hashdata_label');
             var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
+            let labelHex = document.getElementById('form_label_hex').certlabelhex.value;
+
 
             var bToken_sn = undefined;
             if (token_sn.length != 0) {
                 bToken_sn = hexStringToArrayBuffer(token_sn);
             }
-            var bLabel = new Uint8Array(label.length);
-            bLabel.set(toUTF8Array(label), 0);
+            var bLabel;
+            if(label.length!=0){
+                bLabel = new Uint8Array(label.length);
+                bLabel.set(toUTF8Array(label), 0);
+            }else{
+                bLabel = hexStringToArrayBuffer(labelHex);
+            }
+           
+            
 
             GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bToken_sn).then((value) => {
                 if (value.statusCode === CTAP1_ERR_SUCCESS) {
@@ -249,13 +266,19 @@
             let label = document.getElementById('form_label').certlabel.value;
             let isUseHashedData2Sign = document.getElementById('use_hashdata_label');
             var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
-
+            let labelHex = document.getElementById('form_label_hex').certlabelhex.value;
             var bToken_sn = undefined;
             if (token_sn.length != 0) {
                 bToken_sn = hexStringToArrayBuffer(token_sn);
             }
-            var bLabel = new Uint8Array(label.length);
-            bLabel.set(toUTF8Array(label), 0);
+            var bLabel;
+            if(label.length!=0){
+                bLabel = new Uint8Array(label.length);
+                bLabel.set(toUTF8Array(label), 0);
+            }else{
+                bLabel = hexStringToArrayBuffer(labelHex);
+            }
+
 
             GTIDEM_ReadCertExtraWithLabel(bLabel, bToken_sn).then((value) => {
                 if (value.statusCode === CTAP1_ERR_SUCCESS) {
