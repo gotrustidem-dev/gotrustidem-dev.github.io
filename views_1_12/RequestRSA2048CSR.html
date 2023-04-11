@@ -245,10 +245,6 @@
             if (extra_data.length != 0) {
                 bExtraData = toUTF8Array(extra_data);
             } 
-            var browser = get_browser(); // browser.name = 'Chrome'
-
-
-
             GTIDEM_ImportCertificate(bToken_sn, bKeyHandle, bKeyID, bHexCert, undefined,bExtraData).then((
                 response) => {
                 if (response.statusCode == CTAP1_ERR_SUCCESS) {
@@ -284,9 +280,11 @@
                 let token_sn = document.getElementById('form_token_sn').token_sn.value;
                 let key_id = document.getElementById('form_key_id').key_id.value;
                 let key_handle = document.getElementById('form_key_handle').key_handle.value;
+                let extra_data = document.getElementById('form_extra_data').info.value;
                 console.log(token_sn);
                 console.log(key_id);
                 console.log(key_handle);
+                console.log(extra_data);
 
                 //var bHexCert = Uint8Array.from(csrasn1, c => c.charCodeAt(0));
                 var bHexCert = hexStringToArrayBuffer(csrasn1);
@@ -305,6 +303,10 @@
                     bKeyID = bKeyHandle;
                 }
 
+                var bExtraData = undefined;
+                if (extra_data.length != 0) {
+                    bExtraData = toUTF8Array(extra_data);
+                } 
 
                 GTIDEM_ImportCertificate(bToken_sn, bKeyHandle, bKeyID, bHexCert, undefined).then((
                     response) => {

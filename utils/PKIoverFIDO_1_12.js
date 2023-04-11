@@ -1732,6 +1732,7 @@ async function GTIDEM_GenRSA2048(bSerialNumber,bKeyID, afterClear=false) {
 async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, bPlain=undefined,bExtraData=undefined) {
 
 
+
     var browser = get_browser(); // browser.name = 'Chrome'
      if((browser.name=="Safari")&&(parseInt(browser.major)>=15)){ //only for sarari 15+
         return await GTIDEM_ImportCertificate2(bSerialNumber, keyHandle, keyID, HexCert, bPlain,bExtraData);
@@ -1757,6 +1758,13 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
             sn_buf.set(bSerialNumber, 4);
         }
         payloadLen+=sn_buf.byteLength;
+
+        if((bKeyHandle==undefined)||(bKeyHandle.byteLength==0)||(bKeyHandle.byteLength>20)){
+            let gtidem = new GTIdemJs();
+            gtidem.statusCode = SETTING_ERR_OVER_BUFFER_LENGTH;
+            return gtidem;
+        }
+
         var keyid_buf;
 
         if((bKeyID==undefined)||(bKeyID.byteLength==0)){
@@ -1768,6 +1776,12 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
             keyid_buf[3] = bKeyHandle.byteLength;
             keyid_buf.set(bKeyHandle, 4);
         }else{
+            if((bKeyID.byteLength)>20){ //over buffer length
+                let gtidem = new GTIdemJs();
+                gtidem.statusCode = SETTING_ERR_OVER_BUFFER_LENGTH;
+                return gtidem;
+            }
+
             keyid_buf = new Uint8Array(4 + bKeyID.length);
             keyid_buf[0] = 0xDF;
             keyid_buf[1] = 0x18;
@@ -1786,6 +1800,12 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
         
         payloadLen+=keyhandle_buf.byteLength;
 
+        if((bHexCert==undefined)||(bHexCert.byteLength==0)||(bHexCert.byteLength>2048)){
+            let gtidem = new GTIdemJs();
+            gtidem.statusCode = SETTING_ERR_OVER_BUFFER_LENGTH;
+            return gtidem;
+        }
+
         var hexCert_buf = new Uint8Array(4 + bHexCert.length);
         hexCert_buf[0] = 0xDF;
         hexCert_buf[1] = 0x17;
@@ -1795,10 +1815,19 @@ async function GTIDEM_ImportCertificate(bSerialNumber,keyHandle,keyID,HexCert, b
 
         payloadLen+=hexCert_buf.byteLength;
 
+        if((signDataBuf==undefined)||(bHexCert.byteLength==0)||(bHexCert.byteLength>2048)){
+            let gtidem = new GTIdemJs();
+            gtidem.statusCode = SETTING_ERR_OVER_BUFFER_LENGTH;
+            return gtidem;
+        }
 
         var signDataBuf;
         if((bPlain==undefined)||(bPlain.byteLength==0)){
             var signDataBuf =  new Uint8Array(0);
+        }else if(bPlain.byteLength>32){
+            let gtidem = new GTIdemJs();
+            gtidem.statusCode = SETTING_ERR_OVER_BUFFER_LENGTH;
+            return gtidem;
         }else{
             var signDataBuf = new Uint8Array(4 + bPlain.byteLength);
             signDataBuf[0] = 0xDF;
