@@ -159,6 +159,9 @@ var showFIDOErrorMessage = (gtidem) => {
         case CTAP2_ERR_NO_CREDENTIALS:
             errorMsg += '要求物件不存在';
             break;
+        case CTAP2_ERR_CREDENTIAL_NOT_VALID:
+            errorMsg += '物件毀損或是未完成匯入憑證';
+            break;    
         case CTAP2_ERR_CREDENTIAL_EXCLUDED:
             errorMsg +='要求物件已存在';
             break;
