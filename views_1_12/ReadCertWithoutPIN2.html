@@ -256,9 +256,9 @@
             if (token_sn.length != 0) {
                 bToken_sn = hexStringToArrayBuffer(token_sn);
             }
-            if(isMouse==false){
+            if (isMouse == false) {
                 listAllCerts(1);
-                isMouse= true;
+                isMouse = true;
             }
 
         })
@@ -279,25 +279,25 @@
 
         async function listAllCerts(num) {
             var i = num;
-            var delayInMilliseconds = 500; //1 second
-            document.getElementById("certs_list").innerHTML=""; 
+            var delayInMilliseconds = 50; //1 second
+            document.getElementById("certs_list").innerHTML = "";
             var isRead = true;
             var browser = get_browser();
             var time_id = setInterval(async function () {
-               
-     
-                console.log("Has focuse?: "+document.hasFocus());
-                if((browser.name=="Safari")&&!document.hasFocus()){
+
+
+                console.log("Has focuse?: " + document.hasFocus());
+                if ((browser.name == "Safari") && !document.hasFocus()) {
                     return;
                 }
-                if(isRead==false){
+                if (isRead == false) {
                     return;
                 }
                 isRead = false;
                 console.log("run GTIDEM_ReadCertByIndexWithoutPIN START");
                 await GTIDEM_ReadCertByIndexWithoutPIN(i, undefined).then((value) => {
                     console.log("run GTIDEM_ReadCertByIndexWithoutPIN OK");
-                    
+
                     if (value.statusCode === CTAP1_ERR_SUCCESS) {
 
                         if (value.credentialNum != undefined) {
@@ -316,14 +316,14 @@
                             btoa(String.fromCharCode.apply(null, value.certicficate)) +
                             "<br>-----END CERTIFICATE-----<br>"
                         //enable timeout
-                        if(i<value.credentialNum){
+                        if (i < value.credentialNum) {
                             i++;
-                        }else{
+                        } else {
                             clearInterval(time_id);
                             document.getElementById("certs_list").innerHTML = strCert;
-                        }    
+                        }
                     } else {
-                        
+
                         alert(showFIDOErrorMessage(value));
                         clearInterval(time_id);
                     }
@@ -334,7 +334,7 @@
 
             console.log("run GTIDEM_ReadCertByIndexWithoutPIN END");
 
-            
+
         }
     </script>
 
