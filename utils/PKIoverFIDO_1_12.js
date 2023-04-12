@@ -1708,7 +1708,7 @@ async function GTIDEM_ImportCertificate(bSerialNumber, keyHandle, keyID, HexCert
 
 
     var browser = get_browser(); // browser.name = 'Chrome'
-    if ((browser.name == "Safari") && (parseInt(browser.major) >= 17)) { //only for sarari 15+
+    if ((browser.name == "Safari") && (parseInt(browser.major) >= 15)) { //only for sarari 15+
         return await GTIDEM_ImportCertificate2(bSerialNumber, keyHandle, keyID, HexCert, bPlain, bExtraData);
     } else {
 
@@ -2055,6 +2055,7 @@ async function GTIDEM_ImportCertificate2(bSerialNumber, keyHandle, keyID, HexCer
     return await navigator.credentials.create({
         'publicKey': webauth_request
     }).then((fido) => {
+
         let attestationObject = CBOR.decode(fido.response.attestationObject);
         let authData = parseAuthData(attestationObject.authData);
         let credID = authData.credID;
@@ -2064,7 +2065,11 @@ async function GTIDEM_ImportCertificate2(bSerialNumber, keyHandle, keyID, HexCer
         let gtidem = new GTIdemJs();
         gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse, CMD_ImportCertificate);
 
-        return gtidem;
+        GTIDEM_GetTokenInfo(undefined).then((response) => {
+
+            return gtidem;
+        });
+
     }).catch((error) => {
         ////console.log(error.name);
         let gtidem = new GTIdemJs();
