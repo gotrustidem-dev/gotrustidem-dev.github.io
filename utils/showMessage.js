@@ -49,20 +49,20 @@ const CTAP2_ERR_VENDOR_LAST = 0xFF; //Vendor specific error.
 
 const CTAP2_VENDOR_ERROR_TOKEN = 0xF2;
 const CTAP2_VENDOR_ERROR_LENGTH = 0xF3;
-const CTAP2_ERR_VENDOR_ERROR_NO_USER    = 0xF4;    //Vendor specific error.
-const CTAP2_ERR_VENDOR_ERROR_CREDENTIAL_EXIST    =0xF5;    //Vendor specific error.
-const CTAP2_ERR_VENDOR_ERROR_INVALID_DATA    =0xF6;    //Vendor specific error.
-const CTAP2_ERR_VENDOR_ERROR_NOT_ALLOWED_RPID    =0xF7;    //Vendor specific error.
-const CTAP2_ERR_VENDOR_ERROR_PIN_EXPIRED    =0xF8;    //Vendor specific error.
-const CTAP2_ERR_VENDOR_ERROR_PIN_LEN    =0xF9;    //Vendor specific error.
-const CTAP2_ERR_VENDOR_ERROR_PIN_REUSE    =0xFA;    //Vendor specific error.
+const CTAP2_ERR_VENDOR_ERROR_NO_USER = 0xF4; //Vendor specific error.
+const CTAP2_ERR_VENDOR_ERROR_CREDENTIAL_EXIST = 0xF5; //Vendor specific error.
+const CTAP2_ERR_VENDOR_ERROR_INVALID_DATA = 0xF6; //Vendor specific error.
+const CTAP2_ERR_VENDOR_ERROR_NOT_ALLOWED_RPID = 0xF7; //Vendor specific error.
+const CTAP2_ERR_VENDOR_ERROR_PIN_EXPIRED = 0xF8; //Vendor specific error.
+const CTAP2_ERR_VENDOR_ERROR_PIN_LEN = 0xF9; //Vendor specific error.
+const CTAP2_ERR_VENDOR_ERROR_PIN_REUSE = 0xFA; //Vendor specific error.
 
-const IKP_ERR_SETTING_SOPIN_LEN      = 0x81;  //Other unspecified error.
-const IKP_ERR_SETTING_USERPIN_LEN    = 0x82;  //Other unspecified error.
-const IKP_ERR_SETTING_RETRY          = 0x83;  //Other unspecified error.
-const IKP_ERR_SETTING_DOMAIN         = 0x84;  //Other unspecified error.
-const IKP_ERR_SETTING_LEN_RANGE      = 0x85;  //Other unspecified error.
-	 
+const IKP_ERR_SETTING_SOPIN_LEN = 0x81; //Other unspecified error.
+const IKP_ERR_SETTING_USERPIN_LEN = 0x82; //Other unspecified error.
+const IKP_ERR_SETTING_RETRY = 0x83; //Other unspecified error.
+const IKP_ERR_SETTING_DOMAIN = 0x84; //Other unspecified error.
+const IKP_ERR_SETTING_LEN_RANGE = 0x85; //Other unspecified error.
+
 
 const ErrorMsg_OK = "No ERROR";
 const ErrorMsg_PIN_INVALID = "PIN invalid.";
@@ -78,140 +78,140 @@ const Msg_PIN_Trial_Counter = "The retries counter is ";
  * This error from brower or native api
  */
 
- const WEB_ERR_UserCancelorTimeout = 0xE001;
- const WEB_ERR_OperationAbort = 0xE002;
- const WEB_ERR_Timeout = 0xE003;
- const WEB_ERR_Unknow= 0xE004;
- const WEB_ERR_InvalidState= 0xE005;
- const WEB_ERR_ClientIsBusy= 0xE006;
+const WEB_ERR_UserCancelorTimeout = 0xE001;
+const WEB_ERR_OperationAbort = 0xE002;
+const WEB_ERR_Timeout = 0xE003;
+const WEB_ERR_Unknow = 0xE004;
+const WEB_ERR_InvalidState = 0xE005;
+const WEB_ERR_ClientIsBusy = 0xE006;
 
- 
- const SETTING_ERR_USERPIN_SAME= 0xC001;
- const SETTING_ERR_USERPIN_LEN= 0xC002;
- const SETTING_ERR_USERPIN_LEVEL= 0xC003;
- const SETTING_ERR_CBOR_PARSING= 0xC004;
- const SETTING_ERR_USERPIN_LEN_TOO_LONG= 0xC005;
- const SETTING_ERR_USERPIN_LEN_TOO_SHORT= 0xC006;
- const SETTING_ERR_USERPIN_NEED_NUMBER= 0xC007;
- const SETTING_ERR_USERPIN_NEED_UPPERCASE= 0xC008;
- const SETTING_ERR_USERPIN_NEED_LOWERCASE= 0xC009;
- const SETTING_ERR_USERPIN_NEED_LETTER= 0xC00A;
- const SETTING_ERR_USERPIN_NEED_SYMBOL= 0xC00B;
- const SETTING_ERR_USERPIN_BAN_NUMBER= 0xC00C;
- const SETTING_ERR_USERPIN_BAN_UPPERCASE= 0xC00D;
- const SETTING_ERR_USERPIN_BAN_LOWERCASE= 0xC00E;
- const SETTING_ERR_USERPIN_BAN_LETTER= 0xC00F;
- const SETTING_ERR_USERPIN_BAN_SYMBOL= 0xC010;
 
- const SETTING_ERR_SOPIN_LEN_TOO_LONG= 0xC011;
- const SETTING_ERR_SOPIN_LEN_TOO_SHORT= 0xC012;
+const SETTING_ERR_USERPIN_SAME = 0xC001;
+const SETTING_ERR_USERPIN_LEN = 0xC002;
+const SETTING_ERR_USERPIN_LEVEL = 0xC003;
+const SETTING_ERR_CBOR_PARSING = 0xC004;
+const SETTING_ERR_USERPIN_LEN_TOO_LONG = 0xC005;
+const SETTING_ERR_USERPIN_LEN_TOO_SHORT = 0xC006;
+const SETTING_ERR_USERPIN_NEED_NUMBER = 0xC007;
+const SETTING_ERR_USERPIN_NEED_UPPERCASE = 0xC008;
+const SETTING_ERR_USERPIN_NEED_LOWERCASE = 0xC009;
+const SETTING_ERR_USERPIN_NEED_LETTER = 0xC00A;
+const SETTING_ERR_USERPIN_NEED_SYMBOL = 0xC00B;
+const SETTING_ERR_USERPIN_BAN_NUMBER = 0xC00C;
+const SETTING_ERR_USERPIN_BAN_UPPERCASE = 0xC00D;
+const SETTING_ERR_USERPIN_BAN_LOWERCASE = 0xC00E;
+const SETTING_ERR_USERPIN_BAN_LETTER = 0xC00F;
+const SETTING_ERR_USERPIN_BAN_SYMBOL = 0xC010;
 
- const SETTING_ERR_USERPIN_ALLOW_ALL= 0xC013;
- const SETTING_ERR_USERPIN_REJECT_ALL= 0xC014;
-  
- const SETTING_ERR_INVAILD_DOMAINS= 0xC015;
- const SETTING_ERR_INVAILD_USERPIN_RETRY= 0xC016;
- const SETTING_ERR_INVAILD_USERPIN_MIN_LEN= 0xC017;
- const SETTING_ERR_CBOR_UNEXPECTED_TYPE= 0xC018;
- const SETTING_ERR_OVER_BUFFER_LENGTH= 0xC019;
- 
+const SETTING_ERR_SOPIN_LEN_TOO_LONG = 0xC011;
+const SETTING_ERR_SOPIN_LEN_TOO_SHORT = 0xC012;
 
- var showIKPJSExecptionMessage = (status) => {
+const SETTING_ERR_USERPIN_ALLOW_ALL = 0xC013;
+const SETTING_ERR_USERPIN_REJECT_ALL = 0xC014;
+
+const SETTING_ERR_INVAILD_DOMAINS = 0xC015;
+const SETTING_ERR_INVAILD_USERPIN_RETRY = 0xC016;
+const SETTING_ERR_INVAILD_USERPIN_MIN_LEN = 0xC017;
+const SETTING_ERR_CBOR_UNEXPECTED_TYPE = 0xC018;
+const SETTING_ERR_OVER_BUFFER_LENGTH = 0xC019;
+
+
+var showIKPJSExecptionMessage = (status) => {
     var gtidem = new GTIdemJs();
     gtidem.statusCode = status;
     return showFIDOErrorMessage(gtidem);
- }
+}
 
 var showFIDOErrorMessage = (gtidem) => {
 
-    console.log(gtidem);
-    var errorMsg ='錯誤碼:'+gtidem.statusCode;+'.   ';
+    //console.log(gtidem);
+    var errorMsg = '錯誤碼:' + gtidem.statusCode; + '.   ';
     switch (gtidem.statusCode) {
 
         case CTAP2_ERR_PIN_INVALID:
             errorMsg += "密碼錯誤！";
-            if(gtidem.pinRetry!=undefined){
-                errorMsg+= "User PIN剩餘次數:" + gtidem.pinRetry;
-            }else if(gtidem.sopinRetry!=undefined){
-                errorMsg+= "SO PIN剩餘次數:" + gtidem.sopinRetry;
+            if (gtidem.pinRetry != undefined) {
+                errorMsg += "User PIN剩餘次數:" + gtidem.pinRetry;
+            } else if (gtidem.sopinRetry != undefined) {
+                errorMsg += "SO PIN剩餘次數:" + gtidem.sopinRetry;
             }
-            
+
             break;
         case CTAP2_ERR_PIN_BLOCKED:
-            errorMsg +='超過嘗試次數，密碼鎖定';
-            if(gtidem.pinRetry!=undefined){
-                errorMsg+= "User PIN剩餘次數:" + gtidem.pinRetry;
-            }else if(gtidem.sopinRetry!=undefined){
-                errorMsg+= "SO PIN剩餘次數:" + gtidem.sopinRetry;
+            errorMsg += '超過嘗試次數，密碼鎖定';
+            if (gtidem.pinRetry != undefined) {
+                errorMsg += "User PIN剩餘次數:" + gtidem.pinRetry;
+            } else if (gtidem.sopinRetry != undefined) {
+                errorMsg += "SO PIN剩餘次數:" + gtidem.sopinRetry;
             }
             break;
 
         case CTAP2_ERR_PIN_POLICY_VIOLATION:
             errorMsg = "密碼不符合要求";
-            break; 
-            
+            break;
+
         case CTAP2_ERR_MISSING_PARAMETER:
             errorMsg = "缺少必要的參數";
-            break; 
+            break;
 
         case CTAP2_ERR_KEY_STORE_FULL:
-            errorMsg +='憑證空間已滿';
+            errorMsg += '憑證空間已滿';
             break;
         case CTAP2_ERR_NO_CREDENTIALS:
             errorMsg += '要求物件不存在';
             break;
         case CTAP2_ERR_CREDENTIAL_NOT_VALID:
             errorMsg += '物件毀損或是未完成匯入憑證';
-            break;    
+            break;
         case CTAP2_ERR_CREDENTIAL_EXCLUDED:
-            errorMsg +='要求物件已存在';
+            errorMsg += '要求物件已存在';
             break;
         case CTAP2_VENDOR_ERROR_TOKEN:
-            errorMsg += '序號錯誤.'; 
+            errorMsg += '序號錯誤.';
             break;
         case CTAP2_ERR_VENDOR_ERROR_INVALID_DATA:
-            errorMsg+= '不可用的初始化資料.';
+            errorMsg += '不可用的初始化資料.';
             break;
         case CTAP2_ERR_VENDOR_ERROR_CREDENTIAL_EXIST:
-            errorMsg += '憑證已經存在';  
+            errorMsg += '憑證已經存在';
             break;
         case CTAP2_ERR_VENDOR_ERROR_NOT_ALLOWED_RPID:
-            errorMsg += '此網站不能使用載具'; 
-            break;    
+            errorMsg += '此網站不能使用載具';
+            break;
         case CTAP2_ERR_VENDOR_ERROR_PIN_EXPIRED:
-            errorMsg += '密碼到期。需變更密碼'; 
-            break;    
+            errorMsg += '密碼到期。需變更密碼';
+            break;
         case CTAP2_ERR_VENDOR_ERROR_PIN_REUSE:
-            errorMsg += '無法變更為預設密碼'; 
+            errorMsg += '無法變更為預設密碼';
             break;
         case CTAP2_ERR_UNSUPPORTED_ALGORITHM:
-            errorMsg += '不支援的演算法'; 
-            break;        
+            errorMsg += '不支援的演算法';
+            break;
         case CTAP2_VENDOR_ERROR_LENGTH:
-            errorMsg += '資料長度錯誤'; 
-            break;    
+            errorMsg += '資料長度錯誤';
+            break;
 
         case IKP_ERR_SETTING_SOPIN_LEN:
-            errorMsg += '管理者密碼長度錯誤'; 
-            break;    
+            errorMsg += '管理者密碼長度錯誤';
+            break;
         case IKP_ERR_SETTING_USERPIN_LEN:
-             
-            errorMsg += '使用者密碼長度錯誤'; 
-            break;    
+
+            errorMsg += '使用者密碼長度錯誤';
+            break;
         case IKP_ERR_SETTING_RETRY:
-            errorMsg += '密碼重試次數參數錯誤'; 
-            break;    
+            errorMsg += '密碼重試次數參數錯誤';
+            break;
         case IKP_ERR_SETTING_DOMAIN:
-            errorMsg += '載具允許網域設定錯誤'; 
-            break;    
+            errorMsg += '載具允許網域設定錯誤';
+            break;
         case IKP_ERR_SETTING_LEN_RANGE:
-            errorMsg += '密碼長度參數超出允許範圍'; 
-            break;    
-    
+            errorMsg += '密碼長度參數超出允許範圍';
+            break;
+
         case WEB_ERR_UserCancelorTimeout:
             errorMsg += '操作取消';
             break;
-            
+
         case WEB_ERR_OperationAbort:
             errorMsg += '操作拒絕';
             break;
@@ -222,7 +222,7 @@ var showFIDOErrorMessage = (gtidem) => {
             errorMsg += '發生不預期錯誤';
             break;
         case WEB_ERR_InvalidState:
-             errorMsg += '無效的操作';
+            errorMsg += '無效的操作';
             break;
 
         case WEB_ERR_ClientIsBusy:
@@ -230,31 +230,31 @@ var showFIDOErrorMessage = (gtidem) => {
             break;
         case SETTING_ERR_USERPIN_SAME:
             errorMsg += '新舊密碼必須不同';
-           break;
+            break;
         case SETTING_ERR_USERPIN_LEN_TOO_LONG:
             errorMsg += '新密碼長度太長';
-           break;
+            break;
         case SETTING_ERR_USERPIN_LEN_TOO_SHORT:
             errorMsg += '新密碼長度太短';
-           break;   
+            break;
         case SETTING_ERR_USERPIN_LEVEL:
             errorMsg += '新密碼複雜度不合';
-           break;   
+            break;
         case SETTING_ERR_USERPIN_NEED_NUMBER:
             errorMsg += '新密碼需要數字';
-           break;  
+            break;
         case SETTING_ERR_USERPIN_NEED_LETTER:
             errorMsg += '新密碼需要英文';
-           break;    
+            break;
         case SETTING_ERR_USERPIN_NEED_UPPERCASE:
             errorMsg += '新密碼需要英文大寫';
-           break;      
+            break;
         case SETTING_ERR_USERPIN_NEED_LOWERCASE:
             errorMsg += '新密碼需要英文小寫';
-           break;            
+            break;
         case SETTING_ERR_USERPIN_NEED_SYMBOL:
             errorMsg += '新密碼需要符號';
-           break;      
+            break;
         case SETTING_ERR_USERPIN_BAN_NUMBER:
             errorMsg += '新密碼禁止數字';
             break;
@@ -272,45 +272,45 @@ var showFIDOErrorMessage = (gtidem) => {
             break;
         case SETTING_ERR_USERPIN_ALLOW_ALL:
             errorMsg += '新密碼禁止無密碼複雜度要求';
-           break;      
+            break;
         case SETTING_ERR_USERPIN_REJECT_ALL:
             errorMsg += '禁止所有元素無效';
-           break;    
+            break;
 
         case SETTING_ERR_SOPIN_LEN_TOO_LONG:
             errorMsg += '新SOPIN 長度太長';
-           break;    
+            break;
         case SETTING_ERR_SOPIN_LEN_TOO_SHORT:
             errorMsg += '新SOPIN 長度太短';
-           break;    
+            break;
         case SETTING_ERR_INVAILD_DOMAINS:
             errorMsg += '允許操作的domain不可用';
-        break; 
-           case SETTING_ERR_INVAILD_USERPIN_RETRY:
+            break;
+        case SETTING_ERR_INVAILD_USERPIN_RETRY:
             errorMsg += '使用者密碼嘗試次數不可用';
-           break;    
+            break;
         case SETTING_ERR_INVAILD_USERPIN_MIN_LEN:
             errorMsg += '使用者密碼最短長度不可用';
-           break;       
+            break;
         case SETTING_ERR_CBOR_PARSING:
             errorMsg += '資料不是CBOR格式';
-        break;        
+            break;
 
         case SETTING_ERR_CBOR_UNEXPECTED_TYPE:
             errorMsg += '出現非預期的資料型態';
-        break;     
+            break;
         case SETTING_ERR_OVER_BUFFER_LENGTH:
             errorMsg += '輸入參數超過長度';
-        break;     
-        
+            break;
+
         default:
             errorMsg += '不能判別的錯誤。';
             break;
     }
 
-    if(gtidem.sn!= undefined){
-        errorMsg += '\n該裝置序號為'+ ConverSNFormat(gtidem.sn);
-    }  
+    if (gtidem.sn != undefined) {
+        errorMsg += '\n該裝置序號為' + ConverSNFormat(gtidem.sn);
+    }
     return errorMsg;
 }
 
@@ -366,14 +366,14 @@ var showCertificMessage = (buffer) => {
         }
         alert(errorMsg);
     } else { // show normal message
-        console.log("show normal message!!");
+        //console.log("show normal message!!");
     }
 }
 
 var showSignMessage = (buffer) => {
 
     let gtHeader = buffer.slice(0, 16);
-    console.log('gtHeader', bufToHex(gtHeader));
+    //console.log('gtHeader', bufToHex(gtHeader));
     if (String.fromCharCode.apply(null, new Uint8Array(gtHeader)) === GTheaderStr) { //This is error handle
 
         buffer = buffer.slice(16);
@@ -385,7 +385,7 @@ var showSignMessage = (buffer) => {
 
         var errorMsg = undefined;
 
-        console.log('status', status);
+        //console.log('status', status);
         switch (status) {
 
             case CTAP2_ERR_NO_CREDENTIALS:
@@ -409,7 +409,7 @@ var showSignMessage = (buffer) => {
 
                 errorMsg = ErrorMsg_PIN_REQUIRED;
                 break;
-  
+
             case CTAP2_ERR_MISSING_PARAMETER:
 
                 errorMsg = "Command error!";
@@ -425,9 +425,9 @@ var showSignMessage = (buffer) => {
     } else { // show normal message
 
 
-        var str = String.fromCharCode.apply(null, new Uint8Array(buffer));
-        alert("Signature:" + "\n" + btoa(str));
-        console.log("show normal message!!");
+        // var str = String.fromCharCode.apply(null, new Uint8Array(buffer));
+        // alert("Signature:" + "\n" + btoa(str));
+        // console.log("show normal message!!");
     }
 
 
@@ -486,15 +486,4 @@ var showRSAKeyPair = (buffer) => {
         }
         alert(Msg);
     }
-}
-var isErrorMessage = (buffer) => {
-
-    let gtHeader = buffer.slice(0, 16);
-    console.log('gtHeader', bufToHex(gtHeader));
-    if (String.fromCharCode.apply(null, new Uint8Array(gtHeader)) === GTheaderStr) {
-
-        return 1;
-    }
-
-    return 0;
 }
