@@ -110,12 +110,12 @@
                                                             </form>
                                                             <label>Hex String:</label>
                                                             <form style="text-align: center;" id="form_label_hex"
-                                                            onsubmit="return false">
-                                                            <p>
-                                                                <input type="text" name="certlabelhex"
-                                                                    style="width: 342px; height:41px">
-                                                            </p>
-                                                        </form>
+                                                                onsubmit="return false">
+                                                                <p>
+                                                                    <input type="text" name="certlabelhex"
+                                                                        style="width: 342px; height:41px">
+                                                                </p>
+                                                            </form>
                                                         </p>
                                                         <form style="text-align: center;" id="form_signdata_label_btn"
                                                             onsubmit="return false">
@@ -147,11 +147,11 @@
                                                                     style="width: 162px; height:34px;background-color: #008CBA;">Read
                                                                     Cert</button>
                                                             </form>
-                                                            <form style="text-align: center;" id="form_extradata_index_btn"
-                                                            onsubmit="return false">
-                                                            <button class="btn btn-primary" action="submit"
-                                                                style="width: 162px; height:34px;background-color: #008CBA;">Read
-                                                                Ｅxtra Data</button>
+                                                            <form style="text-align: center;"
+                                                                id="form_extradata_index_btn" onsubmit="return false">
+                                                                <button class="btn btn-primary" action="submit"
+                                                                    style="width: 162px; height:34px;background-color: #008CBA;">Read
+                                                                    Ｅxtra Data</button>
                                                             </form>
                                                         </p>
                                                     </td>
@@ -168,10 +168,11 @@
                                                             </form>
 
                                                             <form style="text-align: center;" id="list_all_certextras"
-                                                            onsubmit="return false">
-                                                            <button class="btn btn-primary" action="submit"
-                                                                style="width: 162px; height:34px;background-color: #008CBA;">Read All Cert Extra data</button>
-                                                        </form>
+                                                                onsubmit="return false">
+                                                                <button class="btn btn-primary" action="submit"
+                                                                    style="width: 162px; height:34px;background-color: #008CBA;">Read
+                                                                    All Cert Extra data</button>
+                                                            </form>
 
                                                         </p>
                                                     </td>
@@ -225,14 +226,14 @@
                 bToken_sn = hexStringToArrayBuffer(token_sn);
             }
             var bLabel;
-            if(label.length!=0){
+            if (label.length != 0) {
                 bLabel = new Uint8Array(label.length);
                 bLabel.set(toUTF8Array(label), 0);
-            }else{
+            } else {
                 bLabel = hexStringToArrayBuffer(labelHex);
             }
-           
-            
+
+
 
             GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bToken_sn).then((value) => {
                 if (value.statusCode === CTAP1_ERR_SUCCESS) {
@@ -259,7 +260,7 @@
             });
 
         })
-        
+
         document.getElementById('form_extradata_label_btn').addEventListener('submit', function (event) {
             event.preventDefault();
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
@@ -272,10 +273,10 @@
                 bToken_sn = hexStringToArrayBuffer(token_sn);
             }
             var bLabel;
-            if(label.length!=0){
+            if (label.length != 0) {
                 bLabel = new Uint8Array(label.length);
                 bLabel.set(toUTF8Array(label), 0);
-            }else{
+            } else {
                 bLabel = hexStringToArrayBuffer(labelHex);
             }
 
@@ -291,10 +292,10 @@
                         strCert += "載具序號" + ConverSNFormat(value.sn) + "\n";
 
                     }
-                    strCert += "憑證附加資訊："+ "\n";
-                    if(value.certExtras[0].length==0){
+                    strCert += "憑證附加資訊：" + "\n";
+                    if (value.certExtras[0].length == 0) {
                         strCert += "無附加資料"
-                    }else{
+                    } else {
                         strCert += new TextDecoder().decode(value.certExtras[0]);
                     }
                     document.getElementById("certs_list").innerHTML = strCert;
@@ -371,10 +372,10 @@
                         strCert += "載具序號" + ConverSNFormat(value.sn) + "\n";
 
                     }
-                    strCert += "憑證附加資訊："+ "\n";
-                    if(value.certExtras[0].length==0){
+                    strCert += "憑證附加資訊：" + "\n";
+                    if (value.certExtras[0].length == 0) {
                         strCert += "無附加資料"
-                    }else{
+                    } else {
                         strCert += new TextDecoder().decode(value.certExtras[0]);
                     }
                     document.getElementById("certs_list").innerHTML = strCert;
@@ -412,22 +413,22 @@
                         strCert += "載具序號" + ConverSNFormat(value.sn) + "<br>";
 
                     }
-                    strCert += "憑證附加資訊："+ "<br>";
-                    for(var i=0;i<value.certExtras.length;i++){
-                        strCert += "Index "+(i+1)+":"+ "<br>";
-                        if(value.certExtras[i].length==0){
-                            strCert += "無附加資料"+ "<br>";
-                        }else{
+                    strCert += "憑證附加資訊：" + "<br>";
+                    for (var i = 0; i < value.certExtras.length; i++) {
+                        strCert += "Index " + (i + 1) + ":" + "<br>";
+                        if (value.certExtras[i].length == 0) {
+                            strCert += "無附加資料" + "<br>";
+                        } else {
 
                             strCert += new TextDecoder().decode(value.certExtras[i]);
-                            
+
                             //strCert += new TextDecoder().decode(value.certExtras[i].toString())+ "\n";
                         }
-                        strCert +="<br>";
+                        strCert += "<br>";
 
                     }
                     document.getElementById("certs_list").innerHTML = strCert;
-                   // alert(strCert);
+                    // alert(strCert);
                     // alert("憑證:" + "\n" + strCert);
                 } else {
                     alert(showFIDOErrorMessage(value));
@@ -436,57 +437,6 @@
             });
 
         })
-
-    
-       /* document.getElementById('list_all_certs_use_btn').addEventListener('submit', function (event) {
-            event.preventDefault();
-            let token_sn = document.getElementById('form_token_sn').token_sn.value;
-            var signDataPayload = Uint8Array.from(window.atob(signData), c => c.charCodeAt(0));
-
-            var bToken_sn = undefined;
-            if (token_sn.length != 0) {
-                bToken_sn = hexStringToArrayBuffer(token_sn);
-            }
-            strCerts = "";
-            GTIDEM_ReadCertByIndexWithoutPIN(i, undefined).then((value) => {
-                clearTimeout(time_id);
-                if (value.statusCode === CTAP1_ERR_SUCCESS) {
-
-                    if (value.credentialNum != undefined) {
-                        if (i == 1) {
-                            strCerts += "憑證數量 " + value.credentialNum + "<br>";
-                            credNum = value.credentialNum;
-                        }
-                    }
-                    if (value.sn != undefined) {
-                        if (i == 1) {
-                            strCerts += "載具序號" + ConverSNFormat(value.sn) + "<br>";
-                        }
-
-                    }
-                    strCerts += "憑證 " + i + "<br>-----BEGIN CERTIFICATE-----<br>" +
-                        btoa(String.fromCharCode.apply(null, value.certicficate)) +
-                        "<br>-----END CERTIFICATE-----<br>"
-                    //enable timeout
-                    if (i < value.credentialNum) {
-                        if (response.statusCode == CTAP1_ERR_SUCCESS) {
-                            params = response;
-                            $("#changePINDialog").data('index', i).data('certNum', value.credentialNum).dialog("open");
-                        } else {
-                            alert(showFIDOErrorMessage(response));
-                        }
-
-                    } else {
-                        document.getElementById("certs_list").innerHTML = strCert;
-                    }
-                } else {
-                    alert(showFIDOErrorMessage(value));
-                }
-            });
-
-
-        })*/
-        
 
 
         document.getElementById('list_all_certs').addEventListener('submit', function (event) {
@@ -501,7 +451,7 @@
             listAllCerts(1);
 
         })
-       
+
 
         async function listAllCerts(num) {
             var i = num;
@@ -510,7 +460,7 @@
 
             var time_id = setTimeout(async function () {
                 console.log("run GTIDEM_ReadCertByIndexWithoutPIN START");
-
+                console.log(time_id);
 
                 await GTIDEM_ReadCertByIndexWithoutPIN(i, undefined).then((value) => {
                     console.log("run GTIDEM_ReadCertByIndexWithoutPIN OK");
