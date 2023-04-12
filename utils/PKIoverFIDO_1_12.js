@@ -913,7 +913,7 @@ async function GTIDEM_ChangeUserPINwithInterval(bOldPIN, bNewPIN, bSerialNumber,
             return result;
         });
 
-    }, 150);
+    }, 0);
 
 }
 
@@ -2065,11 +2065,7 @@ async function GTIDEM_ImportCertificate2(bSerialNumber, keyHandle, keyID, HexCer
         let gtidem = new GTIdemJs();
         gtidem.parsePKIoverFIDOResponse(bPKIoverFIDOResponse, CMD_ImportCertificate);
 
-        GTIDEM_GetTokenInfo(undefined).then((response) => {
-
-            return gtidem;
-        });
-
+        return gtidem;
     }).catch((error) => {
         ////console.log(error.name);
         let gtidem = new GTIdemJs();
