@@ -132,17 +132,17 @@
                                                     Cert</button>
                                             </form>
                                         </p>
-                                        <!-- <p>
+                                        <p>
                                             <label>向 https://pkioverfido2-0910.herokuapp.com 申請，將回傳的憑證匯入金鑰。</label>
                                             <form action="https://pkioverfido2-0910.herokuapp.com/signcsr/csr2hex"
                                                 style="text-align: center;" \ id="form_requet_cert_btn" method="post"
-                                                target="_blank" onsubmit="return requestRealCert()">
+                                                target="_blank">
                                                 <label>CSR</label>
                                                 <textarea id="csr_textarea" name="csr" rows="4" cols="50"></textarea>
-                                               
+
                                             </form>
 
-                                        </p> -->
+                                        </p>
 
                                     </td>
                                 </tr>
@@ -451,7 +451,7 @@
 
 
                 GTIDEM_ImportCertificate(bToken_sn, bKeyHandle, bKeyID, bHexCert, undefined).then((
-                response) => {
+                    response) => {
 
 
                     if (response.statusCode == CTAP1_ERR_SUCCESS) {
@@ -478,8 +478,6 @@
 
             return false; // 必須返回false，否則表單會自己再做一次提交操作，並且頁面跳轉 
         }
-
-       
     </script>
 
 </body>
