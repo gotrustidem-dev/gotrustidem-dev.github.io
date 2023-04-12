@@ -882,30 +882,6 @@ async function GTIDEM_ChangeUserPINwithInterval(bOldPIN, bNewPIN, bSerialNumber,
         return gtidem;
     }
 
-    // let timer_id = setInterval(  async  function () {
-    //     console.log("setInterval start:",new Date().getTime());
-    //     if(prepareUpdate==undefined){
-    //         return;
-    //     }
-    //     console.log("Has focuse?: "+document.hasFocus());
-    //     console.log("Who Has focuse: "+document.activeElement);
-    //     console.log("Who Has focuse: "+document.activeElement.className);
-    //     console.log("Who Has focuse: "+document.activeElement.id);
-    //     if(!document.hasFocus()){
-    //         document.activeElement.blur();
-    //         window.focus();
-    //         console.log("After focused?: "+document.hasFocus());
-    //     }
-    //     clearInterval(timer_id); 
-    //     await GTIDEM_ChangeUserPIN_V1(bSerialNumber, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash,prepareUpdate.bEncryptedNEWPIN).then((result) => {
-
-    //         if(callback!=undefined)
-    //             callback(result);
-    //         return result;
-    //     });
-
-    // }, 100);
-    //Generate 
     console.log("computingSessionKey:", new Date().getTime());
     prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
     console.log("computingSessionKey OK:", new Date().getTime());
@@ -914,8 +890,6 @@ async function GTIDEM_ChangeUserPINwithInterval(bOldPIN, bNewPIN, bSerialNumber,
     console.log("2.Who Has focuse: " + document.activeElement.className);
     console.log("2.Who Has focuse: " + document.activeElement.id);
     if (!document.hasFocus()) {
-        //document.activeElement.blur();
-        //window.focus();
         console.log("2.After focused?: " + document.hasFocus());
     }
 
@@ -929,8 +903,6 @@ async function GTIDEM_ChangeUserPINwithInterval(bOldPIN, bNewPIN, bSerialNumber,
         console.log("1.Who Has focuse: " + document.activeElement.className);
         console.log("1.Who Has focuse: " + document.activeElement.id);
         if (!document.hasFocus()) {
-            //document.activeElement.blur();
-            //window.focus();
             console.log("1.After focused?: " + document.hasFocus());
         }
         clearInterval(timer_id);
@@ -2372,40 +2344,6 @@ async function GTIDEM_SignDataByIndex(index, bSerialNumber, alg_number, bPlain) 
     var alg_buf;
     var signDataBuf;
 
-    //check Hash Data Length
-
-    //     const ALG_RSA2048SHA1_PreHash = 0x11;
-    // const ALG_RSA2048SHA256_PreHash = 0x12;
-    // const ALG_RSA2048SHA384_PreHash = 0x13;
-    // const ALG_RSA2048SHA512_PreHash = 0x14;
-    // const ALG_RSA2048SHA1_PSS_PreHash = 0x15;
-    // const ALG_RSA2048SHA256_PSS_PreHash = 0x16;
-    // const ALG_RSA2048SHA384_PSS_PreHash = 0x17;
-    // const ALG_RSA2048SHA512_PSS_PreHash = 0x18;
-
-
-    /*if(alg_number==ALG_RSA2048SHA256){
-        await crypto.subtle.digest("SHA-256", new Uint8Array(bPlain)).then(function (signHashedDataPayload) {
-
-            alg_buf = new Uint8Array(5);
-            alg_buf[0] = 0xDF;
-            alg_buf[1] = 0x03;
-            alg_buf[2] = 0x00;
-            alg_buf[3] = 0x01;
-            alg_buf[4] = ALG_RSA2048SHA256_PreHash;
-
-            var bHashData = new Uint8Array(signHashedDataPayload)
-            signDataBuf = new Uint8Array(4 + bHashData.byteLength);
-            signDataBuf[0] = 0xDF;
-            signDataBuf[1] = 0x06;
-            signDataBuf[2] = bHashData.length >> 8;
-            signDataBuf[3] = bHashData.length;
-            signDataBuf.set(bHashData, 4);
-            return;
-        });
-
-    }else{*/
-
     alg_buf = new Uint8Array(5);
     alg_buf[0] = 0xDF;
     alg_buf[1] = 0x03;
@@ -2420,9 +2358,6 @@ async function GTIDEM_SignDataByIndex(index, bSerialNumber, alg_number, bPlain) 
     signDataBuf[2] = bPlain.length >> 8;
     signDataBuf[3] = bPlain.length;
     signDataBuf.set(bPlain, 4);
-    //}
-
-
 
     var pki_payload_length = sn_buf.byteLength + command_buf.byteLength + alg_buf.byteLength + signDataBuf.byteLength;
 
