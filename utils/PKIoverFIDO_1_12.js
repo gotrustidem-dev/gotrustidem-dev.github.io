@@ -891,6 +891,7 @@ async function GTIDEM_ChangeUserPINwithInterval(bOldPIN, bNewPIN, bSerialNumber,
     console.log("2.Who Has focuse: " + document.activeElement.id);
     if (!document.hasFocus()) {
         console.log("2.After focused?: " + document.hasFocus());
+        return;
     }
 
     let timer_id = setInterval(async function () {

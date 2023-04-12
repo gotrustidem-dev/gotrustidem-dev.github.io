@@ -83,6 +83,7 @@ const Msg_PIN_Trial_Counter = "The retries counter is ";
  const WEB_ERR_Timeout = 0xE003;
  const WEB_ERR_Unknow= 0xE004;
  const WEB_ERR_InvalidState= 0xE005;
+ const WEB_ERR_ClientIsBusy= 0xE006;
 
  
  const SETTING_ERR_USERPIN_SAME= 0xC001;
@@ -222,6 +223,10 @@ var showFIDOErrorMessage = (gtidem) => {
             break;
         case WEB_ERR_InvalidState:
              errorMsg += '無效的操作';
+            break;
+
+        case WEB_ERR_ClientIsBusy:
+            errorMsg += '呼叫太頻繁';
             break;
         case SETTING_ERR_USERPIN_SAME:
             errorMsg += '新舊密碼必須不同';

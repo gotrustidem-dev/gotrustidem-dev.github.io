@@ -36,6 +36,9 @@ class GTIdemJs {
         if (error == "NotAllowedError") {
             this.statusCode = WEB_ERR_UserCancelorTimeout;
         }
+        if ((error == "NotAllowedError") && (msg == "The document is not focused")) {
+            this.statusCode = WEB_ERR_ClientIsBusy;
+        }
 
         if (error == "TimeoutError") {
             this.statusCode = WEB_ERR_Timeout;
@@ -48,6 +51,10 @@ class GTIdemJs {
         if (error == "InvalidStateError") {
             this.statusCode = WEB_ERR_InvalidState;
         }
+        if (error == "InvalidStateError") {
+            this.statusCode = WEB_ERR_InvalidState;
+        }
+
         this.msg = msg;
 
     }
