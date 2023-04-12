@@ -914,7 +914,7 @@ async function GTIDEM_ChangeUserPINwithInterval(bOldPIN, bNewPIN, bSerialNumber,
             return result;
         });
 
-    }, 0);
+    }, 150);
 
 }
 
