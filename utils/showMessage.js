@@ -178,6 +178,10 @@ var showFIDOErrorMessage = (gtidem) => {
         case CTAP2_ERR_VENDOR_ERROR_NOT_ALLOWED_RPID:
             errorMsg += '此網站不能使用載具';
             break;
+            
+        case CTAP2_ERR_PIN_REQUIRED:
+            errorMsg += '未驗證密碼';
+            break;    
         case CTAP2_ERR_VENDOR_ERROR_PIN_EXPIRED:
             errorMsg += '密碼到期。需變更密碼';
             break;
