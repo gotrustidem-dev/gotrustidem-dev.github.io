@@ -230,7 +230,7 @@ var showFIDOErrorMessage = (gtidem) => {
             break;
 
         case WEB_ERR_ClientIsBusy:
-            errorMsg += '呼叫太頻繁';
+            errorMsg += '忙碌中，重試';
             break;
         case SETTING_ERR_USERPIN_SAME:
             errorMsg += '新舊密碼必須不同';
