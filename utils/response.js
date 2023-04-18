@@ -1,8 +1,4 @@
 class GTIdemJs {
-
-
-
-
     constructor(statusCode) {
         this.statusCode = statusCode;
         this.fw = undefined;
