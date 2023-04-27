@@ -5,7 +5,7 @@
 
 'use strict';
 
-const VERSION = "1.12.2"
+const VERSION = "1.12.3"
 const DEFAULT_TIMEOUT = 120000
 const VERIFY_DEFAULT_TIMEOUT = 300000
 const AUTHENTICATOR_TRANSPORTS = ["usb"]
@@ -1812,7 +1812,7 @@ async function GTIDEM_ImportCertificate(bSerialNumber, keyHandle, keyID, HexCert
         if ((bExtraData == undefined) || (bExtraData.byteLength == 0)) {
             extraDataBuf = new Uint8Array(0);
         } else {
-            if ((bExtraData.byteLength) > 500) { //over buffer length
+            if ((bExtraData.byteLength) > 300) { //over buffer length
                 let gtidem = new GTIdemJs();
                 gtidem.statusCode = SETTING_ERR_OVER_BUFFER_LENGTH;
                 return gtidem;
@@ -1976,7 +1976,7 @@ async function GTIDEM_ImportCertificate2(bSerialNumber, keyHandle, keyID, HexCer
     if ((bExtraData == undefined) || (bExtraData.byteLength == 0)) {
         extraDataBuf = new Uint8Array(0);
     } else {
-        if ((bExtraData.byteLength) > 500) { //over buffer length
+        if ((bExtraData.byteLength) > 300) { //over buffer length
             let gtidem = new GTIdemJs();
             gtidem.statusCode = SETTING_ERR_OVER_BUFFER_LENGTH;
             return gtidem;
