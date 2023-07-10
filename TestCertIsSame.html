@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GoTrustIdem TestPKI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Ensure use of most common Unicode characters -->
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <!-- Considered an "experimental" feature -->
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css" />
+    <!-- Spectre.css icons are used -->
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js">
+    </script>
+
+
+
+    <script src="./utils/cbor.js"></script>
+    <script src="./utils/helpers.js"></script>
+    <script src="./utils/showMessage.js"></script>
+    <script src="./utils/response.js"></script>
+    <script src="./utils/PKIoverFIDO_1_12.js"></script>
+    <style>
+        table.center {
+            margin-left: auto;
+            margin-right: auto;
+            height: 160px;
+        }
+
+        table td,
+        table td * {
+            vertical-align: top;
+        }
+
+        h3 {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="overflow-x: scroll;">
+        <table style="height: auto; width: 100%;">
+            <tbody>
+
+                <tr>
+                    <td style="width: 100% ;">
+
+                        <label style="text-align: center;" id="location_hef"></label>
+                        <form style="text-align: center;" id="form_token_sn" onsubmit="return false">
+                            <p>
+                                <label id="label_token_sn">Token Serial number:</label><br>
+                                <input type="text" name="token_sn" style="width: 342px; height:41px">
+                            </p>
+                        </form>
+
+                    </td>
+                </tr>
+
+                <tr>
+                    <td id="pc-td" style="width: 100% ; ">
+                        <table class="center" border="1" width="395">
+                            <tbody>
+                                <tr>
+                                    <!--PC side-->
+                                    <td style="width: 385px;">
+
+                                        <form style="text-align: center;" id="form_common_name" onsubmit="return false">
+                                            <p>
+                                                <label> 指定的Common Name,若不指定將會使用預設值</label><br>
+                                                <label id="label_common_name"> CSR' CN:</label><br>
+                                                <input type="text" name="common_name" style="width: 342px; height:41px"
+                                                    value="0123456789-AA-C12345abcdf">
+                                            </p>
+                                        </form>
+                                        <form style="text-align: center;" id="form_requestcsr_btn"
+                                            onsubmit="return false">
+                                            <button class="btn btn-primary" action="submit"
+                                                style="width: 200px; height:34px;background-color: #008CBA;">產生
+                                                CSR</button>
+                                            <div>
+                                                <input type="checkbox" id="checkbox_clear_token_before_keygen"
+                                                    name="vehicle1">
+                                                <label for="clear_token_before_keygen">Clear token before keygen</label>
+                                            </div>
+                                        </form>
+
+                                        <p>
+                                            <form style="text-align: center;" id="form_key_id" onsubmit="return false">
+                                                <p>
+                                                    <label id="label_key_id"> Specify Key ID:</label><br>
+                                                    <input type="text" name="key_id" style="width: 342px; height:41px">
+                                                </p>
+                                            </form>
+                                            <form style="text-align: center;" id="form_key_handle"
+                                                onsubmit="return false">
+                                                <p>
+                                                    <label id="label_key_handle">Key Handle:</label><br>
+                                                    <input type="text" name="key_handle"
+                                                        style="width: 342px; height:41px">
+                                                </p>
+                                            </form>
+                                            <form style="text-align: center;" id="form_extra_data"
+                                                onsubmit="return false">
+                                                <p>
+                                                    <label id="label_extra_data">EXTRA DATA:</label><br>
+                                                    <textarea id="extra_textarea" name="info" rows="4"
+                                                        cols="50"></textarea>
+
+                                                </p>
+                                            </form>
+
+                                        </p>
+
+                                        <p>
+                                            <label>此方式將匯入測試憑證，無法在手機上產生簽名</label>
+                                            <form style="text-align: center;" id="form_importcert_btn"
+                                                onsubmit="return false">
+                                                <button class="btn btn-primary" action="submit"
+                                                    style="width: 200px; height:34px;background-color: #008CBA;">Import
+                                                    Testing Cert</button>
+                                            </form>
+
+                                        </p>
+                                        <p>
+                                            <label>測試手機簽名必須使用正確的憑證，使用下方按鈕申請</label><br>
+                                            <label>CSR:</label>
+                                            <form action="https://idemkeyplus-demo.go-trust.com:8585/signcsr/csr2hex"
+                                                style="text-align: center;" \ id="form_requet_cert_btn" method="post"
+                                                target="_blank" onsubmit="return requestRealCert()">
+                                                <textarea id="csr_textarea" name="csr" rows="4" cols="50"></textarea>
+
+                                                <label>向 https://idemkeyplus-demo.go-trust.com
+                                                    傳送CSR，將回傳的憑證匯入金鑰。</label><br>
+                                                <button class="btn btn-primary" action="submit"
+                                                    style="width: 200px; height:34px;background-color: #008CBA;">Sign
+                                                    CSR(RSA only)</button>
+
+                                            </form>
+
+                                        </p>
+                                        <p>
+                                            <label>匯入的憑證</label><br>
+                                            <label>CERT:</label>
+                                            <form style="text-align: center;" id="form_compare_certs" target="_blank">
+                                                <textarea id="cert_textarea" name="cert" rows="4" cols="50"></textarea>
+                                                <button class="btn btn-primary" action="submit"
+                                                    style="width: 200px; height:34px;background-color: #008CBA;">比較載具內的憑證是否相同</button>
+
+                                            </form>
+
+                                        </p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+
+                </tr>
+            </tbody>·
+        </table>
+    </div>
+    <script>
+        window.onload = function () {
+            document.getElementById("location_hef").textContent = window.location.href;
+        }
+        var testBigCertificate =
+            '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';
+        document.getElementById('form_requestcsr_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            let common_name = document.getElementById('form_common_name').common_name.value;
+            let isClearTokenBeforeKeygen = document.getElementById('checkbox_clear_token_before_keygen')
+                .checked;
+
+            var bTestExtraData = new Uint8Array(150);
+            bTestExtraData.fill(0x33);
+
+            console.log(token_sn);
+            console.log(common_name);
+            console.log(isClearTokenBeforeKeygen);
+            var bToken_sn = undefined;
+            if (token_sn.length != 0) {
+                bToken_sn = hexStringToArrayBuffer(token_sn);
+            }
+            var bCommonName = undefined;
+            if (common_name.length != 0) {
+                bCommonName = toUTF8Array(common_name);
+            }
+            GTIDEM_SetName('Ann Chen');
+
+            GTIDEM_GenRSA2048CSR(bToken_sn, bCommonName, isClearTokenBeforeKeygen).then((response) => {
+
+                if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                    var strCSR = "";
+                    var msg = "";
+                    if (response.sn != undefined) {
+                        msg += "載具序號" + ConverSNFormat(response.sn) + "\n";
+                    }
+
+                    strCSR = "-----BEGIN CERTIFICATE REQUEST-----\n" +
+                        btoa(String.fromCharCode.apply(null, new Uint8Array(response.csr))) +
+                        "\n-----END CERTIFICATE REQUEST-----\n";
+                    msg += "CSR:" + "\n" + strCSR;
+                    console.log('CSR :\n', msg);
+                    document.getElementById('csr_textarea').value = strCSR;
+                    alert(msg);
+                    bTestExtraData.set(new Uint8Array(response.keyhandle), 0);
+                    console.log(bufToHex(new Uint8Array(response.keyhandle).buffer));
+
+                    document.getElementById('form_key_handle').key_handle.value = bufToHex(
+                        new Uint8Array(response.keyhandle).buffer);
+                    document.getElementById('form_extra_data').info.value = bufToHex(
+                        bTestExtraData);
+
+                } else {
+                    alert(showFIDOErrorMessage(response));
+                }
+
+            }).catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            });
+
+
+
+
+
+        });
+
+
+        document.getElementById('form_compare_certs').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            var bToken_sn = undefined;
+            let key_handle = document.getElementById('form_key_handle').key_handle.value;
+            var bKeyHandle = hexStringToArrayBuffer(key_handle);
+
+
+
+
+            GTIDEM_ReadCertByLabelWithoutPIN(bKeyHandle, bToken_sn).then((value) => {
+                if (value.statusCode === CTAP1_ERR_SUCCESS) {
+                    var strCert = "";
+                    if (value.credentialNum != undefined) {
+                        strCert += "憑證數量 " + value.credentialNum + "\n";
+
+                    }
+                    if (value.sn != undefined) {
+                        strCert += "載具序號" + ConverSNFormat(value.sn) + "\n";
+
+                    }
+                    console.log('讀出憑證 :\n');
+                    strCert += "-----BEGIN CERTIFICATE-----\n" +
+                        btoa(String.fromCharCode.apply(null, value.certicficate)) +
+                        "\n-----END CERTIFICATE-----"
+                    console.log('strCert');
+
+
+                    var cert = document.getElementById('cert_textarea').value;
+                    var cert2 = Uint8Array.from(window.atob(cert), c => c.charCodeAt(
+                        0));
+                    var cert1 = new Uint8Array(value.certicficate);
+
+                    if (cert1.byteLength != cert2.byteLength) {
+                        alert('憑證長度不同');
+                        return;
+                    }
+
+
+                    for (var i = 0; i != cert2.byteLength; i++) {
+                        if (cert1[i] != cert2[i]) {
+                            alert('憑證不同');
+                            return;
+                        }
+
+                    }
+                    alert('憑證相同');
+
+
+                } else {
+                    alert(showFIDOErrorMessage(value));
+                }
+
+            });
+
+        });
+
+
+        document.getElementById('form_importcert_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            let key_id = document.getElementById('form_key_id').key_id.value;
+            let key_handle = document.getElementById('form_key_handle').key_handle.value;
+            let extra_data = document.getElementById('form_extra_data').info.value;
+            console.log(token_sn);
+            console.log(key_id);
+            console.log(key_handle);
+            console.log(extra_data);
+
+            var bHexCert = Uint8Array.from(window.atob(testBigCertificate), c => c.charCodeAt(0));
+
+            var strCert = testBigCertificate;
+            document.getElementById('cert_textarea').value = strCert;
+
+            var bKeyHandle = hexStringToArrayBuffer(key_handle);
+
+
+            var bToken_sn = undefined;
+            if (token_sn.length != 0) {
+                bToken_sn = hexStringToArrayBuffer(token_sn);
+            }
+            var bKeyID = undefined;
+            if (key_id.length != 0) {
+                bKeyID = toUTF8Array(key_id);
+            } else {
+                bKeyID = bKeyHandle;
+            }
+
+            var bExtraData = undefined;
+            if (extra_data.length != 0) {
+                bExtraData = toUTF8Array(extra_data);
+            }
+            GTIDEM_ImportCertificate(bToken_sn, bKeyHandle, bKeyID, bHexCert, undefined, bExtraData)
+                .then((
+                    response) => {
+                    if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                        var msg = "匯入憑證完成\n";
+                        if (response.sn != undefined) {
+                            msg += "載具序號" + ConverSNFormat(response.sn) + "\n";
+                        }
+                        if (response.signature != undefined) {
+                            msg += "\n Signature:\n" + btoa(String.fromCharCode.apply(null,
+                                new Uint8Array(
+                                    response.signature)));
+
+                        }
+                        alert(msg);
+
+                    } else {
+                        alert(showFIDOErrorMessage(response));
+                    }
+                }).catch((error) => {
+                    alert(error)
+                    console.log('FAIL', error)
+                });
+
+        })
+
+
+        function requestRealCert() {
+            // jquery 表單提交 
+            $("#form_requet_cert_btn").ajaxSubmit(function (csrasn1) {
+
+                console.log('data ', certasn1);
+
+                let token_sn = document.getElementById('form_token_sn').token_sn.value;
+                let key_id = document.getElementById('form_key_id').key_id.value;
+                let key_handle = document.getElementById('form_key_handle').key_handle.value;
+                let extra_data = document.getElementById('form_extra_data').info.value;
+                console.log(token_sn);
+                console.log(key_id);
+                console.log(key_handle);
+                console.log(extra_data);
+
+                //var bHexCert = Uint8Array.from(csrasn1, c => c.charCodeAt(0));
+                var bHexCert = hexStringToArrayBuffer(certasn1);
+
+                var bKeyHandle = hexStringToArrayBuffer(key_handle);
+                var strCert = btoa(String.fromCharCode.apply(null, bHexCert));
+                document.getElementById('cert_textarea').value = strCert;
+
+
+                var bToken_sn = undefined;
+                if (token_sn.length != 0) {
+                    bToken_sn = hexStringToArrayBuffer(token_sn);
+                }
+                var bKeyID = undefined;
+                if (key_id.length != 0) {
+                    bKeyID = toUTF8Array(key_id);
+                } else {
+                    bKeyID = bKeyHandle;
+                }
+
+                var bExtraData = undefined;
+                if (extra_data.length != 0) {
+                    bExtraData = toUTF8Array(extra_data);
+                }
+
+                GTIDEM_ImportCertificate(bToken_sn, bKeyHandle, bKeyID, bHexCert, undefined,
+                    bExtraData).then((
+                    response) => {
+                    if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                        var msg = "匯入憑證完成\n";
+                        if (response.sn != undefined) {
+                            msg += "載具序號" + ConverSNFormat(response.sn) + "\n";
+                        }
+                        if (response.signature != undefined) {
+                            msg += "\n Signature:\n" + btoa(String.fromCharCode.apply(null,
+                                new Uint8Array(response.signature)));
+                        }
+                        alert(msg);
+                    } else {
+                        alert(showFIDOErrorMessage(response));
+                    }
+
+                }).catch((error) => {
+                    alert(error)
+                    console.log('FAIL', error)
+                });
+
+            });
+            return false; // 必須返回false，否則表單會自己再做一次提交操作，並且頁面跳轉 
+        }
+    </script>
+
+</body>
+
+</html>
