@@ -4,14 +4,16 @@
 <head>
     <title>GoTrustIdem TestPKI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="../utils/cbor.js"></script>
+    <!-- <script src="../utils/cbor.js"></script> -->
     <script src="../utils/helpers.js"></script>
     <script src="../utils/showMessage.js"></script>
     <script src="../utils/response.js"></script>
     <script src="../utils/PKIoverFIDO_1_12.js"></script>
+
+    <script src="../utils/PKIoverFIDO_1_12.js"></script>
 </head>
 
-<body>
+<body >
     <div style="overflow-x: scroll;">
         <table style="height: auto; width: 100%;">
             <tbody>
@@ -71,7 +73,8 @@
                                             </form>
                                         </p>
                                         <form style="text-align: center;" id="form_pin_params" onsubmit="return false">
-                                            <input type="checkbox" id="pinexpired_checkbox" name="pinexpired_checkbox" value="pin_expired"> Set PIN Expired<br>
+                                            <input type="checkbox" id="pinexpired_checkbox" name="pinexpired_checkbox"
+                                                value="pin_expired"> Set PIN Expired<br>
                                         </form>
 
                                     </td>
@@ -85,18 +88,16 @@
         </table>
     </div>
     <script>
-
-    window.onload = function () {
+        window.onload = function () {
             var browser = get_browser();
-            if((browser.name=="Safari")&&
+            if ((browser.name == "Safari") &&
                 (
-                        ((parseInt(browser.major)==14)&&(parseInt(browser.minor)==1))||
-                        ((parseInt(browser.major)==15)&&(parseInt(browser.minor)==0))||
-                        ((parseInt(browser.major)==15)&&(parseInt(browser.minor)==1))||
-                        ((parseInt(browser.major)==15)&&(parseInt(browser.minor)==2))||
-                        ((parseInt(browser.major)==15)&&(parseInt(browser.minor)==3))
-                        ))
-            {
+                    ((parseInt(browser.major) == 14) && (parseInt(browser.minor) == 1)) ||
+                    ((parseInt(browser.major) == 15) && (parseInt(browser.minor) == 0)) ||
+                    ((parseInt(browser.major) == 15) && (parseInt(browser.minor) == 1)) ||
+                    ((parseInt(browser.major) == 15) && (parseInt(browser.minor) == 2)) ||
+                    ((parseInt(browser.major) == 15) && (parseInt(browser.minor) == 3))
+                )) {
                 //show alert
                 alert("此瀏覽器版本不支援此方式更換密碼，請使用 ChangePIN using two steps");
                 return;
@@ -163,7 +164,7 @@
 
             let isPINExpired = document.getElementById('form_pin_params').pinexpired_checkbox.checked;
 
-            var para = buildUnlockToken(bSOPINArray, bRandom, bToken_sn, bNewUserPINArray,isPINExpired)
+            var para = buildUnlockToken(bSOPINArray, bRandom, bToken_sn, bNewUserPINArray, isPINExpired)
                 .then(result => {
                     GTIDEM_UnlockPIN(bToken_sn, result.bEncryptedInitData, result.bHashMacofInitData).then(
                         response => {
@@ -247,7 +248,7 @@
 
 
         }
-        async function prepareUnloukPIN(so_pin, bRandom, bToken_sn, bNewUserPIN,isPINExpired) {
+        async function prepareUnloukPIN(so_pin, bRandom, bToken_sn, bNewUserPIN, isPINExpired) {
 
             var sessionKey;
             var iv;

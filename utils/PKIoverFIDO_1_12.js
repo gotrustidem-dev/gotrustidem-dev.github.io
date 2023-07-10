@@ -2282,7 +2282,7 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
     var idList = [{
         id: pki_buffer,
         type: "public-key",
-        transports: AUTHENTICATOR_TRANSPORTS
+        transports: [usb, nfc] //AUTHENTICATOR_TRANSPORTS
     }];
 
     getAssertionChallenge.allowCredentials = idList;
