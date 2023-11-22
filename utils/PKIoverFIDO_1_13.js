@@ -5,7 +5,7 @@
 
 'use strict';
 
-const VERSION = "1.12.3"
+const VERSION = "1.13.1"
 const DEFAULT_TIMEOUT = 120000
 const VERIFY_DEFAULT_TIMEOUT = 300000
 const AUTHENTICATOR_TRANSPORTS = ["usb"]
@@ -162,13 +162,13 @@ function hexStringToArrayBuffer(hexString) {
 
     // ensure even number of characters
     if (hexString.length % 2 != 0) {
-        //console.log('WARNING: expecting an even number of characters in the hexString');
+        console.log('WARNING: expecting an even number of characters in the hexString');
     }
 
     // check for some non-hex characters
     var bad = hexString.match(/[G-Z\s]/i);
     if (bad) {
-        //console.log('WARNING: found non-hex characters', bad);
+        console.log('WARNING: found non-hex characters', bad);
     }
 
     // split the string into pairs of octets
@@ -3250,9 +3250,6 @@ async function _GTIDEM_ReadCertExtras(bLabelOrKeyID, index, bSerialNumber) {
         gtidem.ConvertWebError(error.name, error.message);
         return gtidem;
     });
-
-
-    return
 }
 
 

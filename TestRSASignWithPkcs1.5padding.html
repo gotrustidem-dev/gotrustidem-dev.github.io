@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GoTrustIdem TestPKI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../utils/cbor.js"></script>
+    <script src="../utils/helpers.js"></script>
+    <script src="../utils/showMessage.js"></script>
+    <script src="../utils/response.js"></script>
+    <script src="../utils/PKIoverFIDO_1_12.js"></script>
+</head>
+
+<body>
+    <div style="overflow-x: scroll;">
+        <table style="height: auto; width: 100%;">
+            <tbody>
+
+                <tr>
+                    <td style="width: 100% ;">
+
+
+                        <form style="text-align: center;" id="form_token_sn" onsubmit="return false">
+                            <p>
+                                <label id="label_token_sn">Token Serial number:</label><br>
+                                <input type="text" name="token_sn" style="width: 342px; height:41px">
+                            </p>
+
+
+                        </form>
+                        <form style="text-align: center;" id="form_tokeninfo_btn" onsubmit="return false">
+                            <button class="btn btn-primary" action="submit"
+                                style="width: 200px; height:34px;background-color: #008CBA;">Get Token Info</button>
+                            <br><label></label>Random number: <br>
+                            <br><label id="label_random_number"></label><br>
+                        </form>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="width: 100% ; ">
+                        <table class="center" border="1" width="100%">
+                            <table>
+                                <tr>
+                                    <!--PC side-->
+                                    <td style="width: 385px;">
+
+                                        <form style="text-align: center;" id="form_reset_key" onsubmit="return false">
+                                            <p>
+                                                <label id="label_reset_key"> Factory Reset Key:</label><br>
+                                                <input type="text" name="reset_key"
+                                                    value="31323334353637383132333435363738"
+                                                    style="width: 342px; height:41px">
+                                            </p>
+                                        </form>
+
+
+
+                                        <p>
+                                            <form style="text-align: center;" id="form_reset_btn"
+                                                onsubmit="return false">
+                                                <button class="btn btn-primary" action="submit"
+                                                    style="width: 200px; height:34px;background-color: #008CBA;">Reset
+                                                    Token</button>
+                                            </form>
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </table>
+                    </td>
+
+                </tr>
+            </tbody>·
+        </table>
+    </div>
+    <script>
+        var flags = undefined;
+        var result = undefined;
+        document.getElementById('form_tokeninfo_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let token_sn = document.getElementById('form_token_sn').token_sn.value;
+            console.log(token_sn);
+
+            var bToken_sn = undefined;
+            if (token_sn.length != 0) {
+                bToken_sn = hexStringToArrayBuffer(token_sn);
+
+            }
+            GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
+
+                console.log('SUCCESS', response);
+                if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                    document.getElementById('form_token_sn').token_sn.value = ConverSNFormat(response
+                        .sn);
+                    document.getElementById('label_random_number').innerText = ConverSNFormat(response
+                        .rn);
+                    let reset_key = document.getElementById('form_reset_key').reset_key.value;
+                    bReset_key = hexStringToArrayBuffer(reset_key);
+
+                    let random = document.getElementById('label_random_number').textContent;
+                    bRandom = hexStringToArrayBuffer(random);
+                    var bRandomNumber = bRandom.slice(0, 16);
+                    var bChallenge = bRandom.slice(16, 32);
+                    let token_sn = document.getElementById('form_token_sn').token_sn.value;
+
+                    if (token_sn.length != 0) {
+                        bToken_sn = hexStringToArrayBuffer(token_sn);
+                    }
+                    result = prepareResetResponse(bReset_key, bRandomNumber, bToken_sn, bChallenge);
+
+
+                } else {
+                    alert(showFIDOErrorMessage(response));
+                }
+            }).catch((error) => {
+                alert(error)
+                console.log('FAIL', error)
+            });
+
+        });
+    </script>
+
+</body>
+
+</html>

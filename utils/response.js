@@ -28,7 +28,7 @@ class GTIdemJs {
 
             this.statusCode = WEB_ERR_OperationAbort;
         }
-
+        ''
         if (error == "NotAllowedError") {
             this.statusCode = WEB_ERR_UserCancelorTimeout;
         }
