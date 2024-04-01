@@ -145,7 +145,7 @@
       const username = document.getElementById('username').value;
       window.crypto.getRandomValues(challenge);
       const allowCredentials = getExcludeCredentialsForUsername(username);
-      const userVerificationValue = document.getElementById('reg_userVerification').value;
+      const userVerificationValue = document.getElementById('auth_userVerification').value;
       const options = {
         challenge: challenge, // will be another value, provided by the relying party server
         userVerification: userVerificationValue,
@@ -165,7 +165,7 @@
             console.log('Signature:', assertionPKCred.response.signature);
             console.log('User Handle:', assertionPKCred.response.userHandle);
             var data = parseAuthenticatorData(assertionPKCred.response.authenticatorData);
-            alert('Authentication complete!!!' + data)
+            alert('Authentication complete!!!\n' + data)
           }
         }).catch((error) => {
           alert(error)
