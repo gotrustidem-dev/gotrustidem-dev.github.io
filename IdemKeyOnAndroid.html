@@ -7,20 +7,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WebAuthn Demo</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+    .form-control {
+      width: 100%;
+      /* 使输入框和按钮宽度填满容器 */
+      margin-bottom: 10px;
+      /* 添加一些底部间距 */
+      box-sizing: border-box;
+      /* 确保padding和border不会增加元素的宽度 */
     }
 
-    label,
-    input,
-    button {
-      margin: 10px;
+    .form-container {
+      max-width: 400px;
+      /* 或你希望的最大宽度 */
+      margin: auto;
+      /* 水平居中 */
+      padding: 20px;
+      /* 添加一些内边距 */
     }
   </style>
   <script src="utils/cbor.js"></script>
@@ -41,17 +43,26 @@
   <h2>WebAuthn Registration and Authentication</h2>
 
   <!-- 用户名输入框 -->
-  <div>
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username">
+
+
+  <div class="form-container">
+    <input type="text" id="username" name="username" placeholder="Username" class="form-control">
+    <label>Register User Verification</label>
+    <select id="reg_userVerification" class="select-control">
+      <option value="preferred">Preferred</option>
+      <option value="required">Required</option>
+      <option value="discouraged">Discouraged</option>
+
+    </select>
+    <button id="register" type="button" onclick="register()" class="form-control">Register</button>
+    <label>Authenticate User Verification</label>
+    <select id="auth_userVerification" class="select-control">
+      <option value="preferred">Preferred</option>
+      <option value="required">Required</option>
+      <option value="discouraged">Discouraged</option>
+    </select>
+    <button id="authenticate" type="button" onclick="authenticate()" class="form-control">Authenticate</button>
   </div>
-
-  <!-- 注册按钮 -->
-  <button id="register">Register</button>
-
-  <!-- 验证按钮 -->
-  <button id="authenticate">Authenticate</button>
-
   <script>
     // 注册按钮事件监听
     document.getElementById('register').addEventListener('click', function () {
@@ -63,7 +74,7 @@
       var userid = new Uint8Array(64);
       window.crypto.getRandomValues(userid);
       const excludeCredentials = getExcludeCredentialsForUsername(username);
-
+      const userVerificationValue = document.getElementById('reg_userVerification').value;
       const publicKey = {
         rp: {
           name: "webauthn.io"
@@ -87,7 +98,7 @@
           authenticatorAttachment: "cross-platform",
           residentKey: "discouraged",
           requireResidentKey: false,
-          userVerification: "required"
+          userVerification: userVerificationValue
         },
         attestation: "none",
         timeout: 60000,
@@ -131,12 +142,13 @@
       // 这里添加调用验证函数的逻辑
       console.log('Authenticate button clicked');
       var challenge = new Uint8Array(32);
+      const username = document.getElementById('username').value;
       window.crypto.getRandomValues(challenge);
       const allowCredentials = getExcludeCredentialsForUsername(username);
-
+      const userVerificationValue = document.getElementById('reg_userVerification').value;
       const options = {
         challenge: challenge, // will be another value, provided by the relying party server
-        userVerification: "required",
+        userVerification: userVerificationValue,
         allowCredentials: allowCredentials
       };
       navigator.credentials.get({
@@ -145,13 +157,15 @@
         .then((assertionPKCred) => {
 
           if (assertionPKCred.response) {
-            const clientDataJSON = JSON.parse(String.fromCharCode.apply(null, new Uint8Array(credential.response
-              .clientDataJSON)));
+            const clientDataJSON = JSON.parse(String.fromCharCode.apply(null, new Uint8Array(assertionPKCred
+              .response.clientDataJSON)));
             console.log('Client Data JSON:', clientDataJSON);
-            console.log('Authenticator Data:', credential.response.authenticatorData);
-            console.log('Signature:', credential.response.signature);
-            console.log('User Handle:', credential.response.userHandle);
-            alert('Authentication complete!!!')
+            console.log('Authenticator Data:', assertionPKCred.response.authenticatorData);
+
+            console.log('Signature:', assertionPKCred.response.signature);
+            console.log('User Handle:', assertionPKCred.response.userHandle);
+            var data = parseAuthenticatorData(assertionPKCred.response.authenticatorData);
+            alert('Authentication complete!!!' + data)
           }
         }).catch((error) => {
           alert(error)
@@ -224,7 +238,19 @@
       console.log('User Verified:', userVerified);
       console.log('Sign Count:', signCount);
 
+      let output = '';
+      output += 'User Present: ' + userPresent + '\n';
+      output += 'User Verified: ' + userVerified + '\n';
+      output += 'Sign Count: ' + signCount;
+
+      return output;
       // 此处省略了Attested Credential Data和Extensions的解析
+    }
+
+    function byteArrayToHexString(byteArray) {
+      return Array.from(byteArray, byte => {
+        return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+      }).join('');
     }
   </script>
 </body>
