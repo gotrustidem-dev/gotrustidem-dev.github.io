@@ -82,7 +82,7 @@
       window.crypto.getRandomValues(challenge);
       var userid = new Uint8Array(64);
       window.crypto.getRandomValues(userid);
-      const excludeCredentials = getExcludeCredentialsForUsername(username);
+      const excludeCredentials = getCredentialsForUsername(username);
       const userVerificationValue = document.getElementById('reg_userVerification').value;
       const publicKey = {
         rp: {
@@ -153,7 +153,7 @@
       var challenge = new Uint8Array(32);
       const username = document.getElementById('username').value;
       window.crypto.getRandomValues(challenge);
-      const allowCredentials = getExcludeCredentialsForUsername(username);
+      const allowCredentials = getCredentialsForUsername(username);
       const userVerificationValue = document.getElementById('auth_userVerification').value;
       const options = {
         challenge: challenge, // will be another value, provided by the relying party server
@@ -196,7 +196,7 @@
       localStorage.setItem('webauthnCredentials', JSON.stringify(credentials));
     }
 
-    function getExcludeCredentialsForUsername(username) {
+    function getCredentialsForUsername(username) {
       const credentials = JSON.parse(localStorage.getItem('webauthnCredentials') || '{}');
       if (credentials[username]) {
         return [{
