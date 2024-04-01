@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <!-- 设置视口以确保页面在移动设备上正确显示 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebAuthn Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    label,
+    input,
+    button {
+      margin: 10px;
+    }
+  </style>
+  <script src="utils/cbor.js"></script>
+  <script src="utils/helpers.js"></script>
+  <script src="utils/showMessage.js"></script>
+  <script src="utils/PKIoverFIDO.js"></script>
+  <script src="utils/jquery.min.js"></script>
+  <script src="utils/bootstrap.min.js" integrity="sha256-Tz+u7EaSlLYQ9sqCqhzCszaP1WYRsxxVHC7iJP6ttBE="
+    crossorigin="anonymous"></script>
+  <script async="" src="lib/bundle.js"></script>
+
+  <script src="utils/PKIoverFIDO.js"></script>
+
+</head>
+
+<body>
+
+  <h2>WebAuthn Registration and Authentication</h2>
+
+  <!-- 用户名输入框 -->
+  <div>
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username">
+  </div>
+
+  <!-- 注册按钮 -->
+  <button id="register">Register</button>
+
+  <!-- 验证按钮 -->
+  <button id="authenticate">Authenticate</button>
+
+  <script>
+    // 注册按钮事件监听
+    document.getElementById('register').addEventListener('click', function () {
+      // 这里添加调用注册函数的逻辑
+      console.log('Register button clicked');
+      const username = document.getElementById('username').value;
+      var challenge = new Uint8Array(32);
+      window.crypto.getRandomValues(challenge);
+      var userid = new Uint8Array(64);
+      window.crypto.getRandomValues(userid);
+      const excludeCredentials = getExcludeCredentialsForUsername(username);
+
+      const publicKey = {
+        rp: {
+          name: "webauthn.io"
+        },
+        user: {
+          id: userid,
+          name: username,
+          displayName: username
+        },
+        challenge: challenge, // 替换为从服务器获得的挑战
+        pubKeyCredParams: [{
+            type: "public-key",
+            alg: -7
+          },
+          {
+            type: "public-key",
+            alg: -257
+          }
+        ],
+        authenticatorSelection: {
+          authenticatorAttachment: "cross-platform",
+          residentKey: "discouraged",
+          requireResidentKey: false,
+          userVerification: "required"
+        },
+        attestation: "none",
+        timeout: 60000,
+        excludeCredentials: excludeCredentials, // 使用从localStorage获取的数据
+      };
+      const userCredentialsJSON = localStorage.getItem(username);
+
+
+
+      console.log('List publicKey', publicKey);
+      navigator.credentials.create({
+          'publicKey': publicKey
+        })
+        .then((newCredentialInfo) => {
+
+
+
+          console.log('SUCCESS', newCredentialInfo)
+          console.log('ClientDataJSON: ', arrayBufferToString(newCredentialInfo.response
+            .clientDataJSON))
+          let attestationObject = CBOR.decode(newCredentialInfo.response.attestationObject);
+          console.log('AttestationObject: ', attestationObject)
+          let authData = parseAuthData(attestationObject.authData);
+          console.log('AuthData: ', authData);
+          console.log('CredID: ', bufToHex(authData.credID));
+          saveCredential(username, arrayBufferToBase64(authData.credID))
+          console.log('AAGUID: ', bufToHex(authData.aaguid));
+          console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
+          alert('Register complete!!!')
+
+
+        })
+        .catch((error) => {
+          alert(error)
+          console.log('FAIL', error)
+        })
+
+
+    });
+
+    // 验证按钮事件监听
+    document.getElementById('authenticate').addEventListener('click', function () {
+      // 这里添加调用验证函数的逻辑
+      console.log('Authenticate button clicked');
+    });
+
+    async function hashUsernameToUserId(username) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(username);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      return new Uint8Array(hashBuffer);
+    }
+
+    function saveCredential(username, credentialID) {
+      const credentials = JSON.parse(localStorage.getItem('webauthnCredentials') || '{}');
+      credentials[username] = credentialID;
+      localStorage.setItem('webauthnCredentials', JSON.stringify(credentials));
+    }
+
+    function getExcludeCredentialsForUsername(username) {
+      const credentials = JSON.parse(localStorage.getItem('webauthnCredentials') || '{}');
+      if (credentials[username]) {
+        return [{
+          id: base64ToArrayBuffer(credentials[username]), // 假设 credentialID 已经是 Base64 编码的
+          type: "public-key",
+          transports: ["ubs"]
+        }];
+      }
+      return [];
+    }
+
+    function arrayBufferToString(arrayBuffer) {
+      return String.fromCharCode.apply(null, new Uint8Array(arrayBuffer));
+    }
+
+    function base64ToArrayBuffer(base64) {
+      const binaryString = window.atob(base64); // 将Base64字符串解码为二进制字符串
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len); // 创建与二进制字符串长度相等的Uint8Array
+
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i); // 将每个字符的char code转换为Uint8Array的元素
+      }
+      return bytes.buffer; // 返回Uint8Array的buffer属性，它是一个ArrayBuffer
+    }
+
+    function arrayBufferToBase64(buffer) {
+      let binary = '';
+      const bytes = new Uint8Array(buffer);
+      const len = bytes.byteLength;
+      for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return window.btoa(binary);
+    }
+  </script>
+</body>
+
+</html>
