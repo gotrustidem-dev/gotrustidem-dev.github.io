@@ -24,6 +24,10 @@
       padding: 20px;
       /* 添加一些内边距 */
     }
+
+    h2 {
+      text-align: center;
+    }
   </style>
   <script src="utils/cbor.js"></script>
   <script src="utils/helpers.js"></script>
@@ -63,7 +67,12 @@
     </select>
     <button id="authenticate" type="button" onclick="authenticate()" class="form-control">Authenticate</button>
   </div>
+
   <script>
+    window.addEventListener('load', () => {
+      localStorage.clear();
+      console.log('LocalStorage has been cleared.');
+    });
     // 注册按钮事件监听
     document.getElementById('register').addEventListener('click', function () {
       // 这里添加调用注册函数的逻辑
