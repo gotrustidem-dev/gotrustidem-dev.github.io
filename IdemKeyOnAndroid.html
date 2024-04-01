@@ -117,8 +117,6 @@
           console.log('AAGUID: ', bufToHex(authData.aaguid));
           console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
           alert('Register complete!!!')
-
-
         })
         .catch((error) => {
           alert(error)
@@ -132,6 +130,34 @@
     document.getElementById('authenticate').addEventListener('click', function () {
       // 这里添加调用验证函数的逻辑
       console.log('Authenticate button clicked');
+      var challenge = new Uint8Array(32);
+      window.crypto.getRandomValues(challenge);
+      const allowCredentials = getExcludeCredentialsForUsername(username);
+
+      const options = {
+        challenge: challenge, // will be another value, provided by the relying party server
+        userVerification: "required",
+        allowCredentials: allowCredentials
+      };
+      navigator.credentials.get({
+          publicKey: options
+        })
+        .then((assertionPKCred) => {
+
+          if (assertionPKCred.response) {
+            const clientDataJSON = JSON.parse(String.fromCharCode.apply(null, new Uint8Array(credential.response
+              .clientDataJSON)));
+            console.log('Client Data JSON:', clientDataJSON);
+            console.log('Authenticator Data:', credential.response.authenticatorData);
+            console.log('Signature:', credential.response.signature);
+            console.log('User Handle:', credential.response.userHandle);
+            alert('Authentication complete!!!')
+          }
+        }).catch((error) => {
+          alert(error)
+          console.log('FAIL', error)
+        });
+
     });
 
     async function hashUsernameToUserId(username) {
@@ -182,6 +208,23 @@
         binary += String.fromCharCode(bytes[i]);
       }
       return window.btoa(binary);
+    }
+
+    function parseAuthenticatorData(buffer) {
+      const dataView = new DataView(buffer);
+      const rpIdHash = buffer.slice(0, 32); // RP ID hash 占据前32个字节
+      const flagsByte = dataView.getUint8(32); // 标志位在第32个字节
+      const userPresent = (flagsByte & 0x01) === 0x01; // 用户出席标志位
+      const userVerified = (flagsByte & 0x04) === 0x04; // 用户验证标志位
+      const signCount = dataView.getUint32(33, false); // 签名计数器占据第33到36字节
+
+      // 打印出解析结果
+      console.log('RP ID Hash:', rpIdHash);
+      console.log('User Present:', userPresent);
+      console.log('User Verified:', userVerified);
+      console.log('Sign Count:', signCount);
+
+      // 此处省略了Attested Credential Data和Extensions的解析
     }
   </script>
 </body>
