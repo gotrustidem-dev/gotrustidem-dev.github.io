@@ -202,7 +202,7 @@
         return [{
           id: base64ToArrayBuffer(credentials[username]), // 假设 credentialID 已经是 Base64 编码的
           type: "public-key",
-          transports: ["ubs"]
+          transports: ["idemkey"]
         }];
       }
       return [];
