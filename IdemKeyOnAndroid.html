@@ -137,7 +137,7 @@
       const userCredentialsJSON = localStorage.getItem(username);
       let publicKeyCopy = transformPublicKey(publicKey);
       // 将publicKey对象转换为易于阅读的字符串
-      const message = JSON.stringify(publicKeyCopy, null, 2);
+      const message = "Register\n" + JSON.stringify(publicKeyCopy, null, 2);
 
       // 将消息添加到消息框中
       const messageBox = document.getElementById("messageBox");
@@ -154,9 +154,6 @@
           'publicKey': publicKey
         })
         .then((newCredentialInfo) => {
-
-
-
           console.log('SUCCESS', newCredentialInfo)
           console.log('ClientDataJSON: ', arrayBufferToString(newCredentialInfo.response
             .clientDataJSON))
@@ -169,6 +166,15 @@
           console.log('AAGUID: ', bufToHex(authData.aaguid));
           console.log('PublicKey', CBOR.decode(authData.COSEPublicKey.buffer));
           alert('Register complete!!!')
+          const message = "Register complete!!!,Store " + username + " to LocalStorage";
+          const newMessage = document.createElement("div");
+          newMessage.classList.add("message");
+          newMessage.textContent = message;
+          messageBox.appendChild(newMessage);
+
+          // 确保新消息可见（滚动到底部）
+          messageBox.scrollTop = messageBox.scrollHeight;
+
         })
         .catch((error) => {
           alert(error)
@@ -192,6 +198,21 @@
         userVerification: userVerificationValue,
         allowCredentials: allowCredentials
       };
+
+      let optionsCopy = transformPublicKey(options);
+      // 将publicKey对象转换为易于阅读的字符串
+      const message = "Authenticate\n" + JSON.stringify(optionsCopy, null, 2);
+
+      // 将消息添加到消息框中
+      const messageBox = document.getElementById("messageBox");
+      const newMessage = document.createElement("div");
+      newMessage.classList.add("message");
+      newMessage.textContent = message;
+      messageBox.appendChild(newMessage);
+
+      // 确保新消息可见（滚动到底部）
+      messageBox.scrollTop = messageBox.scrollHeight;
+
       navigator.credentials.get({
           publicKey: options
         })
@@ -207,6 +228,12 @@
             console.log('User Handle:', assertionPKCred.response.userHandle);
             var data = parseAuthenticatorData(assertionPKCred.response.authenticatorData);
             alert('Authentication complete!!!\n' + data)
+            const message = "Authentication complete!!!\n'" + data;
+            const newMessage = document.createElement("div");
+            newMessage.classList.add("message");
+            newMessage.textContent = message;
+            messageBox.appendChild(newMessage);
+            messageBox.scrollTop = messageBox.scrollHeight;
           }
         }).catch((error) => {
           alert(error)
@@ -312,12 +339,14 @@
       newPublicKey.challenge = byteArrayToHexString(publicKey.challenge);
       // }
       // if (newPublicKey.user.id instanceof Uint8Array) {
-      newPublicKey.user.id = byteArrayToHexString(publicKey.user.id);
+      if (typeof newPublicKey.user !== 'undefined') {
+        newPublicKey.user.id = byteArrayToHexString(publicKey.user.id);
+      }
       //}
-      if (newPublicKey.excludeCredentials.length !== 0) {
+      if (typeof newPublicKey.excludeCredentials !== 'undefined' && newPublicKey.excludeCredentials.length > 0) {
         // if (newPublicKey.excludeCredentials[0].id instanceof Uint8Array) {
         newPublicKey.excludeCredentials[0].id = byteArrayToHexString(new Uint8Array(publicKey.excludeCredentials[0]
-        .id));
+          .id));
         //}
       }
       if (typeof newPublicKey.allowCredentials !== 'undefined' && newPublicKey.allowCredentials.length > 0) {
