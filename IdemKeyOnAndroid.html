@@ -3,26 +3,19 @@
 
 <head>
   <meta charset="UTF-8">
-  <!-- 设置视口以确保页面在移动设备上正确显示 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WebAuthn Demo</title>
   <style>
     .form-control {
       width: 100%;
-      /* 使输入框和按钮宽度填满容器 */
       margin-bottom: 10px;
-      /* 添加一些底部间距 */
       box-sizing: border-box;
-      /* 确保padding和border不会增加元素的宽度 */
     }
 
     .form-container {
       max-width: 400px;
-      /* 或你希望的最大宽度 */
       margin: auto;
-      /* 水平居中 */
       padding: 20px;
-      /* 添加一些内边距 */
     }
 
     h2 {
@@ -31,23 +24,16 @@
 
     #messageBox {
       height: 200px;
-      /* 设置固定高度 */
       overflow-y: auto;
-      /* 显示垂直滚动条 */
       border: 1px solid #ccc;
-      /* 设置边框 */
       margin-top: 10px;
-      /* 和上面的元素保持间距 */
       padding: 5px;
-      /* 内边距 */
     }
 
-    /* 消息之间的分隔线 */
     .message {
       border-bottom: 1px solid #eee;
-      /* 设置分隔线 */
+     
       padding: 5px 0;
-      /* 设置消息的上下内边距 */
     }
   </style>
   <script src="utils/cbor.js"></script>
@@ -67,7 +53,7 @@
 
   <h2>WebAuthn Registration and Authentication</h2>
 
-  <!-- 用户名输入框 -->
+
 
 
   <div class="form-container">
@@ -94,9 +80,8 @@
       localStorage.clear();
       console.log('LocalStorage has been cleared.');
     });
-    // 注册按钮事件监听
     document.getElementById('register').addEventListener('click', function () {
-      // 这里添加调用注册函数的逻辑
+
       console.log('Register button clicked');
       const username = document.getElementById('username').value;
       var challengeByte = new Uint8Array(32);
@@ -114,7 +99,7 @@
           name: username,
           displayName: username
         },
-        challenge: challengeByte, // 替换为从服务器获得的挑战
+        challenge: challengeByte, 
         pubKeyCredParams: [{
             type: "public-key",
             alg: -7
@@ -132,21 +117,20 @@
         },
         attestation: "none",
         timeout: 60000,
-        excludeCredentials: excludeCredentials, // 使用从localStorage获取的数据
+        excludeCredentials: excludeCredentials,
       };
       const userCredentialsJSON = localStorage.getItem(username);
       let publicKeyCopy = transformPublicKey(publicKey);
-      // 将publicKey对象转换为易于阅读的字符串
+
       const message = "Register\n" + JSON.stringify(publicKeyCopy, null, 2);
 
-      // 将消息添加到消息框中
+
       const messageBox = document.getElementById("messageBox");
       const newMessage = document.createElement("div");
       newMessage.classList.add("message");
       newMessage.textContent = message;
       messageBox.appendChild(newMessage);
 
-      // 确保新消息可见（滚动到底部）
       messageBox.scrollTop = messageBox.scrollHeight;
 
       console.log('List publicKey', publicKey);
@@ -172,7 +156,6 @@
           newMessage.textContent = message;
           messageBox.appendChild(newMessage);
 
-          // 确保新消息可见（滚动到底部）
           messageBox.scrollTop = messageBox.scrollHeight;
 
         })
@@ -184,9 +167,8 @@
 
     });
 
-    // 验证按钮事件监听
     document.getElementById('authenticate').addEventListener('click', function () {
-      // 这里添加调用验证函数的逻辑
+
       console.log('Authenticate button clicked');
       var challenge = new Uint8Array(32);
       const username = document.getElementById('username').value;
@@ -200,17 +182,14 @@
       };
 
       let optionsCopy = transformPublicKey(options);
-      // 将publicKey对象转换为易于阅读的字符串
       const message = "Authenticate\n" + JSON.stringify(optionsCopy, null, 2);
 
-      // 将消息添加到消息框中
       const messageBox = document.getElementById("messageBox");
       const newMessage = document.createElement("div");
       newMessage.classList.add("message");
       newMessage.textContent = message;
       messageBox.appendChild(newMessage);
 
-      // 确保新消息可见（滚动到底部）
       messageBox.scrollTop = messageBox.scrollHeight;
 
       navigator.credentials.get({
@@ -259,7 +238,7 @@
       const credentials = JSON.parse(localStorage.getItem('webauthnCredentials') || '{}');
       if (credentials[username]) {
         return [{
-          id: base64ToArrayBuffer(credentials[username]), // 假设 credentialID 已经是 Base64 编码的
+          id: base64ToArrayBuffer(credentials[username]), 
           type: "public-key",
           transports: ["idemkey"]
         }];
@@ -272,14 +251,14 @@
     }
 
     function base64ToArrayBuffer(base64) {
-      const binaryString = window.atob(base64); // 将Base64字符串解码为二进制字符串
+      const binaryString = window.atob(base64); 
       const len = binaryString.length;
-      const bytes = new Uint8Array(len); // 创建与二进制字符串长度相等的Uint8Array
+      const bytes = new Uint8Array(len); 
 
       for (let i = 0; i < len; i++) {
-        bytes[i] = binaryString.charCodeAt(i); // 将每个字符的char code转换为Uint8Array的元素
+        bytes[i] = binaryString.charCodeAt(i); 
       }
-      return bytes.buffer; // 返回Uint8Array的buffer属性，它是一个ArrayBuffer
+      return bytes.buffer; 
     }
 
     function arrayBufferToBase64(buffer) {
@@ -294,13 +273,13 @@
 
     function parseAuthenticatorData(buffer) {
       const dataView = new DataView(buffer);
-      const rpIdHash = buffer.slice(0, 32); // RP ID hash 占据前32个字节
-      const flagsByte = dataView.getUint8(32); // 标志位在第32个字节
-      const userPresent = (flagsByte & 0x01) === 0x01; // 用户出席标志位
-      const userVerified = (flagsByte & 0x04) === 0x04; // 用户验证标志位
-      const signCount = dataView.getUint32(33, false); // 签名计数器占据第33到36字节
+      const rpIdHash = buffer.slice(0, 32); 
+      const flagsByte = dataView.getUint8(32);
+      const userPresent = (flagsByte & 0x01) === 0x01; 
+      const userVerified = (flagsByte & 0x04) === 0x04; 
+      const signCount = dataView.getUint32(33, false); 
 
-      // 打印出解析结果
+     
       console.log('RP ID Hash:', rpIdHash);
       console.log('User Present:', userPresent);
       console.log('User Verified:', userVerified);
@@ -312,7 +291,7 @@
       output += 'Sign Count: ' + signCount;
 
       return output;
-      // 此处省略了Attested Credential Data和Extensions的解析
+     
     }
 
     function byteArrayToHexString(byteArray) {
@@ -327,36 +306,24 @@
     }
 
     function transformPublicKey(publicKey) {
-      // 复制publicKey对象
+     
       var newPublicKey = JSON.parse(JSON.stringify(publicKey));;
-      //   if (typeof JSON.clone !== "function") {
-      //     JSON.clone = function(obj) {
-      //     return 
-      //     };
-      // }
-      // 将Uint8Array转换为十六进制字符串
-      //if (newPublicKey.challenge instanceof Uint8Array) {
+      
       newPublicKey.challenge = byteArrayToHexString(publicKey.challenge);
-      // }
-      // if (newPublicKey.user.id instanceof Uint8Array) {
+      
       if (typeof newPublicKey.user !== 'undefined') {
         newPublicKey.user.id = byteArrayToHexString(publicKey.user.id);
       }
-      //}
       if (typeof newPublicKey.excludeCredentials !== 'undefined' && newPublicKey.excludeCredentials.length > 0) {
-        // if (newPublicKey.excludeCredentials[0].id instanceof Uint8Array) {
         newPublicKey.excludeCredentials[0].id = byteArrayToHexString(new Uint8Array(publicKey.excludeCredentials[0]
           .id));
-        //}
+       
       }
       if (typeof newPublicKey.allowCredentials !== 'undefined' && newPublicKey.allowCredentials.length > 0) {
-        // if (newPublicKey.allowCredentials[0].id instanceof Uint8Array) {
+
         newPublicKey.allowCredentials[0].id = byteArrayToHexString(new Uint8Array(publicKey.allowCredentials[0].id));
-        //}
       }
 
-
-      // 可以在这里继续转换其他可能存在的Uint8Array属性
 
       return newPublicKey;
     }
