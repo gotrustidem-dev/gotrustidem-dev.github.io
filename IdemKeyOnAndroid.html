@@ -28,6 +28,27 @@
     h2 {
       text-align: center;
     }
+
+    #messageBox {
+      height: 200px;
+      /* 设置固定高度 */
+      overflow-y: auto;
+      /* 显示垂直滚动条 */
+      border: 1px solid #ccc;
+      /* 设置边框 */
+      margin-top: 10px;
+      /* 和上面的元素保持间距 */
+      padding: 5px;
+      /* 内边距 */
+    }
+
+    /* 消息之间的分隔线 */
+    .message {
+      border-bottom: 1px solid #eee;
+      /* 设置分隔线 */
+      padding: 5px 0;
+      /* 设置消息的上下内边距 */
+    }
   </style>
   <script src="utils/cbor.js"></script>
   <script src="utils/helpers.js"></script>
@@ -67,7 +88,7 @@
     </select>
     <button id="authenticate" type="button" onclick="authenticate()" class="form-control">Authenticate</button>
   </div>
-
+  <div id="messageBox"></div>
   <script>
     window.addEventListener('load', () => {
       localStorage.clear();
@@ -78,9 +99,9 @@
       // 这里添加调用注册函数的逻辑
       console.log('Register button clicked');
       const username = document.getElementById('username').value;
-      var challenge = new Uint8Array(32);
-      window.crypto.getRandomValues(challenge);
-      var userid = new Uint8Array(64);
+      var challengeByte = new Uint8Array(32);
+      window.crypto.getRandomValues(challengeByte);
+      var userid = new Uint8Array(32);
       window.crypto.getRandomValues(userid);
       const excludeCredentials = getCredentialsForUsername(username);
       const userVerificationValue = document.getElementById('reg_userVerification').value;
@@ -93,7 +114,7 @@
           name: username,
           displayName: username
         },
-        challenge: challenge, // 替换为从服务器获得的挑战
+        challenge: challengeByte, // 替换为从服务器获得的挑战
         pubKeyCredParams: [{
             type: "public-key",
             alg: -7
@@ -114,8 +135,19 @@
         excludeCredentials: excludeCredentials, // 使用从localStorage获取的数据
       };
       const userCredentialsJSON = localStorage.getItem(username);
+      let publicKeyCopy = transformPublicKey(publicKey);
+      // 将publicKey对象转换为易于阅读的字符串
+      const message = JSON.stringify(publicKeyCopy, null, 2);
 
+      // 将消息添加到消息框中
+      const messageBox = document.getElementById("messageBox");
+      const newMessage = document.createElement("div");
+      newMessage.classList.add("message");
+      newMessage.textContent = message;
+      messageBox.appendChild(newMessage);
 
+      // 确保新消息可见（滚动到底部）
+      messageBox.scrollTop = messageBox.scrollHeight;
 
       console.log('List publicKey', publicKey);
       navigator.credentials.create({
@@ -260,6 +292,44 @@
       return Array.from(byteArray, byte => {
         return ('0' + (byte & 0xFF).toString(16)).slice(-2);
       }).join('');
+    }
+
+    function uint8ArrayToHexString2(uint8Array) {
+
+      return Array.from(uint8Array, byte => ('0' + (byte & 0xFF).toString(16)).slice(-2)).join('');
+    }
+
+    function transformPublicKey(publicKey) {
+      // 复制publicKey对象
+      var newPublicKey = JSON.parse(JSON.stringify(publicKey));;
+      //   if (typeof JSON.clone !== "function") {
+      //     JSON.clone = function(obj) {
+      //     return 
+      //     };
+      // }
+      // 将Uint8Array转换为十六进制字符串
+      //if (newPublicKey.challenge instanceof Uint8Array) {
+      newPublicKey.challenge = byteArrayToHexString(publicKey.challenge);
+      // }
+      // if (newPublicKey.user.id instanceof Uint8Array) {
+      newPublicKey.user.id = byteArrayToHexString(publicKey.user.id);
+      //}
+      if (newPublicKey.excludeCredentials.length !== 0) {
+        // if (newPublicKey.excludeCredentials[0].id instanceof Uint8Array) {
+        newPublicKey.excludeCredentials[0].id = byteArrayToHexString(new Uint8Array(publicKey.excludeCredentials[0]
+        .id));
+        //}
+      }
+      if (typeof newPublicKey.allowCredentials !== 'undefined' && newPublicKey.allowCredentials.length > 0) {
+        // if (newPublicKey.allowCredentials[0].id instanceof Uint8Array) {
+        newPublicKey.allowCredentials[0].id = byteArrayToHexString(new Uint8Array(publicKey.allowCredentials[0].id));
+        //}
+      }
+
+
+      // 可以在这里继续转换其他可能存在的Uint8Array属性
+
+      return newPublicKey;
     }
   </script>
 </body>
