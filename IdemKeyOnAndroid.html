@@ -32,7 +32,7 @@
 
     .message {
       border-bottom: 1px solid #eee;
-     
+
       padding: 5px 0;
     }
   </style>
@@ -96,7 +96,7 @@
           name: username,
           displayName: username
         },
-        challenge: challengeByte, 
+        challenge: challengeByte,
         pubKeyCredParams: [{
             type: "public-key",
             alg: -7
@@ -235,7 +235,7 @@
       const credentials = JSON.parse(localStorage.getItem('webauthnCredentials') || '{}');
       if (credentials[username]) {
         return [{
-          id: base64ToArrayBuffer(credentials[username]), 
+          id: base64ToArrayBuffer(credentials[username]),
           type: "public-key",
           transports: ["idemkey"]
         }];
@@ -248,14 +248,14 @@
     }
 
     function base64ToArrayBuffer(base64) {
-      const binaryString = window.atob(base64); 
+      const binaryString = window.atob(base64);
       const len = binaryString.length;
-      const bytes = new Uint8Array(len); 
+      const bytes = new Uint8Array(len);
 
       for (let i = 0; i < len; i++) {
-        bytes[i] = binaryString.charCodeAt(i); 
+        bytes[i] = binaryString.charCodeAt(i);
       }
-      return bytes.buffer; 
+      return bytes.buffer;
     }
 
     function arrayBufferToBase64(buffer) {
@@ -270,25 +270,24 @@
 
     function parseAuthenticatorData(buffer) {
       const dataView = new DataView(buffer);
-      const rpIdHash = buffer.slice(0, 32); 
+      const rpIdHash = buffer.slice(0, 32);
       const flagsByte = dataView.getUint8(32);
-      const userPresent = (flagsByte & 0x01) === 0x01; 
-      const userVerified = (flagsByte & 0x04) === 0x04; 
-      const signCount = dataView.getUint32(33, false); 
+      const userPresent = (flagsByte & 0x01) === 0x01;
+      const userVerified = (flagsByte & 0x04) === 0x04;
+      const signCount = dataView.getUint32(33, false);
 
-     
+
       console.log('RP ID Hash:', rpIdHash);
       console.log('User Present:', userPresent);
       console.log('User Verified:', userVerified);
-      console.log('Sign Count:', signCount);
 
       let output = '';
       output += 'User Present: ' + userPresent + '\n';
       output += 'User Verified: ' + userVerified + '\n';
-      output += 'Sign Count: ' + signCount;
+
 
       return output;
-     
+
     }
 
     function byteArrayToHexString(byteArray) {
@@ -303,18 +302,18 @@
     }
 
     function transformPublicKey(publicKey) {
-     
+
       var newPublicKey = JSON.parse(JSON.stringify(publicKey));;
-      
+
       newPublicKey.challenge = byteArrayToHexString(publicKey.challenge);
-      
+
       if (typeof newPublicKey.user !== 'undefined') {
         newPublicKey.user.id = byteArrayToHexString(publicKey.user.id);
       }
       if (typeof newPublicKey.excludeCredentials !== 'undefined' && newPublicKey.excludeCredentials.length > 0) {
         newPublicKey.excludeCredentials[0].id = byteArrayToHexString(new Uint8Array(publicKey.excludeCredentials[0]
           .id));
-       
+
       }
       if (typeof newPublicKey.allowCredentials !== 'undefined' && newPublicKey.allowCredentials.length > 0) {
 
