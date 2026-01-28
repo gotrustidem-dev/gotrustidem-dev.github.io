@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IdemKey+ 管理平台 v1.14</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-bg: #ecf0f1;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --hover-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft JhengHei', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            color: var(--primary-color);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .version-badge {
+            background: var(--secondary-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.4em;
+            font-weight: normal;
+        }
+
+        header p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        .status-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-icon {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-icon.connected {
+            background: var(--success-color);
+        }
+
+        .status-icon.disconnected {
+            background: var(--danger-color);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .search-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1em;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .category-header {
+            padding: 20px;
+            background: linear-gradient(135deg, var(--secondary-color), #2980b9);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .category-header.cert {
+            background: linear-gradient(135deg, var(--success-color), #229954);
+        }
+
+        .category-header.security {
+            background: linear-gradient(135deg, var(--danger-color), #c0392b);
+        }
+
+        .category-header.advanced {
+            background: linear-gradient(135deg, var(--warning-color), #d68910);
+        }
+
+        .category-icon {
+            font-size: 2em;
+        }
+
+        .category-title {
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+
+        .function-list {
+            padding: 20px;
+        }
+
+        .function-item {
+            display: block;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: var(--light-bg);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--primary-color);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .function-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--secondary-color);
+            transform: scaleY(0);
+            transition: transform 0.3s;
+        }
+
+        .function-item:hover {
+            background: white;
+            transform: translateX(10px);
+            box-shadow: var(--card-shadow);
+        }
+
+        .function-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        .function-item .icon {
+            margin-right: 10px;
+        }
+
+        .function-item .badge {
+            float: right;
+            background: var(--secondary-color);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+
+        .function-item.recommended .badge {
+            background: var(--success-color);
+        }
+
+        .function-item.new .badge {
+            background: var(--warning-color);
+        }
+
+        footer {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            color: #7f8c8d;
+        }
+
+        .quick-actions {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+        }
+
+        .quick-actions h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .quick-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .quick-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+        }
+
+        .quick-btn.primary {
+            background: var(--secondary-color);
+        }
+
+        .quick-btn.success {
+            background: var(--success-color);
+        }
+
+        .quick-btn.warning {
+            background: var(--warning-color);
+        }
+
+        .quick-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--card-shadow);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .browser-warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .browser-warning .icon {
+            font-size: 1.5em;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+                flex-direction: column;
+            }
+
+            .categories {
+                grid-template-columns: 1fr;
+            }
+
+            .status-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        .info-panel {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: var(--hover-shadow);
+        }
+
+        .info-panel h3 {
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .info-panel ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-panel li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .info-panel li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>
+                🔐 IdemKey+ 管理平台
+                <span class="version-badge">v1.14</span>
+            </h1>
+            <p>專業的 FIDO 安全金鑰管理工具</p>
+        </header>
+
+        <!-- Browser Warning -->
+        <div id="browserWarning" class="browser-warning hidden">
+            <span class="icon">⚠️</span>
+            <div>
+                <strong>瀏覽器兼容性警告</strong>
+                <p>檢測到您的 Safari 版本可能不支援某些功能，建議使用最新版本的 Chrome、Firefox 或 Edge。</p>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="status-icon disconnected" id="deviceStatus"></span>
+                <span>設備狀態: <strong id="deviceStatusText">未連接</strong></span>
+            </div>
+            <div class="status-item">
+                <span>API 版本: <strong>1.14.0</strong></span>
+            </div>
+            <div class="status-item">
+                <span>支援的瀏覽器: Chrome 67+, Firefox 60+, Safari 13+</span>
+            </div>
+        </div>
+
+        <!-- Quick Info Panel -->
+        <div class="info-panel">
+            <h3>🚀 快速開始指南</h3>
+            <ul>
+                <li>首次使用請先執行「初始化 Token」</li>
+                <li>建議先「讀取 Token 資訊」確認設備狀態</li>
+                <li>產生憑證前請先確認 PIN 碼</li>
+                <li>手機簽名測試請使用「產生 RSA2048 CSR」</li>
+            </ul>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <input type="text" 
+                   class="search-input" 
+                   id="searchInput" 
+                   placeholder="🔍 搜尋功能... (例如: 讀取憑證、變更 PIN、簽章)">
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h3>⚡ 常用功能</h3>
+            <div class="quick-buttons">
+                <a href="views_1_12/GetTokenInfo.html" class="quick-btn primary">
+                    📊 Token 資訊
+                </a>
+                <a href="views_1_12/ReadCertWithoutPIN.html" class="quick-btn success">
+                    📄 讀取憑證
+                </a>
+                <a href="views_1_12/SignData.html" class="quick-btn warning">
+                    ✍️ 數位簽章
+                </a>
+                <a href="example_modern_usage.html" class="quick-btn primary">
+                    🎯 互動式範例
+                </a>
+            </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="categories">
+            <!-- 基本操作 -->
+            <div class="category-card">
+                <div class="category-header">
+                    <span class="category-icon">📋</span>
+                    <span class="category-title">基本操作</span>
+                </div>
+                <div class="function-list">
+                    <a href="views_1_12/GetTokenInfo.html" class="function-item recommended">
+                        <span class="icon">📊</span>
+                        讀取 Token 資訊
+                        <span class="badge">推薦</span>
+                    </a>
+                    <a href="views_1_12/ReadCertWithoutPIN.html" class="function-item recommended">
+                        <span class="icon">📄</span>
+                        讀取憑證 (無需 PIN)
+                        <span class="badge">推薦</span>
+                    </a>
+                    <a href="views_1_12/SignData.html" class="function-item">
+                        <span class="icon">✍️</span>
+                        數位簽章
+                    </a>
+                    <a href="views_1_12/CheckPINValid.html" class="function-item">
+                        <span class="icon">🔍</span>
+                        檢查 PIN 有效性
+                    </a>
+                    <a href="views_1_12/CheckPINValidV2.html" class="function-item">
+                        <span class="icon">🔍</span>
+                        檢查 PIN 有效性 V2
+                    </a>
+                </div>
+            </div>
+
+            <!-- 憑證管理 -->
+            <div class="category-card">
+                <div class="category-header cert">
+                    <span class="category-icon">🎫</span>
+                    <span class="category-title">憑證管理</span>
+                </div>
+                <div class="function-list">
+                    <a href="views_1_12/RequestRSA2048CSR.html" class="function-item recommended">
+                        <span class="icon">🔑</span>
+                        產生 RSA2048 CSR
+                        <span class="badge">手機推薦</span>
+                    </a>
+                    <a href="views_1_12/RequestP256CSR.html" class="function-item">
+                        <span class="icon">🔐</span>
+                        產生 P256 CSR
+                    </a>
+                    <a href="views_1_12/RequestP384CSR.html" class="function-item">
+                        <span class="icon">🔐</span>
+                        產生 P384 CSR
+                    </a>
+                    <a href="views_1_12/RequestP521CSR.html" class="function-item">
+                        <span class="icon">🔐</span>
+                        產生 P521 CSR
+                    </a>
+                    <a href="views_1_12/RequestRSA2048KeyPair.html" class="function-item">
+                        <span class="icon">🔑</span>
+                        產生 RSA2048 金鑰對
+                    </a>
+                    <a href="views_1_12/RequestAsymKeyPair.html" class="function-item">
+                        <span class="icon">🔑</span>
+                        產生非對稱金鑰對
+                    </a>
+                </div>
+            </div>
+
+            <!-- 安全設定 -->
+            <div class="category-card">
+                <div class="category-header security">
+                    <span class="category-icon">🔒</span>
+                    <span class="category-title">安全設定</span>
+                </div>
+                <div class="function-list">
+                    <a href="views_1_12/ChangePIN.html" class="function-item" id="changePinLink">
+                        <span class="icon">🔐</span>
+                        變更 PIN 碼
+                    </a>
+                    <a href="views_1_12/ChangePIN4AllBrower_V2.html" class="function-item recommended">
+                        <span class="icon">🔐</span>
+                        變更 PIN (兩步驟)
+                        <span class="badge">推薦</span>
+                    </a>
+                    <a href="views_1_12/RequestInitToken.html" class="function-item">
+                        <span class="icon">🆕</span>
+                        初始化 Token
+                    </a>
+                    <a href="views_1_12/RequestUnlockPIN.html" class="function-item">
+                        <span class="icon">🔓</span>
+                        解鎖 PIN 碼
+                    </a>
+                    <a href="views_1_12/DeleteCerts.html" class="function-item">
+                        <span class="icon">🗑️</span>
+                        刪除憑證或清除 Token
+                    </a>
+                    <a href="views_1_12/RequestTokenReset.html" class="function-item">
+                        <span class="icon">♻️</span>
+                        重置 Token
+                    </a>
+                </div>
+            </div>
+
+            <!-- 開發者工具 -->
+            <div class="category-card">
+                <div class="category-header advanced">
+                    <span class="category-icon">🛠️</span>
+                    <span class="category-title">開發者工具</span>
+                </div>
+                <div class="function-list">
+                    <a href="example_modern_usage.html" class="function-item recommended">
+                        <span class="icon">🎯</span>
+                        互動式 API 範例
+                        <span class="badge">新版</span>
+                    </a>
+                    <a href="utils/README_v1.14.md" class="function-item new">
+                        <span class="icon">📚</span>
+                        API 完整文檔
+                        <span class="badge">v1.14</span>
+                    </a>
+                    <a href="QUICK_REFERENCE_v1.14.md" class="function-item new">
+                        <span class="icon">⚡</span>
+                        快速參考手冊
+                        <span class="badge">v1.14</span>
+                    </a>
+                    <a href="VERSION_1.14_RELEASE.md" class="function-item">
+                        <span class="icon">📋</span>
+                        版本發布說明
+                    </a>
+                    <a href="INDEX_v1.14.md" class="function-item">
+                        <span class="icon">📖</span>
+                        文件索引
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p><strong>GoTrustID IdemKey+ Management Platform</strong></p>
+            <p>版本 1.14.0 | 使用現代化 ES6+ JavaScript API</p>
+            <p>支援 WebAuthn 和 FIDO2 標準 | © 2026 GoTrustID</p>
+            <p style="margin-top: 15px;">
+                <a href="https://github.com/gotrustidem" style="color: #3498db; text-decoration: none;">GitHub</a> |
+                <a href="LICENSE" style="color: #3498db; text-decoration: none;">授權條款</a> |
+                <a href="CHANGELOG.md" style="color: #3498db; text-decoration: none;">更新日誌</a>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // 瀏覽器檢測
+        function checkBrowser() {
+            const ua = navigator.userAgent;
+            const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+            
+            if (isSafari) {
+                const match = ua.match(/Version\/(\d+)\.(\d+)/);
+                if (match) {
+                    const major = parseInt(match[1]);
+                    const minor = parseInt(match[2]);
+                    
+                    // 檢查是否為已知有問題的版本
+                    if ((major === 14 && minor === 1) || 
+                        (major === 15 && minor <= 3)) {
+                        document.getElementById('browserWarning').classList.remove('hidden');
+                        
+                        // 更新變更 PIN 連結文字
+                        const changePinLink = document.getElementById('changePinLink');
+                        if (changePinLink) {
+                            changePinLink.innerHTML += ' <span style="color: #e74c3c; font-size: 0.9em;">(此瀏覽器版本可能無法使用)</span>';
+                        }
+                    }
+                }
+            }
+        }
+
+        // 搜尋功能
+        function initSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const functionItems = document.querySelectorAll('.function-item');
+
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+
+                functionItems.forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    const categoryCard = item.closest('.category-card');
+
+                    if (text.includes(searchTerm)) {
+                        item.style.display = 'block';
+                        categoryCard.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+
+                // 隱藏沒有可見項目的分類
+                document.querySelectorAll('.category-card').forEach(card => {
+                    const visibleItems = card.querySelectorAll('.function-item[style*="display: block"]');
+                    if (visibleItems.length === 0 && searchTerm) {
+                        card.style.display = 'none';
+                    } else {
+                        card.style.display = 'block';
+                    }
+                });
+            });
+        }
+
+        // 設備狀態檢測（模擬）
+        function checkDeviceStatus() {
+            // 這是一個簡化的檢測，實際應該通過 WebAuthn API 檢測
+            if (navigator.credentials && navigator.credentials.get) {
+                document.getElementById('deviceStatus').classList.remove('disconnected');
+                document.getElementById('deviceStatus').classList.add('connected');
+                document.getElementById('deviceStatusText').textContent = 'API 就緒';
+            } else {
+                document.getElementById('deviceStatusText').textContent = '不支援 WebAuthn';
+            }
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            checkBrowser();
+            initSearch();
+            checkDeviceStatus();
+
+            // 添加鍵盤快捷鍵
+            document.addEventListener('keydown', (e) => {
+                // Ctrl/Cmd + K 快速搜尋
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    document.getElementById('searchInput').focus();
+                }
+            });
+
+            // 添加提示訊息
+            console.log('%c🔐 IdemKey+ v1.14', 'font-size: 20px; color: #3498db; font-weight: bold;');
+            console.log('%c現代化 API 已載入', 'font-size: 14px; color: #27ae60;');
+            console.log('快捷鍵: Ctrl/Cmd + K 快速搜尋');
+        });
+    </script>
+</body>
+</html>

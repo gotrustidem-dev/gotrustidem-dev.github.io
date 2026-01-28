@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>變更 PIN 碼 - IdemKey+ v1.14</title>
+    <script type="module" src="../utils/PKIoverFIDO_1_14.js"></script>
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5568d3;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-700: #495057;
+            --gray-900: #212529;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: var(--primary);
+            margin-bottom: 5px;
+            font-size: 2em;
+        }
+
+        .header .subtitle {
+            color: var(--gray-700);
+            font-size: 0.95em;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--gray-700);
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            color: var(--gray-700);
+        }
+
+        .btn {
+            padding: 12px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: var(--gray-300);
+            cursor: not-allowed;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid var(--warning);
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid var(--success);
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid var(--danger);
+        }
+
+        .pin-requirements {
+            background: var(--gray-100);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .pin-requirements ul {
+            margin: 10px 0 0 20px;
+            color: var(--gray-700);
+        }
+
+        .pin-requirements li {
+            margin: 5px 0;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid var(--gray-300);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../IdemKeyPlus_1_14.html" class="back-link">← 返回主頁</a>
+
+        <div class="header">
+            <h1>🔐 變更 PIN 碼</h1>
+            <p class="subtitle">更新您的 IdemKey+ 裝置 PIN 碼</p>
+        </div>
+
+        <div class="card">
+            <div class="alert alert-warning">
+                ⚠️ 請妥善保管您的 PIN 碼。連續輸入錯誤將導致裝置鎖定。
+            </div>
+
+            <form id="changePinForm">
+                <div class="form-group">
+                    <label for="token_sn">Token 序號</label>
+                    <input type="text" id="token_sn" placeholder="將自動顯示裝置序號" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="currentPin">目前的 PIN 碼</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="currentPin" placeholder="請輸入目前的 PIN 碼" required autocomplete="off">
+                        <button type="button" class="toggle-password" data-target="currentPin">👁️</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="newPin">新的 PIN 碼</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="newPin" placeholder="請輸入新的 PIN 碼" required autocomplete="off">
+                        <button type="button" class="toggle-password" data-target="newPin">👁️</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPin">確認新的 PIN 碼</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="confirmPin" placeholder="請再次輸入新的 PIN 碼" required autocomplete="off">
+                        <button type="button" class="toggle-password" data-target="confirmPin">👁️</button>
+                    </div>
+                </div>
+
+                <div class="pin-requirements">
+                    <strong>📝 PIN 碼要求：</strong>
+                    <ul>
+                        <li>長度為 6-8 位數字</li>
+                        <li>僅包含數字 0-9</li>
+                        <li>建議不要使用簡單序列（如 123456）</li>
+                    </ul>
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn btn-primary" style="margin-top: 20px;">
+                    🔄 變更 PIN 碼
+                </button>
+            </form>
+
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 15px; color: var(--gray-700);">正在變更 PIN 碼...</p>
+            </div>
+
+            <div id="resultMsg" style="display: none; margin-top: 20px;"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createIdemKeyAPI } from '../utils/PKIoverFIDO_1_14.js';
+
+        const api = createIdemKeyAPI();
+        const form = document.getElementById('changePinForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const resultMsg = document.getElementById('resultMsg');
+
+        // Toggle password visibility
+        document.querySelectorAll('.toggle-password').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetId = btn.getAttribute('data-target');
+                const input = document.getElementById(targetId);
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    btn.textContent = '🙈';
+                } else {
+                    input.type = 'password';
+                    btn.textContent = '👁️';
+                }
+            });
+        });
+
+        // Get token info on page load
+        (async () => {
+            try {
+                const response = await api.getTokenInfo();
+                if (response.isSuccess() && response.data.serialNumber) {
+                    document.getElementById('token_sn').value = response.data.serialNumber;
+                }
+            } catch (error) {
+                console.error('Failed to get token info:', error);
+            }
+        })();
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const currentPin = document.getElementById('currentPin').value;
+            const newPin = document.getElementById('newPin').value;
+            const confirmPin = document.getElementById('confirmPin').value;
+
+            // Validation
+            if (newPin !== confirmPin) {
+                showResult('danger', '❌ 新 PIN 碼與確認 PIN 碼不符！');
+                return;
+            }
+
+            if (!/^\d{6,8}$/.test(newPin)) {
+                showResult('danger', '❌ PIN 碼必須是 6-8 位數字！');
+                return;
+            }
+
+            if (newPin === currentPin) {
+                showResult('warning', '⚠️ 新 PIN 碼不能與目前 PIN 碼相同！');
+                return;
+            }
+
+            try {
+                submitBtn.disabled = true;
+                form.style.display = 'none';
+                loading.classList.add('active');
+                resultMsg.style.display = 'none';
+
+                const response = await api.changeUserPIN(currentPin, newPin);
+
+                if (response.isSuccess()) {
+                    showResult('success', '✅ PIN 碼變更成功！請使用新 PIN 碼進行後續操作。');
+                    form.reset();
+                } else {
+                    throw new Error(response.error || 'PIN 碼變更失敗');
+                }
+            } catch (error) {
+                showResult('danger', `❌ 錯誤：${error.message}`);
+                console.error('Error:', error);
+            } finally {
+                loading.classList.remove('active');
+                form.style.display = 'block';
+                submitBtn.disabled = false;
+            }
+        });
+
+        function showResult(type, message) {
+            resultMsg.className = `alert alert-${type}`;
+            resultMsg.innerHTML = message;
+            resultMsg.style.display = 'block';
+            resultMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    </script>
+</body>
+</html>

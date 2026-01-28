@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>數位簽章 - IdemKey+ v1.14</title>
+    <script type="module" src="../utils/PKIoverFIDO_1_14.js"></script>
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5568d3;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-700: #495057;
+            --gray-900: #212529;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: var(--primary);
+            margin-bottom: 5px;
+            font-size: 2em;
+        }
+
+        .header .subtitle {
+            color: var(--gray-700);
+            font-size: 0.95em;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 6px;
+        }
+
+        .back-link:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--gray-700);
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+        }
+
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            border: 2px dashed var(--gray-300);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--gray-100);
+        }
+
+        .file-upload-btn:hover {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .file-upload-btn.has-file {
+            border-style: solid;
+            border-color: var(--success);
+            background: rgba(39, 174, 96, 0.05);
+        }
+
+        .btn {
+            padding: 12px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: var(--gray-300);
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--gray-200);
+            color: var(--gray-900);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid var(--success);
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid var(--danger);
+        }
+
+        .signature-output {
+            background: var(--gray-900);
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85em;
+            word-break: break-all;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .info-box {
+            background: var(--gray-100);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .info-box .label {
+            font-size: 0.85em;
+            color: var(--gray-700);
+            margin-bottom: 5px;
+        }
+
+        .info-box .value {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid var(--gray-300);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../IdemKeyPlus_1_14.html" class="back-link">← 返回主頁</a>
+
+        <div class="header">
+            <h1>✍️ 數位簽章</h1>
+            <p class="subtitle">使用 IdemKey+ 裝置對資料進行數位簽章</p>
+        </div>
+
+        <div class="card">
+            <div class="alert alert-info">
+                ℹ️ 請選擇要簽署的資料或檔案，並選擇憑證索引進行簽章。
+            </div>
+
+            <form id="signForm">
+                <div class="form-group">
+                    <label for="token_sn">Token 序號</label>
+                    <input type="text" id="token_sn" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>選擇簽章方式</label>
+                    <div style="display: flex; gap: 10px;">
+                        <label style="flex: 1; cursor: pointer;">
+                            <input type="radio" name="signMethod" value="text" checked>
+                            <span style="margin-left: 5px;">文字輸入</span>
+                        </label>
+                        <label style="flex: 1; cursor: pointer;">
+                            <input type="radio" name="signMethod" value="file">
+                            <span style="margin-left: 5px;">檔案上傳</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="textInput" class="form-group">
+                    <label for="dataToSign">要簽署的資料</label>
+                    <textarea id="dataToSign" placeholder="請輸入要簽署的文字內容..."></textarea>
+                </div>
+
+                <div id="fileInput" class="form-group" style="display: none;">
+                    <label>上傳檔案</label>
+                    <div class="file-upload">
+                        <input type="file" id="fileToSign" accept="*/*">
+                        <label for="fileToSign" class="file-upload-btn" id="fileUploadBtn">
+                            <div style="text-align: center;">
+                                <div style="font-size: 2em; margin-bottom: 10px;">📁</div>
+                                <div id="fileUploadText">點擊或拖曳檔案到此處</div>
+                                <div style="font-size: 0.85em; color: var(--gray-700); margin-top: 5px;">
+                                    支援任何類型的檔案
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="certIndex">憑證索引 (0-9)</label>
+                    <select id="certIndex">
+                        <option value="0">索引 0</option>
+                        <option value="1">索引 1</option>
+                        <option value="2">索引 2</option>
+                        <option value="3">索引 3</option>
+                        <option value="4">索引 4</option>
+                        <option value="5">索引 5</option>
+                        <option value="6">索引 6</option>
+                        <option value="7">索引 7</option>
+                        <option value="8">索引 8</option>
+                        <option value="9">索引 9</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="pin">PIN 碼</label>
+                    <input type="password" id="pin" placeholder="請輸入 PIN 碼" required autocomplete="off">
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    ✍️ 進行數位簽章
+                </button>
+            </form>
+
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 15px; color: var(--gray-700);">正在進行數位簽章...</p>
+            </div>
+
+            <div id="resultMsg" style="display: none; margin-top: 20px;"></div>
+
+            <div id="signatureOutput" style="display: none;">
+                <h3 style="margin: 20px 0 10px; color: var(--gray-900);">📝 簽章結果</h3>
+                
+                <div class="info-box">
+                    <div class="label">原始資料 (SHA-256 雜湊)</div>
+                    <div class="value" id="dataHash" style="word-break: break-all; font-size: 0.9em;"></div>
+                </div>
+
+                <div class="signature-output" id="signatureContent"></div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="copySignature()">📋 複製簽章</button>
+                    <button class="btn btn-secondary" onclick="downloadSignature()">💾 下載簽章</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createIdemKeyAPI } from '../utils/PKIoverFIDO_1_14.js';
+
+        const api = createIdemKeyAPI();
+        let currentSignature = '';
+        let currentDataHash = '';
+
+        // Toggle between text and file input
+        document.querySelectorAll('input[name="signMethod"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if (e.target.value === 'text') {
+                    document.getElementById('textInput').style.display = 'block';
+                    document.getElementById('fileInput').style.display = 'none';
+                } else {
+                    document.getElementById('textInput').style.display = 'none';
+                    document.getElementById('fileInput').style.display = 'block';
+                }
+            });
+        });
+
+        // File upload handling
+        const fileInput = document.getElementById('fileToSign');
+        const fileUploadBtn = document.getElementById('fileUploadBtn');
+        const fileUploadText = document.getElementById('fileUploadText');
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                fileUploadBtn.classList.add('has-file');
+                fileUploadText.innerHTML = `✅ ${file.name}<br><small>${(file.size / 1024).toFixed(2)} KB</small>`;
+            }
+        });
+
+        // Get token info on page load
+        (async () => {
+            try {
+                const response = await api.getTokenInfo();
+                if (response.isSuccess() && response.data.serialNumber) {
+                    document.getElementById('token_sn').value = response.data.serialNumber;
+                }
+            } catch (error) {
+                console.error('Failed to get token info:', error);
+            }
+        })();
+
+        // Form submission
+        document.getElementById('signForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const signMethod = document.querySelector('input[name="signMethod"]:checked').value;
+            const certIndex = parseInt(document.getElementById('certIndex').value);
+            const pin = document.getElementById('pin').value;
+
+            let dataToSign;
+
+            if (signMethod === 'text') {
+                const text = document.getElementById('dataToSign').value;
+                if (!text) {
+                    showResult('danger', '❌ 請輸入要簽署的文字！');
+                    return;
+                }
+                dataToSign = new TextEncoder().encode(text);
+            } else {
+                const file = fileInput.files[0];
+                if (!file) {
+                    showResult('danger', '❌ 請選擇要簽署的檔案！');
+                    return;
+                }
+                dataToSign = await file.arrayBuffer();
+            }
+
+            const loading = document.getElementById('loading');
+            const resultMsg = document.getElementById('resultMsg');
+            const signatureOutput = document.getElementById('signatureOutput');
+
+            try {
+                loading.classList.add('active');
+                resultMsg.style.display = 'none';
+                signatureOutput.style.display = 'none';
+
+                // Calculate hash
+                const hashBuffer = await crypto.subtle.digest('SHA-256', dataToSign);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                currentDataHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+                // Sign data
+                const response = await api.signDataByIndex(certIndex, pin, new Uint8Array(dataToSign));
+
+                if (response.isSuccess()) {
+                    currentSignature = response.data.signature || 'Signature generated';
+                    
+                    document.getElementById('dataHash').textContent = currentDataHash;
+                    document.getElementById('signatureContent').textContent = currentSignature;
+                    
+                    signatureOutput.style.display = 'block';
+                    showResult('success', '✅ 數位簽章成功！');
+                } else {
+                    throw new Error(response.error || '簽章失敗');
+                }
+            } catch (error) {
+                showResult('danger', `❌ 錯誤：${error.message}`);
+                console.error('Error:', error);
+            } finally {
+                loading.classList.remove('active');
+            }
+        });
+
+        function showResult(type, message) {
+            const resultMsg = document.getElementById('resultMsg');
+            resultMsg.className = `alert alert-${type}`;
+            resultMsg.innerHTML = message;
+            resultMsg.style.display = 'block';
+            resultMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        window.copySignature = function() {
+            const text = `Data Hash (SHA-256):\n${currentDataHash}\n\nSignature:\n${currentSignature}`;
+            navigator.clipboard.writeText(text).then(() => {
+                showResult('success', '✅ 簽章已複製到剪貼簿！');
+            });
+        };
+
+        window.downloadSignature = function() {
+            const text = `Data Hash (SHA-256):\n${currentDataHash}\n\nSignature:\n${currentSignature}`;
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `signature_${Date.now()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showResult('success', '✅ 簽章已下載！');
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IdemKey+ Modern API 使用範例</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #555;
+            margin-top: 30px;
+        }
+        .example-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-left: 4px solid #4CAF50;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 4px;
+            border: 1px solid #4CAF50;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .error {
+            background: #ffebee;
+            border-color: #f44336;
+            color: #c62828;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #555;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            border-left: 4px solid #2196F3;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 IdemKey+ 現代化 API 使用範例 (v1.14)</h1>
+        
+        <div class="info">
+            <strong>📌 注意：</strong> 此頁面展示如何使用現代化的 IdemKey+ JavaScript API v1.14。
+            需要連接 IdemKey+ FIDO 安全金鑰才能正常運作。
+        </div>
+
+        <!-- 版本資訊 -->
+        <div class="example-section">
+            <h2>📋 版本資訊</h2>
+            <button onclick="showVersion()">顯示版本</button>
+            <div id="version-result" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- 設置序列號 -->
+        <div class="example-section">
+            <h2>🔧 設定</h2>
+            <label for="serial-number">設備序列號：</label>
+            <input type="text" id="serial-number" placeholder="請輸入序列號" value="TEST123456">
+            
+            <label for="username">應用程式名稱：</label>
+            <input type="text" id="username" placeholder="應用程式名稱" value="MyApp">
+            <button onclick="setUsername()">設定名稱</button>
+            <div id="username-result" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- Token 資訊 -->
+        <div class="example-section">
+            <h2>ℹ️ Token 資訊</h2>
+            <button onclick="getTokenInfo()">取得 Token 資訊</button>
+            <div id="token-info-result" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- 變更 PIN -->
+        <div class="example-section">
+            <h2>🔑 變更 PIN</h2>
+            <label for="old-pin">舊 PIN：</label>
+            <input type="password" id="old-pin" placeholder="輸入舊 PIN" value="1234">
+            
+            <label for="new-pin">新 PIN：</label>
+            <input type="password" id="new-pin" placeholder="輸入新 PIN" value="5678">
+            
+            <button onclick="changePIN()">變更 PIN</button>
+            <div id="change-pin-result" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- 生成 CSR -->
+        <div class="example-section">
+            <h2>📜 生成憑證簽署請求 (CSR)</h2>
+            <label for="common-name">Common Name：</label>
+            <input type="text" id="common-name" placeholder="Certificate CN" value="Test Certificate">
+            
+            <button onclick="genCSR('P256')">生成 P256 CSR</button>
+            <button onclick="genCSR('P384')">生成 P384 CSR</button>
+            <button onclick="genCSR('RSA2048')">生成 RSA2048 CSR</button>
+            <div id="csr-result" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- 讀取憑證 -->
+        <div class="example-section">
+            <h2>📖 讀取憑證</h2>
+            <label for="cert-index">憑證索引：</label>
+            <input type="text" id="cert-index" placeholder="0-based index" value="0">
+            
+            <button onclick="readCertificate()">讀取憑證</button>
+            <div id="read-cert-result" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- 簽名資料 -->
+        <div class="example-section">
+            <h2>✍️ 數位簽章</h2>
+            <label for="data-to-sign">要簽名的資料：</label>
+            <input type="text" id="data-to-sign" placeholder="輸入要簽名的資料" value="Hello, World!">
+            
+            <label for="sign-index">憑證索引：</label>
+            <input type="text" id="sign-index" placeholder="0-based index" value="0">
+            
+            <button onclick="signData()">簽名 (ECDSA-SHA256)</button>
+            <div id="sign-result" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- 清除 Token -->
+        <div class="example-section">
+            <h2>⚠️ 危險操作</h2>
+            <button onclick="clearToken()" style="background-color: #f44336;">清除 Token</button>
+            <div id="clear-result" class="result" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- 使用現代化的 ES6 模組 -->
+    <script type="module">
+        // 導入現代化 API v1.14
+        import { 
+            IdemKeyPlusAPI,
+            GTIdemResponse,
+            IdemKeyError,
+            Algorithms,
+            Commands,
+            toUTF8Array,
+            bufferToHex
+        } from './utils/PKIoverFIDO_1_14.js';
+
+        // 創建 API 實例
+        const api = new IdemKeyPlusAPI();
+        
+        // 將 API 暴露到全域，方便範例使用
+        window.idemAPI = api;
+        window.IdemKeyUtils = {
+            toUTF8Array,
+            bufferToHex,
+            Algorithms,
+            Commands,
+            IdemKeyError
+        };
+
+        // 顯示 API 已載入
+        console.log('✅ IdemKey+ Modern API loaded successfully');
+        console.log('Version:', api.getVersion());
+    </script>
+
+    <script>
+        // 輔助函數：顯示結果
+        function showResult(elementId, content, isError = false) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.textContent = content;
+            element.className = isError ? 'result error' : 'result';
+        }
+
+        // 獲取序列號
+        function getSerialNumber() {
+            const sn = document.getElementById('serial-number').value;
+            return window.IdemKeyUtils.toUTF8Array(sn);
+        }
+
+        // 顯示版本
+        function showVersion() {
+            try {
+                const version = window.idemAPI.getVersion();
+                showResult('version-result', `Library Version: ${version}`);
+            } catch (error) {
+                showResult('version-result', `錯誤: ${error.message}`, true);
+            }
+        }
+
+        // 設定用戶名
+        function setUsername() {
+            try {
+                const username = document.getElementById('username').value;
+                window.idemAPI.setUsername(username);
+                showResult('username-result', `✅ 已設定應用程式名稱為: ${username}`);
+            } catch (error) {
+                showResult('username-result', `錯誤: ${error.message}`, true);
+            }
+        }
+
+        // 取得 Token 資訊
+        async function getTokenInfo() {
+            try {
+                showResult('token-info-result', '⏳ 正在讀取 Token 資訊...');
+                
+                const serialNumber = getSerialNumber();
+                const response = await window.idemAPI.getTokenInfo(serialNumber);
+                
+                if (response.isSuccess()) {
+                    const info = JSON.stringify(response.data, null, 2);
+                    showResult('token-info-result', `✅ Token 資訊:\n${info}`);
+                } else {
+                    showResult('token-info-result', `❌ 失敗: ${response.statusMessage}`, true);
+                }
+            } catch (error) {
+                if (error instanceof window.IdemKeyUtils.IdemKeyError) {
+                    showResult('token-info-result', 
+                        `❌ IdemKey 錯誤 (${error.statusCode}): ${error.message}`, true);
+                } else {
+                    showResult('token-info-result', `❌ 錯誤: ${error.message}`, true);
+                }
+            }
+        }
+
+        // 變更 PIN
+        async function changePIN() {
+            try {
+                showResult('change-pin-result', '⏳ 正在變更 PIN...');
+                
+                const oldPIN = window.IdemKeyUtils.toUTF8Array(
+                    document.getElementById('old-pin').value
+                );
+                const newPIN = window.IdemKeyUtils.toUTF8Array(
+                    document.getElementById('new-pin').value
+                );
+                const serialNumber = getSerialNumber();
+                
+                const response = await window.idemAPI.changeUserPIN(oldPIN, newPIN, serialNumber);
+                
+                if (response.isSuccess()) {
+                    showResult('change-pin-result', '✅ PIN 已成功變更！');
+                } else {
+                    showResult('change-pin-result', 
+                        `❌ 變更失敗: ${response.statusMessage}`, true);
+                }
+            } catch (error) {
+                showResult('change-pin-result', `❌ 錯誤: ${error.message}`, true);
+            }
+        }
+
+        // 生成 CSR
+        async function genCSR(keyType) {
+            try {
+                showResult('csr-result', `⏳ 正在生成 ${keyType} CSR...`);
+                
+                const serialNumber = getSerialNumber();
+                const commonName = window.IdemKeyUtils.toUTF8Array(
+                    document.getElementById('common-name').value
+                );
+                
+                let response;
+                switch (keyType) {
+                    case 'P256':
+                        response = await window.idemAPI.genP256CSR(serialNumber, commonName);
+                        break;
+                    case 'P384':
+                        response = await window.idemAPI.genP384CSR(serialNumber, commonName);
+                        break;
+                    case 'RSA2048':
+                        response = await window.idemAPI.genRSA2048CSR(serialNumber, commonName);
+                        break;
+                    default:
+                        throw new Error('未知的金鑰類型');
+                }
+                
+                if (response.isSuccess()) {
+                    const csrData = window.IdemKeyUtils.bufferToHex(response.data);
+                    showResult('csr-result', 
+                        `✅ ${keyType} CSR 生成成功！\n\n${csrData.substring(0, 200)}...`);
+                } else {
+                    showResult('csr-result', 
+                        `❌ 生成失敗: ${response.statusMessage}`, true);
+                }
+            } catch (error) {
+                showResult('csr-result', `❌ 錯誤: ${error.message}`, true);
+            }
+        }
+
+        // 讀取憑證
+        async function readCertificate() {
+            try {
+                showResult('read-cert-result', '⏳ 正在讀取憑證...');
+                
+                const index = parseInt(document.getElementById('cert-index').value);
+                const serialNumber = getSerialNumber();
+                
+                const response = await window.idemAPI.readCertByIndexWithoutPIN(
+                    index, 
+                    serialNumber
+                );
+                
+                if (response.isSuccess()) {
+                    const certHex = window.IdemKeyUtils.bufferToHex(response.data);
+                    showResult('read-cert-result', 
+                        `✅ 憑證讀取成功！\n\n${certHex.substring(0, 200)}...`);
+                } else {
+                    showResult('read-cert-result', 
+                        `❌ 讀取失敗: ${response.statusMessage}`, true);
+                }
+            } catch (error) {
+                showResult('read-cert-result', `❌ 錯誤: ${error.message}`, true);
+            }
+        }
+
+        // 簽名資料
+        async function signData() {
+            try {
+                showResult('sign-result', '⏳ 正在簽名...');
+                
+                const dataToSign = window.IdemKeyUtils.toUTF8Array(
+                    document.getElementById('data-to-sign').value
+                );
+                const index = parseInt(document.getElementById('sign-index').value);
+                const serialNumber = getSerialNumber();
+                
+                const response = await window.idemAPI.signDataByIndex(
+                    index,
+                    serialNumber,
+                    window.IdemKeyUtils.Algorithms.ECDSA_SHA256,
+                    dataToSign
+                );
+                
+                if (response.isSuccess()) {
+                    const signature = window.IdemKeyUtils.bufferToHex(response.data);
+                    showResult('sign-result', 
+                        `✅ 簽名成功！\n\n簽章: ${signature}`);
+                } else {
+                    showResult('sign-result', 
+                        `❌ 簽名失敗: ${response.statusMessage}`, true);
+                }
+            } catch (error) {
+                showResult('sign-result', `❌ 錯誤: ${error.message}`, true);
+            }
+        }
+
+        // 清除 Token
+        async function clearToken() {
+            if (!confirm('⚠️ 警告：這將清除 Token 上的所有資料！確定要繼續嗎？')) {
+                return;
+            }
+            
+            try {
+                showResult('clear-result', '⏳ 正在清除 Token...');
+                
+                const serialNumber = getSerialNumber();
+                const response = await window.idemAPI.clearToken(serialNumber);
+                
+                if (response.isSuccess()) {
+                    showResult('clear-result', '✅ Token 已成功清除！');
+                } else {
+                    showResult('clear-result', 
+                        `❌ 清除失敗: ${response.statusMessage}`, true);
+                }
+            } catch (error) {
+                showResult('clear-result', `❌ 錯誤: ${error.message}`, true);
+            }
+        }
+    </script>
+</body>
+</html>

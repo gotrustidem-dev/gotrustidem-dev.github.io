@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IdemKey+ 1.14 功能導航</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .header h1 {
+            font-size: 3em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header .version {
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .card-header {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .card-title {
+            font-size: 1.5em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .link-list {
+            list-style: none;
+        }
+
+        .link-list li {
+            margin-bottom: 12px;
+        }
+
+        .link-list a {
+            display: block;
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #2c3e50;
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+        }
+
+        .link-list a:hover {
+            background: #e9ecef;
+            border-left-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #667eea;
+            color: white;
+            border-radius: 12px;
+            font-size: 0.7em;
+            margin-left: 8px;
+        }
+
+        .badge.new {
+            background: #27ae60;
+        }
+
+        .badge.hot {
+            background: #e74c3c;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="header">
+            <h1>🔐 IdemKey+ 1.14</h1>
+            <p class="version">現代化 FIDO 安全金鑰管理平台</p>
+        </div>
+
+        <div class="grid">
+            <!-- 開始使用 -->
+            <div class="card">
+                <div class="card-header">🚀</div>
+                <h2 class="card-title">開始使用</h2>
+                <ul class="link-list">
+                    <li><a href="index.html">主控台<span class="badge new">推薦</span></a></li>
+                    <li><a href="example_modern_usage.html">互動式範例<span class="badge new">v1.14</span></a></li>
+                    <li><a href="QUICK_REFERENCE_v1.14.md">快速參考</a></li>
+                    <li><a href="utils/README_v1.14.md">完整文檔</a></li>
+                </ul>
+            </div>
+
+            <!-- 基本功能 -->
+            <div class="card">
+                <div class="card-header">📋</div>
+                <h2 class="card-title">基本功能</h2>
+                <ul class="link-list">
+                    <li><a href="views_1_14/GetTokenInfo.html">Token 資訊<span class="badge hot">常用</span><span class="badge new">v1.14</span></a></li>
+                    <li><a href="views_1_14/ReadCert.html">讀取憑證<span class="badge new">v1.14</span></a></li>
+                    <li><a href="views_1_14/SignData.html">數位簽章<span class="badge new">v1.14</span></a></li>
+                    <li><a href="views_1_12/CheckPINValid.html">檢查 PIN</a></li>
+                </ul>
+            </div>
+
+            <!-- 憑證管理 -->
+            <div class="card">
+                <div class="card-header">🎫</div>
+                <h2 class="card-title">憑證管理</h2>
+                <ul class="link-list">
+                    <li><a href="views_1_14/RequestCSR.html">產生 CSR (全功能)<span class="badge new">v1.14</span></a></li>
+                    <li><a href="views_1_12/RequestRSA2048CSR.html">RSA2048 CSR</a></li>
+                    <li><a href="views_1_12/RequestP256CSR.html">P256 CSR</a></li>
+                    <li><a href="views_1_12/DeleteCerts.html">刪除憑證</a></li>
+                </ul>
+            </div>
+
+            <!-- 安全設定 -->
+            <div class="card">
+                <div class="card-header">🔒</div>
+                <h2 class="card-title">安全設定</h2>
+                <ul class="link-list">
+                    <li><a href="views_1_14/ChangePIN.html">變更 PIN<span class="badge hot">推薦</span><span class="badge new">v1.14</span></a></li>
+                    <li><a href="views_1_12/RequestInitToken.html">初始化 Token</a></li>
+                    <li><a href="views_1_12/RequestUnlockPIN.html">解鎖 PIN</a></li>
+                    <li><a href="views_1_12/RequestTokenReset.html">重置 Token</a></li>
+                </ul>
+            </div>
+
+            <!-- 舊版本 -->
+            <div class="card">
+                <div class="card-header">📦</div>
+                <h2 class="card-title">其他版本</h2>
+                <ul class="link-list">
+                    <li><a href="IdemKeyPlus_1_12.html">v1.12 介面</a></li>
+                    <li><a href="IdemKeyPlus_1_11.html">v1.11 介面</a></li>
+                    <li><a href="IdemKeyPlus_1_10.html">v1.10 介面</a></li>
+                    <li><a href="IdemKeyPlus.html">經典介面</a></li>
+                </ul>
+            </div>
+
+            <!-- 開發資源 -->
+            <div class="card">
+                <div class="card-header">🛠️</div>
+                <h2 class="card-title">開發資源</h2>
+                <ul class="link-list">
+                    <li><a href="VERSION_1.14_RELEASE.md">發布說明<span class="badge new">v1.14</span></a></li>
+                    <li><a href="INDEX_v1.14.md">文件索引</a></li>
+                    <li><a href="MODERNIZATION_SUMMARY.md">現代化指南</a></li>
+                    <li><a href="CHANGELOG.md">變更日誌</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('%c🔐 IdemKey+ v1.14', 'font-size: 24px; color: #667eea; font-weight: bold;');
+        console.log('歡迎使用現代化管理平台！');
+    </script>
+</body>
+</html>
