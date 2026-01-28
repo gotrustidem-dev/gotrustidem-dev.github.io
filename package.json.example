@@ -1,0 +1,65 @@
+{
+  "name": "@gotrust/idemkey-plus",
+  "version": "1.12.3",
+  "description": "Modern JavaScript library for GoTrustID IdemKey+ FIDO security key",
+  "type": "module",
+  "main": "./utils/PKIoverFIDO_1_12.modern.js",
+  "module": "./utils/PKIoverFIDO_1_12.modern.js",
+  "types": "./utils/PKIoverFIDO_1_12.modern.d.ts",
+  "exports": {
+    ".": {
+      "import": "./utils/PKIoverFIDO_1_12.modern.js",
+      "require": "./utils/PKIoverFIDO_1_12.modern.js",
+      "types": "./utils/PKIoverFIDO_1_12.modern.d.ts"
+    }
+  },
+  "files": [
+    "utils/PKIoverFIDO_1_12.modern.js",
+    "utils/PKIoverFIDO_1_12.modern.d.ts",
+    "utils/MODERNIZATION_README.md"
+  ],
+  "scripts": {
+    "test": "echo \"No tests specified yet\"",
+    "lint": "eslint utils/PKIoverFIDO_1_12.modern.js",
+    "format": "prettier --write utils/PKIoverFIDO_1_12.modern.js",
+    "docs": "jsdoc -c jsdoc.json"
+  },
+  "keywords": [
+    "fido",
+    "fido2",
+    "webauthn",
+    "security-key",
+    "pki",
+    "certificate",
+    "crypto",
+    "idemkey",
+    "gotrust"
+  ],
+  "author": "GoTrustID",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gotrustidem/gotrustidem-dev.github.io.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gotrustidem/gotrustidem-dev.github.io/issues"
+  },
+  "homepage": "https://gotrustidem-dev.github.io",
+  "peerDependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "eslint": "^8.0.0",
+    "jsdoc": "^4.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
+  },
+  "browserslist": [
+    "Chrome >= 67",
+    "Firefox >= 60",
+    "Safari >= 13",
+    "Edge >= 79"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

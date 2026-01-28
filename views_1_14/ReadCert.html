@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>讀取憑證 - IdemKey+ v1.14</title>
+    <script type="module" src="../utils/PKIoverFIDO_1_14.js"></script>
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5568d3;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-700: #495057;
+            --gray-900: #212529;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: var(--primary);
+            margin-bottom: 5px;
+            font-size: 2em;
+        }
+
+        .header .subtitle {
+            color: var(--gray-700);
+            font-size: 0.95em;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 6px;
+        }
+
+        .back-link:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .cert-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .cert-button {
+            aspect-ratio: 1;
+            border: 2px solid var(--gray-300);
+            background: var(--gray-100);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .cert-button:hover {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .cert-button.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+
+        .cert-button .icon {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--gray-700);
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 12px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: var(--gray-300);
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--gray-200);
+            color: var(--gray-900);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid var(--success);
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid var(--danger);
+        }
+
+        .cert-output {
+            background: var(--gray-900);
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85em;
+            word-break: break-all;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .cert-info {
+            background: var(--gray-100);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .cert-info-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--gray-300);
+        }
+
+        .cert-info-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .cert-info-item .label {
+            font-size: 0.85em;
+            color: var(--gray-700);
+            margin-bottom: 5px;
+        }
+
+        .cert-info-item .value {
+            font-weight: 600;
+            color: var(--gray-900);
+            word-break: break-all;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid var(--gray-300);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .cert-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../IdemKeyPlus_1_14.html" class="back-link">← 返回主頁</a>
+
+        <div class="header">
+            <h1>🎫 讀取憑證</h1>
+            <p class="subtitle">從 IdemKey+ 裝置讀取憑證資料</p>
+        </div>
+
+        <div class="card">
+            <div class="alert alert-info">
+                ℹ️ 選擇憑證索引來讀取對應的憑證資料。無需輸入 PIN 碼。
+            </div>
+
+            <div class="form-group">
+                <label for="token_sn">Token 序號</label>
+                <input type="text" id="token_sn" readonly>
+            </div>
+
+            <div class="form-group">
+                <label>選擇憑證索引 (0-9)</label>
+                <div class="cert-grid">
+                    <button class="cert-button" data-index="0">
+                        <div class="icon">🎫</div>
+                        <div>0</div>
+                    </button>
+                    <button class="cert-button" data-index="1">
+                        <div class="icon">🎫</div>
+                        <div>1</div>
+                    </button>
+                    <button class="cert-button" data-index="2">
+                        <div class="icon">🎫</div>
+                        <div>2</div>
+                    </button>
+                    <button class="cert-button" data-index="3">
+                        <div class="icon">🎫</div>
+                        <div>3</div>
+                    </button>
+                    <button class="cert-button" data-index="4">
+                        <div class="icon">🎫</div>
+                        <div>4</div>
+                    </button>
+                    <button class="cert-button" data-index="5">
+                        <div class="icon">🎫</div>
+                        <div>5</div>
+                    </button>
+                    <button class="cert-button" data-index="6">
+                        <div class="icon">🎫</div>
+                        <div>6</div>
+                    </button>
+                    <button class="cert-button" data-index="7">
+                        <div class="icon">🎫</div>
+                        <div>7</div>
+                    </button>
+                    <button class="cert-button" data-index="8">
+                        <div class="icon">🎫</div>
+                        <div>8</div>
+                    </button>
+                    <button class="cert-button" data-index="9">
+                        <div class="icon">🎫</div>
+                        <div>9</div>
+                    </button>
+                </div>
+            </div>
+
+            <button id="readCertBtn" class="btn btn-primary" disabled>
+                📖 讀取憑證
+            </button>
+
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 15px; color: var(--gray-700);">正在讀取憑證...</p>
+            </div>
+
+            <div id="resultMsg" style="display: none; margin-top: 20px;"></div>
+
+            <div id="certOutput" style="display: none;">
+                <h3 style="margin: 20px 0 10px; color: var(--gray-900);">📄 憑證資訊</h3>
+                
+                <div class="cert-info" id="certInfo"></div>
+
+                <h3 style="margin: 20px 0 10px; color: var(--gray-900);">🔐 憑證內容 (PEM)</h3>
+                <div class="cert-output" id="certContent"></div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="copyCert()">📋 複製憑證</button>
+                    <button class="btn btn-secondary" onclick="downloadCert()">💾 下載憑證</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createIdemKeyAPI } from '../utils/PKIoverFIDO_1_14.js';
+
+        const api = createIdemKeyAPI();
+        let selectedIndex = null;
+        let currentCert = '';
+
+        // Get token info on page load
+        (async () => {
+            try {
+                const response = await api.getTokenInfo();
+                if (response.isSuccess() && response.data.serialNumber) {
+                    document.getElementById('token_sn').value = response.data.serialNumber;
+                }
+            } catch (error) {
+                console.error('Failed to get token info:', error);
+            }
+        })();
+
+        // Certificate selection
+        document.querySelectorAll('.cert-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.cert-button').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedIndex = parseInt(btn.getAttribute('data-index'));
+                document.getElementById('readCertBtn').disabled = false;
+            });
+        });
+
+        // Read certificate
+        document.getElementById('readCertBtn').addEventListener('click', async () => {
+            if (selectedIndex === null) {
+                showResult('danger', '❌ 請選擇憑證索引！');
+                return;
+            }
+
+            const loading = document.getElementById('loading');
+            const resultMsg = document.getElementById('resultMsg');
+            const certOutput = document.getElementById('certOutput');
+            const readCertBtn = document.getElementById('readCertBtn');
+
+            try {
+                readCertBtn.disabled = true;
+                loading.classList.add('active');
+                resultMsg.style.display = 'none';
+                certOutput.style.display = 'none';
+
+                const response = await api.readCertByIndex(selectedIndex);
+
+                if (response.isSuccess()) {
+                    const certData = response.data;
+                    currentCert = certData.certificate || certData.pem || 'Certificate data';
+
+                    // Display certificate info
+                    const certInfo = document.getElementById('certInfo');
+                    certInfo.innerHTML = `
+                        <div class="cert-info-item">
+                            <div class="label">📇 憑證索引</div>
+                            <div class="value">${selectedIndex}</div>
+                        </div>
+                        <div class="cert-info-item">
+                            <div class="label">👤 主體 (Subject)</div>
+                            <div class="value">${certData.subject || 'N/A'}</div>
+                        </div>
+                        <div class="cert-info-item">
+                            <div class="label">🏢 發行者 (Issuer)</div>
+                            <div class="value">${certData.issuer || 'N/A'}</div>
+                        </div>
+                        <div class="cert-info-item">
+                            <div class="label">📅 有效期限</div>
+                            <div class="value">${certData.validFrom || 'N/A'} 至 ${certData.validTo || 'N/A'}</div>
+                        </div>
+                        <div class="cert-info-item">
+                            <div class="label">🔑 公鑰演算法</div>
+                            <div class="value">${certData.algorithm || 'N/A'}</div>
+                        </div>
+                        <div class="cert-info-item">
+                            <div class="label">📊 序號</div>
+                            <div class="value" style="font-size: 0.85em;">${certData.serialNumber || 'N/A'}</div>
+                        </div>
+                    `;
+
+                    document.getElementById('certContent').textContent = currentCert;
+                    certOutput.style.display = 'block';
+                    showResult('success', '✅ 憑證讀取成功！');
+                } else {
+                    throw new Error(response.error || '憑證讀取失敗');
+                }
+            } catch (error) {
+                showResult('danger', `❌ 錯誤：${error.message}`);
+                console.error('Error:', error);
+            } finally {
+                loading.classList.remove('active');
+                readCertBtn.disabled = false;
+            }
+        });
+
+        function showResult(type, message) {
+            const resultMsg = document.getElementById('resultMsg');
+            resultMsg.className = `alert alert-${type}`;
+            resultMsg.innerHTML = message;
+            resultMsg.style.display = 'block';
+            resultMsg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        window.copyCert = function() {
+            navigator.clipboard.writeText(currentCert).then(() => {
+                showResult('success', '✅ 憑證已複製到剪貼簿！');
+            });
+        };
+
+        window.downloadCert = function() {
+            const blob = new Blob([currentCert], { type: 'application/x-pem-file' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `certificate_${selectedIndex}_${Date.now()}.pem`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showResult('success', '✅ 憑證已下載！');
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>產生 CSR - IdemKey+ v1.14</title>
+    <script type="module" src="../utils/PKIoverFIDO_1_14.js"></script>
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5568d3;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-700: #495057;
+            --gray-900: #212529;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: var(--primary);
+            margin-bottom: 5px;
+            font-size: 2em;
+        }
+
+        .header .subtitle {
+            color: var(--gray-700);
+            font-size: 0.95em;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 6px;
+        }
+
+        .back-link:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 1em;
+            color: var(--gray-700);
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            color: var(--primary);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--gray-700);
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: var(--gray-300);
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--gray-200);
+            color: var(--gray-900);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid var(--success);
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid var(--danger);
+        }
+
+        .csr-output {
+            background: var(--gray-900);
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+            word-break: break-all;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid var(--gray-300);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab {
+                font-size: 0.9em;
+                padding: 10px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../IdemKeyPlus_1_14.html" class="back-link">← 返回主頁</a>
+
+        <div class="header">
+            <h1>📝 憑證簽署請求 (CSR)</h1>
+            <p class="subtitle">產生不同演算法的憑證簽署請求</p>
+        </div>
+
+        <div class="card">
+            <div class="alert alert-info">
+                ℹ️ 選擇您需要的加密演算法，填寫憑證資訊後產生 CSR。
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" data-tab="rsa2048">🔐 RSA 2048</button>
+                <button class="tab" data-tab="p256">🔑 P-256</button>
+                <button class="tab" data-tab="p384">🔑 P-384</button>
+                <button class="tab" data-tab="p521">🔑 P-521</button>
+            </div>
+
+            <!-- RSA 2048 Tab -->
+            <div id="rsa2048" class="tab-content active">
+                <form id="formRSA2048">
+                    <div class="form-group">
+                        <label for="rsa_token_sn">Token 序號</label>
+                        <input type="text" id="rsa_token_sn" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rsa_cn">Common Name (CN)</label>
+                        <input type="text" id="rsa_cn" placeholder="例：John Doe" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="rsa_o">組織 (O)</label>
+                            <input type="text" id="rsa_o" placeholder="例：公司名稱">
+                        </div>
+                        <div class="form-group">
+                            <label for="rsa_ou">部門 (OU)</label>
+                            <input type="text" id="rsa_ou" placeholder="例：IT 部門">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="rsa_c">國家 (C)</label>
+                            <input type="text" id="rsa_c" placeholder="例：TW" maxlength="2">
+                        </div>
+                        <div class="form-group">
+                            <label for="rsa_st">州/省 (ST)</label>
+                            <input type="text" id="rsa_st" placeholder="例：台灣">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rsa_pin">PIN 碼</label>
+                        <input type="password" id="rsa_pin" placeholder="請輸入 PIN 碼" required autocomplete="off">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        🔐 產生 RSA 2048 CSR
+                    </button>
+                </form>
+            </div>
+
+            <!-- P-256 Tab -->
+            <div id="p256" class="tab-content">
+                <form id="formP256">
+                    <div class="form-group">
+                        <label for="p256_token_sn">Token 序號</label>
+                        <input type="text" id="p256_token_sn" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="p256_cn">Common Name (CN)</label>
+                        <input type="text" id="p256_cn" placeholder="例：John Doe" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="p256_o">組織 (O)</label>
+                            <input type="text" id="p256_o" placeholder="例：公司名稱">
+                        </div>
+                        <div class="form-group">
+                            <label for="p256_ou">部門 (OU)</label>
+                            <input type="text" id="p256_ou" placeholder="例：IT 部門">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="p256_pin">PIN 碼</label>
+                        <input type="password" id="p256_pin" placeholder="請輸入 PIN 碼" required autocomplete="off">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        🔑 產生 P-256 CSR
+                    </button>
+                </form>
+            </div>
+
+            <!-- P-384 Tab -->
+            <div id="p384" class="tab-content">
+                <form id="formP384">
+                    <div class="form-group">
+                        <label for="p384_token_sn">Token 序號</label>
+                        <input type="text" id="p384_token_sn" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="p384_cn">Common Name (CN)</label>
+                        <input type="text" id="p384_cn" placeholder="例：John Doe" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="p384_pin">PIN 碼</label>
+                        <input type="password" id="p384_pin" placeholder="請輸入 PIN 碼" required autocomplete="off">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        🔑 產生 P-384 CSR
+                    </button>
+                </form>
+            </div>
+
+            <!-- P-521 Tab -->
+            <div id="p521" class="tab-content">
+                <form id="formP521">
+                    <div class="form-group">
+                        <label for="p521_token_sn">Token 序號</label>
+                        <input type="text" id="p521_token_sn" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="p521_cn">Common Name (CN)</label>
+                        <input type="text" id="p521_cn" placeholder="例：John Doe" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="p521_pin">PIN 碼</label>
+                        <input type="password" id="p521_pin" placeholder="請輸入 PIN 碼" required autocomplete="off">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        🔑 產生 P-521 CSR
+                    </button>
+                </form>
+            </div>
+
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 15px; color: var(--gray-700);">正在產生 CSR...</p>
+            </div>
+
+            <div id="resultMsg" style="display: none; margin-top: 20px;"></div>
+
+            <div id="csrOutput" style="display: none;">
+                <h3 style="margin: 20px 0 10px; color: var(--gray-900);">📄 CSR 輸出</h3>
+                <div class="csr-output" id="csrContent"></div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="copyCSR()">📋 複製 CSR</button>
+                    <button class="btn btn-secondary" onclick="downloadCSR()">💾 下載 CSR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createIdemKeyAPI } from '../utils/PKIoverFIDO_1_14.js';
+
+        const api = createIdemKeyAPI();
+        let currentCSR = '';
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Get token info on page load
+        (async () => {
+            try {
+                const response = await api.getTokenInfo();
+                if (response.isSuccess() && response.data.serialNumber) {
+                    const sn = response.data.serialNumber;
+                    document.getElementById('rsa_token_sn').value = sn;
+                    document.getElementById('p256_token_sn').value = sn;
+                    document.getElementById('p384_token_sn').value = sn;
+                    document.getElementById('p521_token_sn').value = sn;
+                }
+            } catch (error) {
+                console.error('Failed to get token info:', error);
+            }
+        })();
+
+        // Form handlers
+        document.getElementById('formRSA2048').addEventListener('submit', (e) => {
+            e.preventDefault();
+            generateCSR('RSA2048', {
+                cn: document.getElementById('rsa_cn').value,
+                o: document.getElementById('rsa_o').value,
+                ou: document.getElementById('rsa_ou').value,
+                c: document.getElementById('rsa_c').value,
+                st: document.getElementById('rsa_st').value,
+                pin: document.getElementById('rsa_pin').value
+            });
+        });
+
+        document.getElementById('formP256').addEventListener('submit', (e) => {
+            e.preventDefault();
+            generateCSR('P256', {
+                cn: document.getElementById('p256_cn').value,
+                o: document.getElementById('p256_o').value,
+                ou: document.getElementById('p256_ou').value,
+                pin: document.getElementById('p256_pin').value
+            });
+        });
+
+        document.getElementById('formP384').addEventListener('submit', (e) => {
+            e.preventDefault();
+            generateCSR('P384', {
+                cn: document.getElementById('p384_cn').value,
+                pin: document.getElementById('p384_pin').value
+            });
+        });
+
+        document.getElementById('formP521').addEventListener('submit', (e) => {
+            e.preventDefault();
+            generateCSR('P521', {
+                cn: document.getElementById('p521_cn').value,
+                pin: document.getElementById('p521_pin').value
+            });
+        });
+
+        async function generateCSR(type, data) {
+            const loading = document.getElementById('loading');
+            const resultMsg = document.getElementById('resultMsg');
+            const csrOutput = document.getElementById('csrOutput');
+
+            try {
+                loading.classList.add('active');
+                resultMsg.style.display = 'none';
+                csrOutput.style.display = 'none';
+
+                let response;
+                switch(type) {
+                    case 'RSA2048':
+                        response = await api.genRSA2048CSR(data.pin, data.cn);
+                        break;
+                    case 'P256':
+                        response = await api.genP256CSR(data.pin, data.cn);
+                        break;
+                    case 'P384':
+                        response = await api.genP384CSR(data.pin, data.cn);
+                        break;
+                    case 'P521':
+                        response = await api.genP521CSR(data.pin, data.cn);
+                        break;
+                }
+
+                if (response.isSuccess()) {
+                    currentCSR = response.data.csr || 'CSR generated successfully';
+                    document.getElementById('csrContent').textContent = currentCSR;
+                    csrOutput.style.display = 'block';
+                    showResult('success', `✅ ${type} CSR 產生成功！`);
+                } else {
+                    throw new Error(response.error || 'CSR 產生失敗');
+                }
+            } catch (error) {
+                showResult('danger', `❌ 錯誤：${error.message}`);
+                console.error('Error:', error);
+            } finally {
+                loading.classList.remove('active');
+            }
+        }
+
+        function showResult(type, message) {
+            const resultMsg = document.getElementById('resultMsg');
+            resultMsg.className = `alert alert-${type}`;
+            resultMsg.innerHTML = message;
+            resultMsg.style.display = 'block';
+        }
+
+        window.copyCSR = function() {
+            navigator.clipboard.writeText(currentCSR).then(() => {
+                showResult('success', '✅ CSR 已複製到剪貼簿！');
+            });
+        };
+
+        window.downloadCSR = function() {
+            const blob = new Blob([currentCSR], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `csr_${Date.now()}.pem`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showResult('success', '✅ CSR 已下載！');
+        };
+    </script>
+</body>
+</html>
