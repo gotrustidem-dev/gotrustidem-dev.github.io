@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GoTrustIdem - RSA2048 綜合測試</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/node-forge@1.3.1/dist/forge.min.js"></script>
+
+    <script src="../utils/cbor.js"></script>
+    <script src="../utils/helpers.js"></script>
+    <script src="../utils/showMessage.js"></script>
+    <script src="../utils/response.js"></script>
+    <script src="../utils/PKIoverFIDO_1_12.js"></script>
+    <style>
+        body {
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #f7f8f9;
+        }
+
+        .step-card {
+            background: #fff;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .step-number {
+            background-color: #008CBA;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .step-number.done {
+            background-color: #32b643;
+        }
+
+        .step-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #303742;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: #455060;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            max-width: 500px;
+            padding: 6px 10px;
+            border: 1px solid #bcc3ce;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .btn-action {
+            width: 220px;
+            height: 36px;
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 4px;
+        }
+
+        .btn-action:hover {
+            background-color: #006d91;
+        }
+
+        .btn-action.btn-sign {
+            background-color: #e85600;
+        }
+
+        .btn-action.btn-sign:hover {
+            background-color: #c04800;
+        }
+
+        .btn-action.btn-import {
+            background-color: #32b643;
+        }
+
+        .btn-action.btn-import:hover {
+            background-color: #279335;
+        }
+
+        #log_area {
+            width: 100%;
+            min-height: 200px;
+            font-family: monospace;
+            font-size: 12px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 12px;
+            border-radius: 4px;
+            border: none;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+
+        .status-pending {
+            background: #f0f0f0;
+            color: #999;
+        }
+
+        .status-ok {
+            background: #e6f9e6;
+            color: #32b643;
+        }
+
+        .status-fail {
+            background: #fce4e4;
+            color: #e85600;
+        }
+
+        .options-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .top-bar {
+            background: #fff;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+        }
+
+        h2 {
+            margin: 0 0 8px 0;
+            color: #303742;
+        }
+
+        .hint {
+            color: #999;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 頂部共用參數 -->
+    <div class="top-bar">
+        <h2>🔐 RSA2048 綜合測試</h2>
+        <label id="location_hef" style="font-size: 12px; color: #999;"></label>
+        <div class="form-group" style="margin-top:12px;">
+            <label>Token Serial Number (選填，Hex 格式)</label>
+            <input type="text" id="input_token_sn" placeholder="留空則不指定載具序號">
+        </div>
+    </div>
+
+    <!-- Step 1: 建立 CSR -->
+    <div class="step-card" id="card_step1">
+        <div class="step-header">
+            <div class="step-number" id="step1_num">1</div>
+            <span class="step-title">建立 CSR (Certificate Signing Request)</span>
+            <span class="status-indicator status-pending" id="step1_status">待執行</span>
+        </div>
+
+        <div class="form-group">
+            <label>CSR Common Name (CN)</label>
+            <input type="text" id="input_common_name" value="0123456789-AA-C12345abcdf">
+            <div class="hint">若不指定將使用預設值</div>
+        </div>
+
+        <div class="form-group">
+            <label style="display:inline;">
+                <input type="checkbox" id="checkbox_clear_token"> Clear token before keygen
+            </label>
+        </div>
+
+        <button class="btn-action" onclick="doGenCSR()">🔑 產生 RSA2048 CSR</button>
+
+        <div class="form-group" style="margin-top:16px;">
+            <label>Key Handle (自動產生)</label>
+            <input type="text" id="output_key_handle" readonly
+                style="background:#f0f0f0;" placeholder="產生 CSR 後自動填入">
+        </div>
+
+        <div class="form-group">
+            <label>CSR 結果</label>
+            <textarea id="output_csr" rows="5" readonly
+                style="background:#f0f0f0;" placeholder="產生 CSR 後自動填入"></textarea>
+        </div>
+    </div>
+
+    <!-- Step 2: 匯入憑證 -->
+    <div class="step-card" id="card_step2">
+        <div class="step-header">
+            <div class="step-number" id="step2_num">2</div>
+            <span class="step-title">匯入憑證 (Import Certificate)</span>
+            <span class="status-indicator status-pending" id="step2_status">待執行</span>
+        </div>
+
+        <div class="form-group">
+            <label>Key Handle (用於綁定憑證與金鑰)</label>
+            <input type="text" id="input_import_key_handle" placeholder="從 Step 1 自動帶入，或手動輸入">
+        </div>
+
+        <div class="form-group">
+            <label>Key ID (選填，不填則使用 Key Handle)</label>
+            <input type="text" id="input_import_key_id">
+        </div>
+
+        <div class="form-group">
+            <label>匯入方式</label>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+            <button class="btn-action btn-import" onclick="doImportTestCert()">📄 匯入測試憑證</button>
+            <div class="hint" style="margin-top:4px;">使用內建測試憑證，無法在手機上產生簽名</div>
+        </div>
+
+        <div style="border-top: 1px dashed #dadce0; padding-top: 12px; margin-top: 12px;">
+            <div class="form-group">
+                <label>或者：使用瀏覽器端測試 CA 簽發憑證並匯入</label>
+                <textarea id="input_csr_for_sign" rows="4"
+                    placeholder="CSR 會從 Step 1 自動帶入"></textarea>
+            </div>
+            <button class="btn-action btn-import" onclick="doRequestRealCert()">📜 瀏覽器端簽發憑證並匯入</button>
+            <div class="hint">使用 forge.js 在瀏覽器內產生測試 CA 並簽發憑證，無需外部伺服器，適用於 GitHub Pages</div>
+        </div>
+    </div>
+
+    <!-- Step 3: 建立簽名 -->
+    <div class="step-card" id="card_step3">
+        <div class="step-header">
+            <div class="step-number" id="step3_num">3</div>
+            <span class="step-title">建立簽名 (Sign Data)</span>
+            <span class="status-indicator status-pending" id="step3_status">待執行</span>
+        </div>
+
+        <div class="form-group">
+            <label>Key Handle / Label (指定簽名金鑰)</label>
+            <input type="text" id="input_sign_key_handle" placeholder="從 Step 1 自動帶入，或手動輸入">
+        </div>
+
+        <div class="options-row">
+            <div class="form-group">
+                <label>簽名演算法</label>
+                <select id="select_sign_alg">
+                    <optgroup label="RSA PKCS#1 v1.5 (Token 做 Hash)">
+                        <option value="ALG_RSA2048SHA1">ALG_RSA2048SHA1</option>
+                        <option value="ALG_RSA2048SHA256" selected>ALG_RSA2048SHA256</option>
+                        <option value="ALG_RSA2048SHA384">ALG_RSA2048SHA384</option>
+                        <option value="ALG_RSA2048SHA512">ALG_RSA2048SHA512</option>
+                    </optgroup>
+                    <optgroup label="RSA PKCS#1 v1.5 PreHash (網頁做 Hash)">
+                        <option value="ALG_RSA2048SHA256_PreHash">ALG_RSA2048SHA256_PreHash</option>
+                    </optgroup>
+                    <optgroup label="RSA PSS (Token 做 Hash)">
+                        <option value="ALG_RSA2048SHA256_PSS">ALG_RSA2048SHA256_PSS</option>
+                    </optgroup>
+                    <optgroup label="RSA PSS PreHash (網頁做 Hash)">
+                        <option value="ALG_RSA2048SHA256_PSS_PreHash">ALG_RSA2048SHA256_PSS_PreHash</option>
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>待簽名資料 (Base64)</label>
+            <textarea id="input_sign_data" rows="3">MTIzNDU2Nzg5MGFiY2RlZjEyMzQ1Njc4OTBhYmNkZWY=</textarea>
+            <div class="hint">預設為 "1234567890abcdef1234567890abcdef" 的 Base64</div>
+        </div>
+
+        <button class="btn-action btn-sign" onclick="doSignData()">✍️ 產生簽名</button>
+
+        <div class="form-group" style="margin-top:16px;">
+            <label>簽名結果 (Base64)</label>
+            <textarea id="output_signature" rows="4" readonly style="background:#f0f0f0;"
+                placeholder="簽名後自動填入"></textarea>
+        </div>
+    </div>
+
+    <!-- Log -->
+    <div class="step-card">
+        <div class="step-header">
+            <span class="step-title">📋 操作紀錄</span>
+            <button class="btn-action" style="width:100px; height:28px; margin-left:auto; background:#999;"
+                onclick="clearLog()">清除</button>
+        </div>
+        <textarea id="log_area" readonly></textarea>
+    </div>
+
+    <script>
+        // ============================================================
+        // Init
+        // ============================================================
+        window.onload = function () {
+            document.getElementById("location_hef").textContent = window.location.href;
+        }
+
+        var testBigCertificate =
+            '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';
+
+        // ALG mapping
+        var ALG_MAP = {
+            'ALG_RSA2048SHA1': ALG_RSA2048SHA1,
+            'ALG_RSA2048SHA256': ALG_RSA2048SHA256,
+            'ALG_RSA2048SHA384': ALG_RSA2048SHA384,
+            'ALG_RSA2048SHA512': ALG_RSA2048SHA512,
+            'ALG_RSA2048SHA256_PreHash': ALG_RSA2048SHA256_PreHash,
+            'ALG_RSA2048SHA256_PSS': ALG_RSA2048SHA256_PSS,
+            'ALG_RSA2048SHA256_PSS_PreHash': ALG_RSA2048SHA256_PSS_PreHash,
+        };
+
+        // ============================================================
+        // Utility
+        // ============================================================
+        function log(msg) {
+            var area = document.getElementById('log_area');
+            var now = new Date().toLocaleTimeString();
+            area.value += '[' + now + '] ' + msg + '\n';
+            area.scrollTop = area.scrollHeight;
+            console.log(msg);
+        }
+
+        function clearLog() {
+            document.getElementById('log_area').value = '';
+        }
+
+        function setStepStatus(stepNum, status) {
+            var el = document.getElementById('step' + stepNum + '_status');
+            var numEl = document.getElementById('step' + stepNum + '_num');
+            el.className = 'status-indicator';
+            if (status === 'ok') {
+                el.className += ' status-ok';
+                el.textContent = '✅ 成功';
+                numEl.className = 'step-number done';
+            } else if (status === 'fail') {
+                el.className += ' status-fail';
+                el.textContent = '❌ 失敗';
+            } else {
+                el.className += ' status-pending';
+                el.textContent = '⏳ 執行中...';
+            }
+        }
+
+        function getTokenSN() {
+            var sn = document.getElementById('input_token_sn').value.trim();
+            if (sn.length === 0) return undefined;
+            return hexStringToArrayBuffer(sn);
+        }
+
+        // ============================================================
+        // Step 1: 產生 CSR
+        // ============================================================
+        function doGenCSR() {
+            setStepStatus(1, 'pending');
+            log('=== Step 1: 產生 RSA2048 CSR ===');
+
+            var bToken_sn = getTokenSN();
+            var common_name = document.getElementById('input_common_name').value.trim();
+            var isClear = document.getElementById('checkbox_clear_token').checked;
+
+            var bCommonName = undefined;
+            if (common_name.length !== 0) {
+                bCommonName = toUTF8Array(common_name);
+            }
+
+            log('Common Name: ' + (common_name || '(預設)'));
+            log('Clear token before keygen: ' + isClear);
+
+            GTIDEM_SetName('TestAll');
+
+            GTIDEM_GenRSA2048CSR(bToken_sn, bCommonName, isClear).then(function (response) {
+                if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                    // SN
+                    if (response.sn != undefined) {
+                        log('載具序號: ' + ConverSNFormat(response.sn));
+                    }
+
+                    // CSR
+                    var strCSR = "-----BEGIN CERTIFICATE REQUEST-----\n" +
+                        btoa(String.fromCharCode.apply(null, new Uint8Array(response.csr))) +
+                        "\n-----END CERTIFICATE REQUEST-----\n";
+                    document.getElementById('output_csr').value = strCSR;
+                    document.getElementById('input_csr_for_sign').value = strCSR;
+                    log('CSR 產生成功');
+
+                    // Key Handle
+                    var keyHandleHex = bufToHex(new Uint8Array(response.keyhandle).buffer);
+                    document.getElementById('output_key_handle').value = keyHandleHex;
+                    document.getElementById('input_import_key_handle').value = keyHandleHex;
+                    document.getElementById('input_sign_key_handle').value = keyHandleHex;
+                    log('Key Handle: ' + keyHandleHex);
+
+                    setStepStatus(1, 'ok');
+                } else {
+                    log('ERROR: ' + showFIDOErrorMessage(response));
+                    setStepStatus(1, 'fail');
+                    alert(showFIDOErrorMessage(response));
+                }
+            }).catch(function (error) {
+                log('FAIL: ' + error);
+                setStepStatus(1, 'fail');
+                alert(error);
+            });
+        }
+
+        // ============================================================
+        // Step 2a: 匯入測試憑證
+        // ============================================================
+        function doImportTestCert() {
+            setStepStatus(2, 'pending');
+            log('=== Step 2: 匯入測試憑證 ===');
+
+            var bToken_sn = getTokenSN();
+            var key_handle = document.getElementById('input_import_key_handle').value.trim();
+            var key_id = document.getElementById('input_import_key_id').value.trim();
+
+            if (key_handle.length === 0) {
+                alert('請先執行 Step 1 產生 CSR，或手動填入 Key Handle');
+                setStepStatus(2, 'fail');
+                return;
+            }
+
+            var bKeyHandle = hexStringToArrayBuffer(key_handle);
+            var bHexCert = Uint8Array.from(window.atob(testBigCertificate), function (c) { return c.charCodeAt(0); });
+
+            var bKeyID;
+            if (key_id.length !== 0) {
+                bKeyID = toUTF8Array(key_id);
+            } else {
+                bKeyID = bKeyHandle;
+            }
+
+            log('Key Handle: ' + key_handle);
+            log('Key ID: ' + (key_id || '(使用 Key Handle)'));
+
+            GTIDEM_ImportCertificate(bToken_sn, bKeyHandle, bKeyID, bHexCert, undefined).then(function (response) {
+                if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                    var msg = '匯入測試憑證完成';
+                    if (response.sn != undefined) {
+                        msg += ' | 載具序號: ' + ConverSNFormat(response.sn);
+                    }
+                    if (response.signature != undefined) {
+                        msg += '\nSignature: ' + btoa(String.fromCharCode.apply(null, new Uint8Array(response.signature)));
+                    }
+                    log(msg);
+                    setStepStatus(2, 'ok');
+                    alert(msg);
+                } else {
+                    log('ERROR: ' + showFIDOErrorMessage(response));
+                    setStepStatus(2, 'fail');
+                    alert(showFIDOErrorMessage(response));
+                }
+            }).catch(function (error) {
+                log('FAIL: ' + error);
+                setStepStatus(2, 'fail');
+                alert(error);
+            });
+        }
+
+        // ============================================================
+        // Step 2b: 瀏覽器端簽發憑證並匯入 (使用 forge.js)
+        // ============================================================
+        var cachedTestCA = null;
+
+        function getOrCreateTestCA() {
+            return new Promise(function (resolve, reject) {
+                if (cachedTestCA) {
+                    log('使用已快取的測試 CA');
+                    resolve(cachedTestCA);
+                    return;
+                }
+                log('首次使用，產生瀏覽器端測試 CA 金鑰對 (約需數秒)...');
+                forge.pki.rsa.generateKeyPair({ bits: 2048, workers: 2 }, function (err, caKeys) {
+                    if (err) { reject(err); return; }
+
+                    var caCert = forge.pki.createCertificate();
+                    caCert.publicKey = caKeys.publicKey;
+                    caCert.serialNumber = '01';
+                    caCert.validity.notBefore = new Date();
+                    caCert.validity.notAfter = new Date();
+                    caCert.validity.notAfter.setFullYear(caCert.validity.notAfter.getFullYear() + 10);
+
+                    var caAttrs = [
+                        { name: 'commonName', value: 'Browser Test CA' },
+                        { name: 'organizationName', value: 'GoTrustIdem GitHub Pages Test' },
+                        { name: 'countryName', value: 'TW' }
+                    ];
+                    caCert.setSubject(caAttrs);
+                    caCert.setIssuer(caAttrs);
+                    caCert.setExtensions([
+                        { name: 'basicConstraints', cA: true },
+                        { name: 'keyUsage', keyCertSign: true, cRLSign: true }
+                    ]);
+                    caCert.sign(caKeys.privateKey, forge.md.sha256.create());
+
+                    cachedTestCA = { keys: caKeys, cert: caCert, attrs: caAttrs };
+                    log('測試 CA 產生完成: CN=Browser Test CA');
+                    resolve(cachedTestCA);
+                });
+            });
+        }
+
+        async function doRequestRealCert() {
+            setStepStatus(2, 'pending');
+            log('=== Step 2: 瀏覽器端簽發憑證並匯入 ===');
+
+            var csrPem = document.getElementById('input_csr_for_sign').value.trim();
+            if (csrPem.length === 0) {
+                alert('請先執行 Step 1 產生 CSR');
+                setStepStatus(2, 'fail');
+                return;
+            }
+
+            try {
+                // 1) 解析 CSR
+                log('解析 CSR...');
+                var csr = forge.pki.certificationRequestFromPem(csrPem);
+                var cnField = csr.subject.getField('CN');
+                log('CSR Subject CN: ' + (cnField ? cnField.value : '(無)'));
+
+                // 2) 取得或產生測試 CA
+                var ca = await getOrCreateTestCA();
+
+                // 3) 用測試 CA 簽發使用者憑證
+                log('使用測試 CA 簽發使用者憑證...');
+                var cert = forge.pki.createCertificate();
+                cert.publicKey = csr.publicKey;
+                cert.serialNumber = forge.util.bytesToHex(forge.random.getBytesSync(16));
+                cert.validity.notBefore = new Date();
+                cert.validity.notAfter = new Date();
+                cert.validity.notAfter.setFullYear(cert.validity.notAfter.getFullYear() + 1);
+
+                cert.setSubject(csr.subject.attributes);
+                cert.setIssuer(ca.attrs);
+                cert.setExtensions([
+                    { name: 'basicConstraints', cA: false },
+                    { name: 'keyUsage', digitalSignature: true, nonRepudiation: true },
+                    { name: 'extKeyUsage', clientAuth: true }
+                ]);
+                cert.sign(ca.keys.privateKey, forge.md.sha256.create());
+
+                log('憑證簽發成功');
+                log('  Subject: ' + (cert.subject.getField('CN') ? cert.subject.getField('CN').value : ''));
+                log('  Issuer : ' + cert.issuer.getField('CN').value);
+                log('  Serial : ' + cert.serialNumber);
+                log('  有效期 : ' + cert.validity.notBefore.toLocaleDateString() + ' ~ ' + cert.validity.notAfter.toLocaleDateString());
+
+                // 4) 轉換為 DER 格式
+                var certAsn1 = forge.pki.certificateToAsn1(cert);
+                var certDer = forge.asn1.toDer(certAsn1);
+                var certBytes = new Uint8Array(certDer.length());
+                for (var i = 0; i < certDer.length(); i++) {
+                    certBytes[i] = certDer.at(i);
+                }
+                log('憑證大小: ' + certBytes.length + ' bytes，準備匯入 Token...');
+
+                // 5) 匯入 Token
+                var bToken_sn = getTokenSN();
+                var key_handle = document.getElementById('input_import_key_handle').value.trim();
+                var key_id = document.getElementById('input_import_key_id').value.trim();
+
+                if (key_handle.length === 0) {
+                    log('ERROR: Key Handle 為空');
+                    setStepStatus(2, 'fail');
+                    alert('請先執行 Step 1，或手動填入 Key Handle');
+                    return;
+                }
+
+                var bKeyHandle = hexStringToArrayBuffer(key_handle);
+                var bKeyID;
+                if (key_id.length !== 0) {
+                    bKeyID = toUTF8Array(key_id);
+                } else {
+                    bKeyID = bKeyHandle;
+                }
+
+                var response = await GTIDEM_ImportCertificate(bToken_sn, bKeyHandle, bKeyID, certBytes, undefined);
+
+                if (response.statusCode == CTAP1_ERR_SUCCESS) {
+                    var msg = '瀏覽器簽發憑證匯入完成';
+                    if (response.sn != undefined) {
+                        msg += ' | 載具序號: ' + ConverSNFormat(response.sn);
+                    }
+                    if (response.signature != undefined) {
+                        msg += '\nSignature: ' + btoa(String.fromCharCode.apply(null, new Uint8Array(response.signature)));
+                    }
+                    log(msg);
+                    setStepStatus(2, 'ok');
+                    alert(msg);
+                } else {
+                    log('ERROR: ' + showFIDOErrorMessage(response));
+                    setStepStatus(2, 'fail');
+                    alert(showFIDOErrorMessage(response));
+                }
+            } catch (error) {
+                log('FAIL: ' + error);
+                setStepStatus(2, 'fail');
+                alert('憑證簽發失敗: ' + error);
+            }
+        }
+
+        // ============================================================
+        // Step 3: 建立簽名
+        // ============================================================
+        async function doSignData() {
+            setStepStatus(3, 'pending');
+            log('=== Step 3: 建立簽名 ===');
+
+            var bToken_sn = getTokenSN();
+            var keyHandleHex = document.getElementById('input_sign_key_handle').value.trim();
+
+            if (keyHandleHex.length === 0) {
+                alert('請先執行 Step 1 產生 CSR，或手動填入 Key Handle');
+                setStepStatus(3, 'fail');
+                return;
+            }
+
+            var bKeyHandle = hexStringToArrayBuffer(keyHandleHex);
+            var algName = document.getElementById('select_sign_alg').value;
+            var algNumber = ALG_MAP[algName];
+
+            log('演算法: ' + algName + ' (0x' + algNumber.toString(16).padStart(2, '0') + ')');
+            log('Key Handle: ' + keyHandleHex);
+
+            var signDataB64 = document.getElementById('input_sign_data').value.trim();
+            var signDataPayload = Uint8Array.from(window.atob(signDataB64), function (c) { return c.charCodeAt(0); });
+
+            // 判斷是否為 PreHash 演算法
+            var isPreHash = algName.indexOf('PreHash') !== -1;
+
+            var finalPayload = signDataPayload;
+
+            if (isPreHash) {
+                log('PreHash 模式：網頁端先做 SHA-256 Hash...');
+                try {
+                    var hashBuffer = await crypto.subtle.digest("SHA-256", signDataPayload);
+                    finalPayload = new Uint8Array(hashBuffer);
+                    log('Hash 結果: ' + bufToHex(hashBuffer));
+                } catch (e) {
+                    log('Hash 失敗: ' + e);
+                    setStepStatus(3, 'fail');
+                    return;
+                }
+            } else {
+                log('非 PreHash 模式：原始資料直接傳給 Token 做 Hash + 簽名');
+            }
+
+            log('傳送資料長度: ' + finalPayload.byteLength + ' bytes');
+
+            try {
+                var value = await GTIDEM_SignDataByLabel(bKeyHandle, bToken_sn, algNumber, finalPayload);
+
+                if (value.statusCode == CTAP1_ERR_SUCCESS) {
+                    var sigB64 = btoa(String.fromCharCode.apply(null, new Uint8Array(value.signature)));
+                    document.getElementById('output_signature').value = sigB64;
+
+                    var msg = '簽名成功';
+                    if (value.sn != undefined) {
+                        msg += ' | 載具序號: ' + ConverSNFormat(value.sn);
+                    }
+                    log(msg);
+                    log('Signature (Base64): ' + sigB64);
+                    setStepStatus(3, 'ok');
+                    alert(msg);
+                } else {
+                    log('ERROR: ' + showFIDOErrorMessage(value));
+                    setStepStatus(3, 'fail');
+                    alert(showFIDOErrorMessage(value));
+                }
+            } catch (error) {
+                log('FAIL: ' + error);
+                setStepStatus(3, 'fail');
+                alert(error);
+            }
+        }
+    </script>
+</body>
+
+</html>
