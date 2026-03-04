@@ -212,6 +212,18 @@
     <h3 class="page-title">🏦 Bank Test Case</h3>
     <p class="page-subtitle">IdemKey Plus v1.12 — FIDO2 + PKI-over-FIDO 整合測試</p>
 
+    <!-- Factory Reset Bar -->
+    <div style="max-width:700px; margin:0 auto 16px auto; text-align:center; padding:12px 16px; background:#fff3f3; border:2px solid #e85600; border-radius:8px;">
+        <div style="display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap;">
+            <label style="font-weight:bold; color:#e85600;">⚠️ Factory Reset</label>
+            <span style="font-family:monospace; font-size:13px; color:#667189;">Reset Key: 31323334353637383132333435363738</span>
+            <button class="btn btn-error" id="btn_factory_reset" onclick="doFactoryReset()" style="height:36px;">
+                🔄 Factory Reset
+            </button>
+        </div>
+        <div id="reset_status" style="margin-top:8px; font-size:13px; color:#667189;"></div>
+    </div>
+
     <div class="sn-bar">
         <label>Token Serial Number (optional):</label><br>
         <input type="text" id="input_token_sn" placeholder="留空則不指定載具序號">
@@ -895,6 +907,91 @@
 
             _running.right = false;
             setBtnEnabled('btn_verify', true);
+        }
+
+        // ================================================================
+        //  Factory Reset
+        // ================================================================
+        async function doFactoryReset() {
+            var statusEl = document.getElementById('reset_status');
+            var btn = document.getElementById('btn_factory_reset');
+            btn.disabled = true;
+            btn.classList.add('loading');
+            statusEl.innerHTML = '<span style="color:#89b4fa;">⏳ 步驟 1/3：取得 Token 資訊...</span>';
+
+            try {
+                var bSN = getTokenSN();
+
+                // Step 1: Get Token Info → random number
+                var info = await GTIDEM_GetTokenInfo(bSN);
+                if (info.statusCode !== CTAP1_ERR_SUCCESS) {
+                    statusEl.innerHTML = '<span style="color:#f38ba8;">❌ 取得 Token Info 失敗: ' + showFIDOErrorMessage(info) + '</span>';
+                    btn.disabled = false; btn.classList.remove('loading');
+                    return;
+                }
+
+                if (info.sn) {
+                    document.getElementById('input_token_sn').value = ConverSNFormat(info.sn);
+                }
+
+                var bRandom = info.rn;
+                var bRandomNumber = bRandom.slice(0, 16);
+                var bChallenge = bRandom.slice(16, 32);
+
+                // Step 2: Compute encrypted challenge
+                statusEl.innerHTML = '<span style="color:#89b4fa;">⏳ 步驟 2/3：計算加密挑戰值...</span>';
+                var resetKeyHex = '31323334353637383132333435363738';
+                var bResetKey = hexStringToArrayBuffer(resetKeyHex);
+                var bTokenSN = info.sn;
+
+                var bEncChallenge = await prepareResetResponse(bResetKey, bRandomNumber, bTokenSN, bChallenge);
+
+                // Step 3: Factory Reset
+                statusEl.innerHTML = '<span style="color:#89b4fa;">⏳ 步驟 3/3：執行 Factory Reset，請操作金鑰...</span>';
+                var resp = await GTIDEM_FactoryResetToken(bSN, bEncChallenge);
+
+                if (resp.statusCode === CTAP1_ERR_SUCCESS) {
+                    var msg = '✅ Factory Reset 成功！載具已回出廠狀態。';
+                    if (resp.sn) msg += ' 序號: ' + ConverSNFormat(resp.sn);
+                    statusEl.innerHTML = '<span style="color:#a6e3a1;">' + msg + '</span>';
+                    // Clear state
+                    state.credentialId = null; state.fidoPublicKey = null;
+                    state.keyHandle = null; state.pkiPublicKeyPem = null;
+                    state.csrPem = null; state.signature = null;
+                    ['status_L1','status_L2','status_L3','status_R1','status_R2','status_R3','status_R4']
+                        .forEach(function(id){ setStatus(id, 'wait'); });
+                } else {
+                    statusEl.innerHTML = '<span style="color:#f38ba8;">❌ Factory Reset 失敗: ' + showFIDOErrorMessage(resp) + '</span>';
+                }
+            } catch (e) {
+                statusEl.innerHTML = '<span style="color:#f38ba8;">❌ 錯誤: ' + e.message + '</span>';
+            }
+            btn.disabled = false;
+            btn.classList.remove('loading');
+        }
+
+        async function prepareResetResponse(bResetKey, bRandomNumber, bTokenSN, bChallenge) {
+            var sessionKey = await computingSessionKey(bResetKey, bRandomNumber);
+            var iv = await computingIV(bTokenSN);
+            var bEncrypted = await window.crypto.subtle.importKey("raw", sessionKey, "aes-cbc", false, ["encrypt"])
+                .then(function (cryptoKey) {
+                    return crypto.subtle.encrypt({ name: "aes-cbc", iv: iv }, cryptoKey, bChallenge);
+                });
+            return bEncrypted;
+        }
+
+        async function computingSessionKey(key, random) {
+            var data = new Uint8Array(key.byteLength + random.byteLength + 1);
+            data.set(new Uint8Array(key), 0);
+            data.set(new Uint8Array(random), key.byteLength);
+            data.set(new Uint8Array([0x01]), key.byteLength + random.byteLength);
+            var hash = await window.crypto.subtle.digest("SHA-256", data);
+            return new Uint8Array(hash);
+        }
+
+        async function computingIV(bTokenSN) {
+            var hash = await window.crypto.subtle.digest("SHA-256", bTokenSN);
+            return new Uint8Array(hash).slice(0, 16);
         }
     </script>
 </body>
