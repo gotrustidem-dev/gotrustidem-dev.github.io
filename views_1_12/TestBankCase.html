@@ -221,21 +221,21 @@
 
         <!-- ===== Left Panel: Setup / Provisioning ===== -->
         <div class="panel panel-left">
-            <div class="panel-header">📋 Setup（金鑰配置）</div>
+            <div class="panel-header">📋 註冊</div>
 
             <div class="step-card">
-                <div class="step-title"><span class="step-status" id="status_L1">⬜</span>L1 — MakeCredential (Resident Key)</div>
-                <div class="step-desc">建立 FIDO2 RK，記錄 credentialID 與公鑰</div>
+                <div class="step-title"><span class="step-status" id="status_L1">⬜</span>L1 — Token 綁定</div>
+                <div class="step-desc">建立 FIDO2 Resident Key，將 Token 綁定至此服務</div>
             </div>
 
             <div class="step-card">
-                <div class="step-title"><span class="step-status" id="status_L2">⬜</span>L2 — Gen RSA2048 CSR</div>
-                <div class="step-desc">產生 RSA2048 金鑰對 + CSR，記錄 KeyHandle 與 PKI 公鑰</div>
+                <div class="step-title"><span class="step-status" id="status_L2">⬜</span>L2 — 產生金鑰和 CSR</div>
+                <div class="step-desc">產生 RSA2048 金鑰對與憑證簽署請求（CSR）</div>
             </div>
 
             <div class="step-card">
-                <div class="step-title"><span class="step-status" id="status_L3">⬜</span>L3 — Self-Sign CSR & Import Cert</div>
-                <div class="step-desc">自簽 Root CA → 簽署 CSR → 匯入憑證（KeyID = KeyHandle）</div>
+                <div class="step-title"><span class="step-status" id="status_L3">⬜</span>L3 — 匯入憑證</div>
+                <div class="step-desc">自簽 Root CA → 簽署 CSR → 將憑證匯入 Token</div>
             </div>
 
             <div class="progress-wrap" id="progress_left">
@@ -244,35 +244,35 @@
             </div>
 
             <button class="btn btn-success btn-lg btn-run" id="btn_setup" onclick="runSetup()">
-                ▶ 執行 Setup（L1 → L2 → L3）
+                ▶ 執行註冊（L1 → L2 → L3）
             </button>
 
-            <span class="log-label">Setup Log:</span>
+            <span class="log-label">註冊 Log:</span>
             <div class="log-area" id="log_left"></div>
         </div>
 
         <!-- ===== Right Panel: Verification / Usage ===== -->
         <div class="panel panel-right">
-            <div class="panel-header">🔐 Verify（驗證操作）</div>
+            <div class="panel-header">🔐 驗證</div>
 
             <div class="step-card">
-                <div class="step-title"><span class="step-status" id="status_R1">⬜</span>R1 — GetAssertion & Verify</div>
-                <div class="step-desc">以記錄的 credentialID 執行 GetAssertion 並驗證簽名</div>
+                <div class="step-title"><span class="step-status" id="status_R1">⬜</span>R1 — 驗證是否為被綁定 Token</div>
+                <div class="step-desc">以 credentialID 執行 GetAssertion，確認此 Token 已綁定</div>
             </div>
 
             <div class="step-card">
-                <div class="step-title"><span class="step-status" id="status_R2">⬜</span>R2 — Read Certificate</div>
-                <div class="step-desc">以 KeyHandle 讀取已匯入的憑證並顯示資訊</div>
+                <div class="step-title"><span class="step-status" id="status_R2">⬜</span>R2 — 讀取憑證</div>
+                <div class="step-desc">從 Token 讀取已匯入的憑證並顯示資訊</div>
             </div>
 
             <div class="step-card">
-                <div class="step-title"><span class="step-status" id="status_R3">⬜</span>R3 — Sign Data (RSA2048SHA256)</div>
-                <div class="step-desc">以 PKCS#1 v1.5 RSA2048SHA256 對 "123" 簽名</div>
+                <div class="step-title"><span class="step-status" id="status_R3">⬜</span>R3 — 產生放行簽章</div>
+                <div class="step-desc">以 RSA2048SHA256 (PKCS#1 v1.5) 對資料簽名</div>
             </div>
 
             <div class="step-card">
-                <div class="step-title"><span class="step-status" id="status_R4">⬜</span>R4 — Verify Signature</div>
-                <div class="step-desc">以 PKI 公鑰驗證 R3 產生的 RSA 簽名</div>
+                <div class="step-title"><span class="step-status" id="status_R4">⬜</span>R4 — 驗證放行簽章</div>
+                <div class="step-desc">以 PKI 公鑰驗證放行簽章是否正確</div>
             </div>
 
             <div class="progress-wrap" id="progress_right">
@@ -281,10 +281,10 @@
             </div>
 
             <button class="btn btn-error btn-lg btn-run" id="btn_verify" onclick="runVerify()">
-                ▶ 執行 Verify（R1 → R2 → R3 → R4）
+                ▶ 執行驗證（R1 → R2 → R3 → R4）
             </button>
 
-            <span class="log-label">Verify Log:</span>
+            <span class="log-label">驗證 Log:</span>
             <div class="log-area" id="log_right"></div>
         </div>
     </div>
@@ -623,7 +623,7 @@
             log('right', '══ R1: GetAssertion & Verify ══', 'inf');
 
             if (!state.credentialId || !state.fidoPublicKey) {
-                log('right', '❌ 請先執行左側 Setup', 'err');
+                log('right', '❌ 請先執行左側註冊', 'err');
                 return false;
             }
 
@@ -679,7 +679,7 @@
             log('right', '══ R2: Read Certificate ══', 'inf');
 
             if (!state.keyHandle) {
-                log('right', '❌ 請先執行左側 Setup', 'err');
+                log('right', '❌ 請先執行左側註冊', 'err');
                 return false;
             }
 
@@ -726,7 +726,7 @@
             log('right', '══ R3: Sign Data (RSA2048SHA256 PKCS#1 v1.5) ══', 'inf');
 
             if (!state.keyHandle) {
-                log('right', '❌ 請先執行左側 Setup', 'err');
+                log('right', '❌ 請先執行左側註冊', 'err');
                 return false;
             }
 
@@ -814,7 +814,7 @@
             progressShow('left');
             progressSet('left', 0, '準備中...');
 
-            log('left', '🚀 開始 Setup 流程（L1 → L2 → L3）', 'inf');
+            log('left', '🚀 開始註冊流程（L1 → L2 → L3）', 'inf');
 
             // L1 → 0~25%, L2 → 25~55%, L3 → 55~100% (L3 manages own bar)
             var steps = [
@@ -843,10 +843,10 @@
                 if (!ok) { allOk = false; break; }
             }
 
-            if (allOk) progressSet('left', 100, '✅ Setup 全部完成');
+            if (allOk) progressSet('left', 100, '✅ 註冊全部完成');
 
             log('left', '', 'dim');
-            log('left', allOk ? '🎉 Setup 流程全部完成' : '⚠️ Setup 流程未完成', allOk ? 'ok' : 'err');
+            log('left', allOk ? '🎉 註冊流程全部完成' : '⚠️ 註冊流程未完成', allOk ? 'ok' : 'err');
 
             _running.left = false;
             setBtnEnabled('btn_setup', true);
@@ -865,7 +865,7 @@
             progressShow('right');
             progressSet('right', 0, '準備中...');
 
-            log('right', '🚀 開始 Verify 流程（R1 → R2 → R3 → R4）', 'inf');
+            log('right', '🚀 開始驗證流程（R1 → R2 → R3 → R4）', 'inf');
 
             var steps = [
                 { id: 'status_R1', fn: step_R1, label: 'R1' },
@@ -888,10 +888,10 @@
                 if (!ok) { allOk = false; break; }
             }
 
-            if (allOk) progressSet('right', 100, '✅ Verify 全部完成');
+            if (allOk) progressSet('right', 100, '✅ 驗證全部完成');
 
             log('right', '', 'dim');
-            log('right', allOk ? '🎉 Verify 流程全部完成' : '⚠️ Verify 流程未完成', allOk ? 'ok' : 'err');
+            log('right', allOk ? '🎉 驗證流程全部完成' : '⚠️ 驗證流程未完成', allOk ? 'ok' : 'err');
 
             _running.right = false;
             setBtnEnabled('btn_verify', true);
