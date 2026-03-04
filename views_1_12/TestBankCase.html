@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GoTrust Bank Test Case</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+
+    <script src="../utils/cbor.js"></script>
+    <script src="../utils/helpers.js"></script>
+    <script src="../utils/showMessage.js"></script>
+    <script src="../utils/response.js"></script>
+    <script src="../utils/PKIoverFIDO_1_12.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/node-forge@1.3.1/dist/forge.min.js"></script>
+
+    <style>
+        body {
+            padding: 16px;
+            background: #f7f8fa;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 6px;
+            color: #303742;
+        }
+
+        .page-subtitle {
+            text-align: center;
+            color: #667189;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .sn-bar {
+            max-width: 500px;
+            margin: 0 auto 20px auto;
+            text-align: center;
+        }
+
+        .sn-bar input {
+            width: 340px;
+            height: 36px;
+        }
+
+        .panel-container {
+            display: flex;
+            gap: 20px;
+        }
+
+        .panel {
+            flex: 1;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            padding: 16px;
+            background: #fff;
+        }
+
+        .panel-left {
+            border-color: #32b643;
+        }
+
+        .panel-right {
+            border-color: #e85600;
+        }
+
+        .panel-header {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .panel-left .panel-header {
+            color: #32b643;
+        }
+
+        .panel-right .panel-header {
+            color: #e85600;
+        }
+
+        .step-card {
+            margin-bottom: 6px;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #ccc;
+        }
+
+        .panel-left .step-card {
+            border-left-color: #32b643;
+        }
+
+        .panel-right .step-card {
+            border-left-color: #e85600;
+        }
+
+        .step-title {
+            font-weight: bold;
+            font-size: 13px;
+            margin-bottom: 2px;
+        }
+
+        .step-desc {
+            font-size: 12px;
+            color: #667189;
+            margin-bottom: 0;
+        }
+
+        .step-status {
+            float: right;
+            font-size: 14px;
+        }
+
+        .btn-run {
+            width: 100%;
+            margin-top: 14px;
+            margin-bottom: 10px;
+            font-size: 15px;
+            height: 46px;
+        }
+
+        .log-label {
+            font-weight: bold;
+            margin-top: 10px;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .log-area {
+            width: 100%;
+            height: 320px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            background: #1e1e2e;
+            color: #cdd6f4;
+            border: 1px solid #45475a;
+            border-radius: 6px;
+            padding: 10px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .log-ok {
+            color: #a6e3a1;
+        }
+
+        .log-err {
+            color: #f38ba8;
+        }
+
+        .log-inf {
+            color: #89b4fa;
+        }
+
+        .log-dim {
+            color: #6c7086;
+        }
+
+        /* Progress bar */
+        .progress-wrap {
+            margin: 10px 0 0 0;
+            display: none;
+        }
+
+        .progress-wrap .bar {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #e2e4e9;
+            overflow: hidden;
+        }
+
+        .progress-wrap .bar-inner {
+            height: 100%;
+            width: 0%;
+            border-radius: 4px;
+            transition: width 0.35s ease;
+        }
+
+        .panel-left .bar-inner {
+            background: linear-gradient(90deg, #32b643, #5fdd6e);
+        }
+
+        .panel-right .bar-inner {
+            background: linear-gradient(90deg, #e85600, #ff8c42);
+        }
+
+        .progress-wrap .bar-text {
+            font-size: 12px;
+            color: #667189;
+            margin-top: 4px;
+            text-align: center;
+        }
+
+        @media (max-width: 860px) {
+            .panel-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h3 class="page-title">🏦 Bank Test Case</h3>
+    <p class="page-subtitle">IdemKey Plus v1.12 — FIDO2 + PKI-over-FIDO 整合測試</p>
+
+    <div class="sn-bar">
+        <label>Token Serial Number (optional):</label><br>
+        <input type="text" id="input_token_sn" placeholder="留空則不指定載具序號">
+    </div>
+
+    <div class="panel-container">
+
+        <!-- ===== Left Panel: Setup / Provisioning ===== -->
+        <div class="panel panel-left">
+            <div class="panel-header">📋 Setup（金鑰配置）</div>
+
+            <div class="step-card">
+                <div class="step-title"><span class="step-status" id="status_L1">⬜</span>L1 — MakeCredential (Resident Key)</div>
+                <div class="step-desc">建立 FIDO2 RK，記錄 credentialID 與公鑰</div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-title"><span class="step-status" id="status_L2">⬜</span>L2 — Gen RSA2048 CSR</div>
+                <div class="step-desc">產生 RSA2048 金鑰對 + CSR，記錄 KeyHandle 與 PKI 公鑰</div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-title"><span class="step-status" id="status_L3">⬜</span>L3 — Self-Sign CSR & Import Cert</div>
+                <div class="step-desc">自簽 Root CA → 簽署 CSR → 匯入憑證（KeyID = KeyHandle）</div>
+            </div>
+
+            <div class="progress-wrap" id="progress_left">
+                <div class="bar"><div class="bar-inner" id="progress_left_bar"></div></div>
+                <div class="bar-text" id="progress_left_text"></div>
+            </div>
+
+            <button class="btn btn-success btn-lg btn-run" id="btn_setup" onclick="runSetup()">
+                ▶ 執行 Setup（L1 → L2 → L3）
+            </button>
+
+            <span class="log-label">Setup Log:</span>
+            <div class="log-area" id="log_left"></div>
+        </div>
+
+        <!-- ===== Right Panel: Verification / Usage ===== -->
+        <div class="panel panel-right">
+            <div class="panel-header">🔐 Verify（驗證操作）</div>
+
+            <div class="step-card">
+                <div class="step-title"><span class="step-status" id="status_R1">⬜</span>R1 — GetAssertion & Verify</div>
+                <div class="step-desc">以記錄的 credentialID 執行 GetAssertion 並驗證簽名</div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-title"><span class="step-status" id="status_R2">⬜</span>R2 — Read Certificate</div>
+                <div class="step-desc">以 KeyHandle 讀取已匯入的憑證並顯示資訊</div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-title"><span class="step-status" id="status_R3">⬜</span>R3 — Sign Data (RSA2048SHA256)</div>
+                <div class="step-desc">以 PKCS#1 v1.5 RSA2048SHA256 對 "123" 簽名</div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-title"><span class="step-status" id="status_R4">⬜</span>R4 — Verify Signature</div>
+                <div class="step-desc">以 PKI 公鑰驗證 R3 產生的 RSA 簽名</div>
+            </div>
+
+            <div class="progress-wrap" id="progress_right">
+                <div class="bar"><div class="bar-inner" id="progress_right_bar"></div></div>
+                <div class="bar-text" id="progress_right_text"></div>
+            </div>
+
+            <button class="btn btn-error btn-lg btn-run" id="btn_verify" onclick="runVerify()">
+                ▶ 執行 Verify（R1 → R2 → R3 → R4）
+            </button>
+
+            <span class="log-label">Verify Log:</span>
+            <div class="log-area" id="log_right"></div>
+        </div>
+    </div>
+
+    <script>
+        // ================================================================
+        //  State
+        // ================================================================
+        var state = {
+            credentialId: null, fidoPublicKey: null, fidoPublicKeyAlg: null,
+            keyHandle: null, keyHandleBytes: null, pkiPublicKeyPem: null, csrPem: null,
+            caKeys: null, caCert: null,
+            plainData: null, signature: null
+        };
+        var _running = { left: false, right: false };
+
+        // ================================================================
+        //  Logging helpers
+        // ================================================================
+        function log(side, msg, type) {
+            var el = document.getElementById('log_' + side);
+            var ts = new Date().toLocaleTimeString();
+            var cls = type === 'ok' ? 'log-ok' : type === 'err' ? 'log-err' : type === 'dim' ? 'log-dim' : 'log-inf';
+            el.innerHTML += '<span class="' + cls + '">[' + ts + '] ' + escapeHtml(msg) + '</span>\n';
+            el.scrollTop = el.scrollHeight;
+        }
+
+        function logClear(side) {
+            document.getElementById('log_' + side).innerHTML = '';
+        }
+
+        function escapeHtml(t) {
+            var d = document.createElement('div');
+            d.appendChild(document.createTextNode(t));
+            return d.innerHTML;
+        }
+
+        function getTokenSN() {
+            var v = document.getElementById('input_token_sn').value;
+            return v.length ? hexStringToArrayBuffer(v) : undefined;
+        }
+
+        // ================================================================
+        //  Step status icon
+        // ================================================================
+        function setStatus(id, s) {
+            var map = { wait: '⬜', run: '🔄', ok: '✅', err: '❌' };
+            document.getElementById(id).textContent = map[s] || s;
+        }
+
+        // ================================================================
+        //  Progress bar helpers
+        // ================================================================
+        function progressShow(side) {
+            document.getElementById('progress_' + side).style.display = 'block';
+            progressSet(side, 0, '');
+        }
+
+        function progressHide(side) {
+            document.getElementById('progress_' + side).style.display = 'none';
+        }
+
+        function progressSet(side, pct, text) {
+            document.getElementById('progress_' + side + '_bar').style.width = pct + '%';
+            document.getElementById('progress_' + side + '_text').textContent = text;
+        }
+
+        // Yield to UI so progress bar repaints
+        function uiTick(ms) {
+            return new Promise(function (r) { setTimeout(r, ms || 30); });
+        }
+
+        // ================================================================
+        //  Button enable / disable  (spectre.css loading class)
+        // ================================================================
+        function setBtnEnabled(id, en) {
+            var b = document.getElementById(id);
+            b.disabled = !en;
+            b.classList.toggle('loading', !en);
+        }
+
+        // ================================================================
+        //  DER → Raw  (for ECDSA WebAuthn signatures)
+        // ================================================================
+        function derToRaw(der) {
+            var buf = new Uint8Array(der);
+            var off = 0;
+            if (buf[off++] !== 0x30) throw new Error('Expected SEQUENCE');
+            var tl = buf[off++];
+            if (tl & 0x80) { var n = tl & 0x7F; tl = 0; for (var i = 0; i < n; i++) tl = (tl << 8) | buf[off++]; }
+            if (buf[off++] !== 0x02) throw new Error('Expected INTEGER r');
+            var rL = buf[off++]; var r = buf.slice(off, off + rL); off += rL;
+            if (buf[off++] !== 0x02) throw new Error('Expected INTEGER s');
+            var sL = buf[off++]; var s = buf.slice(off, off + sL);
+            while (r.length > 32 && r[0] === 0) r = r.slice(1);
+            while (s.length > 32 && s[0] === 0) s = s.slice(1);
+            var raw = new Uint8Array(64);
+            raw.set(r, 32 - r.length);
+            raw.set(s, 64 - s.length);
+            return raw.buffer;
+        }
+
+        // ================================================================
+        //  L1: MakeCredential (Resident Key)
+        // ================================================================
+        async function step_L1() {
+            log('left', '', 'dim');
+            log('left', '══ L1: MakeCredential (Resident Key) ══', 'inf');
+            try {
+                var challenge = new Uint8Array(32);
+                crypto.getRandomValues(challenge);
+                var userId = new Uint8Array(16);
+                crypto.getRandomValues(userId);
+
+                var createOpts = {
+                    publicKey: {
+                        challenge: challenge,
+                        rp: { name: "GoTrust Bank Test", id: window.location.hostname },
+                        user: { id: userId, name: "banktest@gotrust.com", displayName: "Bank Test User" },
+                        pubKeyCredParams: [
+                            { type: "public-key", alg: -7 },
+                            { type: "public-key", alg: -257 }
+                        ],
+                        authenticatorSelection: {
+                            requireResidentKey: true,
+                            residentKey: "required",
+                            userVerification: "required",
+                            authenticatorAttachment: "cross-platform"
+                        },
+                        timeout: 120000,
+                        attestation: "direct"
+                    }
+                };
+
+                log('left', '等待使用者操作金鑰...', 'dim');
+                var cred = await navigator.credentials.create(createOpts);
+
+                state.credentialId = cred.rawId;
+                var credIdHex = bufToHex(new Uint8Array(cred.rawId).buffer);
+
+                var spki = cred.response.getPublicKey();
+                var alg = cred.response.getPublicKeyAlgorithm();
+                state.fidoPublicKeyAlg = alg;
+
+                var importParams;
+                if (alg === -7) {
+                    importParams = { name: "ECDSA", namedCurve: "P-256" };
+                } else if (alg === -257) {
+                    importParams = { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" };
+                } else {
+                    importParams = { name: "ECDSA", namedCurve: "P-256" };
+                }
+                state.fidoPublicKey = await crypto.subtle.importKey('spki', spki, importParams, true, ['verify']);
+
+                log('left', '✅ MakeCredential 完成', 'ok');
+                log('left', 'Credential ID: ' + credIdHex, 'inf');
+                log('left', '公鑰演算法: ' + (alg === -7 ? 'ES256 (P-256)' : alg === -257 ? 'RS256' : 'ALG=' + alg), 'inf');
+                return true;
+            } catch (e) {
+                log('left', '❌ L1 失敗: ' + e.message, 'err');
+                return false;
+            }
+        }
+
+        // ================================================================
+        //  L2: Gen RSA2048 CSR
+        // ================================================================
+        async function step_L2() {
+            log('left', '', 'dim');
+            log('left', '══ L2: Gen RSA2048 CSR ══', 'inf');
+            try {
+                GTIDEM_SetName('BankTestUser');
+                var cn = 'BankTest-' + Date.now().toString(36);
+                var bCommonName = toUTF8Array(cn);
+                var bSN = getTokenSN();
+
+                log('left', 'Common Name: ' + cn, 'inf');
+                log('left', '等待使用者操作金鑰...', 'dim');
+
+                var resp = await GTIDEM_GenRSA2048CSR(bSN, bCommonName, false);
+
+                if (resp.statusCode !== CTAP1_ERR_SUCCESS) {
+                    log('left', '❌ L2 失敗: ' + showFIDOErrorMessage(resp), 'err');
+                    return false;
+                }
+
+                state.keyHandleBytes = new Uint8Array(resp.keyhandle);
+                state.keyHandle = bufToHex(state.keyHandleBytes.buffer);
+
+                var csrB64 = btoa(String.fromCharCode.apply(null, new Uint8Array(resp.csr)));
+                state.csrPem = "-----BEGIN CERTIFICATE REQUEST-----\n" + csrB64 + "\n-----END CERTIFICATE REQUEST-----\n";
+
+                var csr = forge.pki.certificationRequestFromPem(state.csrPem);
+                state.pkiPublicKeyPem = forge.pki.publicKeyToPem(csr.publicKey);
+
+                log('left', '✅ Gen RSA2048 CSR 完成', 'ok');
+                if (resp.sn) log('left', '載具序號: ' + ConverSNFormat(resp.sn), 'inf');
+                log('left', 'Key Handle: ' + state.keyHandle, 'inf');
+                log('left', 'CSR Subject CN: ' + csr.subject.getField('CN').value, 'inf');
+                return true;
+            } catch (e) {
+                log('left', '❌ L2 失敗: ' + e.message, 'err');
+                return false;
+            }
+        }
+
+        // ================================================================
+        //  L3: Self-Sign CSR & Import Certificate  (with progress bar)
+        // ================================================================
+        async function step_L3() {
+            log('left', '', 'dim');
+            log('left', '══ L3: Self-Sign & Import Certificate ══', 'inf');
+
+            try {
+                // ---- 1. Root CA (cached) ----
+                if (!state.caKeys || !state.caCert) {
+                    progressSet('left', 58, '正在產生 Root CA 金鑰對 (RSA 2048)，請稍候...');
+                    log('left', '產生 Root CA 金鑰對 (RSA 2048)...', 'dim');
+                    await uiTick(80);
+
+                    // Use setTimeout so UI thread repaints before the blocking keygen
+                    state.caKeys = await new Promise(function (resolve) {
+                        setTimeout(function () {
+                            resolve(forge.pki.rsa.generateKeyPair({ bits: 2048, e: 0x10001 }));
+                        }, 80);
+                    });
+
+                    progressSet('left', 72, '金鑰對已產生，建立 Root CA 憑證...');
+                    await uiTick();
+
+                    var ca = forge.pki.createCertificate();
+                    ca.publicKey = state.caKeys.publicKey;
+                    ca.serialNumber = '01';
+                    ca.validity.notBefore = new Date();
+                    ca.validity.notAfter = new Date();
+                    ca.validity.notAfter.setFullYear(ca.validity.notBefore.getFullYear() + 10);
+                    var caAttrs = [
+                        { name: 'commonName', value: 'GoTrust Bank Test Root CA' },
+                        { name: 'countryName', value: 'TW' },
+                        { name: 'organizationName', value: 'GoTrust Idem Test' }
+                    ];
+                    ca.setSubject(caAttrs);
+                    ca.setIssuer(caAttrs);
+                    ca.setExtensions([
+                        { name: 'basicConstraints', cA: true },
+                        { name: 'keyUsage', keyCertSign: true, digitalSignature: true, cRLSign: true },
+                        { name: 'subjectKeyIdentifier' }
+                    ]);
+
+                    progressSet('left', 76, '正在自簽 Root CA 憑證...');
+                    await uiTick();
+                    ca.sign(state.caKeys.privateKey, forge.md.sha256.create());
+                    state.caCert = ca;
+
+                    progressSet('left', 80, '✅ Root CA 產生完成');
+                    await uiTick();
+                    log('left', '✅ Root CA 產生完成', 'ok');
+                } else {
+                    progressSet('left', 80, '使用已快取的 Root CA');
+                    log('left', '使用已快取的 Root CA', 'inf');
+                }
+
+                // ---- 2. Verify CSR ----
+                progressSet('left', 82, '驗證 CSR 簽名...');
+                await uiTick();
+                var csr = forge.pki.certificationRequestFromPem(state.csrPem);
+                if (!csr.verify()) {
+                    log('left', '❌ CSR 簽名驗證失敗', 'err');
+                    return false;
+                }
+                log('left', '✅ CSR 簽名驗證通過', 'ok');
+
+                // ---- 3. Issue certificate ----
+                progressSet('left', 86, '簽署 CSR 產生憑證...');
+                await uiTick();
+
+                var cert = forge.pki.createCertificate();
+                cert.publicKey = csr.publicKey;
+                cert.serialNumber = Date.now().toString(16);
+                cert.validity.notBefore = new Date();
+                cert.validity.notAfter = new Date();
+                cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + 1);
+                cert.setSubject(csr.subject.attributes);
+                cert.setIssuer(state.caCert.subject.attributes);
+                cert.setExtensions([
+                    { name: 'basicConstraints', cA: false },
+                    { name: 'keyUsage', digitalSignature: true, nonRepudiation: true },
+                    { name: 'subjectKeyIdentifier' }
+                ]);
+                cert.sign(state.caKeys.privateKey, forge.md.sha256.create());
+
+                progressSet('left', 90, '✅ 憑證簽署完成');
+                await uiTick();
+                log('left', '✅ 憑證簽署完成', 'ok');
+
+                // ---- 4. DER ----
+                var derStr = forge.asn1.toDer(forge.pki.certificateToAsn1(cert)).getBytes();
+                var certBytes = new Uint8Array(derStr.length);
+                for (var i = 0; i < derStr.length; i++) certBytes[i] = derStr.charCodeAt(i);
+                log('left', '憑證 DER 大小: ' + certBytes.length + ' bytes', 'inf');
+                if (certBytes.length > 2048) {
+                    log('left', '❌ 憑證大小超過限制 (2048 bytes)', 'err');
+                    return false;
+                }
+
+                // ---- 5. Import ----
+                progressSet('left', 93, '等待使用者操作金鑰匯入憑證...');
+                await uiTick();
+
+                var bKeyHandle = hexStringToArrayBuffer(state.keyHandle);
+                var bSN = getTokenSN();
+                log('left', '等待使用者操作金鑰匯入憑證...', 'dim');
+
+                var resp = await GTIDEM_ImportCertificate(bSN, bKeyHandle, bKeyHandle, certBytes, undefined, undefined);
+
+                if (resp.statusCode === CTAP1_ERR_SUCCESS) {
+                    progressSet('left', 100, '✅ 憑證匯入完成');
+                    log('left', '✅ 憑證匯入完成', 'ok');
+                    if (resp.sn) log('left', '載具序號: ' + ConverSNFormat(resp.sn), 'inf');
+                    return true;
+                } else {
+                    log('left', '❌ 匯入失敗: ' + showFIDOErrorMessage(resp), 'err');
+                    return false;
+                }
+            } catch (e) {
+                log('left', '❌ L3 失敗: ' + e.message, 'err');
+                return false;
+            }
+        }
+
+        // ================================================================
+        //  R1: GetAssertion & Verify
+        // ================================================================
+        async function step_R1() {
+            log('right', '', 'dim');
+            log('right', '══ R1: GetAssertion & Verify ══', 'inf');
+
+            if (!state.credentialId || !state.fidoPublicKey) {
+                log('right', '❌ 請先執行左側 Setup', 'err');
+                return false;
+            }
+
+            try {
+                var challenge = new Uint8Array(32);
+                crypto.getRandomValues(challenge);
+                log('right', '等待使用者操作金鑰...', 'dim');
+
+                var assertion = await navigator.credentials.get({
+                    publicKey: {
+                        challenge: challenge,
+                        allowCredentials: [{
+                            id: state.credentialId,
+                            type: "public-key",
+                            transports: ["usb"]
+                        }],
+                        userVerification: "required",
+                        timeout: 120000
+                    }
+                });
+
+                log('right', '✅ GetAssertion 回應取得', 'ok');
+
+                var authData = new Uint8Array(assertion.response.authenticatorData);
+                var cdHash = new Uint8Array(await crypto.subtle.digest('SHA-256', assertion.response.clientDataJSON));
+                var signedData = new Uint8Array(authData.length + cdHash.length);
+                signedData.set(authData, 0);
+                signedData.set(cdHash, authData.length);
+
+                var sig = assertion.response.signature;
+                var verifyParams;
+                if (state.fidoPublicKeyAlg === -7) {
+                    sig = derToRaw(new Uint8Array(sig));
+                    verifyParams = { name: "ECDSA", hash: "SHA-256" };
+                } else {
+                    verifyParams = { name: "RSASSA-PKCS1-v1_5" };
+                }
+
+                var valid = await crypto.subtle.verify(verifyParams, state.fidoPublicKey, sig, signedData);
+                log('right', 'Assertion 驗證結果: ' + (valid ? '✅ 通過' : '❌ 失敗'), valid ? 'ok' : 'err');
+                return valid;
+            } catch (e) {
+                log('right', '❌ R1 失敗: ' + e.message, 'err');
+                return false;
+            }
+        }
+
+        // ================================================================
+        //  R2: Read Certificate
+        // ================================================================
+        async function step_R2() {
+            log('right', '', 'dim');
+            log('right', '══ R2: Read Certificate ══', 'inf');
+
+            if (!state.keyHandle) {
+                log('right', '❌ 請先執行左側 Setup', 'err');
+                return false;
+            }
+
+            try {
+                var bLabel = hexStringToArrayBuffer(state.keyHandle);
+                var bSN = getTokenSN();
+                log('right', 'KeyHandle (Label): ' + state.keyHandle, 'inf');
+                log('right', '等待讀取憑證...', 'dim');
+
+                var resp = await GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSN);
+
+                if (resp.statusCode === CTAP1_ERR_SUCCESS) {
+                    log('right', '✅ 讀取憑證完成', 'ok');
+                    if (resp.sn) log('right', '載具序號: ' + ConverSNFormat(resp.sn), 'inf');
+                    if (resp.certicficate) {
+                        var certB64 = btoa(String.fromCharCode.apply(null, new Uint8Array(resp.certicficate)));
+                        var certPem = "-----BEGIN CERTIFICATE-----\n" + certB64 + "\n-----END CERTIFICATE-----";
+                        log('right', '憑證大小: ' + resp.certicficate.byteLength + ' bytes', 'inf');
+                        try {
+                            var cert = forge.pki.certificateFromPem(certPem);
+                            log('right', 'Subject CN: ' + cert.subject.getField('CN').value, 'inf');
+                            log('right', 'Issuer  CN: ' + cert.issuer.getField('CN').value, 'inf');
+                            log('right', 'Valid Until: ' + cert.validity.notAfter.toISOString().split('T')[0], 'inf');
+                        } catch (pe) {
+                            log('right', '憑證解析警告: ' + pe.message, 'err');
+                        }
+                    }
+                    return true;
+                } else {
+                    log('right', '❌ R2 失敗: ' + showFIDOErrorMessage(resp), 'err');
+                    return false;
+                }
+            } catch (e) {
+                log('right', '❌ R2 失敗: ' + e.message, 'err');
+                return false;
+            }
+        }
+
+        // ================================================================
+        //  R3: Sign Data (PKCS#1 v1.5 RSA2048SHA256)
+        // ================================================================
+        async function step_R3() {
+            log('right', '', 'dim');
+            log('right', '══ R3: Sign Data (RSA2048SHA256 PKCS#1 v1.5) ══', 'inf');
+
+            if (!state.keyHandle) {
+                log('right', '❌ 請先執行左側 Setup', 'err');
+                return false;
+            }
+
+            try {
+                state.plainData = Uint8Array.from(window.atob("MTIz"), function (c) { return c.charCodeAt(0); });
+                var bLabel = hexStringToArrayBuffer(state.keyHandle);
+                var bSN = getTokenSN();
+                GTIDEM_SetName('BankTestUser');
+
+                log('right', '簽名資料: "123" (3 bytes)', 'inf');
+                log('right', '演算法: ALG_RSA2048SHA256 (PKCS#1 v1.5)', 'inf');
+                log('right', '等待使用者操作金鑰簽名...', 'dim');
+
+                var resp = await GTIDEM_SignDataByLabel(bLabel, bSN, ALG_RSA2048SHA256, state.plainData);
+
+                if (resp.statusCode === CTAP1_ERR_SUCCESS) {
+                    state.signature = new Uint8Array(resp.signature);
+                    var sigB64 = btoa(String.fromCharCode.apply(null, state.signature));
+                    log('right', '✅ 簽名完成', 'ok');
+                    if (resp.sn) log('right', '載具序號: ' + ConverSNFormat(resp.sn), 'inf');
+                    log('right', '簽名長度: ' + state.signature.length + ' bytes', 'inf');
+                    log('right', '簽名 (Base64): ' + sigB64.substring(0, 64) + '...', 'inf');
+                    return true;
+                } else {
+                    log('right', '❌ R3 失敗: ' + showFIDOErrorMessage(resp), 'err');
+                    return false;
+                }
+            } catch (e) {
+                log('right', '❌ R3 失敗: ' + e.message, 'err');
+                return false;
+            }
+        }
+
+        // ================================================================
+        //  R4: Verify Signature (Web Crypto)
+        // ================================================================
+        async function step_R4() {
+            log('right', '', 'dim');
+            log('right', '══ R4: Verify Signature (Web Crypto) ══', 'inf');
+
+            if (!state.signature || !state.pkiPublicKeyPem || !state.plainData) {
+                log('right', '❌ 請先完成 R3 簽名', 'err');
+                return false;
+            }
+
+            try {
+                var pemBody = state.pkiPublicKeyPem
+                    .replace('-----BEGIN PUBLIC KEY-----', '')
+                    .replace('-----END PUBLIC KEY-----', '')
+                    .replace(/\s/g, '');
+                var spkiDer = Uint8Array.from(atob(pemBody), function (c) { return c.charCodeAt(0); });
+
+                var pubKey = await crypto.subtle.importKey(
+                    'spki', spkiDer.buffer,
+                    { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+                    true, ['verify']
+                );
+                log('right', '✅ PKI 公鑰匯入 Web Crypto 完成', 'ok');
+
+                var valid = await crypto.subtle.verify(
+                    'RSASSA-PKCS1-v1_5', pubKey,
+                    state.signature.buffer, state.plainData.buffer
+                );
+
+                log('right', '══════════════════════════════', 'dim');
+                log('right', 'RSA 簽名驗證結果: ' + (valid ? '✅ 通過' : '❌ 失敗'), valid ? 'ok' : 'err');
+                log('right', '══════════════════════════════', 'dim');
+                return valid;
+            } catch (e) {
+                log('right', '❌ R4 失敗: ' + e.message, 'err');
+                return false;
+            }
+        }
+
+        // ================================================================
+        //  MASTER — Run Setup  (L1 → L2 → L3)
+        // ================================================================
+        async function runSetup() {
+            if (_running.left) return;
+            _running.left = true;
+            setBtnEnabled('btn_setup', false);
+
+            logClear('left');
+            ['status_L1', 'status_L2', 'status_L3'].forEach(function (id) { setStatus(id, 'wait'); });
+            progressShow('left');
+            progressSet('left', 0, '準備中...');
+
+            log('left', '🚀 開始 Setup 流程（L1 → L2 → L3）', 'inf');
+
+            // L1 → 0~25%, L2 → 25~55%, L3 → 55~100% (L3 manages own bar)
+            var steps = [
+                { id: 'status_L1', fn: step_L1, pctStart: 0,  pctEnd: 25,  label: 'L1', selfProgress: false },
+                { id: 'status_L2', fn: step_L2, pctStart: 25, pctEnd: 55,  label: 'L2', selfProgress: false },
+                { id: 'status_L3', fn: step_L3, pctStart: 55, pctEnd: 100, label: 'L3', selfProgress: true }
+            ];
+
+            var allOk = true;
+            for (var i = 0; i < steps.length; i++) {
+                var s = steps[i];
+                setStatus(s.id, 'run');
+
+                if (!s.selfProgress) {
+                    progressSet('left', s.pctStart, '執行 ' + s.label + '...');
+                    await uiTick();
+                }
+
+                var ok = await s.fn();
+                setStatus(s.id, ok ? 'ok' : 'err');
+
+                if (!s.selfProgress && ok) {
+                    progressSet('left', s.pctEnd, s.label + ' 完成');
+                }
+
+                if (!ok) { allOk = false; break; }
+            }
+
+            if (allOk) progressSet('left', 100, '✅ Setup 全部完成');
+
+            log('left', '', 'dim');
+            log('left', allOk ? '🎉 Setup 流程全部完成' : '⚠️ Setup 流程未完成', allOk ? 'ok' : 'err');
+
+            _running.left = false;
+            setBtnEnabled('btn_setup', true);
+        }
+
+        // ================================================================
+        //  MASTER — Run Verify (R1 → R2 → R3 → R4)
+        // ================================================================
+        async function runVerify() {
+            if (_running.right) return;
+            _running.right = true;
+            setBtnEnabled('btn_verify', false);
+
+            logClear('right');
+            ['status_R1', 'status_R2', 'status_R3', 'status_R4'].forEach(function (id) { setStatus(id, 'wait'); });
+            progressShow('right');
+            progressSet('right', 0, '準備中...');
+
+            log('right', '🚀 開始 Verify 流程（R1 → R2 → R3 → R4）', 'inf');
+
+            var steps = [
+                { id: 'status_R1', fn: step_R1, label: 'R1' },
+                { id: 'status_R2', fn: step_R2, label: 'R2' },
+                { id: 'status_R3', fn: step_R3, label: 'R3' },
+                { id: 'status_R4', fn: step_R4, label: 'R4' }
+            ];
+
+            var allOk = true;
+            for (var i = 0; i < steps.length; i++) {
+                var s = steps[i];
+                setStatus(s.id, 'run');
+                progressSet('right', Math.round((i / steps.length) * 100), '執行 ' + s.label + '...');
+                await uiTick();
+
+                var ok = await s.fn();
+                setStatus(s.id, ok ? 'ok' : 'err');
+                progressSet('right', Math.round(((i + 1) / steps.length) * 100), s.label + ' 完成');
+
+                if (!ok) { allOk = false; break; }
+            }
+
+            if (allOk) progressSet('right', 100, '✅ Verify 全部完成');
+
+            log('right', '', 'dim');
+            log('right', allOk ? '🎉 Verify 流程全部完成' : '⚠️ Verify 流程未完成', allOk ? 'ok' : 'err');
+
+            _running.right = false;
+            setBtnEnabled('btn_verify', true);
+        }
+    </script>
+</body>
+
+</html>
