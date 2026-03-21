@@ -1,0 +1,1946 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>IdemKey+ All-in-One Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+
+    <script src="../utils/cbor.js"></script>
+    <script src="../utils/helpers.js"></script>
+    <script src="../utils/showMessage.js"></script>
+    <script src="../utils/response.js"></script>
+    <script src="../utils/PKIoverFIDO_1_12.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/node-forge@1.3.1/dist/forge.min.js"></script>
+
+    <style>
+        body {
+            padding: 16px;
+            background: #f7f8fa;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 6px;
+            color: #303742;
+        }
+
+        .page-subtitle {
+            text-align: center;
+            color: #667189;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .sn-bar {
+            max-width: 500px;
+            margin: 0 auto 20px auto;
+            text-align: center;
+        }
+
+        .sn-bar input {
+            width: 340px;
+            height: 36px;
+        }
+
+        .section-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .section {
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            padding: 16px;
+            background: #fff;
+            margin-bottom: 16px;
+        }
+
+        .section-header {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-header .section-status {
+            font-size: 18px;
+        }
+
+        .section[data-feature="gti"] { border-color: #5755d9; }
+        .section[data-feature="gti"] .section-header { color: #5755d9; }
+
+        .section[data-feature="csr"] { border-color: #32b643; }
+        .section[data-feature="csr"] .section-header { color: #32b643; }
+
+        .section[data-feature="readcert"] { border-color: #ffb700; }
+        .section[data-feature="readcert"] .section-header { color: #b38600; }
+
+        .section[data-feature="signdata"] { border-color: #e85600; }
+        .section[data-feature="signdata"] .section-header { color: #e85600; }
+
+        .section[data-feature="changepin"] { border-color: #e91e63; }
+        .section[data-feature="changepin"] .section-header { color: #e91e63; }
+
+        .section[data-feature="clearcerts"] { border-color: #f44336; }
+        .section[data-feature="clearcerts"] .section-header { color: #f44336; }
+
+        .field-row {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .field-row label {
+            min-width: 140px;
+            font-weight: bold;
+            font-size: 13px;
+            text-align: right;
+        }
+
+        .field-row input, .field-row select {
+            flex: 1;
+            max-width: 340px;
+            height: 34px;
+        }
+
+        .btn-action {
+            margin-top: 10px;
+            min-width: 200px;
+            width: auto;
+            padding: 0 20px;
+            height: 38px;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .result-area {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 13px;
+            min-height: 24px;
+            display: none;
+        }
+
+        .result-area.visible {
+            display: block;
+        }
+
+        .result-row {
+            margin-bottom: 4px;
+            word-break: break-all;
+        }
+
+        .result-row .result-label {
+            font-weight: bold;
+            color: #667189;
+        }
+
+        .result-row .result-value {
+            color: #303742;
+        }
+
+        .result-error {
+            color: #e85600;
+            font-weight: bold;
+        }
+
+        .result-ok {
+            color: #32b643;
+            font-weight: bold;
+        }
+
+        .log-area {
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+            height: 200px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            background: #1e1e2e;
+            color: #cdd6f4;
+            border: 1px solid #45475a;
+            border-radius: 6px;
+            padding: 10px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .log-ok { color: #a6e3a1; }
+        .log-err { color: #f38ba8; }
+        .log-inf { color: #89b4fa; }
+        .log-dim { color: #6c7086; }
+
+        .btn-row {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .cert-textarea {
+            width: 100%;
+            height: 80px;
+            font-family: monospace;
+            font-size: 11px;
+            resize: vertical;
+        }
+    </style>
+</head>
+
+<body>
+    <h3 class="page-title">IdemKey+ All-in-One Test</h3>
+    <p class="page-subtitle">v1.12 — 全功能整合測試頁面</p>
+
+    <div class="sn-bar">
+        <label>Token Serial Number (optional):</label><br>
+        <input type="text" id="input_token_sn" placeholder="留空則不指定載具序號">
+    </div>
+
+    <div class="section-container">
+
+        <!-- ===== 1. GetTokenInfo ===== -->
+        <div class="section" data-feature="gti" data-status="idle" id="section_gti">
+            <div class="section-header">
+                <span>1. GetTokenInfo — 取得載具資訊</span>
+                <span class="section-status" id="status_gti">⬜</span>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-primary btn-action" id="btn_get_token_info" onclick="doGetTokenInfo()">
+                    Get Token Info
+                </button>
+            </div>
+            <div class="result-area" id="result_gti">
+                <div class="result-row"><span class="result-label">FW Version: </span><span class="result-value" id="result_gti_fw"></span></div>
+                <div class="result-row"><span class="result-label">SW Version: </span><span class="result-value" id="result_gti_sw"></span></div>
+                <div class="result-row"><span class="result-label">PIN Retries: </span><span class="result-value" id="result_gti_pin_retries"></span></div>
+                <div class="result-row"><span class="result-label">Credentials: </span><span class="result-value" id="result_gti_credentials"></span></div>
+                <div class="result-row"><span class="result-label">Serial Number: </span><span class="result-value" id="result_gti_sn"></span></div>
+                <div class="result-row"><span class="result-label">Random Number: </span><span class="result-value" id="result_gti_rn"></span></div>
+                <div class="result-row"><span class="result-label">EC Public Point: </span><span class="result-value" id="result_gti_ecpoint"></span></div>
+                <div class="result-row"><span class="result-label">Flags: </span><span class="result-value" id="result_gti_flags"></span></div>
+                <div class="result-row"><span class="result-value" id="result_gti_message"></span></div>
+            </div>
+        </div>
+
+        <!-- ===== 2. Gen P256 CSR + Import Cert ===== -->
+        <div class="section" data-feature="csr" data-status="idle" id="section_csr">
+            <div class="section-header">
+                <span>2. GenCSR + ImportCert — 產生金鑰、自簽並匯入憑證</span>
+                <span class="section-status" id="status_csr">⬜</span>
+            </div>
+            <div class="field-row">
+                <label>Key Type:</label>
+                <select id="select_key_type">
+                    <option value="P256" selected>EC P-256 (secp256r1)</option>
+                    <option value="P384">EC P-384 (secp384r1)</option>
+                    <option value="P521">EC P-521 (secp521r1)</option>
+                    <option value="RSA2048">RSA 2048</option>
+                </select>
+            </div>
+            <div class="field-row">
+                <label>Common Name:</label>
+                <input type="text" id="input_csr_cn" value="TestAll-AutoTest">
+            </div>
+            <div class="field-row">
+                <label></label>
+                <label style="min-width:auto; font-weight:normal;">
+                    <input type="checkbox" id="checkbox_clear_before_csr"> Clear token before keygen
+                </label>
+            </div>
+            <div class="field-row">
+                <label>Key ID (hex):</label>
+                <input type="text" id="input_csr_keyid" placeholder="留空則使用 KeyHandle">
+            </div>
+            <div class="field-row">
+                <label></label>
+                <label style="min-width:auto; font-weight:normal;">
+                    <input type="checkbox" id="checkbox_csr_only"> GenCSR only (skip import)
+                </label>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-success btn-action" id="btn_gen_p256_csr" onclick="doGenCSRAndImport()">
+                    GenCSR + Import Cert
+                </button>
+            </div>
+            <div class="result-area" id="result_csr">
+                <div class="result-row"><span class="result-label">Key Handle: </span><span class="result-value" id="result_csr_keyhandle"></span></div>
+                <div class="result-row"><span class="result-label">CSR:</span></div>
+                <textarea class="cert-textarea" id="result_csr_pem" readonly></textarea>
+                <div class="result-row"><span class="result-label">Certificate:</span></div>
+                <textarea class="cert-textarea" id="result_csr_cert" readonly></textarea>
+                <div class="result-row"><span class="result-value" id="result_csr_message"></span></div>
+            </div>
+        </div>
+
+        <!-- ===== 3. Read Certificate ===== -->
+        <div class="section" data-feature="readcert" data-status="idle" id="section_readcert">
+            <div class="section-header">
+                <span>3. ReadCert — 讀取憑證</span>
+                <span class="section-status" id="status_readcert">⬜</span>
+            </div>
+            <div class="field-row">
+                <label>Certificate Index:</label>
+                <input type="number" id="input_read_index" value="1">
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-primary btn-action" id="btn_read_cert" onclick="doReadCert()" style="background-color:#b38600;border-color:#b38600;">
+                    Read Cert
+                </button>
+            </div>
+            <div class="result-area" id="result_readcert">
+                <div class="result-row"><span class="result-label">Credential Count: </span><span class="result-value" id="result_readcert_count"></span></div>
+                <div class="result-row"><span class="result-label">Certificate:</span></div>
+                <textarea class="cert-textarea" id="result_readcert_pem" readonly></textarea>
+                <div class="result-row"><span class="result-value" id="result_readcert_message"></span></div>
+            </div>
+        </div>
+
+        <!-- ===== 4. Sign Data ===== -->
+        <div class="section" data-feature="signdata" data-status="idle" id="section_signdata">
+            <div class="section-header">
+                <span>4. SignData — 資料簽章</span>
+                <span class="section-status" id="status_signdata">⬜</span>
+            </div>
+            <div class="field-row">
+                <label>Sign Mode:</label>
+                <select id="select_sign_mode">
+                    <option value="index" selected>By Index</option>
+                    <option value="label">By Label (KEYID / KeyHandle)</option>
+                </select>
+            </div>
+            <div class="field-row">
+                <label>Index / Label:</label>
+                <input type="text" id="input_sign_param" value="1">
+            </div>
+            <div class="field-row">
+                <label>Algorithm:</label>
+                <select id="select_sign_alg">
+                    <option value="10" selected>ECDSA_SHA256</option>
+                    <optgroup label="ECDSA">
+                        <option value="9">ECDSA_SHA</option>
+                        <option value="10">ECDSA_SHA256</option>
+                        <option value="11">ECDSA_SHA384</option>
+                        <option value="12">ECDSA_SHA512</option>
+                    </optgroup>
+                    <optgroup label="RSA PKCSv1.5">
+                        <option value="1">ALG_RSA2048SHA1</option>
+                        <option value="2">ALG_RSA2048SHA256</option>
+                        <option value="3">ALG_RSA2048SHA384</option>
+                        <option value="4">ALG_RSA2048SHA512</option>
+                    </optgroup>
+                    <optgroup label="RSA PSS">
+                        <option value="5">ALG_RSA2048SHA1_PSS</option>
+                        <option value="6">ALG_RSA2048SHA256_PSS</option>
+                        <option value="7">ALG_RSA2048SHA384_PSS</option>
+                        <option value="8">ALG_RSA2048SHA512_PSS</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-primary btn-action" id="btn_sign_data" onclick="doSignData()" style="background-color:#e85600;border-color:#e85600;">
+                    Sign Data
+                </button>
+            </div>
+            <div class="result-area" id="result_signdata">
+                <div class="result-row"><span class="result-label">Signature (Base64): </span></div>
+                <div class="result-row"><span class="result-value" id="result_sign_signature" style="word-break:break-all;"></span></div>
+                <div class="result-row"><span class="result-value" id="result_sign_message"></span></div>
+            </div>
+        </div>
+
+        <!-- ===== 5. Change PIN ===== -->
+        <div class="section" data-feature="changepin" data-status="idle" id="section_changepin">
+            <div class="section-header">
+                <span>5. ChangePIN — 變更密碼</span>
+                <span class="section-status" id="status_changepin">⬜</span>
+            </div>
+            <div class="field-row">
+                <label>Current PIN:</label>
+                <input type="text" id="input_old_pin">
+            </div>
+            <div class="field-row">
+                <label>New PIN:</label>
+                <input type="text" id="input_new_pin">
+            </div>
+            <div class="field-row">
+                <label>Confirm PIN:</label>
+                <input type="text" id="input_confirm_pin">
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-primary btn-action" id="btn_changepin_step1" onclick="doChangePIN_Step1()" style="background-color:#e91e63;border-color:#e91e63;">
+                    Step 1: Get Token Info
+                </button>
+                <button class="btn btn-primary btn-action" id="btn_changepin_step2" onclick="doChangePIN_Step2()" style="background-color:#e91e63;border-color:#e91e63;" disabled>
+                    Step 2: Change PIN
+                </button>
+            </div>
+            <div class="result-area" id="result_changepin">
+                <div class="result-row"><span class="result-label">PIN Retries: </span><span class="result-value" id="result_changepin_retries"></span></div>
+                <div class="result-row"><span class="result-value" id="result_changepin_message"></span></div>
+            </div>
+        </div>
+
+        <!-- ===== 6. Delete Cert by Label ===== -->
+        <div class="section" data-feature="deletecert" data-status="idle" id="section_deletecert" style="border-color:#ff5722;">
+            <div class="section-header" style="color:#ff5722;">
+                <span>6. DeleteCert — 刪除指定憑證</span>
+                <span class="section-status" id="status_deletecert">⬜</span>
+            </div>
+            <div class="field-row">
+                <label>Label (hex):</label>
+                <input type="text" id="input_delete_label" placeholder="Key Handle hex string">
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-primary btn-action" id="btn_delete_cert" onclick="doDeleteCert()" style="background-color:#ff5722;border-color:#ff5722;">
+                    Delete Cert
+                </button>
+            </div>
+            <div class="result-area" id="result_deletecert">
+                <div class="result-row"><span class="result-label">Remaining Certs: </span><span class="result-value" id="result_deletecert_count"></span></div>
+                <div class="result-row"><span class="result-value" id="result_deletecert_message"></span></div>
+            </div>
+        </div>
+
+        <!-- ===== 7. Clear All Certs ===== -->
+        <div class="section" data-feature="clearcerts" data-status="idle" id="section_clearcerts">
+            <div class="section-header">
+                <span>7. ClearToken — 清除所有憑證</span>
+                <span class="section-status" id="status_clearcerts">⬜</span>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-error btn-action" id="btn_clear_certs" onclick="doClearCerts()">
+                    Clear All Certs
+                </button>
+            </div>
+            <div class="result-area" id="result_clearcerts">
+                <div class="result-row"><span class="result-value" id="result_clearcerts_message"></span></div>
+            </div>
+        </div>
+
+        <!-- ===== 8. Unlock PIN ===== -->
+        <div class="section" data-feature="unlockpin" data-status="idle" id="section_unlockpin" style="border-color:#9c27b0;">
+            <div class="section-header" style="color:#9c27b0;">
+                <span>8. UnlockPIN — 解鎖使用者密碼</span>
+                <span class="section-status" id="status_unlockpin">⬜</span>
+            </div>
+            <div class="field-row">
+                <label>SO PIN:</label>
+                <input type="text" id="input_so_pin" value="12345678">
+            </div>
+            <div class="field-row">
+                <label>New User PIN:</label>
+                <input type="text" id="input_unlock_new_pin" value="12345678">
+            </div>
+            <div class="field-row">
+                <label></label>
+                <label style="min-width:auto; font-weight:normal;">
+                    <input type="checkbox" id="checkbox_pin_expired"> Set PIN Expired
+                </label>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-primary btn-action" id="btn_unlock_pin" onclick="doUnlockPIN()" style="background-color:#9c27b0;border-color:#9c27b0;">
+                    Unlock PIN
+                </button>
+            </div>
+            <div class="result-area" id="result_unlockpin">
+                <div class="result-row"><span class="result-label">PIN Retries: </span><span class="result-value" id="result_unlockpin_retries"></span></div>
+                <div class="result-row"><span class="result-value" id="result_unlockpin_message"></span></div>
+            </div>
+        </div>
+
+        <!-- ===== 9. ReadCert by Label ===== -->
+        <div class="section" data-feature="readcertlabel" data-status="idle" id="section_readcertlabel" style="border-color:#00bcd4;">
+            <div class="section-header" style="color:#00bcd4;">
+                <span>9. ReadCertByLabel — 以標籤讀取憑證</span>
+                <span class="section-status" id="status_readcertlabel">⬜</span>
+            </div>
+            <div class="field-row">
+                <label>Label (hex):</label>
+                <input type="text" id="input_readlabel_hex" placeholder="Key Handle hex string">
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-primary btn-action" id="btn_read_cert_label" onclick="doReadCertByLabel()" style="background-color:#00bcd4;border-color:#00bcd4;">
+                    Read Cert by Label
+                </button>
+            </div>
+            <div class="result-area" id="result_readcertlabel">
+                <div class="result-row"><span class="result-label">Credential Count: </span><span class="result-value" id="result_readcertlabel_count"></span></div>
+                <div class="result-row"><span class="result-label">Certificate:</span></div>
+                <textarea class="cert-textarea" id="result_readcertlabel_pem" readonly></textarea>
+                <div class="result-row"><span class="result-value" id="result_readcertlabel_message"></span></div>
+            </div>
+        </div>
+
+        <!-- ===== 10. GetCertExtra ===== -->
+        <div class="section" data-feature="certextra" data-status="idle" id="section_certextra" style="border-color:#607d8b;">
+            <div class="section-header" style="color:#607d8b;">
+                <span>10. GetCertExtra — 取得憑證額外資料</span>
+                <span class="section-status" id="status_certextra">⬜</span>
+            </div>
+            <div class="field-row">
+                <label>Query Mode:</label>
+                <select id="select_certextra_mode">
+                    <option value="all" selected>All Certs</option>
+                    <option value="index">By Index</option>
+                    <option value="label">By Label</option>
+                </select>
+            </div>
+            <div class="field-row">
+                <label>Index / Label:</label>
+                <input type="text" id="input_certextra_param" placeholder="Index (number) or Label (hex)">
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-primary btn-action" id="btn_get_cert_extra" onclick="doGetCertExtra()" style="background-color:#607d8b;border-color:#607d8b;">
+                    Get Cert Extra
+                </button>
+            </div>
+            <div class="result-area" id="result_certextra">
+                <div class="result-row"><span class="result-label">Credential Count: </span><span class="result-value" id="result_certextra_count"></span></div>
+                <div class="result-row"><span class="result-label">Extra Data:</span></div>
+                <textarea class="cert-textarea" id="result_certextra_data" readonly></textarea>
+                <div class="result-row"><span class="result-value" id="result_certextra_message"></span></div>
+            </div>
+        </div>
+
+        <!-- ===== 11. Factory Reset ===== -->
+        <div class="section" data-feature="factoryreset" data-status="idle" id="section_factoryreset" style="border-color:#212121;">
+            <div class="section-header" style="color:#212121;">
+                <span>12. FactoryReset — 恢復出廠設定</span>
+                <span class="section-status" id="status_factoryreset">⬜</span>
+            </div>
+            <div class="field-row">
+                <label>Reset Key (hex):</label>
+                <input type="text" id="input_reset_key" value="31323334353637383132333435363738">
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-error btn-action" id="btn_factory_reset" onclick="doFactoryReset()">
+                    Factory Reset
+                </button>
+            </div>
+            <div class="result-area" id="result_factoryreset">
+                <div class="result-row"><span class="result-label">PIN Retries: </span><span class="result-value" id="result_factoryreset_pin_retries"></span></div>
+                <div class="result-row"><span class="result-label">Serial Number: </span><span class="result-value" id="result_factoryreset_sn"></span></div>
+                <div class="result-row"><span class="result-value" id="result_factoryreset_message"></span></div>
+            </div>
+        </div>
+
+        <!-- 13. InitToken -->
+        <div class="section" data-feature="inittoken" data-status="idle" id="section_inittoken" style="border-color:#1b5e20;">
+            <div class="section-header" style="color:#1b5e20;">
+                <span>13. InitToken — 初始化載具</span>
+                <span class="section-status" id="status_inittoken">⬜</span>
+            </div>
+            <div class="field-row">
+                <label>SO PIN (current):</label>
+                <input type="text" id="input_init_so_pin" value="12345678">
+            </div>
+            <div class="field-row">
+                <label>New SO PIN:</label>
+                <input type="text" id="input_init_new_so_pin" value="12345678">
+            </div>
+            <div class="field-row">
+                <label>New User PIN:</label>
+                <input type="text" id="input_init_new_user_pin" value="12345678">
+            </div>
+            <div class="field-row">
+                <label>PIN Level:</label>
+                <select id="select_init_pin_level">
+                    <option value="1">0x01 — 數字必要 (NUM_ASK)</option>
+                    <option value="129">0x81 — 英文+數字必要 (ENG_ASK|NUM_ASK)</option>
+                    <option value="177">0xB1 — 大小寫+數字必要</option>
+                    <option value="181">0xB5 — 大小寫+數字+符號必要</option>
+                    <option value="3">0x03 — 數字禁止 (NUM_NO)</option>
+                    <option value="4">0x04 — 符號必要 (SYM_ASK)</option>
+                    <option value="128">0x80 — 英文必要 (ENG_ASK)</option>
+                    <option value="112">0x70 — 英文禁止 (ENG_NO+BOTH)</option>
+                    <option value="160">0xA0 — 大寫必要 (ENG_ASK+HIGHCASE)</option>
+                    <option value="144">0x90 — 小寫必要 (ENG_ASK+LOWCASE)</option>
+                    <option value="12">0x0C — 符號禁止 (SYM_NO)</option>
+                    <option value="224">0xE0 — 大寫必要+小寫禁止 (SPEC+HIGHCASE)</option>
+                </select>
+            </div>
+            <div class="field-row">
+                <label>PIN Retry (1-15):</label>
+                <input type="number" id="input_init_pin_retry" value="8" min="1" max="15">
+            </div>
+            <div class="field-row">
+                <label>PIN Min Length (4-63):</label>
+                <input type="number" id="input_init_pin_min_len" value="4" min="4" max="63">
+            </div>
+            <div class="field-row">
+                <label>Allowed RPID (comma-separated, empty=all):</label>
+                <input type="text" id="input_init_allowed_rpid" value="" placeholder="e.g. localhost,example.com">
+            </div>
+            <div class="field-row">
+                <label><input type="checkbox" id="checkbox_init_pin_expired"> Set PIN Expired</label>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-success btn-action" id="btn_init_token" onclick="doInitToken()">
+                    Init Token
+                </button>
+            </div>
+            <div class="result-area" id="result_inittoken">
+                <div class="result-row"><span class="result-label">PIN Retries: </span><span class="result-value" id="result_inittoken_pin_retries"></span></div>
+                <div class="result-row"><span class="result-value" id="result_inittoken_message"></span></div>
+            </div>
+        </div>
+
+        <!-- 14. SignData With PIN -->
+        <div class="section" data-feature="signwithpin" data-status="idle" id="section_signwithpin" style="border-color:#e85600;">
+            <div class="section-header" style="color:#e85600;">
+                <span>14. SignDataWithPIN — ECDH 加密 PIN 簽章</span>
+                <span class="section-status" id="status_signwithpin">⬜</span>
+            </div>
+            <div class="field-row">
+                <label>User PIN:</label>
+                <input type="text" id="input_signpin_pin" value="12345678">
+            </div>
+            <div class="field-row">
+                <label>Sign Mode:</label>
+                <select id="select_signpin_mode">
+                    <option value="index" selected>By Index</option>
+                    <option value="label">By Label (KEYID / KeyHandle)</option>
+                </select>
+            </div>
+            <div class="field-row">
+                <label>Index / Label:</label>
+                <input type="text" id="input_signpin_param" value="1">
+            </div>
+            <div class="field-row">
+                <label>Algorithm:</label>
+                <select id="select_signpin_alg">
+                    <option value="2" selected>ALG_RSA2048SHA256</option>
+                    <optgroup label="RSA PKCSv1.5">
+                        <option value="1">ALG_RSA2048SHA1</option>
+                        <option value="2">ALG_RSA2048SHA256</option>
+                        <option value="3">ALG_RSA2048SHA384</option>
+                        <option value="4">ALG_RSA2048SHA512</option>
+                    </optgroup>
+                    <optgroup label="RSA PSS">
+                        <option value="5">ALG_RSA2048SHA1_PSS</option>
+                        <option value="6">ALG_RSA2048SHA256_PSS</option>
+                        <option value="7">ALG_RSA2048SHA384_PSS</option>
+                        <option value="8">ALG_RSA2048SHA512_PSS</option>
+                    </optgroup>
+                    <optgroup label="ECDSA">
+                        <option value="9">ECDSA_SHA</option>
+                        <option value="10">ECDSA_SHA256</option>
+                        <option value="11">ECDSA_SHA384</option>
+                        <option value="12">ECDSA_SHA512</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-primary btn-action" id="btn_sign_with_pin" onclick="doSignDataWithPIN()" style="background-color:#e85600;border-color:#e85600;">
+                    Sign Data With PIN
+                </button>
+            </div>
+            <div class="result-area" id="result_signwithpin">
+                <div class="result-row"><span class="result-label">Signature (Base64): </span></div>
+                <div class="result-row"><span class="result-value" id="result_signpin_signature" style="word-break:break-all;"></span></div>
+                <div class="result-row"><span class="result-value" id="result_signpin_message"></span></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Log Area -->
+    <div style="max-width:900px; margin:16px auto 0 auto;">
+        <span style="font-weight:bold; display:block; margin-bottom:4px;">Log:</span>
+        <div class="log-area" id="log_area"></div>
+    </div>
+
+    <script>
+        // ================================================================
+        //  Helpers
+        // ================================================================
+        function getTokenSN() {
+            var v = document.getElementById('input_token_sn').value;
+            return v.length ? hexStringToArrayBuffer(v) : undefined;
+        }
+
+        function setStatus(id, s) {
+            var map = { idle: '⬜', run: '🔄', ok: '✅', err: '❌' };
+            document.getElementById(id).textContent = map[s] || s;
+        }
+
+        function setSectionStatus(feature, status) {
+            var section = document.getElementById('section_' + feature);
+            section.setAttribute('data-status', status);
+            setStatus('status_' + feature, status);
+        }
+
+        function showResult(feature) {
+            document.getElementById('result_' + feature).classList.add('visible');
+        }
+
+        function setBtnEnabled(id, en) {
+            var b = document.getElementById(id);
+            b.disabled = !en;
+            b.classList.toggle('loading', !en);
+        }
+
+        function log(msg, type) {
+            var el = document.getElementById('log_area');
+            var ts = new Date().toLocaleTimeString();
+            var cls = type === 'ok' ? 'log-ok' : type === 'err' ? 'log-err' : type === 'dim' ? 'log-dim' : 'log-inf';
+            var d = document.createElement('div');
+            d.appendChild(document.createTextNode('[' + ts + '] ' + msg));
+            var span = document.createElement('span');
+            span.className = cls;
+            span.innerHTML = d.innerHTML;
+            el.innerHTML += span.outerHTML + '\n';
+            el.scrollTop = el.scrollHeight;
+        }
+
+        function escapeHtml(t) {
+            var d = document.createElement('div');
+            d.appendChild(document.createTextNode(t));
+            return d.innerHTML;
+        }
+
+        // ================================================================
+        //  1. GetTokenInfo
+        // ================================================================
+        async function doGetTokenInfo() {
+            setSectionStatus('gti', 'run');
+            setBtnEnabled('btn_get_token_info', false);
+            log('GetTokenInfo: 開始...', 'inf');
+
+            try {
+                var bSN = getTokenSN();
+                var response = await GTIDEM_GetTokenInfo(bSN);
+
+                if (response.statusCode === CTAP1_ERR_SUCCESS) {
+                    document.getElementById('result_gti_fw').textContent = ConverVersionFormat(response.fw);
+                    document.getElementById('result_gti_sw').textContent = ConverVersionFormat(response.sw);
+                    document.getElementById('result_gti_pin_retries').textContent = response.pinRetry;
+                    document.getElementById('result_gti_credentials').textContent = response.credentialNum;
+                    document.getElementById('result_gti_sn').textContent = ConverSNFormat(response.sn);
+                    document.getElementById('result_gti_rn').textContent = ConverSNFormat(response.rn);
+                    document.getElementById('result_gti_ecpoint').textContent = ConverSNFormat(response.ecpoint);
+                    document.getElementById('result_gti_flags').textContent = ConverSNFormat(response.flags);
+                    document.getElementById('result_gti_message').innerHTML = '<span class="result-ok">取得載具資訊成功</span>';
+
+                    // Auto-fill SN if empty
+                    if (!document.getElementById('input_token_sn').value && response.sn) {
+                        document.getElementById('input_token_sn').value = ConverSNFormat(response.sn);
+                    }
+
+                    showResult('gti');
+                    setSectionStatus('gti', 'ok');
+                    log('GetTokenInfo: 成功 — SN=' + ConverSNFormat(response.sn), 'ok');
+                } else {
+                    document.getElementById('result_gti_message').innerHTML = '<span class="result-error">' + escapeHtml(showFIDOErrorMessage(response)) + '</span>';
+                    showResult('gti');
+                    setSectionStatus('gti', 'err');
+                    log('GetTokenInfo: 失敗 — ' + showFIDOErrorMessage(response), 'err');
+                }
+            } catch (e) {
+                document.getElementById('result_gti_message').innerHTML = '<span class="result-error">' + escapeHtml(e.message) + '</span>';
+                showResult('gti');
+                setSectionStatus('gti', 'err');
+                log('GetTokenInfo: 錯誤 — ' + e.message, 'err');
+            }
+
+            setBtnEnabled('btn_get_token_info', true);
+        }
+
+        // ================================================================
+        //  2. GenCSR + Self-Sign + Import Certificate
+        //     Flow: GenP256CSR → forge self-sign CA → issue cert → ImportCertificate
+        // ================================================================
+        var _caState = { keys: null, cert: null };  // cached CA across calls
+
+        // Yield to UI so progress repaints
+        function uiTick(ms) { return new Promise(function(r) { setTimeout(r, ms || 30); }); }
+
+        async function doGenCSRAndImport() {
+            setSectionStatus('csr', 'run');
+            setBtnEnabled('btn_gen_p256_csr', false);
+
+            try {
+                var bSN = getTokenSN();
+                var cn = document.getElementById('input_csr_cn').value || 'TestAll-AutoTest';
+                var bCommonName = toUTF8Array(cn);
+                var isClear = document.getElementById('checkbox_clear_before_csr').checked;
+
+                // ---- Step 1: Gen CSR (based on selected key type) ----
+                var keyType = document.getElementById('select_key_type').value;
+                log('GenCSR: 產生 ' + keyType + ' 金鑰對與 CSR...', 'inf');
+                GTIDEM_SetName('TestAll');
+                var resp;
+                if (keyType === 'P384') {
+                    resp = await GTIDEM_GenP384CSR(bSN, bCommonName, isClear);
+                } else if (keyType === 'P521') {
+                    resp = await GTIDEM_GenP521CSR(bSN, bCommonName, isClear);
+                } else if (keyType === 'RSA2048') {
+                    resp = await GTIDEM_GenRSA2048CSR(bSN, bCommonName, isClear);
+                } else {
+                    resp = await GTIDEM_GenP256CSR(bSN, bCommonName, isClear);
+                }
+
+                if (resp.statusCode !== CTAP1_ERR_SUCCESS) {
+                    document.getElementById('result_csr_message').innerHTML = '<span class="result-error">GenCSR 失敗: ' + escapeHtml(showFIDOErrorMessage(resp)) + '</span>';
+                    showResult('csr');
+                    setSectionStatus('csr', 'err');
+                    log('GenCSR: 失敗 — ' + showFIDOErrorMessage(resp), 'err');
+                    setBtnEnabled('btn_gen_p256_csr', true);
+                    return;
+                }
+
+                var keyHandleBytes = new Uint8Array(resp.keyhandle);
+                var keyHandle = bufToHex(keyHandleBytes.buffer);
+                var csrB64 = btoa(String.fromCharCode.apply(null, new Uint8Array(resp.csr)));
+                var csrPem = "-----BEGIN CERTIFICATE REQUEST-----\n" + csrB64 + "\n-----END CERTIFICATE REQUEST-----\n";
+
+                document.getElementById('result_csr_keyhandle').textContent = keyHandle;
+                document.getElementById('result_csr_pem').value = csrPem;
+                log('GenCSR: 成功 — KeyHandle=' + keyHandle.substring(0, 32) + '...', 'ok');
+
+                // Check CSR-only mode
+                var csrOnly = document.getElementById('checkbox_csr_only').checked;
+                if (csrOnly) {
+                    document.getElementById('result_csr_message').innerHTML = '<span class="result-ok">GenCSR 完成 (未匯入憑證)</span>';
+                    showResult('csr');
+                    setSectionStatus('csr', 'ok');
+                    log('GenCSR: 完成 (CSR Only)', 'ok');
+                    setBtnEnabled('btn_gen_p256_csr', true);
+                    return;
+                }
+
+                // ---- Step 2: Self-sign CA (cached) ----
+                if (!_caState.keys || !_caState.cert) {
+                    log('ImportCert: 產生 Root CA 金鑰對 (EC P-256)...', 'dim');
+                    await uiTick(80);
+                    _caState.keys = await new Promise(function(resolve) {
+                        setTimeout(function() {
+                            resolve(forge.pki.rsa.generateKeyPair({ bits: 2048, e: 0x10001 }));
+                        }, 80);
+                    });
+
+                    var ca = forge.pki.createCertificate();
+                    ca.publicKey = _caState.keys.publicKey;
+                    ca.serialNumber = '01';
+                    ca.validity.notBefore = new Date();
+                    ca.validity.notAfter = new Date();
+                    ca.validity.notAfter.setFullYear(ca.validity.notBefore.getFullYear() + 10);
+                    var caAttrs = [
+                        { name: 'commonName', value: 'TestAll Root CA' },
+                        { name: 'countryName', value: 'TW' },
+                        { name: 'organizationName', value: 'GoTrust Idem Test' }
+                    ];
+                    ca.setSubject(caAttrs);
+                    ca.setIssuer(caAttrs);
+                    ca.setExtensions([
+                        { name: 'basicConstraints', cA: true },
+                        { name: 'keyUsage', keyCertSign: true, digitalSignature: true, cRLSign: true },
+                        { name: 'subjectKeyIdentifier' }
+                    ]);
+                    ca.sign(_caState.keys.privateKey, forge.md.sha256.create());
+                    _caState.cert = ca;
+                    log('ImportCert: Root CA 產生完成', 'ok');
+                } else {
+                    log('ImportCert: 使用已快取的 Root CA', 'inf');
+                }
+
+                // ---- Step 3: Verify & sign CSR → issue cert ----
+                log('ImportCert: 驗證 CSR 並簽署憑證...', 'dim');
+                await uiTick();
+                var csr = forge.pki.certificationRequestFromPem(csrPem);
+                if (!csr.verify()) {
+                    document.getElementById('result_csr_message').innerHTML = '<span class="result-error">CSR 簽名驗證失敗</span>';
+                    showResult('csr');
+                    setSectionStatus('csr', 'err');
+                    log('ImportCert: CSR 簽名驗證失敗', 'err');
+                    setBtnEnabled('btn_gen_p256_csr', true);
+                    return;
+                }
+
+                var cert = forge.pki.createCertificate();
+                cert.publicKey = csr.publicKey;
+                cert.serialNumber = Date.now().toString(16);
+                cert.validity.notBefore = new Date();
+                cert.validity.notAfter = new Date();
+                cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + 1);
+                cert.setSubject(csr.subject.attributes);
+                cert.setIssuer(_caState.cert.subject.attributes);
+                cert.setExtensions([
+                    { name: 'basicConstraints', cA: false },
+                    { name: 'keyUsage', digitalSignature: true, nonRepudiation: true },
+                    { name: 'subjectKeyIdentifier' }
+                ]);
+                cert.sign(_caState.keys.privateKey, forge.md.sha256.create());
+
+                var derStr = forge.asn1.toDer(forge.pki.certificateToAsn1(cert)).getBytes();
+                var certBytes = new Uint8Array(derStr.length);
+                for (var i = 0; i < derStr.length; i++) certBytes[i] = derStr.charCodeAt(i);
+                log('ImportCert: 憑證簽署完成 (' + certBytes.length + ' bytes)', 'ok');
+
+                if (certBytes.length > 2048) {
+                    document.getElementById('result_csr_message').innerHTML = '<span class="result-error">憑證大小超過限制 (2048 bytes)</span>';
+                    showResult('csr');
+                    setSectionStatus('csr', 'err');
+                    log('ImportCert: 憑證大小超過限制', 'err');
+                    setBtnEnabled('btn_gen_p256_csr', true);
+                    return;
+                }
+
+                // Show cert PEM in result
+                var certPemB64 = btoa(String.fromCharCode.apply(null, certBytes));
+                var certPem = "-----BEGIN CERTIFICATE-----\n" + certPemB64 + "\n-----END CERTIFICATE-----";
+                document.getElementById('result_csr_cert').value = certPem;
+
+                // ---- Step 4: Import certificate to token ----
+                log('ImportCert: 等待使用者操作金鑰匯入憑證...', 'dim');
+                var bKeyHandle = hexStringToArrayBuffer(keyHandle);
+                var keyidHex = document.getElementById('input_csr_keyid').value;
+                var bImportKeyID = keyidHex ? hexStringToArrayBuffer(keyidHex) : bKeyHandle;
+                var importResp = await GTIDEM_ImportCertificate(bSN, bKeyHandle, bImportKeyID, certBytes, undefined, undefined);
+
+                if (importResp.statusCode === CTAP1_ERR_SUCCESS) {
+                    var msg = 'GenCSR + 匯入憑證完成';
+                    if (importResp.sn) msg += ' — 序號: ' + ConverSNFormat(importResp.sn);
+                    document.getElementById('result_csr_message').innerHTML = '<span class="result-ok">' + escapeHtml(msg) + '</span>';
+                    showResult('csr');
+                    setSectionStatus('csr', 'ok');
+                    log('ImportCert: ' + msg, 'ok');
+                } else {
+                    document.getElementById('result_csr_message').innerHTML = '<span class="result-error">匯入失敗: ' + escapeHtml(showFIDOErrorMessage(importResp)) + '</span>';
+                    showResult('csr');
+                    setSectionStatus('csr', 'err');
+                    log('ImportCert: 匯入失敗 — ' + showFIDOErrorMessage(importResp), 'err');
+                }
+            } catch (e) {
+                document.getElementById('result_csr_message').innerHTML = '<span class="result-error">' + escapeHtml(e.message) + '</span>';
+                showResult('csr');
+                setSectionStatus('csr', 'err');
+                log('GenCSR+Import: 錯誤 — ' + e.message, 'err');
+            }
+
+            setBtnEnabled('btn_gen_p256_csr', true);
+        }
+
+        // ================================================================
+        //  3. Read Certificate
+        // ================================================================
+        async function doReadCert() {
+            setSectionStatus('readcert', 'run');
+            setBtnEnabled('btn_read_cert', false);
+            log('ReadCert: 開始...', 'inf');
+
+            try {
+                var bSN = getTokenSN();
+                var indexVal = parseInt(document.getElementById('input_read_index').value);
+                var index = isNaN(indexVal) ? 1 : indexVal;
+
+                log('ReadCert: 讀取 index=' + index + '...', 'dim');
+                var response = await GTIDEM_ReadCertByIndexWithoutPIN(index, bSN);
+
+                if (response.statusCode === CTAP1_ERR_SUCCESS) {
+                    var certB64 = btoa(String.fromCharCode.apply(null, response.certicficate));
+                    var certPem = "-----BEGIN CERTIFICATE-----\n" + certB64 + "\n-----END CERTIFICATE-----";
+                    var count = response.credentialNum != undefined ? response.credentialNum : '-';
+
+                    document.getElementById('result_readcert_count').textContent = count;
+                    document.getElementById('result_readcert_pem').value = certPem;
+                    document.getElementById('result_readcert_message').innerHTML = '<span class="result-ok">讀取憑證成功</span>';
+                    showResult('readcert');
+                    setSectionStatus('readcert', 'ok');
+                    log('ReadCert: 成功 — 憑證數量=' + count, 'ok');
+                } else {
+                    document.getElementById('result_readcert_message').innerHTML = '<span class="result-error">' + escapeHtml(showFIDOErrorMessage(response)) + '</span>';
+                    showResult('readcert');
+                    setSectionStatus('readcert', 'err');
+                    log('ReadCert: 失敗 — ' + showFIDOErrorMessage(response), 'err');
+                }
+            } catch (e) {
+                document.getElementById('result_readcert_message').innerHTML = '<span class="result-error">' + escapeHtml(e.message) + '</span>';
+                showResult('readcert');
+                setSectionStatus('readcert', 'err');
+                log('ReadCert: 錯誤 — ' + e.message, 'err');
+            }
+
+            setBtnEnabled('btn_read_cert', true);
+        }
+
+        // ================================================================
+        //  4. Sign Data
+        // ================================================================
+        async function doSignData() {
+            setSectionStatus('signdata', 'run');
+            setBtnEnabled('btn_sign_data', false);
+            log('SignData: 開始...', 'inf');
+
+            try {
+                var bSN = getTokenSN();
+                var signMode = document.getElementById('select_sign_mode').value;
+                var paramValue = document.getElementById('input_sign_param').value;
+                var algValue = parseInt(document.getElementById('select_sign_alg').value);
+
+                // Plain text: "123"
+                var signDataPayload = Uint8Array.from(window.atob('MTIz'), function(c) { return c.charCodeAt(0); });
+
+                GTIDEM_SetName('TestAll');
+                var response;
+                if (signMode === 'label') {
+                    var bLabel = hexStringToArrayBuffer(paramValue);
+                    log('SignData: By Label=' + paramValue + ', 等待使用者操作金鑰...', 'dim');
+                    response = await GTIDEM_SignDataByLabel(bLabel, bSN, algValue, signDataPayload);
+                } else {
+                    var index = parseInt(paramValue) || 1;
+                    log('SignData: By Index=' + index + ', 等待使用者操作金鑰...', 'dim');
+                    response = await GTIDEM_SignDataByIndex(index, bSN, algValue, signDataPayload);
+                }
+
+                if (response.statusCode === CTAP1_ERR_SUCCESS) {
+                    var sig = new Uint8Array(response.signature);
+                    var sigB64 = btoa(String.fromCharCode.apply(null, sig));
+
+                    document.getElementById('result_sign_signature').textContent = sigB64;
+                    document.getElementById('result_sign_message').innerHTML = '<span class="result-ok">簽章成功 (' + sig.length + ' bytes)</span>';
+                    showResult('signdata');
+                    setSectionStatus('signdata', 'ok');
+                    log('SignData: 成功 — 簽章長度=' + sig.length + ' bytes', 'ok');
+                } else {
+                    document.getElementById('result_sign_message').innerHTML = '<span class="result-error">' + escapeHtml(showFIDOErrorMessage(response)) + '</span>';
+                    showResult('signdata');
+                    setSectionStatus('signdata', 'err');
+                    log('SignData: 失敗 — ' + showFIDOErrorMessage(response), 'err');
+                }
+            } catch (e) {
+                document.getElementById('result_sign_message').innerHTML = '<span class="result-error">' + escapeHtml(e.message) + '</span>';
+                showResult('signdata');
+                setSectionStatus('signdata', 'err');
+                log('SignData: 錯誤 — ' + e.message, 'err');
+            }
+
+            setBtnEnabled('btn_sign_data', true);
+        }
+
+        // ================================================================
+        //  5. Change PIN (Two-Step)
+        // ================================================================
+        var _changePinTokenInfo = null; // cached token info from Step 1
+
+        async function doChangePIN_Step1() {
+            setSectionStatus('changepin', 'run');
+            setBtnEnabled('btn_changepin_step1', false);
+            setBtnEnabled('btn_changepin_step2', false);
+            document.getElementById('result_changepin_retries').textContent = '';
+            document.getElementById('result_changepin_message').innerHTML = '';
+            log('ChangePIN Step1: GetTokenInfo 開始...', 'inf');
+
+            try {
+                var bSN = getTokenSN();
+                var gtidem = await GTIDEM_GetTokenInfo(bSN);
+
+                if (gtidem.statusCode !== CTAP1_ERR_SUCCESS) {
+                    document.getElementById('result_changepin_message').innerHTML = '<span class="result-error">' + escapeHtml(showFIDOErrorMessage(gtidem)) + '</span>';
+                    showResult('changepin');
+                    setSectionStatus('changepin', 'err');
+                    log('ChangePIN Step1: 失敗 — ' + showFIDOErrorMessage(gtidem), 'err');
+                    setBtnEnabled('btn_changepin_step1', true);
+                    return;
+                }
+
+                if (gtidem.pinRetry == 0) {
+                    document.getElementById('result_changepin_retries').textContent = '0';
+                    document.getElementById('result_changepin_message').innerHTML = '<span class="result-error">PIN 已鎖定</span>';
+                    showResult('changepin');
+                    setSectionStatus('changepin', 'err');
+                    log('ChangePIN Step1: PIN 已鎖定', 'err');
+                    setBtnEnabled('btn_changepin_step1', true);
+                    return;
+                }
+
+                _changePinTokenInfo = gtidem;
+                document.getElementById('result_changepin_retries').textContent = gtidem.pinRetry;
+                document.getElementById('result_changepin_message').innerHTML = '<span class="result-ok">Token Info 取得成功，請執行 Step 2</span>';
+                showResult('changepin');
+                setSectionStatus('changepin', 'idle');
+                log('ChangePIN Step1: Token Info 取得成功 (PIN Retries: ' + gtidem.pinRetry + ')', 'ok');
+                setBtnEnabled('btn_changepin_step2', true);
+            } catch (e) {
+                document.getElementById('result_changepin_message').innerHTML = '<span class="result-error">' + escapeHtml(e.message) + '</span>';
+                showResult('changepin');
+                setSectionStatus('changepin', 'err');
+                log('ChangePIN Step1: 錯誤 — ' + e.message, 'err');
+            }
+
+            setBtnEnabled('btn_changepin_step1', true);
+        }
+
+        async function doChangePIN_Step2() {
+            var oldPin = document.getElementById('input_old_pin').value;
+            var newPin = document.getElementById('input_new_pin').value;
+            var confirmPin = document.getElementById('input_confirm_pin').value;
+
+            if (!oldPin || !newPin) {
+                document.getElementById('result_changepin_message').innerHTML = '<span class="result-error">請輸入密碼</span>';
+                showResult('changepin');
+                return;
+            }
+            if (newPin !== confirmPin) {
+                document.getElementById('result_changepin_message').innerHTML = '<span class="result-error">新密碼不一致</span>';
+                showResult('changepin');
+                return;
+            }
+            if (!_changePinTokenInfo) {
+                document.getElementById('result_changepin_message').innerHTML = '<span class="result-error">請先執行 Step 1</span>';
+                showResult('changepin');
+                return;
+            }
+
+            setSectionStatus('changepin', 'run');
+            setBtnEnabled('btn_changepin_step1', false);
+            setBtnEnabled('btn_changepin_step2', false);
+            log('ChangePIN Step2: 變更密碼開始...', 'inf');
+
+            try {
+                var bSN = getTokenSN();
+                var bOldPIN = new Uint8Array(oldPin.length);
+                bOldPIN.set(toUTF8Array(oldPin), 0);
+                var bNewPIN = new Uint8Array(newPin.length);
+                bNewPIN.set(toUTF8Array(newPin), 0);
+
+                var bECPointFromToken = _changePinTokenInfo.ecpoint;
+                var flags = _changePinTokenInfo.flags;
+
+                // Validate PIN
+                if (JSON.stringify(bOldPIN) === JSON.stringify(bNewPIN)) {
+                    document.getElementById('result_changepin_message').innerHTML = '<span class="result-error">新舊密碼不可相同</span>';
+                    showResult('changepin');
+                    setSectionStatus('changepin', 'err');
+                    setBtnEnabled('btn_changepin_step1', true);
+                    setBtnEnabled('btn_changepin_step2', true);
+                    return;
+                }
+                if (flags != undefined) {
+                    var statusCode = checkPINFormatLevel_V2(bNewPIN, flags[1]);
+                    if (statusCode !== CTAP1_ERR_SUCCESS) {
+                        var errObj = { statusCode: statusCode };
+                        document.getElementById('result_changepin_message').innerHTML = '<span class="result-error">' + escapeHtml(showFIDOErrorMessage(errObj)) + '</span>';
+                        showResult('changepin');
+                        setSectionStatus('changepin', 'err');
+                        setBtnEnabled('btn_changepin_step1', true);
+                        setBtnEnabled('btn_changepin_step2', true);
+                        return;
+                    }
+                    if (bNewPIN.length < flags[2]) {
+                        var errObj = { statusCode: SETTING_ERR_USERPIN_LEN_TOO_SHORT };
+                        document.getElementById('result_changepin_message').innerHTML = '<span class="result-error">' + escapeHtml(showFIDOErrorMessage(errObj)) + '</span>';
+                        showResult('changepin');
+                        setSectionStatus('changepin', 'err');
+                        setBtnEnabled('btn_changepin_step1', true);
+                        setBtnEnabled('btn_changepin_step2', true);
+                        return;
+                    }
+                    if (bNewPIN.length > flags[3]) {
+                        var errObj = { statusCode: SETTING_ERR_USERPIN_LEN_TOO_LONG };
+                        document.getElementById('result_changepin_message').innerHTML = '<span class="result-error">' + escapeHtml(showFIDOErrorMessage(errObj)) + '</span>';
+                        showResult('changepin');
+                        setSectionStatus('changepin', 'err');
+                        setBtnEnabled('btn_changepin_step1', true);
+                        setBtnEnabled('btn_changepin_step2', true);
+                        return;
+                    }
+                } else {
+                    document.getElementById('result_changepin_message').innerHTML = '<span class="result-error">Token flags 無效，請重新執行 Step 1</span>';
+                    showResult('changepin');
+                    setSectionStatus('changepin', 'err');
+                    setBtnEnabled('btn_changepin_step1', true);
+                    return;
+                }
+
+                var prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
+                var result = await GTIDEM_ChangeUserPIN_V1(bSN, prepareUpdate.bExportECPublicKeyArray, prepareUpdate.bEcryptedOldPINHash, prepareUpdate.bEncryptedNEWPIN);
+
+                if (result.statusCode === CTAP1_ERR_SUCCESS) {
+                    var msg = '密碼變更完成';
+                    if (result.pinRetry != undefined) msg += ' (剩餘次數: ' + result.pinRetry + ')';
+                    document.getElementById('result_changepin_message').innerHTML = '<span class="result-ok">' + escapeHtml(msg) + '</span>';
+                    showResult('changepin');
+                    setSectionStatus('changepin', 'ok');
+                    log('ChangePIN Step2: 成功', 'ok');
+                } else {
+                    document.getElementById('result_changepin_message').innerHTML = '<span class="result-error">' + escapeHtml(showFIDOErrorMessage(result)) + '</span>';
+                    showResult('changepin');
+                    setSectionStatus('changepin', 'err');
+                    log('ChangePIN Step2: 失敗 — ' + showFIDOErrorMessage(result), 'err');
+                }
+
+                _changePinTokenInfo = null;
+            } catch (e) {
+                document.getElementById('result_changepin_message').innerHTML = '<span class="result-error">' + escapeHtml(e.message) + '</span>';
+                showResult('changepin');
+                setSectionStatus('changepin', 'err');
+                log('ChangePIN Step2: 錯誤 — ' + e.message, 'err');
+            }
+
+            setBtnEnabled('btn_changepin_step1', true);
+            setBtnEnabled('btn_changepin_step2', false);
+        }
+
+        // ================================================================
+        //  6. Clear All Certs
+        // ================================================================
+        async function doClearCerts() {
+            setSectionStatus('clearcerts', 'run');
+            setBtnEnabled('btn_clear_certs', false);
+            log('ClearToken: 開始...', 'inf');
+
+            try {
+                var bSN = getTokenSN();
+                log('ClearToken: 等待使用者操作金鑰...', 'dim');
+                var response = await GTIDEM_ClearToken(bSN);
+
+                if (response.statusCode === CTAP1_ERR_SUCCESS) {
+                    var msg = '清卡完成';
+                    if (response.sn) msg += ' — 序號: ' + ConverSNFormat(response.sn);
+                    document.getElementById('result_clearcerts_message').innerHTML = '<span class="result-ok">' + escapeHtml(msg) + '</span>';
+                    showResult('clearcerts');
+                    setSectionStatus('clearcerts', 'ok');
+                    log('ClearToken: 成功', 'ok');
+                } else {
+                    document.getElementById('result_clearcerts_message').innerHTML = '<span class="result-error">' + escapeHtml(showFIDOErrorMessage(response)) + '</span>';
+                    showResult('clearcerts');
+                    setSectionStatus('clearcerts', 'err');
+                    log('ClearToken: 失敗 — ' + showFIDOErrorMessage(response), 'err');
+                }
+            } catch (e) {
+                document.getElementById('result_clearcerts_message').innerHTML = '<span class="result-error">' + escapeHtml(e.message) + '</span>';
+                showResult('clearcerts');
+                setSectionStatus('clearcerts', 'err');
+                log('ClearToken: 錯誤 — ' + e.message, 'err');
+            }
+
+            setBtnEnabled('btn_clear_certs', true);
+        }
+
+        // ================================================================
+        //  6. Delete Cert by Label
+        // ================================================================
+        async function doDeleteCert() {
+            var labelHex = document.getElementById('input_delete_label').value;
+            if (!labelHex) {
+                document.getElementById('result_deletecert_message').innerHTML = '<span class="result-error">請輸入 Label</span>';
+                showResult('deletecert');
+                return;
+            }
+
+            setSectionStatus('deletecert', 'run');
+            setBtnEnabled('btn_delete_cert', false);
+            log('DeleteCert: 開始...', 'inf');
+
+            try {
+                var bSN = getTokenSN();
+                var bLabel = hexStringToArrayBuffer(labelHex);
+                log('DeleteCert: Label=' + labelHex.substring(0, 32) + '...', 'dim');
+                var response = await GTIDEM_DeleteCertByLabel(bLabel, bSN);
+
+                if (response.statusCode === CTAP1_ERR_SUCCESS) {
+                    var count = response.credentialNum != undefined ? response.credentialNum : '-';
+                    document.getElementById('result_deletecert_count').textContent = count;
+                    var msg = '刪除憑證完成';
+                    if (response.sn) msg += ' — 序號: ' + ConverSNFormat(response.sn);
+                    document.getElementById('result_deletecert_message').innerHTML = '<span class="result-ok">' + escapeHtml(msg) + '</span>';
+                    showResult('deletecert');
+                    setSectionStatus('deletecert', 'ok');
+                    log('DeleteCert: 成功 — 剩餘憑證=' + count, 'ok');
+                } else {
+                    document.getElementById('result_deletecert_message').innerHTML = '<span class="result-error">' + escapeHtml(showFIDOErrorMessage(response)) + '</span>';
+                    showResult('deletecert');
+                    setSectionStatus('deletecert', 'err');
+                    log('DeleteCert: 失敗 — ' + showFIDOErrorMessage(response), 'err');
+                }
+            } catch (e) {
+                document.getElementById('result_deletecert_message').innerHTML = '<span class="result-error">' + escapeHtml(e.message) + '</span>';
+                showResult('deletecert');
+                setSectionStatus('deletecert', 'err');
+                log('DeleteCert: 錯誤 — ' + e.message, 'err');
+            }
+
+            setBtnEnabled('btn_delete_cert', true);
+        }
+
+        // ================================================================
+        //  8. Unlock PIN
+        // ================================================================
+        async function computingUnlockSessionKey(so_pin, random) {
+            var data = new Uint8Array(so_pin.byteLength + random.byteLength + 1);
+            data.set(so_pin, 0);
+            data.set(random, so_pin.byteLength);
+            data.set(new Uint8Array([0x01]), so_pin.byteLength + random.byteLength);
+            var hash = await window.crypto.subtle.digest("SHA-256", data);
+            return new Uint8Array(hash);
+        }
+
+        async function computingMacKey(so_pin, random) {
+            var data = new Uint8Array(so_pin.byteLength + random.byteLength + 1);
+            data.set(so_pin, 0);
+            data.set(random, so_pin.byteLength);
+            data.set(new Uint8Array([0x02]), so_pin.byteLength + random.byteLength);
+            var hash = await window.crypto.subtle.digest("SHA-256", data);
+            return new Uint8Array(hash);
+        }
+
+        async function computingIV(bTokenSN) {
+            var hash = await window.crypto.subtle.digest("SHA-256", bTokenSN);
+            return new Uint8Array(hash).slice(0, 16);
+        }
+
+        async function doUnlockPIN() {
+            var soPin = document.getElementById('input_so_pin').value;
+            var newUserPin = document.getElementById('input_unlock_new_pin').value;
+
+            if (!soPin || !newUserPin) {
+                document.getElementById('result_unlockpin_message').innerHTML = '<span class="result-error">請輸入 SO PIN 和新使用者 PIN</span>';
+                showResult('unlockpin');
+                return;
+            }
+
+            setSectionStatus('unlockpin', 'run');
+            setBtnEnabled('btn_unlock_pin', false);
+            log('UnlockPIN: 開始...', 'inf');
+
+            try {
+                // Step 1: Get token info for random number
+                var bSN = getTokenSN();
+                log('UnlockPIN: 取得 Token 資訊...', 'dim');
+                var info = await GTIDEM_GetTokenInfo(bSN);
+
+                if (info.statusCode !== CTAP1_ERR_SUCCESS) {
+                    document.getElementById('result_unlockpin_message').innerHTML = '<span class="result-error">取得 Token 資訊失敗: ' + escapeHtml(showFIDOErrorMessage(info)) + '</span>';
+                    showResult('unlockpin');
+                    setSectionStatus('unlockpin', 'err');
+                    setBtnEnabled('btn_unlock_pin', true);
+                    return;
+                }
+
+                // Auto-fill SN
+                if (info.sn && !document.getElementById('input_token_sn').value) {
+                    document.getElementById('input_token_sn').value = ConverSNFormat(info.sn);
+                    bSN = info.sn;
+                }
+
+                var bRandom = info.rn;
+                var bTokenSN = info.sn;
+
+                // Step 2: Compute keys and encrypt
+                log('UnlockPIN: 計算加密參數...', 'dim');
+                var bSOPIN = new Uint8Array(soPin.length);
+                bSOPIN.set(toUTF8Array(soPin), 0);
+                var bNewUserPIN = new Uint8Array(newUserPin.length);
+                bNewUserPIN.set(toUTF8Array(newUserPin), 0);
+
+                var isPINExpired = document.getElementById('checkbox_pin_expired').checked;
+                var result = await prepareUnloukPIN(bSOPIN, bRandom, bTokenSN, bNewUserPIN, isPINExpired);
+
+                // Step 3: Unlock PIN
+                log('UnlockPIN: 等待使用者操作金鑰...', 'dim');
+                var response = await GTIDEM_UnlockPIN(bSN, result.bEncryptedInitData, result.bHashMacofInitData);
+
+                if (response.statusCode === CTAP1_ERR_SUCCESS) {
+                    var retries = response.pinRetry != undefined ? response.pinRetry : '-';
+                    document.getElementById('result_unlockpin_retries').textContent = retries;
+                    var msg = '密碼解鎖完成';
+                    if (response.sn) msg += ' — 序號: ' + ConverSNFormat(response.sn);
+                    document.getElementById('result_unlockpin_message').innerHTML = '<span class="result-ok">' + escapeHtml(msg) + '</span>';
+                    showResult('unlockpin');
+                    setSectionStatus('unlockpin', 'ok');
+                    log('UnlockPIN: 成功 — PIN retries=' + retries, 'ok');
+                } else {
+                    document.getElementById('result_unlockpin_message').innerHTML = '<span class="result-error">' + escapeHtml(showFIDOErrorMessage(response)) + '</span>';
+                    showResult('unlockpin');
+                    setSectionStatus('unlockpin', 'err');
+                    log('UnlockPIN: 失敗 — ' + showFIDOErrorMessage(response), 'err');
+                }
+            } catch (e) {
+                document.getElementById('result_unlockpin_message').innerHTML = '<span class="result-error">' + escapeHtml(e.message) + '</span>';
+                showResult('unlockpin');
+                setSectionStatus('unlockpin', 'err');
+                log('UnlockPIN: 錯誤 — ' + e.message, 'err');
+            }
+
+            setBtnEnabled('btn_unlock_pin', true);
+        }
+
+        // ================================================================
+        //  9. Read Cert by Label
+        // ================================================================
+        async function doReadCertByLabel() {
+            var labelHex = document.getElementById('input_readlabel_hex').value;
+            if (!labelHex) {
+                document.getElementById('result_readcertlabel_message').innerHTML = '<span class="result-error">請輸入 Label</span>';
+                showResult('readcertlabel');
+                return;
+            }
+
+            setSectionStatus('readcertlabel', 'run');
+            setBtnEnabled('btn_read_cert_label', false);
+            log('ReadCertByLabel: 開始...', 'inf');
+
+            try {
+                var bSN = getTokenSN();
+                var bLabel = hexStringToArrayBuffer(labelHex);
+                log('ReadCertByLabel: Label=' + labelHex.substring(0, 32) + '...', 'dim');
+                var response = await GTIDEM_ReadCertByLabelWithoutPIN(bLabel, bSN);
+
+                if (response.statusCode === CTAP1_ERR_SUCCESS) {
+                    var certB64 = btoa(String.fromCharCode.apply(null, response.certicficate));
+                    var certPem = "-----BEGIN CERTIFICATE-----\n" + certB64 + "\n-----END CERTIFICATE-----";
+                    var count = response.credentialNum != undefined ? response.credentialNum : '-';
+
+                    document.getElementById('result_readcertlabel_count').textContent = count;
+                    document.getElementById('result_readcertlabel_pem').value = certPem;
+                    document.getElementById('result_readcertlabel_message').innerHTML = '<span class="result-ok">讀取憑證成功</span>';
+                    showResult('readcertlabel');
+                    setSectionStatus('readcertlabel', 'ok');
+                    log('ReadCertByLabel: 成功 — 憑證數量=' + count, 'ok');
+                } else {
+                    document.getElementById('result_readcertlabel_message').innerHTML = '<span class="result-error">' + escapeHtml(showFIDOErrorMessage(response)) + '</span>';
+                    showResult('readcertlabel');
+                    setSectionStatus('readcertlabel', 'err');
+                    log('ReadCertByLabel: 失敗 — ' + showFIDOErrorMessage(response), 'err');
+                }
+            } catch (e) {
+                document.getElementById('result_readcertlabel_message').innerHTML = '<span class="result-error">' + escapeHtml(e.message) + '</span>';
+                showResult('readcertlabel');
+                setSectionStatus('readcertlabel', 'err');
+                log('ReadCertByLabel: 錯誤 — ' + e.message, 'err');
+            }
+
+            setBtnEnabled('btn_read_cert_label', true);
+        }
+
+        // ================================================================
+        //  10. Get Cert Extra
+        // ================================================================
+        async function doGetCertExtra() {
+            setSectionStatus('certextra', 'run');
+            setBtnEnabled('btn_get_cert_extra', false);
+            log('GetCertExtra: 開始...', 'inf');
+
+            try {
+                var bSN = getTokenSN();
+                var mode = document.getElementById('select_certextra_mode').value;
+                var param = document.getElementById('input_certextra_param').value;
+                var response;
+
+                if (mode === 'index') {
+                    var idx = parseInt(param) || 1;
+                    log('GetCertExtra: by index=' + idx, 'dim');
+                    response = await GTIDEM_ReadCertExtraWithIndex(idx, bSN);
+                } else if (mode === 'label') {
+                    var bLabel = hexStringToArrayBuffer(param);
+                    log('GetCertExtra: by label=' + param.substring(0, 32) + '...', 'dim');
+                    response = await GTIDEM_ReadCertExtraWithLabel(bLabel, bSN);
+                } else {
+                    log('GetCertExtra: all certs', 'dim');
+                    response = await GTIDEM_ReadAllCertExtra(bSN);
+                }
+
+                if (response.statusCode === CTAP1_ERR_SUCCESS) {
+                    var count = response.credentialNum != undefined ? response.credentialNum : '-';
+                    var extras = response.cerExtras || [];
+                    var extraText = '';
+                    for (var i = 0; i < extras.length; i++) {
+                        extraText += '[' + i + '] ' + ConverSNFormat(extras[i]) + '\n';
+                    }
+
+                    document.getElementById('result_certextra_count').textContent = count;
+                    document.getElementById('result_certextra_data').value = extraText;
+                    document.getElementById('result_certextra_message').innerHTML = '<span class="result-ok">取得額外資料成功</span>';
+                    showResult('certextra');
+                    setSectionStatus('certextra', 'ok');
+                    log('GetCertExtra: 成功 — 憑證數量=' + count, 'ok');
+                } else {
+                    document.getElementById('result_certextra_message').innerHTML = '<span class="result-error">' + escapeHtml(showFIDOErrorMessage(response)) + '</span>';
+                    showResult('certextra');
+                    setSectionStatus('certextra', 'err');
+                    log('GetCertExtra: 失敗 — ' + showFIDOErrorMessage(response), 'err');
+                }
+            } catch (e) {
+                document.getElementById('result_certextra_message').innerHTML = '<span class="result-error">' + escapeHtml(e.message) + '</span>';
+                showResult('certextra');
+                setSectionStatus('certextra', 'err');
+                log('GetCertExtra: 錯誤 — ' + e.message, 'err');
+            }
+
+            setBtnEnabled('btn_get_cert_extra', true);
+        }
+
+        // ================================================================
+        //  11. Factory Reset
+        // ================================================================
+        async function doFactoryReset() {
+            setSectionStatus('factoryreset', 'run');
+            setBtnEnabled('btn_factory_reset', false);
+            log('FactoryReset: 開始...', 'inf');
+
+            try {
+                var bSN = getTokenSN();
+                var resetKeyHex = document.getElementById('input_reset_key').value;
+                if (!resetKeyHex) {
+                    document.getElementById('result_factoryreset_message').innerHTML = '<span class="result-error">請輸入 Reset Key</span>';
+                    showResult('factoryreset');
+                    setSectionStatus('factoryreset', 'err');
+                    setBtnEnabled('btn_factory_reset', true);
+                    return;
+                }
+                var bResetKey = hexStringToArrayBuffer(resetKeyHex);
+
+                // Step 1: GetTokenInfo for random number
+                log('FactoryReset: 取得 Token 資訊...', 'dim');
+                var info = await GTIDEM_GetTokenInfo(bSN);
+                if (info.statusCode !== CTAP1_ERR_SUCCESS) {
+                    document.getElementById('result_factoryreset_message').innerHTML = '<span class="result-error">取得 Token 資訊失敗: ' + escapeHtml(showFIDOErrorMessage(info)) + '</span>';
+                    showResult('factoryreset');
+                    setSectionStatus('factoryreset', 'err');
+                    setBtnEnabled('btn_factory_reset', true);
+                    return;
+                }
+
+                // Auto-fill SN
+                if (info.sn && !document.getElementById('input_token_sn').value) {
+                    document.getElementById('input_token_sn').value = ConverSNFormat(info.sn);
+                    bSN = info.sn;
+                }
+
+                // Step 2: Extract random
+                var bRandom = info.rn;
+                var bRandomNumber = bRandom.slice(0, 16);
+                var bChallenge = bRandom.slice(16, 32);
+                var bTokenSN = info.sn;
+
+                // Step 3: Compute session key and IV (reuse existing functions)
+                log('FactoryReset: 計算加密參數...', 'dim');
+                var sessionKey = await computingUnlockSessionKey(bResetKey, bRandomNumber);
+                var iv = await computingIV(bTokenSN);
+
+                // Step 4: Encrypt challenge (AES-CBC)
+                var cryptoKey = await window.crypto.subtle.importKey("raw", sessionKey, "aes-cbc", false, ["encrypt"]);
+                var bEncChallenge = await crypto.subtle.encrypt({ name: "aes-cbc", iv: iv }, cryptoKey, bChallenge);
+
+                // Step 5: Call FactoryResetToken
+                log('FactoryReset: 等待使用者操作金鑰...', 'dim');
+                var response = await GTIDEM_FactoryResetToken(bSN, bEncChallenge);
+
+                if (response.statusCode === CTAP1_ERR_SUCCESS) {
+                    var retries = response.pinRetry != undefined ? response.pinRetry : '-';
+                    document.getElementById('result_factoryreset_pin_retries').textContent = retries;
+                    if (response.sn) {
+                        document.getElementById('result_factoryreset_sn').textContent = ConverSNFormat(response.sn);
+                    }
+                    document.getElementById('result_factoryreset_message').innerHTML = '<span class="result-ok">恢復出廠設定成功</span>';
+                    showResult('factoryreset');
+                    setSectionStatus('factoryreset', 'ok');
+                    log('FactoryReset: 成功', 'ok');
+                } else {
+                    document.getElementById('result_factoryreset_message').innerHTML = '<span class="result-error">' + escapeHtml(showFIDOErrorMessage(response)) + '</span>';
+                    showResult('factoryreset');
+                    setSectionStatus('factoryreset', 'err');
+                    log('FactoryReset: 失敗 — ' + showFIDOErrorMessage(response), 'err');
+                }
+            } catch (e) {
+                document.getElementById('result_factoryreset_message').innerHTML = '<span class="result-error">' + escapeHtml(e.message) + '</span>';
+                showResult('factoryreset');
+                setSectionStatus('factoryreset', 'err');
+                log('FactoryReset: 錯誤 — ' + e.message, 'err');
+            }
+
+            setBtnEnabled('btn_factory_reset', true);
+        }
+
+        // ================================================================
+        //  Helper: prepareUnloukPIN (fix: was missing from TestAll.html)
+        // ================================================================
+        async function prepareUnloukPIN(so_pin, bRandom, bToken_sn, bNewUserPIN, isPINExpired) {
+            var sessionKey = await computingUnlockSessionKey(so_pin, bRandom);
+            var iv = await computingIV(bToken_sn);
+            var macKey = await computingMacKey(so_pin, bRandom);
+
+            var initData = { userPIN: bNewUserPIN };
+            initData.pinExpired = isPINExpired;
+
+            var encodedInitData = new Uint8Array(CBOR.encode(initData));
+
+            var cryptoKey = await window.crypto.subtle.importKey("raw", sessionKey, "aes-cbc", false, ["encrypt"]);
+            var bEncryptedInitData = await crypto.subtle.encrypt({ name: "aes-cbc", iv: iv }, cryptoKey, encodedInitData);
+
+            var hmacKey = await window.crypto.subtle.importKey("raw", macKey, { name: "HMAC", hash: { name: "SHA-256" } }, false, ["sign", "verify"]);
+            var bHashMacofInitData = await window.crypto.subtle.sign("HMAC", hmacKey, encodedInitData);
+
+            return { bEncryptedInitData, bHashMacofInitData };
+        }
+
+        // ================================================================
+        //  Helper: prepareInitToken
+        // ================================================================
+        async function prepareInitToken(bSOPIN, bRandom, bToken_sn, bNewSOPin, bNewUserPIN, AllowHostDomains, isPinExpired, sPinRetry, sPinMinLen, sPinLevel) {
+            var sessionKey = await computingUnlockSessionKey(bSOPIN, bRandom);
+            var iv = await computingIV(bToken_sn);
+            var macKey = await computingMacKey(bSOPIN, bRandom);
+
+            var initData = {};
+            initData.soPIN = bNewSOPin;
+            initData.userPIN = bNewUserPIN;
+
+            if (AllowHostDomains.length != 0) {
+                var bHashedDomain = await convertDomainList2Hash(AllowHostDomains);
+                initData.allowedRPID = bHashedDomain;
+            } else {
+                initData.allowedRPID = new Uint8Array(0);
+            }
+            initData.pinExpired = isPinExpired;
+            initData.pinLevel = new Uint8Array([sPinLevel]);
+
+            if (sPinRetry !== "") {
+                initData.pinRetry = new Uint8Array([sPinRetry]);
+            }
+            if (sPinMinLen !== "") {
+                initData.pinMinLen = new Uint8Array([sPinMinLen]);
+            }
+
+            var encodedInitData = new Uint8Array(CBOR.encode(initData));
+
+            var response = GTIDEM_isValidTokenParams(encodedInitData, CMD_INIT_TOKEN);
+            if (response.statusCode != CTAP1_ERR_SUCCESS) {
+                throw response;
+            }
+
+            var cryptoKey = await window.crypto.subtle.importKey("raw", sessionKey, "aes-cbc", false, ["encrypt"]);
+            var bEncryptedInitData = await crypto.subtle.encrypt({ name: "aes-cbc", iv: iv }, cryptoKey, encodedInitData);
+
+            var hmacKey = await window.crypto.subtle.importKey("raw", macKey, { name: "HMAC", hash: { name: "SHA-256" } }, false, ["sign", "verify"]);
+            var bHashMacofInitData = await window.crypto.subtle.sign("HMAC", hmacKey, encodedInitData);
+
+            return { bEncryptedInitData, bHashMacofInitData };
+        }
+
+        // ================================================================
+        //  Helper: convertDomainList2Hash
+        // ================================================================
+        async function convertDomainList2Hash(allowRpid) {
+            var hashedDomainList = new Uint8Array(allowRpid.length * 8);
+            for (var i = 0; i < allowRpid.length; i++) {
+                var domain = allowRpid[i];
+                var encoder = new TextEncoder();
+                var data = encoder.encode(domain);
+                var hash = await window.crypto.subtle.digest("SHA-256", data);
+                hashedDomainList.set(new Uint8Array(hash).slice(0, 8), i * 8);
+            }
+            return hashedDomainList;
+        }
+
+        // ================================================================
+        //  13. Init Token
+        // ================================================================
+        async function doInitToken() {
+            setSectionStatus('inittoken', 'run');
+            setBtnEnabled('btn_init_token', false);
+            log('InitToken: 開始...', 'inf');
+
+            try {
+                var bSN = getTokenSN();
+                var soPin = document.getElementById('input_init_so_pin').value;
+                var newSoPin = document.getElementById('input_init_new_so_pin').value;
+                var newUserPin = document.getElementById('input_init_new_user_pin').value;
+                var pinLevel = parseInt(document.getElementById('select_init_pin_level').value);
+                var pinRetry = parseInt(document.getElementById('input_init_pin_retry').value);
+                var pinMinLen = parseInt(document.getElementById('input_init_pin_min_len').value);
+                var isPinExpired = document.getElementById('checkbox_init_pin_expired').checked;
+                var rpidInput = document.getElementById('input_init_allowed_rpid').value.trim();
+                var AllowHostDomains = rpidInput ? rpidInput.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; }) : [];
+
+                if (!soPin || !newSoPin || !newUserPin) {
+                    document.getElementById('result_inittoken_message').innerHTML = '<span class="result-error">請輸入所有 PIN 欄位</span>';
+                    showResult('inittoken');
+                    setSectionStatus('inittoken', 'err');
+                    setBtnEnabled('btn_init_token', true);
+                    return;
+                }
+
+                // Step 1: GetTokenInfo
+                log('InitToken: 取得 Token 資訊...', 'dim');
+                var info = await GTIDEM_GetTokenInfo(bSN);
+                if (info.statusCode !== CTAP1_ERR_SUCCESS) {
+                    document.getElementById('result_inittoken_message').innerHTML = '<span class="result-error">取得 Token 資訊失敗: ' + escapeHtml(showFIDOErrorMessage(info)) + '</span>';
+                    showResult('inittoken');
+                    setSectionStatus('inittoken', 'err');
+                    setBtnEnabled('btn_init_token', true);
+                    return;
+                }
+
+                // Auto-fill SN
+                if (info.sn && !document.getElementById('input_token_sn').value) {
+                    document.getElementById('input_token_sn').value = ConverSNFormat(info.sn);
+                    bSN = info.sn;
+                }
+
+                var bRandom = info.rn;
+                var bTokenSN = info.sn;
+
+                // Step 2: Prepare encrypted InitToken data
+                log('InitToken: 計算加密參數...', 'dim');
+                var bSOPIN = new Uint8Array(soPin.length);
+                bSOPIN.set(toUTF8Array(soPin), 0);
+                var bNewSOPin = new Uint8Array(newSoPin.length);
+                bNewSOPin.set(toUTF8Array(newSoPin), 0);
+                var bNewUserPIN = new Uint8Array(newUserPin.length);
+                bNewUserPIN.set(toUTF8Array(newUserPin), 0);
+
+                var result = await prepareInitToken(bSOPIN, bRandom, bTokenSN, bNewSOPin, bNewUserPIN, AllowHostDomains, isPinExpired, pinRetry, pinMinLen, pinLevel);
+
+                // Step 3: Call InitToken
+                log('InitToken: 等待使用者操作金鑰...', 'dim');
+                var response = await GTIDEM_InitToken(bSN, result.bEncryptedInitData, result.bHashMacofInitData);
+
+                if (response.statusCode === CTAP1_ERR_SUCCESS) {
+                    var retries = response.pinRetry != undefined ? response.pinRetry : '-';
+                    document.getElementById('result_inittoken_pin_retries').textContent = retries;
+                    document.getElementById('result_inittoken_message').innerHTML = '<span class="result-ok">初始化載具成功</span>';
+                    showResult('inittoken');
+                    setSectionStatus('inittoken', 'ok');
+                    log('InitToken: 成功 — PIN retries=' + retries, 'ok');
+                } else {
+                    document.getElementById('result_inittoken_message').innerHTML = '<span class="result-error">' + escapeHtml(showFIDOErrorMessage(response)) + '</span>';
+                    showResult('inittoken');
+                    setSectionStatus('inittoken', 'err');
+                    log('InitToken: 失敗 — ' + showFIDOErrorMessage(response), 'err');
+                }
+            } catch (e) {
+                var errMsg = e.message || (e.statusCode != undefined ? showFIDOErrorMessage(e) : String(e));
+                document.getElementById('result_inittoken_message').innerHTML = '<span class="result-error">' + escapeHtml(errMsg) + '</span>';
+                showResult('inittoken');
+                setSectionStatus('inittoken', 'err');
+                log('InitToken: 錯誤 — ' + errMsg, 'err');
+            }
+
+            setBtnEnabled('btn_init_token', true);
+        }
+
+        // ================================================================
+        //  14. Sign Data With PIN (ECDH encrypted PIN)
+        //  Flow: ECDH KeyAgreement → Derive+Encrypt PIN → SignWithPIN
+        // ================================================================
+
+        function _buildSignPINCommandBuf(mode, paramValue) {
+            if (mode === 'label') {
+                var labelBytes = hexStringToArrayBuffer(paramValue);
+                var buf = new Uint8Array(4 + labelBytes.byteLength);
+                buf[0] = 0xDF; buf[1] = 0x01;
+                buf[2] = labelBytes.byteLength >> 8; buf[3] = labelBytes.byteLength;
+                buf.set(new Uint8Array(labelBytes), 4);
+                return buf;
+            } else {
+                var idx = parseInt(paramValue) || 1;
+                var buf = new Uint8Array(5);
+                buf[0] = 0xDF; buf[1] = 0x02; buf[2] = 0x00; buf[3] = 0x01; buf[4] = idx;
+                return buf;
+            }
+        }
+
+        function _buildSNBuf(bSN) {
+            if (bSN == undefined || bSN.byteLength == 0) return new Uint8Array(0);
+            var buf = new Uint8Array(4 + bSN.byteLength);
+            buf[0] = 0xDF; buf[1] = 0x20;
+            buf[2] = bSN.byteLength >> 8; buf[3] = bSN.byteLength;
+            buf.set(bSN, 4);
+            return buf;
+        }
+
+        async function _ecdhKeyAgreement(command_buf, sn_buf) {
+            var challenge = new Uint8Array(32);
+            window.crypto.getRandomValues(challenge);
+            var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+            var pki_header = new Uint8Array(3);
+            var pki_payload_length = command_buf.byteLength + sn_buf.byteLength;
+            pki_header[0] = 0xE1;
+            pki_header[1] = pki_payload_length >> 8;
+            pki_header[2] = pki_payload_length;
+            var pki_buffer = _appendBuffer(gtheaderbuffer, pki_header);
+            pki_buffer = _appendBuffer(pki_buffer, sn_buf);
+            pki_buffer = _appendBuffer(pki_buffer, command_buf);
+
+            return navigator.credentials.create({
+                'publicKey': {
+                    'challenge': challenge,
+                    'rp': { 'name': 'GoTrustID Inc.' },
+                    'user': {
+                        'id': pki_buffer,
+                        'name': 'alice@example.com',
+                        'displayName': 'SignDataWithPIN'
+                    },
+                    "authenticatorSelection": {
+                        "userVerification": "discouraged",
+                        "requireResidentKey": false,
+                        "authenticatorAttachment": "cross-platform"
+                    },
+                    'attestation': "direct",
+                    'pubKeyCredParams': [
+                        { 'type': 'public-key', 'alg': -7 },
+                        { 'type': 'public-key', 'alg': -257 }
+                    ]
+                }
+            });
+        }
+
+        async function _deriveAndEncryptPIN(tokenECPubKeyX, tokenECPubKeyY, userpin) {
+            var xB64 = base64EncodeURL(tokenECPubKeyX);
+            var yB64 = base64EncodeURL(tokenECPubKeyY);
+            var externalKey = await window.crypto.subtle.importKey("jwk",
+                { kty: "EC", crv: "P-256", x: xB64, y: yB64, ext: true },
+                { name: "ECDH", namedCurve: "P-256" }, true, []);
+            var localKP = await window.crypto.subtle.generateKey(
+                { name: "ECDH", namedCurve: "P-256" }, true, ["deriveKey", "deriveBits"]);
+            var exportECPublicKeyArray = await window.crypto.subtle.exportKey("raw", localKP.publicKey);
+            var keybits = await window.crypto.subtle.deriveBits(
+                { name: "ECDH", namedCurve: "P-256", public: externalKey },
+                localKP.privateKey, 256);
+            var pinEncKeyBytes = await crypto.subtle.digest("SHA-256", new Uint8Array(keybits));
+            var pinEncKey = await crypto.subtle.importKey("raw", pinEncKeyBytes, "aes-cbc", false, ["encrypt"]);
+            var pinData = new TextEncoder().encode(userpin);
+            var pinDigest = await crypto.subtle.digest("SHA-256", pinData);
+            var iv = new Uint8Array(16);
+            var cipherPIN = await crypto.subtle.encrypt({ name: "aes-cbc", iv: iv }, pinEncKey, pinDigest.slice(0, 16));
+            var EncryptedPINArray = cipherPIN.slice(0, 16);
+            return { exportECPublicKeyArray, EncryptedPINArray };
+        }
+
+        function _sendSignWithPINCommand(command_buf, sn_buf, algNumber, signDataPayload, exportECPubKey, encPIN) {
+            var challenge = new Uint8Array(32);
+            window.crypto.getRandomValues(challenge);
+            var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
+
+            var alg_buf = new Uint8Array(5);
+            alg_buf[0] = 0xDF; alg_buf[1] = 0x03; alg_buf[2] = 0x00; alg_buf[3] = 0x01; alg_buf[4] = algNumber;
+
+            var ecpub_buf = new Uint8Array(4 + exportECPubKey.byteLength);
+            ecpub_buf[0] = 0xDF; ecpub_buf[1] = 0x04;
+            ecpub_buf[2] = exportECPubKey.byteLength >> 8; ecpub_buf[3] = exportECPubKey.byteLength;
+            ecpub_buf.set(new Uint8Array(exportECPubKey), 4);
+
+            var pin_buf = new Uint8Array(4 + encPIN.byteLength);
+            pin_buf[0] = 0xDF; pin_buf[1] = 0x05;
+            pin_buf[2] = encPIN.byteLength >> 8; pin_buf[3] = encPIN.byteLength;
+            pin_buf.set(new Uint8Array(encPIN), 4);
+
+            var data_buf = new Uint8Array(4 + signDataPayload.byteLength);
+            data_buf[0] = 0xDF; data_buf[1] = 0x06;
+            data_buf[2] = signDataPayload.byteLength >> 8; data_buf[3] = signDataPayload.byteLength;
+            data_buf.set(signDataPayload, 4);
+
+            var payloadLen = sn_buf.byteLength + command_buf.byteLength + alg_buf.byteLength +
+                ecpub_buf.byteLength + pin_buf.byteLength + data_buf.byteLength;
+            var pki_header = new Uint8Array(3);
+            pki_header[0] = CMD_SignWithPIN; pki_header[1] = payloadLen >> 8; pki_header[2] = payloadLen;
+
+            var pki_buffer = _appendBuffer(gtheaderbuffer, pki_header);
+            pki_buffer = _appendBuffer(pki_buffer, sn_buf);
+            pki_buffer = _appendBuffer(pki_buffer, command_buf);
+            pki_buffer = _appendBuffer(pki_buffer, alg_buf);
+            pki_buffer = _appendBuffer(pki_buffer, ecpub_buf);
+            pki_buffer = _appendBuffer(pki_buffer, pin_buf);
+            pki_buffer = _appendBuffer(pki_buffer, data_buf);
+
+            return navigator.credentials.get({
+                'publicKey': {
+                    'challenge': challenge,
+                    "userVerification": "discouraged",
+                    timeout: VERIFY_DEFAULT_TIMEOUT,
+                    allowCredentials: [{ id: pki_buffer, transports: ["usb", "nfc"], type: "public-key" }]
+                }
+            }).then(function(fido) { return fido.response.signature; });
+        }
+
+        async function doSignDataWithPIN() {
+            setSectionStatus('signwithpin', 'run');
+            setBtnEnabled('btn_sign_with_pin', false);
+            log('SignWithPIN: 開始...', 'inf');
+
+            try {
+                var bSN = getTokenSN();
+                var userpin = document.getElementById('input_signpin_pin').value;
+                var signMode = document.getElementById('select_signpin_mode').value;
+                var paramValue = document.getElementById('input_signpin_param').value;
+                var algNumber = parseInt(document.getElementById('select_signpin_alg').value);
+
+                if (!userpin) {
+                    document.getElementById('result_signpin_message').innerHTML = '<span class="result-error">請輸入 PIN</span>';
+                    showResult('signwithpin');
+                    setSectionStatus('signwithpin', 'err');
+                    setBtnEnabled('btn_sign_with_pin', true);
+                    return;
+                }
+
+                var signDataPayload = Uint8Array.from(window.atob('MTIz'), function(c) { return c.charCodeAt(0); });
+                var command_buf = _buildSignPINCommandBuf(signMode, paramValue);
+                var sn_buf = _buildSNBuf(bSN);
+
+                // Step 1: ECDH Key Agreement
+                log('SignWithPIN: ECDH 金鑰交換...', 'dim');
+                var ecdhResp = await _ecdhKeyAgreement(command_buf, sn_buf);
+                var attestObj = CBOR.decode(ecdhResp.response.attestationObject);
+                var authData = parseAuthData(attestObj.authData);
+                var pubKey = CBOR.decode(authData.COSEPublicKey.buffer);
+                var tokenX = Object.values(pubKey)[3];
+                var tokenY = Object.values(pubKey)[4];
+
+                // Step 2: Derive + Encrypt PIN
+                log('SignWithPIN: 加密 PIN...', 'dim');
+                var pinResult = await _deriveAndEncryptPIN(tokenX, tokenY, userpin);
+
+                // Step 3: Send SignWithPIN command
+                log('SignWithPIN: 等待使用者操作金鑰...', 'dim');
+                var sigBuffer = await _sendSignWithPINCommand(
+                    command_buf, sn_buf, algNumber, signDataPayload,
+                    pinResult.exportECPublicKeyArray, pinResult.EncryptedPINArray);
+
+                // Parse response: signature buffer IS the raw signature,
+                // unless it starts with GoTrust-Idem-PKI header (error response)
+                var sigBytes = new Uint8Array(sigBuffer);
+                var headerStr = String.fromCharCode.apply(null, sigBytes.slice(0, 16));
+
+                if (headerStr === 'GoTrust-Idem-PKI') {
+                    // Error response — parse with GTIdemJs
+                    var gtidem = new GTIdemJs();
+                    gtidem.parsePKIoverFIDOResponse(sigBuffer, CMD_SignWithPIN);
+                    document.getElementById('result_signpin_message').innerHTML = '<span class="result-error">' + escapeHtml(showFIDOErrorMessage(gtidem)) + '</span>';
+                    showResult('signwithpin');
+                    setSectionStatus('signwithpin', 'err');
+                    log('SignWithPIN: 失敗 — ' + showFIDOErrorMessage(gtidem), 'err');
+                } else {
+                    // Success — sigBuffer is the complete signature
+                    var sigB64 = btoa(String.fromCharCode.apply(null, sigBytes));
+                    document.getElementById('result_signpin_signature').textContent = sigB64;
+                    document.getElementById('result_signpin_message').innerHTML = '<span class="result-ok">簽章成功 (' + sigBytes.length + ' bytes)</span>';
+                    showResult('signwithpin');
+                    setSectionStatus('signwithpin', 'ok');
+                    log('SignWithPIN: 成功 — ' + sigBytes.length + ' bytes', 'ok');
+                }
+            } catch (e) {
+                document.getElementById('result_signpin_message').innerHTML = '<span class="result-error">' + escapeHtml(e.message || String(e)) + '</span>';
+                showResult('signwithpin');
+                setSectionStatus('signwithpin', 'err');
+                log('SignWithPIN: 錯誤 — ' + (e.message || e), 'err');
+            }
+
+            setBtnEnabled('btn_sign_with_pin', true);
+        }
+    </script>
+</body>
+
+</html>
