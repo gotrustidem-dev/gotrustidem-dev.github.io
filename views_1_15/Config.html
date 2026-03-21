@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GoTrust IdemKey+ Config</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+
+    <script src="../utils/cbor.js"></script>
+    <script src="../utils/helpers.js"></script>
+    <script src="../utils/showMessage.js"></script>
+    <script src="../utils/response.js"></script>
+    <script src="../utils/PKIoverFIDO_1_15.js"></script>
+
+    <style>
+        body {
+            padding: 16px;
+            background: #f7f8fa;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 6px;
+            color: #303742;
+        }
+
+        .page-subtitle {
+            text-align: center;
+            color: #667189;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .sn-bar {
+            max-width: 600px;
+            margin: 0 auto 20px auto;
+            text-align: center;
+        }
+
+        .sn-bar input {
+            width: 340px;
+            height: 36px;
+        }
+
+        .config-container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .config-panel {
+            border: 2px solid #5755d9;
+            border-radius: 8px;
+            padding: 20px;
+            background: #fff;
+            margin-bottom: 16px;
+        }
+
+        .config-panel-header {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #5755d9;
+        }
+
+        .config-panel-desc {
+            font-size: 13px;
+            color: #667189;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .config-panel.disabled-panel {
+            opacity: 0.45;
+            pointer-events: none;
+        }
+
+        .setting-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            gap: 10px;
+        }
+
+        .setting-row label {
+            font-size: 14px;
+            color: #303742;
+        }
+
+        .setting-row .desc {
+            font-size: 12px;
+            color: #667189;
+            margin-left: 4px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 28px;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .checkbox-item .sub-cmds {
+            font-size: 11px;
+            color: #999;
+            margin-left: 22px;
+            margin-top: 2px;
+        }
+
+        .hex-display {
+            display: inline-block;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 14px;
+            font-weight: bold;
+            color: #5755d9;
+            background: #f0f1ff;
+            border: 1px solid #c8c7f5;
+            border-radius: 4px;
+            padding: 2px 10px;
+            margin-left: 12px;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .hex-row {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+
+        .hex-label {
+            font-size: 13px;
+            color: #667189;
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+
+        .group-box {
+            border: 1px solid #e2e4e9;
+            border-radius: 6px;
+            padding: 14px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+        }
+
+        .sce-row {
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #ddd;
+        }
+
+        .po-section {
+            margin-left: 4px;
+        }
+
+        .po-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .keep-time-input {
+            width: 70px;
+            height: 30px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .keep-time-input:disabled {
+            opacity: 0.4;
+        }
+
+        .keep-time-unit {
+            font-size: 13px;
+            color: #667189;
+        }
+
+        .btn-send {
+            width: 100%;
+            margin-top: 16px;
+            font-size: 15px;
+            height: 46px;
+        }
+
+        .result-area {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+            min-height: 40px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            display: none;
+        }
+
+        .result-ok {
+            background: #f0faf0;
+            border: 1px solid #32b643;
+            color: #32b643;
+        }
+
+        .result-err {
+            background: #fff3f3;
+            border: 1px solid #e85600;
+            color: #e85600;
+        }
+
+        .result-info {
+            background: #f0f4ff;
+            border: 1px solid #5755d9;
+            color: #303742;
+        }
+    </style>
+</head>
+
+<body>
+    <h3 class="page-title">IdemKey+ Config</h3>
+    <p class="page-subtitle">IdemKey Plus v1.15 — Token 驗證模式設定</p>
+
+    <div class="sn-bar">
+        <label>Token Serial Number (optional):</label><br>
+        <input type="text" id="input_token_sn" placeholder="留空則不指定載具序號">
+    </div>
+
+    <div class="config-container">
+
+        <!-- ============================================================ -->
+        <!-- Byte 0: Session Mode                                         -->
+        <!-- ============================================================ -->
+        <div class="config-panel">
+            <div class="config-panel-header">Session Mode（Byte 0）</div>
+            <div class="config-panel-desc">選擇驗證模式，Per-Command 模式下 Byte 1~3 設定不生效</div>
+
+            <div class="setting-row">
+                <label class="form-radio">
+                    <input type="radio" name="session_mode" value="1">
+                    <i class="form-icon"></i> Per-Command Auth (0x01)
+                </label>
+                <span class="desc">— 每次指令都需重新驗證</span>
+            </div>
+            <div class="setting-row">
+                <label class="form-radio">
+                    <input type="radio" name="session_mode" value="2" checked>
+                    <i class="form-icon"></i> Session Auth (0x02)
+                </label>
+                <span class="desc">— 驗證後維持 session 狀態</span>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- Byte 1: Command Clear Mask                                   -->
+        <!-- ============================================================ -->
+        <div class="config-panel" id="panel_byte1">
+            <div class="config-panel-header">Command Clear Mask（Byte 1）</div>
+            <div class="config-panel-desc">指令執行後觸發清除的對象，需搭配下方 SCE 啟用</div>
+
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <label class="form-checkbox">
+                        <input type="checkbox" id="cmd_import" checked>
+                        <i class="form-icon"></i> Import (bit7)
+                    </label>
+                    <span class="sub-cmds">IMPORT_CERT, IMPORT_CERT2</span>
+                </div>
+                <div class="checkbox-item">
+                    <label class="form-checkbox">
+                        <input type="checkbox" id="cmd_sign" checked>
+                        <i class="form-icon"></i> Sign (bit6)
+                    </label>
+                    <span class="sub-cmds">SIGN, SIGNWithPIN</span>
+                </div>
+                <div class="checkbox-item">
+                    <label class="form-checkbox">
+                        <input type="checkbox" id="cmd_genkey">
+                        <i class="form-icon"></i> GenKey (bit5)
+                    </label>
+                    <span class="sub-cmds">GEN_KEYPAIR, GEN_RSA</span>
+                </div>
+            </div>
+
+            <div class="hex-row">
+                <span class="hex-label">CMD_CLEAR_MASK =</span>
+                <span class="hex-display" id="hex_byte1">0xC0</span>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- Byte 2: PIN Verified Period                                  -->
+        <!-- ============================================================ -->
+        <div class="config-panel" id="panel_byte2">
+            <div class="config-panel-header">PIN Verified Period（Byte 2）</div>
+            <div class="config-panel-desc">PIN 驗證狀態保持設定</div>
+
+            <div class="group-box">
+                <div class="sce-row">
+                    <label class="form-checkbox">
+                        <input type="checkbox" id="pin_sce" checked>
+                        <i class="form-icon"></i> SCE — 執行 Command Clear Mask 匹配指令後清除 PIN 驗證狀態
+                    </label>
+                </div>
+
+                <div class="po-section">
+                    <div class="po-option">
+                        <label class="form-radio">
+                            <input type="radio" name="pin_po" value="0" checked>
+                            <i class="form-icon"></i> 依時間保持 (PO=0)
+                        </label>
+                        <span class="desc">Keep Time:</span>
+                        <input type="number" class="form-input keep-time-input" id="pin_keeptime" value="5" min="1" max="31">
+                        <span class="keep-time-unit">× 30 = <strong id="pin_keeptime_sec">150</strong> 秒</span>
+                    </div>
+                    <div class="po-option">
+                        <label class="form-radio">
+                            <input type="radio" name="pin_po" value="1">
+                            <i class="form-icon"></i> 保持到斷電 (PO=1)
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hex-row">
+                <span class="hex-label">verified_period =</span>
+                <span class="hex-display" id="hex_byte2">0x85</span>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- Byte 3: Touch Period                                         -->
+        <!-- ============================================================ -->
+        <div class="config-panel" id="panel_byte3">
+            <div class="config-panel-header">Touch Period（Byte 3）</div>
+            <div class="config-panel-desc">Touch 狀態保持設定</div>
+
+            <div class="group-box">
+                <div class="sce-row">
+                    <label class="form-checkbox">
+                        <input type="checkbox" id="touch_sce" checked>
+                        <i class="form-icon"></i> SCE — 執行 Command Clear Mask 匹配指令後清除 Touch 狀態
+                    </label>
+                </div>
+
+                <div class="po-section">
+                    <div class="po-option">
+                        <label class="form-radio">
+                            <input type="radio" name="touch_po" value="0" checked>
+                            <i class="form-icon"></i> 依時間保持 (PO=0)
+                        </label>
+                        <span class="desc">Keep Time:</span>
+                        <input type="number" class="form-input keep-time-input" id="touch_keeptime" value="10" min="1" max="31">
+                        <span class="keep-time-unit">× 30 = <strong id="touch_keeptime_sec">300</strong> 秒</span>
+                    </div>
+                    <div class="po-option">
+                        <label class="form-radio">
+                            <input type="radio" name="touch_po" value="1">
+                            <i class="form-icon"></i> 保持到斷電 (PO=1)
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hex-row">
+                <span class="hex-label">touch_period =</span>
+                <span class="hex-display" id="hex_byte3">0x8A</span>
+            </div>
+        </div>
+
+        <!-- Send Button -->
+        <button class="btn btn-primary btn-lg btn-send" id="btn_send" onclick="sendConfig()">
+            送出設定 (Send Config)
+        </button>
+
+        <!-- Result Area -->
+        <div class="result-area" id="result_area"></div>
+    </div>
+
+    <script>
+        // ================================================================
+        //  Helper
+        // ================================================================
+        function toHex(val) {
+            return '0x' + ('0' + val.toString(16).toUpperCase()).slice(-2);
+        }
+
+        // ================================================================
+        //  Byte 0: Session Mode — toggle Byte 1~3 panels
+        // ================================================================
+        document.querySelectorAll('input[name="session_mode"]').forEach(function (radio) {
+            radio.addEventListener('change', updateSessionMode);
+        });
+
+        function updateSessionMode() {
+            var mode = parseInt(document.querySelector('input[name="session_mode"]:checked').value);
+            var disabled = (mode === CONFIG_MODE_TRADITIONAL);
+            document.getElementById('panel_byte1').classList.toggle('disabled-panel', disabled);
+            document.getElementById('panel_byte2').classList.toggle('disabled-panel', disabled);
+            document.getElementById('panel_byte3').classList.toggle('disabled-panel', disabled);
+        }
+
+        // ================================================================
+        //  Byte 1: Command Clear Mask — live hex
+        // ================================================================
+        document.getElementById('cmd_import').addEventListener('change', updateByte1Hex);
+        document.getElementById('cmd_sign').addEventListener('change', updateByte1Hex);
+        document.getElementById('cmd_genkey').addEventListener('change', updateByte1Hex);
+
+        function getByte1() {
+            var val = 0;
+            if (document.getElementById('cmd_import').checked) val |= 0x80;
+            if (document.getElementById('cmd_sign').checked)   val |= 0x40;
+            if (document.getElementById('cmd_genkey').checked)  val |= 0x20;
+            return val;
+        }
+
+        function updateByte1Hex() {
+            document.getElementById('hex_byte1').textContent = toHex(getByte1());
+        }
+
+        // ================================================================
+        //  Byte 2: PIN Verified Period — live hex + PO toggle
+        // ================================================================
+        document.getElementById('pin_sce').addEventListener('change', updateByte2Hex);
+        document.getElementById('pin_keeptime').addEventListener('input', updateByte2Hex);
+        document.querySelectorAll('input[name="pin_po"]').forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                var po = document.querySelector('input[name="pin_po"]:checked').value;
+                document.getElementById('pin_keeptime').disabled = (po === '1');
+                updateByte2Hex();
+            });
+        });
+
+        function getByte2() {
+            var val = 0;
+            if (document.getElementById('pin_sce').checked) val |= 0x80;
+            var po = document.querySelector('input[name="pin_po"]:checked').value;
+            if (po === '1') {
+                val |= 0x40;
+            } else {
+                var keepTime = parseInt(document.getElementById('pin_keeptime').value) || 1;
+                keepTime = Math.max(1, Math.min(31, keepTime));
+                val |= (keepTime & 0x1F);
+            }
+            return val;
+        }
+
+        function updateByte2Hex() {
+            document.getElementById('hex_byte2').textContent = toHex(getByte2());
+            var kt = parseInt(document.getElementById('pin_keeptime').value) || 1;
+            kt = Math.max(1, Math.min(31, kt));
+            document.getElementById('pin_keeptime_sec').textContent = kt * 30;
+        }
+
+        // ================================================================
+        //  Byte 3: Touch Period — live hex + PO toggle
+        // ================================================================
+        document.getElementById('touch_sce').addEventListener('change', updateByte3Hex);
+        document.getElementById('touch_keeptime').addEventListener('input', updateByte3Hex);
+        document.querySelectorAll('input[name="touch_po"]').forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                var po = document.querySelector('input[name="touch_po"]:checked').value;
+                document.getElementById('touch_keeptime').disabled = (po === '1');
+                updateByte3Hex();
+            });
+        });
+
+        function getByte3() {
+            var val = 0;
+            if (document.getElementById('touch_sce').checked) val |= 0x80;
+            var po = document.querySelector('input[name="touch_po"]:checked').value;
+            if (po === '1') {
+                val |= 0x40;
+            } else {
+                var keepTime = parseInt(document.getElementById('touch_keeptime').value) || 1;
+                keepTime = Math.max(1, Math.min(31, keepTime));
+                val |= (keepTime & 0x1F);
+            }
+            return val;
+        }
+
+        function updateByte3Hex() {
+            document.getElementById('hex_byte3').textContent = toHex(getByte3());
+            var kt = parseInt(document.getElementById('touch_keeptime').value) || 1;
+            kt = Math.max(1, Math.min(31, kt));
+            document.getElementById('touch_keeptime_sec').textContent = kt * 30;
+        }
+
+        // ================================================================
+        //  Get Token SN
+        // ================================================================
+        function getTokenSN() {
+            var v = document.getElementById('input_token_sn').value;
+            return v.length ? hexStringToArrayBuffer(v) : undefined;
+        }
+
+        // ================================================================
+        //  Compute all config bytes
+        // ================================================================
+        function getConfigBytes() {
+            var byte0 = parseInt(document.querySelector('input[name="session_mode"]:checked').value);
+            var byte1 = (byte0 === CONFIG_MODE_SIMPLIFIED) ? getByte1() : 0x00;
+            var byte2 = (byte0 === CONFIG_MODE_SIMPLIFIED) ? getByte2() : 0x00;
+            var byte3 = (byte0 === CONFIG_MODE_SIMPLIFIED) ? getByte3() : 0x00;
+            return { byte0: byte0, byte1: byte1, byte2: byte2, byte3: byte3 };
+        }
+
+        // ================================================================
+        //  Send Config command
+        // ================================================================
+        async function sendConfig() {
+            var btn = document.getElementById('btn_send');
+            var resultEl = document.getElementById('result_area');
+            btn.disabled = true;
+            btn.classList.add('loading');
+            resultEl.style.display = 'block';
+            resultEl.className = 'result-area result-info';
+            resultEl.textContent = '等待使用者操作金鑰...';
+
+            try {
+                var cfg = getConfigBytes();
+                var bSN = getTokenSN();
+
+                var gtidem = await GTIDEM_SetConfig(bSN, cfg.byte0, cfg.byte1, cfg.byte2, cfg.byte3);
+
+                if (gtidem.statusCode === CTAP1_ERR_SUCCESS) {
+                    var msg = '設定成功！\n';
+                    msg += 'Session Mode: ' + (cfg.byte0 === CONFIG_MODE_TRADITIONAL ? 'Per-Command Auth (0x01)' : 'Session Auth (0x02)') + '\n';
+                    if (cfg.byte0 === CONFIG_MODE_SIMPLIFIED) {
+                        msg += 'CMD_CLEAR_MASK: ' + toHex(cfg.byte1) + '\n';
+                        msg += 'PIN Verified Period: ' + toHex(cfg.byte2) + '\n';
+                        msg += 'Touch Period: ' + toHex(cfg.byte3) + '\n';
+                    }
+                    if (gtidem.sn) {
+                        msg += '載具序號: ' + ConverSNFormat(gtidem.sn);
+                    }
+                    resultEl.className = 'result-area result-ok';
+                    resultEl.textContent = msg;
+                } else {
+                    resultEl.className = 'result-area result-err';
+                    resultEl.textContent = '設定失敗: ' + showFIDOErrorMessage(gtidem);
+                }
+
+            } catch (error) {
+                resultEl.className = 'result-area result-err';
+                resultEl.textContent = '錯誤: ' + error.message;
+                console.log('Config FAIL', error);
+            }
+
+            btn.disabled = false;
+            btn.classList.remove('loading');
+        }
+
+        // ================================================================
+        //  Init: set initial state
+        // ================================================================
+        updateSessionMode();
+        updateByte1Hex();
+        updateByte2Hex();
+        updateByte3Hex();
+    </script>
+</body>
+
+</html>
