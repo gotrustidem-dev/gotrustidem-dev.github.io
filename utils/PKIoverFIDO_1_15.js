@@ -38,10 +38,6 @@ const CMD_FactoryReset = 0xEF;
 const CMD_ImportCertificate2 = 0xF7;
 
 const CMD_GetCertExtras = 0xB2;
-const CMD_Config = 0xF0;
-
-const CONFIG_MODE_TRADITIONAL = 0x01;
-const CONFIG_MODE_SIMPLIFIED = 0x02;
 
 const CMD_REQUESTCSR = 0xEA;
 const CMD_GenRsaKeyPair = 0xE6;
@@ -3148,83 +3144,6 @@ async function GTIDEM_FactoryResetToken(bSerialNumber, bEncChallenge) {
 
 }
 
-/**
- * 設定載具驗證模式。使用 GetAssertion 傳遞指令，需要使用者驗證。
- *
- * @param {Uint8Array|undefined} bSerialNumber 指定序號。若不指定載具序號，則可填入 undefined 或是空陣列
- * @param {number} mode 模式設定。0x01 = 傳統模式, 0x02 = 簡易模式
- * @param {number} cmdClearMask Command Clear Mask byte (bit7=Import, bit6=Sign, bit5=GenKey)
- * @param {number} pinConfig PIN 驗證設定 byte
- * @param {number} touchConfig Touch 設定 byte
- * @returns {GTIdemJs} 回傳結果的集合
- */
-async function GTIDEM_SetConfig(bSerialNumber, mode, cmdClearMask, pinConfig, touchConfig) {
-
-    var sn_buf;
-    if ((bSerialNumber == undefined) || (bSerialNumber.byteLength == 0)) {
-        sn_buf = new Uint8Array(0);
-    } else {
-        sn_buf = new Uint8Array(4 + bSerialNumber.byteLength);
-        sn_buf[0] = 0xDF;
-        sn_buf[1] = 0x20;
-        sn_buf[2] = bSerialNumber.byteLength >> 8;
-        sn_buf[3] = bSerialNumber.byteLength;
-        sn_buf.set(bSerialNumber, 4);
-    }
-
-    var config_buf = new Uint8Array(8);
-    config_buf[0] = 0xDF;
-    config_buf[1] = 0x29;
-    config_buf[2] = 0x00;
-    config_buf[3] = 0x04;
-    config_buf[4] = mode;
-    config_buf[5] = cmdClearMask;
-    config_buf[6] = pinConfig;
-    config_buf[7] = touchConfig;
-
-    var payloadLen = sn_buf.byteLength + config_buf.byteLength;
-
-    var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
-
-    var pki_header = new Uint8Array(3);
-    pki_header[0] = CMD_Config;
-    pki_header[1] = payloadLen >> 8;
-    pki_header[2] = payloadLen;
-
-    var pki_buffer = _appendBuffer(gtheaderbuffer, pki_header);
-    pki_buffer = _appendBuffer(pki_buffer, sn_buf);
-    pki_buffer = _appendBuffer(pki_buffer, config_buf);
-
-    var challenge = new Uint8Array(32);
-    window.crypto.getRandomValues(challenge);
-
-    var getAssertionChallenge = {
-        'challenge': challenge,
-        "userVerification": "required",
-        timeout: VERIFY_DEFAULT_TIMEOUT,
-    }
-    var idList = [{
-        id: pki_buffer,
-        type: "public-key",
-        transports: AUTHENTICATOR_TRANSPORTS
-    }];
-
-    getAssertionChallenge.allowCredentials = idList;
-
-    return await navigator.credentials.get({
-        'publicKey': getAssertionChallenge
-    }).then((fido) => {
-
-        let gtidem = new GTIdemJs();
-        gtidem.parsePKIoverFIDOResponse(fido.response.signature, CMD_Config);
-        return gtidem;
-    }).catch((error) => {
-        let gtidem = new GTIdemJs();
-        gtidem.ConvertWebError(error.name, error.message);
-        return gtidem;
-    });
-
-}
 
 /**
  * 回傳JS library 版本

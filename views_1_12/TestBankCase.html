@@ -893,6 +893,9 @@
                 progressSet('right', Math.round((i / steps.length) * 100), '執行 ' + s.label + '...');
                 await uiTick();
 
+                // R1 完成後延遲 100ms，避免 R2 太快導致系統無法判斷
+                if (i === 1) await new Promise(function (r) { setTimeout(r, 100); });
+
                 var ok = await s.fn();
                 setStatus(s.id, ok ? 'ok' : 'err');
                 progressSet('right', Math.round(((i + 1) / steps.length) * 100), s.label + ' 完成');
