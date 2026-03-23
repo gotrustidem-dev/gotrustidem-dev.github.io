@@ -272,6 +272,13 @@
                 <div class="step-desc">以 credentialID 執行 GetAssertion，確認此 Token 已綁定</div>
             </div>
 
+            <div style="text-align:center; margin:4px 0; color:#667189; font-size:13px;">
+                ⏱ R1→R2 Delay:
+                <input type="number" id="input_r1r2_delay" value="100" min="0" max="5000" step="50"
+                    style="width:70px; height:28px; text-align:center; font-size:13px; margin:0 4px;">
+                ms
+            </div>
+
             <div class="step-card">
                 <div class="step-title"><span class="step-status" id="status_R2">⬜</span>R2 — 讀取憑證</div>
                 <div class="step-desc">從 Token 讀取已匯入的憑證並顯示資訊</div>
@@ -893,8 +900,14 @@
                 progressSet('right', Math.round((i / steps.length) * 100), '執行 ' + s.label + '...');
                 await uiTick();
 
-                // R1 完成後延遲 100ms，避免 R2 太快導致系統無法判斷
-                if (i === 1) await new Promise(function (r) { setTimeout(r, 100); });
+                // R1 完成後延遲，避免 R2 太快導致系統無法判斷
+                if (i === 1) {
+                    var delayMs = parseInt(document.getElementById('input_r1r2_delay').value) || 0;
+                    if (delayMs > 0) {
+                        log('right', '⏱ R1→R2 delay ' + delayMs + ' ms ...', 'dim');
+                        await new Promise(function (r) { setTimeout(r, delayMs); });
+                    }
+                }
 
                 var ok = await s.fn();
                 setStatus(s.id, ok ? 'ok' : 'err');
