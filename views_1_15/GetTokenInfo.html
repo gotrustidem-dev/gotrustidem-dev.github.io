@@ -33,6 +33,55 @@
         h3 {
             text-align: center;
         }
+
+        .config-panel {
+            max-width: 600px;
+            margin: 16px auto;
+            border: 2px solid #5755d9;
+            border-radius: 8px;
+            padding: 16px 20px;
+            background: #fff;
+            text-align: left;
+            display: none;
+        }
+        .config-panel-header {
+            font-size: 16px;
+            font-weight: bold;
+            color: #5755d9;
+            margin-bottom: 10px;
+        }
+        .config-byte {
+            border: 1px solid #e2e4e9;
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+        }
+        .config-byte-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        .config-byte .hex-val {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-weight: bold;
+            color: #5755d9;
+            background: #f0f1ff;
+            border: 1px solid #c8c7f5;
+            border-radius: 3px;
+            padding: 1px 6px;
+            margin-left: 6px;
+        }
+        .config-bit-list {
+            margin: 4px 0 0 8px;
+            font-size: 13px;
+            color: #303742;
+        }
+        .config-bit-list div {
+            margin-bottom: 2px;
+        }
+        .bit-on  { color: #32b643; font-weight: bold; }
+        .bit-off { color: #999; }
     </style>
 </head>
 
@@ -59,6 +108,14 @@
                             <label id="label_ecPublic_key"></label><br>
                             <label id="label_flags"></label><br>
                             <label id="label_sopin_retries"></label><br>
+                            <div id="config_panel" class="config-panel">
+                                <div class="config-panel-header">Config</div>
+                                <div id="config_content"></div>
+                            </div>
+                            <div id="unknown_fields" style="text-align:left; max-width:500px; margin:10px auto; display:none;">
+                                <label style="font-weight:bold;">Other fields:</label>
+                                <pre id="unknown_fields_content" style="background:#f0f1ff; border:1px solid #c8c7f5; border-radius:4px; padding:10px; font-size:13px; white-space:pre-wrap; word-break:break-all;"></pre>
+                            </div>
                         </form>
 
                     </td>
@@ -126,6 +183,34 @@
                         document.getElementById('label_sopin_retries').innerText = "SOPIN retryies:: " +response.sopinRetry;
                     }
 
+                    // 顯示 Config
+                    displayConfig(response.tokenInfoRaw);
+
+                    // 自動顯示未知欄位
+                    var knownKeys = ['fw','sw','pinRetry','credNum','sn','rn','ecPoint','flags','sopinRetry','config'];
+                    var unknownEl = document.getElementById('unknown_fields');
+                    var unknownContent = document.getElementById('unknown_fields_content');
+                    if (response.tokenInfoRaw) {
+                        var lines = [];
+                        Object.keys(response.tokenInfoRaw).forEach(function(key) {
+                            if (knownKeys.indexOf(key) === -1) {
+                                var val = response.tokenInfoRaw[key];
+                                if (val instanceof Uint8Array || val instanceof ArrayBuffer) {
+                                    val = ConverSNFormat(val instanceof ArrayBuffer ? new Uint8Array(val) : val);
+                                }
+                                lines.push(key + ': ' + val);
+                            }
+                        });
+                        if (lines.length > 0) {
+                            unknownContent.textContent = lines.join('\n');
+                            unknownEl.style.display = 'block';
+                        } else {
+                            unknownEl.style.display = 'none';
+                        }
+                    } else {
+                        unknownEl.style.display = 'none';
+                    }
+
                 }else{
                    alert(showFIDOErrorMessage(response));
                 }
@@ -135,6 +220,95 @@
             });
 
         });
+
+        function toHex(v) {
+            return '0x' + ('0' + v.toString(16).toUpperCase()).slice(-2);
+        }
+
+        function bitLine(label, on) {
+            return '<div class="' + (on ? 'bit-on' : 'bit-off') + '">' +
+                   (on ? '\u2714 ' : '\u2716 ') + label + '</div>';
+        }
+
+        function displayConfig(raw) {
+            var panel = document.getElementById('config_panel');
+            var content = document.getElementById('config_content');
+            if (!raw || !raw.config) { panel.style.display = 'none'; return; }
+
+            var cfg = raw.config;
+            if (cfg instanceof ArrayBuffer) cfg = new Uint8Array(cfg);
+            if (!(cfg instanceof Uint8Array) || cfg.length < 1) { panel.style.display = 'none'; return; }
+
+            var html = '';
+
+            // Byte 0: Session Mode
+            var b0 = cfg[0];
+            var modeName = (b0 === 0x01) ? 'Per-Command Auth (0x01) — 每次指令都需重新驗證'
+                         : (b0 === 0x02) ? 'Session Auth (0x02) — 驗證後維持 session 狀態'
+                         : 'Unknown (' + toHex(b0) + ')';
+            html += '<div class="config-byte">';
+            html += '<div class="config-byte-title">Byte 0 — Session Mode <span class="hex-val">' + toHex(b0) + '</span></div>';
+            html += '<div class="config-bit-list"><div>' + modeName + '</div></div>';
+            html += '</div>';
+
+            var isSession = (b0 === 0x02);
+
+            if (cfg.length >= 2) {
+                // Byte 1: Command Clear Mask
+                var b1 = cfg[1];
+                html += '<div class="config-byte"' + (isSession ? '' : ' style="opacity:0.45"') + '>';
+                html += '<div class="config-byte-title">Byte 1 — Command Clear Mask <span class="hex-val">' + toHex(b1) + '</span></div>';
+                if (!isSession) html += '<div style="font-size:12px;color:#e85600;margin-bottom:4px;">Per-Command 模式下此設定不生效</div>';
+                html += '<div class="config-bit-list">';
+                html += bitLine('bit7 — Import (IMPORT_CERT, IMPORT_CERT2)', (b1 & 0x80) !== 0);
+                html += bitLine('bit6 — Sign (SIGN, SIGNWithPIN)', (b1 & 0x40) !== 0);
+                html += bitLine('bit5 — GenKey (GEN_KEYPAIR, GEN_RSA)', (b1 & 0x20) !== 0);
+                html += '</div></div>';
+            }
+
+            if (cfg.length >= 3) {
+                // Byte 2: PIN Verified Period
+                var b2 = cfg[2];
+                var pinSCE = (b2 & 0x80) !== 0;
+                var pinPO  = (b2 & 0x40) !== 0;
+                var pinKT  = b2 & 0x1F;
+                html += '<div class="config-byte"' + (isSession ? '' : ' style="opacity:0.45"') + '>';
+                html += '<div class="config-byte-title">Byte 2 — PIN Verified Period <span class="hex-val">' + toHex(b2) + '</span></div>';
+                if (!isSession) html += '<div style="font-size:12px;color:#e85600;margin-bottom:4px;">Per-Command 模式下此設定不生效</div>';
+                html += '<div class="config-bit-list">';
+                html += bitLine('bit7 SCE — 執行匹配指令後清除 PIN 驗證狀態', pinSCE);
+                if (pinPO) {
+                    html += bitLine('bit6 PO=1 — 保持到斷電', true);
+                } else {
+                    html += bitLine('bit6 PO=0 — 依時間保持', true);
+                    html += '<div>bit4-0 KeepTime = ' + pinKT + ' (\u00d730 = ' + (pinKT * 30) + ' 秒)</div>';
+                }
+                html += '</div></div>';
+            }
+
+            if (cfg.length >= 4) {
+                // Byte 3: Touch Period
+                var b3 = cfg[3];
+                var touchSCE = (b3 & 0x80) !== 0;
+                var touchPO  = (b3 & 0x40) !== 0;
+                var touchKT  = b3 & 0x1F;
+                html += '<div class="config-byte"' + (isSession ? '' : ' style="opacity:0.45"') + '>';
+                html += '<div class="config-byte-title">Byte 3 — Touch Period <span class="hex-val">' + toHex(b3) + '</span></div>';
+                if (!isSession) html += '<div style="font-size:12px;color:#e85600;margin-bottom:4px;">Per-Command 模式下此設定不生效</div>';
+                html += '<div class="config-bit-list">';
+                html += bitLine('bit7 SCE — 執行匹配指令後清除 Touch 狀態', touchSCE);
+                if (touchPO) {
+                    html += bitLine('bit6 PO=1 — 保持到斷電', true);
+                } else {
+                    html += bitLine('bit6 PO=0 — 依時間保持', true);
+                    html += '<div>bit4-0 KeepTime = ' + touchKT + ' (\u00d730 = ' + (touchKT * 30) + ' 秒)</div>';
+                }
+                html += '</div></div>';
+            }
+
+            content.innerHTML = html;
+            panel.style.display = 'block';
+        }
     </script>
 
 </body>
