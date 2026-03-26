@@ -2294,6 +2294,18 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
 
         let gtidem = new GTIdemJs();
         gtidem.parsePKIoverFIDOResponse(fido.response.signature, CMD_TokenInfo);
+        // v1.15: 保留完整 CBOR map，方便取得韌體新增的欄位
+        try {
+            var buf = fido.response.signature;
+            var hdr = String.fromCharCode.apply(null, new Uint8Array(buf.slice(0, 16)));
+            if (hdr === 'GoTrust-Idem-PKI') {
+                var totalLen = readBE16(new Uint8Array(buf.slice(16, 18)));
+                if (totalLen > 1) {
+                    var payload = buf.slice(19, 16 + 2 + totalLen);
+                    gtidem.tokenInfoRaw = CBOR.decode(payload);
+                }
+            }
+        } catch (e) { /* ignore */ }
         return gtidem;
     }).catch((error) => {
         ////console.log(error.name);
