@@ -2305,7 +2305,7 @@ async function GTIDEM_GetTokenInfo(bSerialNumber) {
                     gtidem.tokenInfoRaw = CBOR.decode(payload);
                 }
             }
-        } catch (e) { /* ignore */ }
+        } catch (e) { console.warn('tokenInfoRaw parse error:', e); }
         return gtidem;
     }).catch((error) => {
         ////console.log(error.name);
