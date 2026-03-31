@@ -1,316 +1,648 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-TW">
 
 <head>
-    <title>GoTrustIdem TestPKI</title>
+    <title>IdemKey+ Token Info</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Ensure use of most common Unicode characters -->
     <meta charset="utf-8">
-    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
-    <!-- Considered an "experimental" feature -->
-    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css" />
-    <!-- Spectre.css icons are used -->
-    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
 
     <script src="../utils/cbor.js"></script>
     <script src="../utils/helpers.js"></script>
     <script src="../utils/showMessage.js"></script>
     <script src="../utils/response.js"></script>
     <script src="../utils/PKIoverFIDO_1_15.js"></script>
-  
+
     <style>
-        table.center {
-            margin-left: auto;
-            margin-right: auto;
-            height: 160px;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --muted: #7f8c8d;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --hover-shadow: 0 8px 16px rgba(0,0,0,0.15);
         }
 
-        table td,
-        table td * {
-            vertical-align: top;
+        body {
+            font-family: 'Segoe UI', 'Microsoft JhengHei', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
         }
 
-        h3 {
+        .container { max-width: 800px; margin: 0 auto; }
+
+        /* Header */
+        .page-header {
+            background: white;
+            padding: 24px 30px;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
             text-align: center;
         }
+        .page-header h1 {
+            color: var(--primary);
+            font-size: 1.6em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .version-badge {
+            background: var(--accent);
+            color: white;
+            padding: 3px 12px;
+            border-radius: 16px;
+            font-size: 0.5em;
+            font-weight: normal;
+        }
 
-        .config-panel {
-            max-width: 600px;
-            margin: 16px auto;
-            border: 2px solid #5755d9;
+        /* SN Input */
+        .sn-card {
+            background: white;
+            padding: 20px 24px;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+        }
+        .sn-card label {
+            font-size: 0.9em;
+            color: var(--muted);
+            display: block;
+            margin-bottom: 8px;
+        }
+        .sn-row {
+            display: flex;
+            gap: 12px;
+            align-items: stretch;
+        }
+        .sn-input {
+            flex: 1;
+            padding: 10px 16px;
+            font-size: 1em;
+            font-family: 'Consolas', 'Courier New', monospace;
+            border: 2px solid #e0e0e0;
             border-radius: 8px;
-            padding: 16px 20px;
-            background: #fff;
-            text-align: left;
+            transition: all 0.3s;
+        }
+        .sn-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
+        }
+        .btn-query {
+            padding: 10px 28px;
+            background: linear-gradient(135deg, var(--accent), #2980b9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        .btn-query:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--card-shadow);
+        }
+        .btn-query:active { transform: translateY(0); }
+        .btn-query.loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        /* Info Cards */
+        .info-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+            overflow: hidden;
             display: none;
         }
-        .config-panel-header {
-            font-size: 16px;
-            font-weight: bold;
-            color: #5755d9;
-            margin-bottom: 10px;
+        .info-card.visible { display: block; }
+        .card-header {
+            padding: 14px 20px;
+            color: white;
+            font-weight: 600;
+            font-size: 1.05em;
         }
-        .config-byte {
-            border: 1px solid #e2e4e9;
-            border-radius: 6px;
-            padding: 10px 14px;
-            margin-bottom: 10px;
-            background: #f8f9fa;
+        .card-header.info    { background: linear-gradient(135deg, var(--accent), #2980b9); }
+        .card-header.status  { background: linear-gradient(135deg, var(--success), #229954); }
+        .card-header.pin     { background: linear-gradient(135deg, var(--warning), #d68910); }
+        .card-header.config  { background: linear-gradient(135deg, #8e44ad, #6c3483); }
+
+        .card-body { padding: 16px 20px; }
+
+        /* Info Row (label: value) */
+        .info-row {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            align-items: flex-start;
         }
-        .config-byte-title {
-            font-weight: bold;
-            font-size: 14px;
+        .info-row:last-child { border-bottom: none; }
+        .info-label {
+            width: 140px;
+            flex-shrink: 0;
+            font-size: 0.85em;
+            color: var(--muted);
+            padding-top: 2px;
+        }
+        .info-value {
+            flex: 1;
+            font-size: 0.95em;
+            color: var(--primary);
+            word-break: break-all;
+        }
+        .info-value.mono {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.85em;
+        }
+
+        /* Status tags */
+        .tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-right: 6px;
             margin-bottom: 4px;
         }
-        .config-byte .hex-val {
+        .tag-ok      { background: #eafaf1; color: var(--success); }
+        .tag-warn    { background: #fef9e7; color: var(--warning); }
+        .tag-danger  { background: #fdedec; color: var(--danger); }
+        .tag-muted   { background: #f4f6f7; color: var(--muted); }
+
+        /* Complexity / Config items */
+        .detail-item {
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            background: var(--light-bg);
+        }
+        .detail-item.required { background: #eafaf1; color: #1e8449; font-weight: 600; }
+        .detail-item.forbidden { background: #f4f6f7; color: #999; }
+        .detail-item.optional { background: #f8f9fa; color: #555; }
+        .detail-item.inactive {
+            opacity: 0.45;
+            background: #f4f6f7;
+        }
+
+        .detail-group {
+            margin-bottom: 12px;
+        }
+        .detail-group-title {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 6px;
+            padding-bottom: 4px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .inactive-notice {
+            font-size: 0.8em;
+            color: var(--danger);
+            font-style: italic;
+            margin-bottom: 4px;
+        }
+        .detail-group-desc {
+            font-size: 0.82em;
+            color: var(--muted);
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        /* Hex badge */
+        .hex {
             font-family: 'Consolas', 'Courier New', monospace;
             font-weight: bold;
-            color: #5755d9;
-            background: #f0f1ff;
-            border: 1px solid #c8c7f5;
-            border-radius: 3px;
-            padding: 1px 6px;
+            color: #8e44ad;
+            background: #f4ecf7;
+            border-radius: 4px;
+            padding: 1px 8px;
+            font-size: 0.85em;
             margin-left: 6px;
         }
-        .config-bit-list {
-            margin: 4px 0 0 8px;
-            font-size: 13px;
-            color: #303742;
+
+        /* Other fields */
+        .other-fields-pre {
+            background: var(--light-bg);
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.85em;
+            white-space: pre-wrap;
+            word-break: break-all;
         }
-        .config-bit-list div {
-            margin-bottom: 2px;
+
+        /* Error */
+        .error-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+            overflow: hidden;
+            display: none;
         }
-        .bit-on  { color: #32b643; font-weight: bold; }
-        .bit-off { color: #999; }
+        .error-card.visible { display: block; }
+        .error-body {
+            padding: 24px;
+            text-align: center;
+            color: var(--danger);
+            font-size: 1em;
+        }
     </style>
 </head>
 
 <body>
-    <div style="overflow-x: scroll;">
-        <table style="height: auto; width: 100%;">
-            <tbody>
+    <div class="container">
+        <!-- Header -->
+        <div class="page-header">
+            <h1>Token Info <span class="version-badge">v1.15</span></h1>
+        </div>
 
-                <tr>
-                    <td style="width: 100% ;">
+        <!-- SN Input + Button -->
+        <div class="sn-card">
+            <label>Token Serial Number (Hex, optional)</label>
+            <form class="sn-row" id="form_tokeninfo" onsubmit="return false">
+                <input class="sn-input" type="text" id="input_token_sn" placeholder="留空則自動偵測載具">
+                <button class="btn-query" type="submit" id="btn_query">查詢</button>
+            </form>
+        </div>
 
+        <!-- Error -->
+        <div class="error-card" id="error_card">
+            <div class="card-header" style="background:linear-gradient(135deg,var(--danger),#c0392b);">錯誤</div>
+            <div class="error-body" id="error_msg"></div>
+        </div>
 
-                        <form style="text-align: center;" id="form_token_sn" onsubmit="return false">
-                            <p>
-                                <label id="label_token_sn">Token Serial number:</label><br>
-                                <input type="text" name="token_sn"  style="width: 342px; height:41px">
-                            </p>
-                            <label id="label_token_fw"></label><br>
-                            <label id="label_token_sw"></label><br>
-                            <label id="label_pin_retries"></label><br>
-                            <label id="label_credentials"></label><br>
-                            <label id="label_serial_number"></label><br>
-                            <label id="label_random_number"></label><br>
-                            <label id="label_ecPublic_key"></label><br>
-                            <label id="label_flags"></label><br>
-                            <label id="label_sopin_retries"></label><br>
-                            <div id="config_panel" class="config-panel">
-                                <div class="config-panel-header">Config</div>
-                                <div id="config_content"></div>
-                            </div>
-                            <div id="unknown_fields" style="text-align:left; max-width:500px; margin:10px auto; display:none;">
-                                <label style="font-weight:bold;">Other fields:</label>
-                                <pre id="unknown_fields_content" style="background:#f0f1ff; border:1px solid #c8c7f5; border-radius:4px; padding:10px; font-size:13px; white-space:pre-wrap; word-break:break-all;"></pre>
-                            </div>
-                        </form>
+        <!-- Basic Info -->
+        <div class="info-card" id="card_basic">
+            <div class="card-header info">基本資訊</div>
+            <div class="card-body">
+                <div class="info-row">
+                    <div class="info-label">Serial Number</div>
+                    <div class="info-value mono" id="val_sn">—</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">FW Version</div>
+                    <div class="info-value" id="val_fw">—</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">SW Version</div>
+                    <div class="info-value" id="val_sw">—</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Credentials</div>
+                    <div class="info-value" id="val_cred">—</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">EC Public Point</div>
+                    <div class="info-value mono" id="val_ec">—</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Random Number</div>
+                    <div class="info-value mono" id="val_rn">—</div>
+                </div>
+            </div>
+        </div>
 
-                    </td>
-                </tr>
+        <!-- Status -->
+        <div class="info-card" id="card_status">
+            <div class="card-header status">載具狀態</div>
+            <div class="card-body">
+                <div class="info-row">
+                    <div class="info-label">PIN 重試次數</div>
+                    <div class="info-value" id="val_pin_retry">—</div>
+                </div>
+                <div class="info-row" id="row_sopin" style="display:none;">
+                    <div class="info-label">SO PIN 重試次數</div>
+                    <div class="info-value" id="val_sopin_retry">—</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">密碼狀態</div>
+                    <div class="info-value" id="val_pin_status">—</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">初始化狀態</div>
+                    <div class="info-value" id="val_init_status">—</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Flags (Raw)</div>
+                    <div class="info-value mono" id="val_flags_raw">—</div>
+                </div>
+            </div>
+        </div>
 
-                <tr>
-                    <td id="pc-td" style="width: 100% ; ">
-                        <table class="center" border="1" width="395">
-                            <tbody>
-                                <tr>
-                                    <!--PC side-->
-                                    <td style="width: 385px;">
-                                        <p>
-                                        <form style="text-align: center;" id="form_tokeninfo_btn" onsubmit="return false">
-                                            <button class="btn btn-primary" action="submit"
-                                                style="width: 200px; height:34px;background-color: #008CBA;">Get Token Info</button>
-                                        </form>
-                                        </p>
+        <!-- PIN Complexity -->
+        <div class="info-card" id="card_pin">
+            <div class="card-header pin">PIN 密碼複雜度</div>
+            <div class="card-body" id="pin_complexity_body"></div>
+        </div>
 
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                    
-                </tr>
-            </tbody>·
-        </table>
+        <!-- Config -->
+        <div class="info-card" id="card_config">
+            <div class="card-header config">Token 驗證模式設定</div>
+            <div class="card-body" id="config_body"></div>
+        </div>
+
+        <!-- Other Fields -->
+        <div class="info-card" id="card_other">
+            <div class="card-header" style="background:linear-gradient(135deg,var(--muted),#5d6d7e);">其他欄位</div>
+            <div class="card-body">
+                <pre class="other-fields-pre" id="other_fields_pre"></pre>
+            </div>
+        </div>
     </div>
+
     <script>
-        document.getElementById('form_tokeninfo_btn').addEventListener('submit', function (event) {
-            event.preventDefault();
-            let token_sn = document.getElementById('form_token_sn').token_sn.value;
-            console.log(token_sn);
+        // ================================================================
+        //  Query
+        // ================================================================
+        document.getElementById('form_tokeninfo').addEventListener('submit', function (e) {
+            e.preventDefault();
+            var snVal = document.getElementById('input_token_sn').value.trim();
+            var bSN = snVal.length ? hexStringToArrayBuffer(snVal) : undefined;
+            var btn = document.getElementById('btn_query');
 
-            var bToken_sn = undefined;
-            if(token_sn.length!=0){
-                bToken_sn = hexStringToArrayBuffer(token_sn);
-               
-            }
-            GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
-
-                console.log('SUCCESS', response);            
-                if(response.statusCode==CTAP1_ERR_SUCCESS){
-                    document.getElementById('label_token_fw').innerText = "FW version: " + ConverVersionFormat(response.fw);
-                    document.getElementById('label_token_sw').innerText = "SW version: " + ConverVersionFormat(response.sw);
-                    document.getElementById('label_pin_retries').innerText = "PIN retryies: " + response.pinRetry;
-                    document.getElementById('label_credentials').innerText = "Credentials: " + response.credentialNum;
-                    document.getElementById('label_serial_number').innerText = "Serial number: " + ConverSNFormat(response.sn);
-                    document.getElementById('label_random_number').innerText = "Random number: " +ConverSNFormat(response.rn);
-                    document.getElementById('label_ecPublic_key').innerText = "EC public point: " +ConverSNFormat(response.ecpoint);
-                    document.getElementById('label_flags').innerText = "Flags: " +ConverSNFormat(response.flags);
-                    if ((response.flags[0]&TOKEN_FLAGS_PINEXPIRED) == TOKEN_FLAGS_PINEXPIRED) {
-                        document.getElementById('label_flags').innerText  += "\n密碼到期，首次使用需變更";
-                        } else {
-                            document.getElementById('label_flags').innerText  += "\n密碼不需變更";
-                        }
-
-                        if ((response.flags[0]&TOKEN_FLAGS_INITIALIZED )== TOKEN_FLAGS_INITIALIZED) {
-                            document.getElementById('label_flags').innerText  += "\n載具已經初始化";
-                        } else {
-                            document.getElementById('label_flags').innerText  += "\n載具未初始化或是不支援此顯示功能";
-                        }
-                    if(response.sopinRetry!=undefined){
-                        document.getElementById('label_sopin_retries').innerText = "SOPIN retryies:: " +response.sopinRetry;
-                    }
-
-                    // 顯示 Config
-                    displayConfig(response.tokenInfoRaw);
-
-                    // 自動顯示未知欄位
-                    var knownKeys = ['fw','sw','pinRetry','credNum','sn','rn','ecPoint','flags','sopinRetry','config'];
-                    var unknownEl = document.getElementById('unknown_fields');
-                    var unknownContent = document.getElementById('unknown_fields_content');
-                    if (response.tokenInfoRaw) {
-                        var lines = [];
-                        Object.keys(response.tokenInfoRaw).forEach(function(key) {
-                            if (knownKeys.indexOf(key) === -1) {
-                                var val = response.tokenInfoRaw[key];
-                                if (val instanceof Uint8Array || val instanceof ArrayBuffer) {
-                                    val = ConverSNFormat(val instanceof ArrayBuffer ? new Uint8Array(val) : val);
-                                }
-                                lines.push(key + ': ' + val);
-                            }
-                        });
-                        if (lines.length > 0) {
-                            unknownContent.textContent = lines.join('\n');
-                            unknownEl.style.display = 'block';
-                        } else {
-                            unknownEl.style.display = 'none';
-                        }
-                    } else {
-                        unknownEl.style.display = 'none';
-                    }
-
-                }else{
-                   alert(showFIDOErrorMessage(response));
-                }
-            }).catch((error) => {
-                alert(error)
-                console.log('FAIL', error)
+            // hide all result cards
+            ['card_basic','card_status','card_pin','card_config','card_other','error_card'].forEach(function(id) {
+                document.getElementById(id).classList.remove('visible');
             });
 
+            btn.classList.add('loading');
+            btn.textContent = '查詢中...';
+
+            GTIDEM_GetTokenInfo(bSN).then(function (response) {
+                console.log('SUCCESS', response);
+
+                if (response.statusCode != CTAP1_ERR_SUCCESS) {
+                    document.getElementById('error_msg').textContent = showFIDOErrorMessage(response);
+                    document.getElementById('error_card').classList.add('visible');
+                    return;
+                }
+
+                // === Basic Info ===
+                document.getElementById('val_sn').textContent = ConverSNFormat(response.sn);
+                document.getElementById('val_fw').textContent = ConverVersionFormat(response.fw);
+                document.getElementById('val_sw').textContent = ConverVersionFormat(response.sw);
+                document.getElementById('val_cred').textContent = response.credentialNum;
+                document.getElementById('val_ec').textContent = ConverSNFormat(response.ecpoint);
+                document.getElementById('val_rn').textContent = ConverSNFormat(response.rn);
+                document.getElementById('card_basic').classList.add('visible');
+
+                // === Status ===
+                document.getElementById('val_pin_retry').textContent = response.pinRetry;
+                document.getElementById('val_flags_raw').textContent = ConverSNFormat(response.flags);
+
+                if (response.sopinRetry != undefined) {
+                    document.getElementById('val_sopin_retry').textContent = response.sopinRetry;
+                    document.getElementById('row_sopin').style.display = '';
+                }
+
+                if (response.flags && response.flags.length >= 1) {
+                    var f0 = response.flags[0];
+                    if ((f0 & TOKEN_FLAGS_PINEXPIRED) == TOKEN_FLAGS_PINEXPIRED) {
+                        document.getElementById('val_pin_status').innerHTML = '<span class="tag tag-warn">密碼到期</span>首次使用需變更';
+                    } else {
+                        document.getElementById('val_pin_status').innerHTML = '<span class="tag tag-ok">正常</span>密碼不需變更';
+                    }
+                    if ((f0 & TOKEN_FLAGS_INITIALIZED) == TOKEN_FLAGS_INITIALIZED) {
+                        document.getElementById('val_init_status').innerHTML = '<span class="tag tag-ok">已初始化</span>';
+                    } else {
+                        document.getElementById('val_init_status').innerHTML = '<span class="tag tag-muted">未初始化</span>或不支援此顯示功能';
+                    }
+                }
+                document.getElementById('card_status').classList.add('visible');
+
+                // === PIN Complexity ===
+                displayPinComplexity(response.flags);
+
+                // === Config ===
+                console.log('tokenInfoRaw:', response.tokenInfoRaw);
+                displayConfig(response.tokenInfoRaw);
+
+                // === Other Fields ===
+                var knownKeys = ['fw','sw','pinRetry','credNum','sn','rn','ecPoint','flags','sopinRetry','configs'];
+                if (response.tokenInfoRaw) {
+                    var lines = [];
+                    Object.keys(response.tokenInfoRaw).forEach(function(key) {
+                        if (knownKeys.indexOf(key) === -1) {
+                            var val = response.tokenInfoRaw[key];
+                            if (val instanceof Uint8Array || val instanceof ArrayBuffer) {
+                                val = ConverSNFormat(val instanceof ArrayBuffer ? new Uint8Array(val) : val);
+                            }
+                            lines.push(key + ': ' + val);
+                        }
+                    });
+                    if (lines.length > 0) {
+                        document.getElementById('other_fields_pre').textContent = lines.join('\n');
+                        document.getElementById('card_other').classList.add('visible');
+                    }
+                }
+
+            }).catch(function (error) {
+                document.getElementById('error_msg').textContent = error.message || error;
+                document.getElementById('error_card').classList.add('visible');
+                console.log('FAIL', error);
+            }).finally(function() {
+                btn.classList.remove('loading');
+                btn.textContent = '查詢';
+            });
         });
 
+        // ================================================================
+        //  Helpers
+        // ================================================================
         function toHex(v) {
             return '0x' + ('0' + v.toString(16).toUpperCase()).slice(-2);
         }
 
-        function bitLine(label, on) {
-            return '<div class="' + (on ? 'bit-on' : 'bit-off') + '">' +
-                   (on ? '\u2714 ' : '\u2716 ') + label + '</div>';
-        }
+        // ================================================================
+        //  PIN Complexity
+        // ================================================================
+        function displayPinComplexity(flags) {
+            var card = document.getElementById('card_pin');
+            var body = document.getElementById('pin_complexity_body');
+            if (!flags || flags.length < 2) return;
 
-        function displayConfig(raw) {
-            var panel = document.getElementById('config_panel');
-            var content = document.getElementById('config_content');
-            if (!raw || !raw.config) { panel.style.display = 'none'; return; }
-
-            var cfg = raw.config;
-            if (cfg instanceof ArrayBuffer) cfg = new Uint8Array(cfg);
-            if (!(cfg instanceof Uint8Array) || cfg.length < 1) { panel.style.display = 'none'; return; }
-
+            var level = flags[1];
             var html = '';
 
-            // Byte 0: Session Mode
-            var b0 = cfg[0];
-            var modeName = (b0 === 0x01) ? 'Per-Command Auth (0x01) — 每次指令都需重新驗證'
-                         : (b0 === 0x02) ? 'Session Auth (0x02) — 驗證後維持 session 狀態'
-                         : 'Unknown (' + toHex(b0) + ')';
-            html += '<div class="config-byte">';
-            html += '<div class="config-byte-title">Byte 0 — Session Mode <span class="hex-val">' + toHex(b0) + '</span></div>';
-            html += '<div class="config-bit-list"><div>' + modeName + '</div></div>';
-            html += '</div>';
+            if (level === PIN_FORMAT_FREE) {
+                html += '<div class="detail-item optional">無限制 — 任意字元皆可</div>';
+            } else {
+                // 英文
+                var engMode = level & 0xC0;
+                var engCase = level & 0x30;
+                if (engMode === PIN_SETUP_ENG_OK) {
+                    html += '<div class="detail-item optional">英文字母：允許（非必要）</div>';
+                } else if (engMode === PIN_SETUP_ENG_ASK) {
+                    var d = '英文字母：必要';
+                    if (engCase === 0x00)      d += '，大小寫皆可';
+                    else if (engCase === 0x10) d += '，小寫必要';
+                    else if (engCase === 0x20) d += '，大寫必要';
+                    else if (engCase === 0x30) d += '，大寫與小寫皆必要';
+                    html += '<div class="detail-item required">' + d + '</div>';
+                } else if (engMode === PIN_SETUP_ENG_NO) {
+                    var d = '英文字母：禁止';
+                    if (engCase === 0x30)      d += '（大小寫皆禁止）';
+                    else if (engCase === 0x10) d += '（小寫禁止，大寫允許）';
+                    else if (engCase === 0x20) d += '（大寫禁止，小寫允許）';
+                    html += '<div class="detail-item forbidden">' + d + '</div>';
+                } else if (engMode === PIN_SETUP_ENG_SPEC) {
+                    if (engCase & 0x20) html += '<div class="detail-item required">英文字母：大寫必要，小寫禁止</div>';
+                    if (engCase & 0x10) html += '<div class="detail-item required">英文字母：小寫必要，大寫禁止</div>';
+                }
 
+                // 數字
+                var numMode = level & PIN_SETUP_NUM_MASK;
+                if (numMode === PIN_SETUP_NUM_OK)       html += '<div class="detail-item optional">數字：允許（非必要）</div>';
+                else if (numMode === PIN_SETUP_NUM_ASK) html += '<div class="detail-item required">數字：必要</div>';
+                else if (numMode === PIN_SETUP_NUM_NO)  html += '<div class="detail-item forbidden">數字：禁止</div>';
+
+                // 符號
+                var symMode = level & PIN_SETUP_SYM_MASK;
+                if (symMode === PIN_SETUP_SYM_OK)       html += '<div class="detail-item optional">符號：允許（非必要）</div>';
+                else if (symMode === PIN_SETUP_SYM_ASK) html += '<div class="detail-item required">符號：必要</div>';
+                else if (symMode === PIN_SETUP_SYM_NO)  html += '<div class="detail-item forbidden">符號：禁止</div>';
+            }
+
+            // PIN 長度
+            if (flags.length >= 4) {
+                html += '<div class="detail-item" style="margin-top:10px;">';
+                html += 'PIN 長度：最短 <b>' + flags[2] + '</b> 字元，最長 <b>' + flags[3] + '</b> 字元';
+                html += '</div>';
+            }
+
+            body.innerHTML = html;
+            card.classList.add('visible');
+        }
+
+        // ================================================================
+        //  Config
+        // ================================================================
+        function displayConfig(raw) {
+            var card = document.getElementById('card_config');
+            var body = document.getElementById('config_body');
+            if (!raw || !raw.configs) return;
+
+            var cfg = raw.configs;
+            if (cfg instanceof ArrayBuffer) cfg = new Uint8Array(cfg);
+            if (!(cfg instanceof Uint8Array) || cfg.length < 1) return;
+
+            var html = '';
+            var b0 = cfg[0];
             var isSession = (b0 === 0x02);
 
-            if (cfg.length >= 2) {
-                // Byte 1: Command Clear Mask
-                var b1 = cfg[1];
-                html += '<div class="config-byte"' + (isSession ? '' : ' style="opacity:0.45"') + '>';
-                html += '<div class="config-byte-title">Byte 1 — Command Clear Mask <span class="hex-val">' + toHex(b1) + '</span></div>';
-                if (!isSession) html += '<div style="font-size:12px;color:#e85600;margin-bottom:4px;">Per-Command 模式下此設定不生效</div>';
-                html += '<div class="config-bit-list">';
-                html += bitLine('bit7 — Import (IMPORT_CERT, IMPORT_CERT2)', (b1 & 0x80) !== 0);
-                html += bitLine('bit6 — Sign (SIGN, SIGNWithPIN)', (b1 & 0x40) !== 0);
-                html += bitLine('bit5 — GenKey (GEN_KEYPAIR, GEN_RSA)', (b1 & 0x20) !== 0);
-                html += '</div></div>';
+            // 驗證模式
+            html += '<div class="detail-group">';
+            html += '<div class="detail-group-title">驗證模式</div>';
+            if (b0 === 0x01) {
+                html += '<div class="detail-item">每次操作皆需驗證 PIN 與觸碰</div>';
+            } else if (b0 === 0x02) {
+                html += '<div class="detail-item required">驗證一次後可連續操作，不需重複驗證</div>';
+            } else {
+                html += '<div class="detail-item">未知模式 (' + toHex(b0) + ')</div>';
+            }
+            html += '</div>';
+
+            if (!isSession) {
+                // Per-Command 模式下其餘設定無意義，直接結束
+                body.innerHTML = html;
+                card.classList.add('visible');
+                return;
             }
 
+            // 以下僅 Session 模式才顯示
+
+            // Command Clear Mask
+            if (cfg.length >= 2) {
+                var b1 = cfg[1];
+                var cmdNames = ['匯入憑證', '放行', '建立金鑰', '搜尋憑證'];
+                var hiNibble = (b1 >> 4) & 0x0F;
+                var loNibble = b1 & 0x0F;
+
+                // Re-auth (high nibble)
+                html += '<div class="detail-group">';
+                html += '<div class="detail-group-title">強制重新驗證 (Re-auth)</div>';
+                html += '<div class="detail-group-desc">執行以下操作時，忽略既有授權，強制重新驗證 PIN 或觸碰</div>';
+                if (hiNibble === 0x00) {
+                    html += '<div class="detail-item optional">無</div>';
+                } else {
+                    for (var i = 0; i < 4; i++) {
+                        if (hiNibble & (0x08 >> i)) html += '<div class="detail-item required">' + cmdNames[i] + '</div>';
+                    }
+                }
+                html += '</div>';
+
+                // Clear after (low nibble)
+                html += '<div class="detail-group">';
+                html += '<div class="detail-group-title">完成後清除授權 (Clear after)</div>';
+                html += '<div class="detail-group-desc">以下操作完成後，清除目前的授權狀態，下次操作需重新驗證</div>';
+                if (loNibble === 0x00) {
+                    html += '<div class="detail-item optional">無</div>';
+                } else {
+                    for (var i = 0; i < 4; i++) {
+                        if (loNibble & (0x08 >> i)) html += '<div class="detail-item required">' + cmdNames[i] + '</div>';
+                    }
+                }
+                html += '</div>';
+            }
+
+            // PIN 驗證有效期
             if (cfg.length >= 3) {
-                // Byte 2: PIN Verified Period
                 var b2 = cfg[2];
                 var pinSCE = (b2 & 0x80) !== 0;
-                var pinPO  = (b2 & 0x40) !== 0;
-                var pinKT  = b2 & 0x1F;
-                html += '<div class="config-byte"' + (isSession ? '' : ' style="opacity:0.45"') + '>';
-                html += '<div class="config-byte-title">Byte 2 — PIN Verified Period <span class="hex-val">' + toHex(b2) + '</span></div>';
-                if (!isSession) html += '<div style="font-size:12px;color:#e85600;margin-bottom:4px;">Per-Command 模式下此設定不生效</div>';
-                html += '<div class="config-bit-list">';
-                html += bitLine('bit7 SCE — 執行匹配指令後清除 PIN 驗證狀態', pinSCE);
+                var pinPO = (b2 & 0x40) !== 0;
+                var pinKT = b2 & 0x1F;
+                html += '<div class="detail-group">';
+                html += '<div class="detail-group-title">PIN 驗證有效期</div>';
                 if (pinPO) {
-                    html += bitLine('bit6 PO=1 — 保持到斷電', true);
+                    html += '<div class="detail-item">PIN 驗證後持續有效，直到載具拔除</div>';
                 } else {
-                    html += bitLine('bit6 PO=0 — 依時間保持', true);
-                    html += '<div>bit4-0 KeepTime = ' + pinKT + ' (\u00d730 = ' + (pinKT * 30) + ' 秒)</div>';
+                    html += '<div class="detail-item">PIN 驗證後 <b>' + (pinKT * 30) + '</b> 秒內有效</div>';
                 }
-                html += '</div></div>';
+                if (pinSCE) {
+                    html += '<div class="detail-item optional">執行上述指定操作後，PIN 驗證立即失效</div>';
+                }
+                html += '</div>';
             }
 
+            // 觸碰有效期
             if (cfg.length >= 4) {
-                // Byte 3: Touch Period
                 var b3 = cfg[3];
                 var touchSCE = (b3 & 0x80) !== 0;
-                var touchPO  = (b3 & 0x40) !== 0;
-                var touchKT  = b3 & 0x1F;
-                html += '<div class="config-byte"' + (isSession ? '' : ' style="opacity:0.45"') + '>';
-                html += '<div class="config-byte-title">Byte 3 — Touch Period <span class="hex-val">' + toHex(b3) + '</span></div>';
-                if (!isSession) html += '<div style="font-size:12px;color:#e85600;margin-bottom:4px;">Per-Command 模式下此設定不生效</div>';
-                html += '<div class="config-bit-list">';
-                html += bitLine('bit7 SCE — 執行匹配指令後清除 Touch 狀態', touchSCE);
+                var touchPO = (b3 & 0x40) !== 0;
+                var touchKT = b3 & 0x1F;
+                html += '<div class="detail-group">';
+                html += '<div class="detail-group-title">觸碰有效期</div>';
                 if (touchPO) {
-                    html += bitLine('bit6 PO=1 — 保持到斷電', true);
+                    html += '<div class="detail-item">觸碰後持續有效，直到載具拔除</div>';
                 } else {
-                    html += bitLine('bit6 PO=0 — 依時間保持', true);
-                    html += '<div>bit4-0 KeepTime = ' + touchKT + ' (\u00d730 = ' + (touchKT * 30) + ' 秒)</div>';
+                    html += '<div class="detail-item">觸碰後 <b>' + (touchKT * 30) + '</b> 秒內有效</div>';
                 }
-                html += '</div></div>';
+                if (touchSCE) {
+                    html += '<div class="detail-item optional">執行上述指定操作後，觸碰狀態立即失效</div>';
+                }
+                html += '</div>';
             }
 
-            content.innerHTML = html;
-            panel.style.display = 'block';
+            body.innerHTML = html;
+            card.classList.add('visible');
         }
     </script>
-
 </body>
 
 </html>
