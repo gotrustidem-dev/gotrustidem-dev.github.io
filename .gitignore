@@ -1,0 +1,67 @@
+# ============================================================
+#  GoTrust IdemKey+ — .gitignore
+#  只上傳測試網頁 + 必要的 JS SDK 供測試人員使用
+#  其餘開發工具、文件、腳本皆排除
+# ============================================================
+
+# --- 內部工具 / 本機檔案 ---
+local/
+
+# --- 文件（測試手冊、PDF、Excel）---
+Doc/
+
+# --- Claude Code ---
+.claude/
+CLAUDE.md
+
+# --- Python 自動化測試 & 工具 ---
+tests/
+__pycache__/
+.venv/
+*.pyc
+run_tests.py
+generate_test_checklist.py
+generate_pdf.py
+check_low_s.py
+
+# --- 開發文件（不供測試人員）---
+CHANGELOG.md
+MODERNIZATION_SUMMARY.md
+V1.14_FILES_SUMMARY.md
+VERSION_1.14_RELEASE.md
+QUICK_REFERENCE_v1.14.md
+INDEX_v1.14.md
+package.json.example
+utils/MODERNIZATION_README.md
+utils/README_v1.14.md
+utils/*_backup.js
+
+# --- 內部 / 備份 ---
+Backup/
+local_ca/
+
+# --- API 文件 PDF（內部用）---
+files/
+
+# --- 舊版測試頁（已由 views_*/TestAll.html 取代）---
+test/
+/test.html
+/testElement.html
+/TestCertIsSame.html
+/TestGroup_IdemKeyPlus.html
+/TestHmacSecret.html
+/TestLoadJS.html
+/TestPKIoverFIDO_notuse.html
+/TestPKIoverFIDOv2.html
+/TestPKIoverFIDOv3.html
+/TestPKIoverFIDOv4.html
+/TestRSASignWithPkcs1.5padding.html
+
+# --- 雜項測試 / backup HTML ---
+/ChangePIN4AllBrower_backup.html
+/webUSB_Test.html
+/webUSB_Test copy.html
+/MakeCredential.html
+/SignDataWithPIN.html
+/example_modern_usage.html
+/IdemKeyOnAndroid.html
