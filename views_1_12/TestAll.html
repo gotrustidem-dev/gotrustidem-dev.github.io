@@ -642,11 +642,15 @@
                 </select>
             </div>
             <div class="btn-row">
-                <button class="btn btn-primary btn-action" id="btn_sign_with_pin" onclick="doSignDataWithPIN()" style="background-color:#e85600;border-color:#e85600;">
-                    Sign Data With PIN
+                <button class="btn btn-primary btn-action" id="btn_signpin_step1" onclick="doSignWithPIN_Step1()" style="background-color:#e85600;border-color:#e85600;">
+                    SignWithPIN Step 1 — ECDH + Encrypt PIN
+                </button>
+                <button class="btn btn-primary btn-action" id="btn_signpin_step2" onclick="doSignWithPIN_Step2()" style="background-color:#e85600;border-color:#e85600;" disabled>
+                    SignWithPIN Step 2 — Sign
                 </button>
             </div>
             <div class="result-area" id="result_signwithpin">
+                <div class="result-row"><span class="result-label">Step 1 Status: </span><span class="result-value" id="result_signpin_step1_status"></span></div>
                 <div class="result-row"><span class="result-label">Signature (Base64): </span></div>
                 <div class="result-row"><span class="result-value" id="result_signpin_signature" style="word-break:break-all;"></span></div>
                 <div class="result-row"><span class="result-value" id="result_signpin_message"></span></div>
@@ -1866,10 +1870,21 @@
             }).then(function(fido) { return fido.response.signature; });
         }
 
-        async function doSignDataWithPIN() {
+        // ---- SignWithPIN 兩步驟（Safari 相容：每次 click 只呼叫一次 WebAuthn API）----
+        // Step 1: ECDH Key Agreement (credentials.create) + Encrypt PIN (browser-side crypto)
+        // Step 2: Send SignWithPIN command (credentials.get) → 取回簽章
+
+        var _signPIN_state = null; // Step 1 結果暫存，供 Step 2 使用
+
+        async function doSignWithPIN_Step1() {
+            _signPIN_state = null;
             setSectionStatus('signwithpin', 'run');
-            setBtnEnabled('btn_sign_with_pin', false);
-            log('SignWithPIN: 開始...', 'inf');
+            setBtnEnabled('btn_signpin_step1', false);
+            setBtnEnabled('btn_signpin_step2', false);
+            document.getElementById('result_signpin_step1_status').innerHTML = '';
+            document.getElementById('result_signpin_signature').textContent = '';
+            document.getElementById('result_signpin_message').innerHTML = '';
+            log('SignWithPIN Step 1: 開始 ECDH 金鑰交換...', 'inf');
 
             try {
                 var bSN = getTokenSN();
@@ -1882,7 +1897,7 @@
                     document.getElementById('result_signpin_message').innerHTML = '<span class="result-error">請輸入 PIN</span>';
                     showResult('signwithpin');
                     setSectionStatus('signwithpin', 'err');
-                    setBtnEnabled('btn_sign_with_pin', true);
+                    setBtnEnabled('btn_signpin_step1', true);
                     return;
                 }
 
@@ -1890,8 +1905,8 @@
                 var command_buf = _buildSignPINCommandBuf(signMode, paramValue);
                 var sn_buf = _buildSNBuf(bSN);
 
-                // Step 1: ECDH Key Agreement
-                log('SignWithPIN: ECDH 金鑰交換...', 'dim');
+                // Step 1a: ECDH Key Agreement (WebAuthn credentials.create)
+                log('SignWithPIN Step 1: ECDH 金鑰交換（WebAuthn create）...', 'dim');
                 var ecdhResp = await _ecdhKeyAgreement(command_buf, sn_buf);
                 var attestObj = CBOR.decode(ecdhResp.response.attestationObject);
                 var authData = parseAuthData(attestObj.authData);
@@ -1899,46 +1914,79 @@
                 var tokenX = Object.values(pubKey)[3];
                 var tokenY = Object.values(pubKey)[4];
 
-                // Step 2: Derive + Encrypt PIN
-                log('SignWithPIN: 加密 PIN...', 'dim');
+                // Step 1b: Derive + Encrypt PIN (browser-side, no WebAuthn call)
+                log('SignWithPIN Step 1: 加密 PIN...', 'dim');
                 var pinResult = await _deriveAndEncryptPIN(tokenX, tokenY, userpin);
 
-                // Step 3: Send SignWithPIN command
-                log('SignWithPIN: 等待使用者操作金鑰...', 'dim');
-                var sigBuffer = await _sendSignWithPINCommand(
-                    command_buf, sn_buf, algNumber, signDataPayload,
-                    pinResult.exportECPublicKeyArray, pinResult.EncryptedPINArray);
+                // 暫存結果供 Step 2 使用
+                _signPIN_state = {
+                    command_buf: command_buf,
+                    sn_buf: sn_buf,
+                    algNumber: algNumber,
+                    signDataPayload: signDataPayload,
+                    exportECPublicKeyArray: pinResult.exportECPublicKeyArray,
+                    EncryptedPINArray: pinResult.EncryptedPINArray
+                };
 
-                // Parse response: signature buffer IS the raw signature,
-                // unless it starts with GoTrust-Idem-PKI header (error response)
+                document.getElementById('result_signpin_step1_status').innerHTML = '<span class="result-ok">ECDH 完成，PIN 已加密 ✅ — 請點擊 Step 2 送出簽章</span>';
+                log('SignWithPIN Step 1: 完成 — 請點擊 Step 2', 'ok');
+
+                // Enable Step 2
+                setBtnEnabled('btn_signpin_step2', true);
+
+            } catch (e) {
+                document.getElementById('result_signpin_step1_status').innerHTML = '<span class="result-error">Step 1 失敗：' + escapeHtml(e.message || String(e)) + '</span>';
+                setSectionStatus('signwithpin', 'err');
+                log('SignWithPIN Step 1: 錯誤 — ' + (e.message || e), 'err');
+            }
+
+            setBtnEnabled('btn_signpin_step1', true);
+        }
+
+        async function doSignWithPIN_Step2() {
+            if (!_signPIN_state) {
+                document.getElementById('result_signpin_message').innerHTML = '<span class="result-error">請先執行 Step 1</span>';
+                return;
+            }
+
+            setBtnEnabled('btn_signpin_step2', false);
+            setBtnEnabled('btn_signpin_step1', false);
+            log('SignWithPIN Step 2: 送出簽章指令（WebAuthn get）...', 'dim');
+
+            try {
+                var s = _signPIN_state;
+                var sigBuffer = await _sendSignWithPINCommand(
+                    s.command_buf, s.sn_buf, s.algNumber, s.signDataPayload,
+                    s.exportECPublicKeyArray, s.EncryptedPINArray);
+
                 var sigBytes = new Uint8Array(sigBuffer);
                 var headerStr = String.fromCharCode.apply(null, sigBytes.slice(0, 16));
 
                 if (headerStr === 'GoTrust-Idem-PKI') {
-                    // Error response — parse with GTIdemJs
                     var gtidem = new GTIdemJs();
                     gtidem.parsePKIoverFIDOResponse(sigBuffer, CMD_SignWithPIN);
                     document.getElementById('result_signpin_message').innerHTML = '<span class="result-error">' + escapeHtml(showFIDOErrorMessage(gtidem)) + '</span>';
                     showResult('signwithpin');
                     setSectionStatus('signwithpin', 'err');
-                    log('SignWithPIN: 失敗 — ' + showFIDOErrorMessage(gtidem), 'err');
+                    log('SignWithPIN Step 2: 失敗 — ' + showFIDOErrorMessage(gtidem), 'err');
                 } else {
-                    // Success — sigBuffer is the complete signature
                     var sigB64 = btoa(String.fromCharCode.apply(null, sigBytes));
                     document.getElementById('result_signpin_signature').textContent = sigB64;
                     document.getElementById('result_signpin_message').innerHTML = '<span class="result-ok">簽章成功 (' + sigBytes.length + ' bytes)</span>';
                     showResult('signwithpin');
                     setSectionStatus('signwithpin', 'ok');
-                    log('SignWithPIN: 成功 — ' + sigBytes.length + ' bytes', 'ok');
+                    log('SignWithPIN Step 2: 成功 — ' + sigBytes.length + ' bytes', 'ok');
                 }
             } catch (e) {
                 document.getElementById('result_signpin_message').innerHTML = '<span class="result-error">' + escapeHtml(e.message || String(e)) + '</span>';
                 showResult('signwithpin');
                 setSectionStatus('signwithpin', 'err');
-                log('SignWithPIN: 錯誤 — ' + (e.message || e), 'err');
+                log('SignWithPIN Step 2: 錯誤 — ' + (e.message || e), 'err');
             }
 
-            setBtnEnabled('btn_sign_with_pin', true);
+            _signPIN_state = null;
+            setBtnEnabled('btn_signpin_step1', true);
+            setBtnEnabled('btn_signpin_step2', false);
         }
     </script>
 </body>
