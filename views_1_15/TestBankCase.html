@@ -309,7 +309,10 @@
             credentialId: null, fidoPublicKey: null, fidoPublicKeyAlg: null,
             keyHandle: null, keyHandleBytes: null, pkiPublicKeyPem: null, csrPem: null,
             caKeys: null, caCert: null,
-            plainData: null, signature: null
+            plainData: null, signature: null,
+            // WebAuthn 驗證所需 binding
+            expectedRpId: null, expectedRpIdHash: null, expectedOrigin: null,
+            aaguid: null, signCount: 0
         };
         var _running = { left: false, right: false };
 
@@ -400,12 +403,165 @@
         }
 
         // ================================================================
+        //  WebAuthn 驗證共用工具
+        // ================================================================
+        function b64urlToBytes(s) {
+            s = String(s).replace(/-/g, '+').replace(/_/g, '/');
+            while (s.length % 4) s += '=';
+            var bin = atob(s);
+            var out = new Uint8Array(bin.length);
+            for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+            return out;
+        }
+
+        function bytesEqual(a, b) {
+            a = new Uint8Array(a); b = new Uint8Array(b);
+            if (a.length !== b.length) return false;
+            var diff = 0;
+            for (var i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
+            return diff === 0;
+        }
+
+        async function sha256Bytes(data) {
+            return new Uint8Array(await crypto.subtle.digest('SHA-256', data));
+        }
+
+        function verifyClientData(jsonBuf, expectedType, expectedChallenge, expectedOrigin) {
+            var json = JSON.parse(new TextDecoder().decode(jsonBuf));
+            if (json.type !== expectedType) {
+                throw new Error('clientData.type 錯誤: ' + json.type + '（預期 ' + expectedType + '）');
+            }
+            var got = b64urlToBytes(json.challenge);
+            if (!bytesEqual(got, expectedChallenge)) {
+                throw new Error('challenge 不符（可能為 replay）');
+            }
+            if (expectedOrigin && json.origin !== expectedOrigin) {
+                throw new Error('origin 不符: ' + json.origin + '（預期 ' + expectedOrigin + '）');
+            }
+            return json;
+        }
+
+        function verifyAuthDataFlags(authData, expectedRpIdHash, requireUV) {
+            if (!bytesEqual(authData.rpIdHash, expectedRpIdHash)) {
+                throw new Error('rpIdHash 不符（authData 來自不同的 RP）');
+            }
+            if (!authData.flags.up) throw new Error('UP flag 未設（使用者未在場）');
+            if (requireUV && !authData.flags.uv) throw new Error('UV flag 未設（未通過 user verification）');
+        }
+
+        // 從 X.509 cert DER 中抽出 SPKI bytes（直接走 ASN.1 結構，跳過 forge 對 EC 的限制）
+        function extractSpkiFromCert(certDer) {
+            var binStr = '';
+            for (var i = 0; i < certDer.length; i++) binStr += String.fromCharCode(certDer[i]);
+            var certAsn1 = forge.asn1.fromDer(binStr);
+            var tbs = certAsn1.value[0];
+            var hasVersion = (tbs.value[0].tagClass === 0x80 && tbs.value[0].type === 0);
+            var spkiAsn1 = tbs.value[hasVersion ? 6 : 5];
+            var spkiBin = forge.asn1.toDer(spkiAsn1).getBytes();
+            var spkiBytes = new Uint8Array(spkiBin.length);
+            for (var i = 0; i < spkiBin.length; i++) spkiBytes[i] = spkiBin.charCodeAt(i);
+            return spkiBytes;
+        }
+
+        function extractSubjectCNFromCert(certDer) {
+            try {
+                var binStr = '';
+                for (var i = 0; i < certDer.length; i++) binStr += String.fromCharCode(certDer[i]);
+                var certAsn1 = forge.asn1.fromDer(binStr);
+                var tbs = certAsn1.value[0];
+                var hasVersion = (tbs.value[0].tagClass === 0x80 && tbs.value[0].type === 0);
+                var subjectAsn1 = tbs.value[hasVersion ? 5 : 4];
+                var rdns = forge.pki.RDNAttributesAsArray(subjectAsn1);
+                for (var i = 0; i < rdns.length; i++) {
+                    if (rdns[i].shortName === 'CN' || rdns[i].name === 'commonName') return rdns[i].value;
+                }
+            } catch (e) { /* ignore */ }
+            return null;
+        }
+
+        // 驗 packed attestation 簽章（authData || clientDataHash）
+        async function verifyPackedAttestation(attStmt, authDataBuf, clientDataHash) {
+            var alg = attStmt.alg;
+            var sig = new Uint8Array(attStmt.sig);
+            var authBytes = new Uint8Array(authDataBuf);
+            var signedData = new Uint8Array(authBytes.length + clientDataHash.length);
+            signedData.set(authBytes, 0);
+            signedData.set(clientDataHash, authBytes.length);
+
+            if (!attStmt.x5c || !attStmt.x5c.length) {
+                return { ok: null, note: 'packed self-attestation（無 x5c），跳過' };
+            }
+
+            var leafDer = new Uint8Array(attStmt.x5c[0]);
+            var spki = extractSpkiFromCert(leafDer);
+            var cn = extractSubjectCNFromCert(leafDer);
+
+            var importParams, verifyParams, sigForVerify = sig;
+            if (alg === -7) {
+                importParams = { name: "ECDSA", namedCurve: "P-256" };
+                verifyParams = { name: "ECDSA", hash: "SHA-256" };
+                sigForVerify = derToRaw(sig);
+            } else if (alg === -257) {
+                importParams = { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" };
+                verifyParams = { name: "RSASSA-PKCS1-v1_5" };
+            } else {
+                return { ok: null, note: 'packed: 不支援的 alg ' + alg + '，跳過' };
+            }
+            var pubKey = await crypto.subtle.importKey('spki', spki, importParams, true, ['verify']);
+            var ok = await crypto.subtle.verify(verifyParams, pubKey, sigForVerify, signedData);
+            return { ok: ok, certSubject: cn };
+        }
+
+        // 驗 fido-u2f attestation 簽章（0x00 || rpIdHash || cdHash || credId || uncompressedPubKey）
+        async function verifyFidoU2fAttestation(attStmt, authData, clientDataHash) {
+            if (!attStmt.x5c || !attStmt.x5c.length) {
+                return { ok: null, note: 'fido-u2f 缺少 x5c，跳過' };
+            }
+            var leafDer = new Uint8Array(attStmt.x5c[0]);
+            var spki = extractSpkiFromCert(leafDer);
+            var cn = extractSubjectCNFromCert(leafDer);
+
+            var cose = CBOR.decode(new Uint8Array(authData.COSEPublicKey).buffer);
+            var coseValues = Object.values(cose);
+            var x = new Uint8Array(coseValues[3]);
+            var y = new Uint8Array(coseValues[4]);
+
+            var pubKeyU2F = new Uint8Array(65);
+            pubKeyU2F[0] = 0x04;
+            pubKeyU2F.set(x, 1);
+            pubKeyU2F.set(y, 33);
+
+            var credId = new Uint8Array(authData.credID);
+            var rpIdHash = new Uint8Array(authData.rpIdHash);
+            var sig = new Uint8Array(attStmt.sig);
+
+            var signedData = new Uint8Array(1 + 32 + 32 + credId.length + 65);
+            var off = 0;
+            signedData[off++] = 0x00;
+            signedData.set(rpIdHash, off); off += 32;
+            signedData.set(clientDataHash, off); off += 32;
+            signedData.set(credId, off); off += credId.length;
+            signedData.set(pubKeyU2F, off);
+
+            var pubKey = await crypto.subtle.importKey('spki', spki, { name: "ECDSA", namedCurve: "P-256" }, true, ['verify']);
+            var rawSig = derToRaw(sig);
+            var ok = await crypto.subtle.verify({ name: "ECDSA", hash: "SHA-256" }, pubKey, rawSig, signedData);
+            return { ok: ok, certSubject: cn };
+        }
+
+        // ================================================================
         //  L1: MakeCredential (Resident Key)
         // ================================================================
         async function step_L1() {
             log('left', '', 'dim');
             log('left', '══ L1: MakeCredential (Resident Key) ══', 'inf');
             try {
+                var rpId = window.location.hostname;
+                var origin = window.location.origin;
+                state.expectedRpId = rpId;
+                state.expectedOrigin = origin;
+                state.expectedRpIdHash = await sha256Bytes(new TextEncoder().encode(rpId));
+
                 var challenge = new Uint8Array(32);
                 crypto.getRandomValues(challenge);
                 var userId = new Uint8Array(16);
@@ -414,7 +570,7 @@
                 var createOpts = {
                     publicKey: {
                         challenge: challenge,
-                        rp: { name: "GoTrust Bank Test", id: window.location.hostname },
+                        rp: { name: "GoTrust Bank Test", id: rpId },
                         user: { id: userId, name: "banktest@gotrust.com", displayName: "Bank Test User" },
                         pubKeyCredParams: [
                             { type: "public-key", alg: -7 },
@@ -434,6 +590,45 @@
                 log('left', '等待使用者操作金鑰...', 'dim');
                 var cred = await navigator.credentials.create(createOpts);
 
+                // ── 1. 驗 clientDataJSON：challenge / origin / type ──
+                verifyClientData(cred.response.clientDataJSON, 'webauthn.create', challenge, origin);
+                log('left', '✅ clientDataJSON 驗證通過 (challenge / origin / type)', 'ok');
+
+                // ── 2. 解 attestationObject ──
+                var clientDataHash = await sha256Bytes(cred.response.clientDataJSON);
+                var attObj = CBOR.decode(cred.response.attestationObject);
+                var fmt = attObj.fmt;
+                var authDataBuf = new Uint8Array(attObj.authData);
+                var authData = parseAuthData(authDataBuf);
+
+                // ── 3. 驗 authData：rpIdHash / UP / UV ──
+                verifyAuthDataFlags(authData, state.expectedRpIdHash, /*requireUV=*/true);
+                log('left', '✅ authData 驗證通過 (rpIdHash / UP=1 / UV=1)', 'ok');
+
+                state.aaguid = bufToHex(new Uint8Array(authData.aaguid).buffer);
+                state.signCount = authData.counter;
+                log('left', 'AAGUID: ' + state.aaguid, 'inf');
+                log('left', 'signCount: ' + authData.counter, 'inf');
+                log('left', 'attestation fmt: ' + fmt, 'inf');
+
+                // ── 4. 驗 attestation 簽章 ──
+                if (fmt === 'packed') {
+                    var r = await verifyPackedAttestation(attObj.attStmt, authDataBuf, clientDataHash);
+                    if (r.ok === false) throw new Error('packed attestation 簽章驗證失敗');
+                    if (r.ok === true) log('left', '✅ packed attestation 簽章驗證通過 (cert CN: ' + (r.certSubject || '(no CN)') + ')', 'ok');
+                    else log('left', '⚠️ ' + r.note, 'inf');
+                } else if (fmt === 'fido-u2f') {
+                    var r = await verifyFidoU2fAttestation(attObj.attStmt, authData, clientDataHash);
+                    if (r.ok === false) throw new Error('fido-u2f attestation 簽章驗證失敗');
+                    if (r.ok === true) log('left', '✅ fido-u2f attestation 簽章驗證通過 (cert CN: ' + (r.certSubject || '(no CN)') + ')', 'ok');
+                    else log('left', '⚠️ ' + r.note, 'inf');
+                } else if (fmt === 'none') {
+                    log('left', '⚠️ attestation fmt = none，跳過 attestation 簽章驗證', 'inf');
+                } else {
+                    log('left', '⚠️ 未實作的 attestation fmt: ' + fmt + '，跳過', 'inf');
+                }
+
+                // ── 5. 存 credential 公鑰供 R1 用 ──
                 state.credentialId = cred.rawId;
                 var credIdHex = bufToHex(new Uint8Array(cred.rawId).buffer);
 
@@ -638,6 +833,10 @@
                 log('right', '❌ 請先執行左側註冊', 'err');
                 return false;
             }
+            if (!state.expectedRpIdHash || !state.expectedOrigin) {
+                log('right', '❌ 缺少 RP binding（請重新執行 L1）', 'err');
+                return false;
+            }
 
             try {
                 var challenge = new Uint8Array(32);
@@ -659,11 +858,30 @@
 
                 log('right', '✅ GetAssertion 回應取得', 'ok');
 
-                var authData = new Uint8Array(assertion.response.authenticatorData);
-                var cdHash = new Uint8Array(await crypto.subtle.digest('SHA-256', assertion.response.clientDataJSON));
-                var signedData = new Uint8Array(authData.length + cdHash.length);
-                signedData.set(authData, 0);
-                signedData.set(cdHash, authData.length);
+                // ── 1. 驗 clientDataJSON：challenge / origin / type ──
+                verifyClientData(assertion.response.clientDataJSON, 'webauthn.get', challenge, state.expectedOrigin);
+                log('right', '✅ clientDataJSON 驗證通過 (challenge / origin / type)', 'ok');
+
+                // ── 2. 解 authData & 驗 rpIdHash / flags ──
+                var authDataBytes = new Uint8Array(assertion.response.authenticatorData);
+                var ad = parseAuthData(authDataBytes);
+                verifyAuthDataFlags(ad, state.expectedRpIdHash, /*requireUV=*/true);
+                log('right', '✅ authData 驗證通過 (rpIdHash / UP=1 / UV=1)', 'ok');
+
+                // ── 3. signCount 單調遞增（若 authenticator 有實作）──
+                if (ad.counter !== 0 || state.signCount !== 0) {
+                    if (ad.counter <= state.signCount) {
+                        throw new Error('signCount 未遞增 (got=' + ad.counter + ', stored=' + state.signCount + ')，可能為 cloned token');
+                    }
+                }
+                log('right', 'signCount: ' + ad.counter + ' (上次 ' + state.signCount + ')', 'inf');
+                state.signCount = ad.counter;
+
+                // ── 4. 驗 assertion 簽章 ──
+                var cdHash = await sha256Bytes(assertion.response.clientDataJSON);
+                var signedData = new Uint8Array(authDataBytes.length + cdHash.length);
+                signedData.set(authDataBytes, 0);
+                signedData.set(cdHash, authDataBytes.length);
 
                 var sig = assertion.response.signature;
                 var verifyParams;
@@ -675,7 +893,7 @@
                 }
 
                 var valid = await crypto.subtle.verify(verifyParams, state.fidoPublicKey, sig, signedData);
-                log('right', 'Assertion 驗證結果: ' + (valid ? '✅ 通過' : '❌ 失敗'), valid ? 'ok' : 'err');
+                log('right', 'Assertion 簽章驗證: ' + (valid ? '✅ 通過' : '❌ 失敗'), valid ? 'ok' : 'err');
                 return valid;
             } catch (e) {
                 log('right', '❌ R1 失敗: ' + e.message, 'err');
@@ -958,6 +1176,8 @@
                     state.credentialId = null; state.fidoPublicKey = null;
                     state.keyHandle = null; state.pkiPublicKeyPem = null;
                     state.csrPem = null; state.signature = null;
+                    state.expectedRpId = null; state.expectedRpIdHash = null;
+                    state.expectedOrigin = null; state.aaguid = null; state.signCount = 0;
                     ['status_L1','status_L2','status_L3','status_R1','status_R2','status_R3','status_R4']
                         .forEach(function(id){ setStatus(id, 'wait'); });
                 } else {
