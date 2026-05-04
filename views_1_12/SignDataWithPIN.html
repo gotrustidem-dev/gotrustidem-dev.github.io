@@ -221,7 +221,7 @@
             var pki_header = new Uint8Array(3);
 
             var pki_payload_length = command_buf.byteLength + sn_buf.byteLength;
-            pki_header[0] = 0xE1; // CMD_ReadCertificate / KeyAgreement
+            pki_header[0] = 0xE0; // CMD_ReadCertificate / KeyAgreement
             pki_header[1] = pki_payload_length >> 8;
             pki_header[2] = pki_payload_length;
 

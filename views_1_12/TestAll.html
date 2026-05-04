@@ -1772,7 +1772,7 @@
             var gtheaderbuffer = Uint8Array.from(window.atob(GTheader), c => c.charCodeAt(0));
             var pki_header = new Uint8Array(3);
             var pki_payload_length = command_buf.byteLength + sn_buf.byteLength;
-            pki_header[0] = 0xE1;
+            pki_header[0] = CMD_KeyAgreement; // 0xE0 — was previously 0xE1 (CMD_ReadCertificate); device accepted both, but 0xE0 matches the spec
             pki_header[1] = pki_payload_length >> 8;
             pki_header[2] = pki_payload_length;
             var pki_buffer = _appendBuffer(gtheaderbuffer, pki_header);
