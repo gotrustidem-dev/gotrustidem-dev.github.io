@@ -169,32 +169,32 @@
                 case "3": algNumber = ALG_RSA2048SHA384; break;
                 case "4": algNumber = ALG_RSA2048SHA512; break;
                 case "5": algNumber = ALG_RSA2048SHA1_PreHash;
-                    signDataPayload = Uint8Array.from(window.atob(signData_sha1), c => c.charCodeAt(0));
+                    signDataPayload = new Uint8Array(await crypto.subtle.digest('SHA-1', signDataPayload));
                     break;
                 case "6": algNumber = ALG_RSA2048SHA256_PreHash;
-                    signDataPayload = Uint8Array.from(window.atob(signData_sha256), c => c.charCodeAt(0));
+                    signDataPayload = new Uint8Array(await crypto.subtle.digest('SHA-256', signDataPayload));
                     break;
                 case "7": algNumber = ALG_RSA2048SHA384_PreHash;
-                    signDataPayload = Uint8Array.from(window.atob(signData_sha384), c => c.charCodeAt(0));
+                    signDataPayload = new Uint8Array(await crypto.subtle.digest('SHA-384', signDataPayload));
                     break;
                 case "8": algNumber = ALG_RSA2048SHA512_PreHash;
-                    signDataPayload = Uint8Array.from(window.atob(signData_sha512), c => c.charCodeAt(0));
+                    signDataPayload = new Uint8Array(await crypto.subtle.digest('SHA-512', signDataPayload));
                     break;
                 case "9": algNumber = ALG_RSA2048SHA1_PSS; break;
                 case "10": algNumber = ALG_RSA2048SHA256_PSS; break;
                 case "11": algNumber = ALG_RSA2048SHA384_PSS; break;
                 case "12": algNumber = ALG_RSA2048SHA512_PSS; break;
                 case "13": algNumber = ALG_RSA2048SHA1_PSS_PreHash;
-                    signDataPayload = Uint8Array.from(window.atob(signData_sha1), c => c.charCodeAt(0));
+                    signDataPayload = new Uint8Array(await crypto.subtle.digest('SHA-1', signDataPayload));
                     break;
                 case "14": algNumber = ALG_RSA2048SHA256_PSS_PreHash;
-                    signDataPayload = Uint8Array.from(window.atob(signData_sha256), c => c.charCodeAt(0));
+                    signDataPayload = new Uint8Array(await crypto.subtle.digest('SHA-256', signDataPayload));
                     break;
                 case "15": algNumber = ALG_RSA2048SHA384_PSS_PreHash;
-                    signDataPayload = Uint8Array.from(window.atob(signData_sha384), c => c.charCodeAt(0));
+                    signDataPayload = new Uint8Array(await crypto.subtle.digest('SHA-384', signDataPayload));
                     break;
                 case "16": algNumber = ALG_RSA2048SHA512_PSS_PreHash;
-                    signDataPayload = Uint8Array.from(window.atob(signData_sha512), c => c.charCodeAt(0));
+                    signDataPayload = new Uint8Array(await crypto.subtle.digest('SHA-512', signDataPayload));
                     break;
                 case "17": algNumber = ALG_ECDSASHA1; break;
                 case "18": algNumber = ALG_ECDSASHA256; break;
@@ -543,7 +543,7 @@
         // ==================== Event Handlers ====================
 
         // Sign by Index button
-        document.getElementById('form_sign_withpin_index_btn').addEventListener('submit', function (event) {
+        document.getElementById('form_sign_withpin_index_btn').addEventListener('submit', async function (event) {
             event.preventDefault();
 
             var token_sn = document.getElementById('form_token_sn').token_sn.value;
@@ -575,7 +575,7 @@
 
 
         // Sign by Label button
-        document.getElementById('form_sign_withpin_label_btn').addEventListener('submit', function (event) {
+        document.getElementById('form_sign_withpin_label_btn').addEventListener('submit', async function (event) {
             event.preventDefault();
 
             var token_sn = document.getElementById('form_token_sn').token_sn.value;

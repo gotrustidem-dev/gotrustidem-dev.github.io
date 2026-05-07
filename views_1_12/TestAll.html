@@ -327,23 +327,35 @@
                 <label>Algorithm:</label>
                 <select id="select_sign_alg">
                     <option value="10" selected>ECDSA_SHA256</option>
-                    <optgroup label="ECDSA">
+                    <optgroup label="ECDSA (Token 端做 Hash)">
                         <option value="9">ECDSA_SHA</option>
                         <option value="10">ECDSA_SHA256</option>
                         <option value="11">ECDSA_SHA384</option>
                         <option value="12">ECDSA_SHA512</option>
                     </optgroup>
-                    <optgroup label="RSA PKCSv1.5">
+                    <optgroup label="RSA PKCSv1.5 (Token 端做 Hash)">
                         <option value="1">ALG_RSA2048SHA1</option>
                         <option value="2">ALG_RSA2048SHA256</option>
                         <option value="3">ALG_RSA2048SHA384</option>
                         <option value="4">ALG_RSA2048SHA512</option>
                     </optgroup>
-                    <optgroup label="RSA PSS">
+                    <optgroup label="RSA PSS (Token 端做 Hash)">
                         <option value="5">ALG_RSA2048SHA1_PSS</option>
                         <option value="6">ALG_RSA2048SHA256_PSS</option>
                         <option value="7">ALG_RSA2048SHA384_PSS</option>
                         <option value="8">ALG_RSA2048SHA512_PSS</option>
+                    </optgroup>
+                    <optgroup label="RSA PKCSv1.5 PreHash (網頁端做 Hash)">
+                        <option value="17">ALG_RSA2048SHA1_PreHash</option>
+                        <option value="18">ALG_RSA2048SHA256_PreHash</option>
+                        <option value="19">ALG_RSA2048SHA384_PreHash</option>
+                        <option value="20">ALG_RSA2048SHA512_PreHash</option>
+                    </optgroup>
+                    <optgroup label="RSA PSS PreHash (網頁端做 Hash)">
+                        <option value="21">ALG_RSA2048SHA1_PSS_PreHash</option>
+                        <option value="22">ALG_RSA2048SHA256_PSS_PreHash</option>
+                        <option value="23">ALG_RSA2048SHA384_PSS_PreHash</option>
+                        <option value="24">ALG_RSA2048SHA512_PSS_PreHash</option>
                     </optgroup>
                 </select>
             </div>
@@ -621,19 +633,31 @@
                 <label>Algorithm:</label>
                 <select id="select_signpin_alg">
                     <option value="2" selected>ALG_RSA2048SHA256</option>
-                    <optgroup label="RSA PKCSv1.5">
+                    <optgroup label="RSA PKCSv1.5 (Token 端做 Hash)">
                         <option value="1">ALG_RSA2048SHA1</option>
                         <option value="2">ALG_RSA2048SHA256</option>
                         <option value="3">ALG_RSA2048SHA384</option>
                         <option value="4">ALG_RSA2048SHA512</option>
                     </optgroup>
-                    <optgroup label="RSA PSS">
+                    <optgroup label="RSA PSS (Token 端做 Hash)">
                         <option value="5">ALG_RSA2048SHA1_PSS</option>
                         <option value="6">ALG_RSA2048SHA256_PSS</option>
                         <option value="7">ALG_RSA2048SHA384_PSS</option>
                         <option value="8">ALG_RSA2048SHA512_PSS</option>
                     </optgroup>
-                    <optgroup label="ECDSA">
+                    <optgroup label="RSA PKCSv1.5 PreHash (網頁端做 Hash)">
+                        <option value="17">ALG_RSA2048SHA1_PreHash</option>
+                        <option value="18">ALG_RSA2048SHA256_PreHash</option>
+                        <option value="19">ALG_RSA2048SHA384_PreHash</option>
+                        <option value="20">ALG_RSA2048SHA512_PreHash</option>
+                    </optgroup>
+                    <optgroup label="RSA PSS PreHash (網頁端做 Hash)">
+                        <option value="21">ALG_RSA2048SHA1_PSS_PreHash</option>
+                        <option value="22">ALG_RSA2048SHA256_PSS_PreHash</option>
+                        <option value="23">ALG_RSA2048SHA384_PSS_PreHash</option>
+                        <option value="24">ALG_RSA2048SHA512_PSS_PreHash</option>
+                    </optgroup>
+                    <optgroup label="ECDSA (Token 端做 Hash)">
                         <option value="9">ECDSA_SHA</option>
                         <option value="10">ECDSA_SHA256</option>
                         <option value="11">ECDSA_SHA384</option>
@@ -980,6 +1004,24 @@
         }
 
         // ================================================================
+        //  Sign helper: PreHash detection & browser-side digest
+        //  PreHash variants (alg 0x11–0x18) require the data to be hashed in
+        //  the browser before sending; the token then only does the RSA
+        //  padding + sign on the digest.
+        // ================================================================
+        var SHA_NAME_BY_PREHASH_ALG = {
+            0x11: 'SHA-1',   0x12: 'SHA-256', 0x13: 'SHA-384', 0x14: 'SHA-512',
+            0x15: 'SHA-1',   0x16: 'SHA-256', 0x17: 'SHA-384', 0x18: 'SHA-512'
+        };
+
+        async function applyPreHashIfNeeded(payload, algNumber) {
+            var shaName = SHA_NAME_BY_PREHASH_ALG[algNumber];
+            if (!shaName) return payload;
+            var hashBuffer = await window.crypto.subtle.digest(shaName, payload);
+            return new Uint8Array(hashBuffer);
+        }
+
+        // ================================================================
         //  4. Sign Data
         // ================================================================
         async function doSignData() {
@@ -995,6 +1037,12 @@
 
                 // Plain text: "123"
                 var signDataPayload = Uint8Array.from(window.atob('MTIz'), function(c) { return c.charCodeAt(0); });
+
+                // PreHash variants: hash on browser side first
+                signDataPayload = await applyPreHashIfNeeded(signDataPayload, algValue);
+                if (SHA_NAME_BY_PREHASH_ALG[algValue]) {
+                    log('SignData: PreHash 模式，網頁端先做 ' + SHA_NAME_BY_PREHASH_ALG[algValue] + '（送 ' + signDataPayload.byteLength + ' bytes digest）', 'dim');
+                }
 
                 GTIDEM_SetName('TestAll');
                 var response;
@@ -1902,6 +1950,11 @@
                 }
 
                 var signDataPayload = Uint8Array.from(window.atob('MTIz'), function(c) { return c.charCodeAt(0); });
+                // PreHash variants: hash on browser side before sending
+                signDataPayload = await applyPreHashIfNeeded(signDataPayload, algNumber);
+                if (SHA_NAME_BY_PREHASH_ALG[algNumber]) {
+                    log('SignWithPIN: PreHash 模式，網頁端先做 ' + SHA_NAME_BY_PREHASH_ALG[algNumber] + '（送 ' + signDataPayload.byteLength + ' bytes digest）', 'dim');
+                }
                 var command_buf = _buildSignPINCommandBuf(signMode, paramValue);
                 var sn_buf = _buildSNBuf(bSN);
 
