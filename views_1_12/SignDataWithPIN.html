@@ -518,28 +518,24 @@
         function handleSignatureResponse(signatureBuffer) {
             if (signatureBuffer == null) return;
 
-            // Check if response contains GoTrust header (error response)
-            if (isErrorMessage(signatureBuffer) === 1) {
-                showSignMessage(signatureBuffer);
-            } else {
-                // Parse using GTIdemJs
-                var gtidem = new GTIdemJs();
-                gtidem.parsePKIoverFIDOResponse(signatureBuffer, CMD_SignWithPIN);
+            // parsePKIoverFIDOResponse handles both PKI error responses (with
+            // "GoTrust-Idem-PKI" header) and raw 256-byte signatures internally.
+            var gtidem = new GTIdemJs();
+            gtidem.parsePKIoverFIDOResponse(signatureBuffer, CMD_SignWithPIN);
 
-                if (gtidem.statusCode == CTAP1_ERR_SUCCESS) {
-                    var strResult = "";
-                    if (gtidem.sn != undefined) {
-                        strResult += "序號: " + ConverSNFormat(gtidem.sn) + "\n";
-                    }
-                    var sig = new Uint8Array(gtidem.signature);
-                    console.log("Signature:", bufToHex(sig.buffer));
-                    var str = String.fromCharCode.apply(null, sig);
-                    strResult += "簽名:\n" + btoa(str);
-                    alert(strResult);
-                    document.getElementById('label_result').innerText = "Signature (Base64): " + btoa(str);
-                } else {
-                    alert(showFIDOErrorMessage(gtidem));
+            if (gtidem.statusCode == CTAP1_ERR_SUCCESS) {
+                var strResult = "";
+                if (gtidem.sn != undefined) {
+                    strResult += "序號: " + ConverSNFormat(gtidem.sn) + "\n";
                 }
+                var sig = new Uint8Array(gtidem.signature);
+                console.log("Signature:", bufToHex(sig.buffer));
+                var str = String.fromCharCode.apply(null, sig);
+                strResult += "簽名:\n" + btoa(str);
+                alert(strResult);
+                document.getElementById('label_result').innerText = "Signature (Base64): " + btoa(str);
+            } else {
+                alert(showFIDOErrorMessage(gtidem));
             }
         }
 
