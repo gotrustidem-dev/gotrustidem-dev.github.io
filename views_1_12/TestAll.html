@@ -1242,7 +1242,9 @@
             }
 
             setBtnEnabled('btn_changepin_step1', true);
-            setBtnEnabled('btn_changepin_step2', false);
+            var btnStep2 = document.getElementById('btn_changepin_step2');
+            btnStep2.disabled = true;
+            btnStep2.classList.remove('loading');
         }
 
         // ================================================================
