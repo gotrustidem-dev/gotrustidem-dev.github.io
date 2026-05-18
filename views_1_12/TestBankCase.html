@@ -509,8 +509,12 @@
 
             try {
                 var bSN = getTokenSN();
-                var bOldPIN = toUTF8Array(oldPin);
-                var bNewPIN = toUTF8Array(newPin);
+                // GTIDEM_ChangeUserPIN expects Uint8Array (it reads .byteLength
+                // inside computingSessionKey); raw Array from toUTF8Array fails.
+                var bOldPIN = new Uint8Array(oldPin.length);
+                bOldPIN.set(toUTF8Array(oldPin), 0);
+                var bNewPIN = new Uint8Array(newPin.length);
+                bNewPIN.set(toUTF8Array(newPin), 0);
 
                 log('left', '舊 PIN 長度: ' + oldPin.length + '，新 PIN 長度: ' + newPin.length, 'inf');
                 log('left', '等待使用者操作金鑰...', 'dim');
