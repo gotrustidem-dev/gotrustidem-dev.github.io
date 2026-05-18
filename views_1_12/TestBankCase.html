@@ -509,21 +509,64 @@
 
             try {
                 var bSN = getTokenSN();
-                // GTIDEM_ChangeUserPIN expects Uint8Array (it reads .byteLength
-                // inside computingSessionKey); raw Array from toUTF8Array fails.
                 var bOldPIN = new Uint8Array(oldPin.length);
                 bOldPIN.set(toUTF8Array(oldPin), 0);
                 var bNewPIN = new Uint8Array(newPin.length);
                 bNewPIN.set(toUTF8Array(newPin), 0);
 
                 log('left', '舊 PIN 長度: ' + oldPin.length + '，新 PIN 長度: ' + newPin.length, 'inf');
-                log('left', '等待使用者操作金鑰...', 'dim');
 
-                var resp = await GTIDEM_ChangeUserPIN(bOldPIN, bNewPIN, bSN);
+                // ---- Step 1/2: GetTokenInfo to fetch ecpoint + flags ----
+                log('left', 'Step 1/2 — GetTokenInfo（等待使用者操作金鑰）...', 'dim');
+                var gtidem = await GTIDEM_GetTokenInfo(bSN);
+                if (gtidem.statusCode !== CTAP1_ERR_SUCCESS) {
+                    log('left', '❌ GetTokenInfo 失敗: ' + showFIDOErrorMessage(gtidem), 'err');
+                    return false;
+                }
+                if (gtidem.pinRetry == 0) {
+                    log('left', '❌ PIN 已鎖定（pinRetry = 0），請先以 SO PIN 解鎖', 'err');
+                    return false;
+                }
+                if (gtidem.sn) log('left', '載具序號: ' + ConverSNFormat(gtidem.sn), 'inf');
+                log('left', '目前 PIN Retries: ' + gtidem.pinRetry, 'inf');
+
+                var bECPointFromToken = gtidem.ecpoint;
+                var flags = gtidem.flags;
+                if (!bECPointFromToken) {
+                    log('left', '❌ 裝置未回傳 EC Point，無法執行 ChangePIN', 'err');
+                    return false;
+                }
+
+                // PIN policy checks (mirrors TestAll.html doChangePIN_Step2)
+                if (flags != undefined) {
+                    var statusCode = checkPINFormatLevel_V2(bNewPIN, flags[1]);
+                    if (statusCode !== CTAP1_ERR_SUCCESS) {
+                        log('left', '❌ 新 PIN 不符合裝置格式政策: ' + showFIDOErrorMessage({ statusCode: statusCode }), 'err');
+                        return false;
+                    }
+                    if (bNewPIN.length < flags[2]) {
+                        log('left', '❌ 新 PIN 長度小於裝置要求 (min=' + flags[2] + ')', 'err');
+                        return false;
+                    }
+                    if (bNewPIN.length > flags[3]) {
+                        log('left', '❌ 新 PIN 長度大於裝置要求 (max=' + flags[3] + ')', 'err');
+                        return false;
+                    }
+                }
+
+                // ---- Step 2/2: Compute encrypted PIN payload and send ChangeUserPIN_V1 ----
+                log('left', 'Step 2/2 — 計算加密參數並執行 ChangeUserPIN（等待使用者操作金鑰）...', 'dim');
+                var prepareUpdate = await computingSessionKey(bOldPIN, bNewPIN, bECPointFromToken);
+                var resp = await GTIDEM_ChangeUserPIN_V1(
+                    bSN,
+                    prepareUpdate.bExportECPublicKeyArray,
+                    prepareUpdate.bEcryptedOldPINHash,
+                    prepareUpdate.bEncryptedNEWPIN
+                );
 
                 if (resp.statusCode === CTAP1_ERR_SUCCESS) {
                     log('left', '✅ ChangePIN 完成（PIN 已更新為新 PIN）', 'ok');
-                    if (resp.sn) log('left', '載具序號: ' + ConverSNFormat(resp.sn), 'inf');
+                    if (resp.pinRetry != undefined) log('left', '剩餘 PIN Retries: ' + resp.pinRetry, 'inf');
                     // 後續 P2/L1/L2/L3 觸發 WebAuthn 時 Windows 會以新 PIN 提示
                     return true;
                 } else {
