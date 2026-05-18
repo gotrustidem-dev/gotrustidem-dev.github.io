@@ -1191,7 +1191,12 @@
         }
 
         async function prepareResetResponse(bResetKey, bRandomNumber, bTokenSN, bChallenge) {
-            var sessionKey = await computingSessionKey(bResetKey, bRandomNumber);
+            // NOTE: must NOT call the function as `computingSessionKey` —
+            // that name is also exported by PKIoverFIDO_1_12.js with a
+            // different signature (3 args for ChangePIN). Defining a local
+            // function with the same name shadows the library version and
+            // breaks ChangePIN. Use a distinct name here.
+            var sessionKey = await computeFactoryResetSessionKey(bResetKey, bRandomNumber);
             var iv = await computingIV(bTokenSN);
             var bEncrypted = await window.crypto.subtle.importKey("raw", sessionKey, "aes-cbc", false, ["encrypt"])
                 .then(function (cryptoKey) {
@@ -1200,7 +1205,7 @@
             return bEncrypted;
         }
 
-        async function computingSessionKey(key, random) {
+        async function computeFactoryResetSessionKey(key, random) {
             var data = new Uint8Array(key.byteLength + random.byteLength + 1);
             data.set(new Uint8Array(key), 0);
             data.set(new Uint8Array(random), key.byteLength);
