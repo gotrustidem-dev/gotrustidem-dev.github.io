@@ -100,6 +100,50 @@
             border-left-color: #e85600;
         }
 
+        /* 前置流程 (銀行要求) — 用藍色與綠色註冊區做視覺區隔 */
+        .panel-left .step-card.pre-step {
+            border-left-color: #1f7adc;
+            background: #eef5fd;
+        }
+
+        .pre-section-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: #1f7adc;
+            margin: 4px 0 6px 0;
+            padding: 4px 8px;
+            background: #eef5fd;
+            border-radius: 4px;
+            border-left: 4px solid #1f7adc;
+        }
+
+        .pre-section-divider {
+            border: 0;
+            border-top: 1px dashed #c5cfdc;
+            margin: 10px 0 8px 0;
+        }
+
+        .pin-inputs {
+            margin-top: 6px;
+            font-size: 12px;
+            color: #303742;
+        }
+
+        .pin-inputs label {
+            display: inline-block;
+            min-width: 56px;
+            font-weight: 600;
+        }
+
+        .pin-inputs input {
+            height: 26px;
+            font-size: 12px;
+            padding: 2px 6px;
+            margin: 2px 0;
+            width: 140px;
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+
         .step-title {
             font-weight: bold;
             font-size: 13px;
@@ -235,6 +279,35 @@
         <div class="panel panel-left">
             <div class="panel-header">📋 註冊</div>
 
+            <!-- 前置流程 (銀行要求): 必須先變更 PIN 並清空舊憑證 -->
+            <div class="pre-section-title">🏦 前置流程（銀行要求）</div>
+
+            <div class="step-card pre-step">
+                <div class="step-title"><span class="step-status" id="status_P1">⬜</span>P1 — 變更使用者 PIN</div>
+                <div class="step-desc">將出廠預設 PIN 改為使用者自己的 PIN（銀行要求個人化）</div>
+                <div class="pin-inputs">
+                    <div>
+                        <label>舊 PIN：</label>
+                        <input type="password" id="input_old_pin" value="12345678" placeholder="出廠預設 12345678">
+                    </div>
+                    <div>
+                        <label>新 PIN：</label>
+                        <input type="password" id="input_new_pin" placeholder="4–63 字元">
+                    </div>
+                    <div>
+                        <label>確認 PIN：</label>
+                        <input type="password" id="input_confirm_pin" placeholder="再輸入一次新 PIN">
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-card pre-step">
+                <div class="step-title"><span class="step-status" id="status_P2">⬜</span>P2 — 清空卡片</div>
+                <div class="step-desc">清除卡片上所有既有憑證（ClearToken），確保註冊起始狀態乾淨</div>
+            </div>
+
+            <hr class="pre-section-divider">
+
             <div class="step-card">
                 <div class="step-title"><span class="step-status" id="status_L1">⬜</span>L1 — Token 綁定</div>
                 <div class="step-desc">建立 FIDO2 Resident Key，將 Token 綁定至此服務</div>
@@ -256,7 +329,7 @@
             </div>
 
             <button class="btn btn-success btn-lg btn-run" id="btn_setup" onclick="runSetup()">
-                ▶ 執行註冊（L1 → L2 → L3）
+                ▶ 執行註冊（P1 → P2 → L1 → L2 → L3）
             </button>
 
             <span class="log-label">註冊 Log:</span>
@@ -404,6 +477,86 @@
             raw.set(r, 32 - r.length);
             raw.set(s, 64 - s.length);
             return raw.buffer;
+        }
+
+        // ================================================================
+        //  P1: ChangePIN  (bank requirement — personalize device PIN)
+        // ================================================================
+        async function step_P1() {
+            log('left', '', 'dim');
+            log('left', '══ P1: ChangePIN（變更使用者 PIN）══', 'inf');
+
+            var oldPin = (document.getElementById('input_old_pin').value || '').trim();
+            var newPin = (document.getElementById('input_new_pin').value || '').trim();
+            var confirmPin = (document.getElementById('input_confirm_pin').value || '').trim();
+
+            if (!oldPin || !newPin) {
+                log('left', '❌ 請輸入舊 PIN 與新 PIN', 'err');
+                return false;
+            }
+            if (newPin.length < 4) {
+                log('left', '❌ 新 PIN 長度不可少於 4 字元', 'err');
+                return false;
+            }
+            if (newPin !== confirmPin) {
+                log('left', '❌ 新 PIN 與確認 PIN 不一致', 'err');
+                return false;
+            }
+            if (oldPin === newPin) {
+                log('left', '❌ 新 PIN 不可與舊 PIN 相同', 'err');
+                return false;
+            }
+
+            try {
+                var bSN = getTokenSN();
+                var bOldPIN = toUTF8Array(oldPin);
+                var bNewPIN = toUTF8Array(newPin);
+
+                log('left', '舊 PIN 長度: ' + oldPin.length + '，新 PIN 長度: ' + newPin.length, 'inf');
+                log('left', '等待使用者操作金鑰...', 'dim');
+
+                var resp = await GTIDEM_ChangeUserPIN(bOldPIN, bNewPIN, bSN);
+
+                if (resp.statusCode === CTAP1_ERR_SUCCESS) {
+                    log('left', '✅ ChangePIN 完成（PIN 已更新為新 PIN）', 'ok');
+                    if (resp.sn) log('left', '載具序號: ' + ConverSNFormat(resp.sn), 'inf');
+                    // 後續 P2/L1/L2/L3 觸發 WebAuthn 時 Windows 會以新 PIN 提示
+                    return true;
+                } else {
+                    log('left', '❌ ChangePIN 失敗: ' + showFIDOErrorMessage(resp), 'err');
+                    return false;
+                }
+            } catch (e) {
+                log('left', '❌ P1 失敗: ' + e.message, 'err');
+                return false;
+            }
+        }
+
+        // ================================================================
+        //  P2: ClearCard  (bank requirement — wipe stale certs before bind)
+        // ================================================================
+        async function step_P2() {
+            log('left', '', 'dim');
+            log('left', '══ P2: ClearCard（清空卡片既有憑證）══', 'inf');
+
+            try {
+                var bSN = getTokenSN();
+                log('left', '等待使用者操作金鑰以授權清空動作...', 'dim');
+
+                var resp = await GTIDEM_ClearToken(bSN);
+
+                if (resp.statusCode === CTAP1_ERR_SUCCESS) {
+                    log('left', '✅ ClearToken 完成（卡片憑證已全部清除）', 'ok');
+                    if (resp.sn) log('left', '載具序號: ' + ConverSNFormat(resp.sn), 'inf');
+                    return true;
+                } else {
+                    log('left', '❌ ClearToken 失敗: ' + showFIDOErrorMessage(resp), 'err');
+                    return false;
+                }
+            } catch (e) {
+                log('left', '❌ P2 失敗: ' + e.message, 'err');
+                return false;
+            }
         }
 
         // ================================================================
@@ -829,16 +982,19 @@
             setBtnEnabled('btn_setup', false);
 
             logClear('left');
-            ['status_L1', 'status_L2', 'status_L3'].forEach(function (id) { setStatus(id, 'wait'); });
+            ['status_P1', 'status_P2', 'status_L1', 'status_L2', 'status_L3']
+                .forEach(function (id) { setStatus(id, 'wait'); });
             progressShow('left');
             progressSet('left', 0, '準備中...');
 
-            log('left', '🚀 開始註冊流程（L1 → L2 → L3）', 'inf');
+            log('left', '🚀 開始註冊流程（P1 → P2 → L1 → L2 → L3）', 'inf');
 
-            // L1 → 0~25%, L2 → 25~55%, L3 → 55~100% (L3 manages own bar)
+            // 進度比例：P1 0~10%, P2 10~20%, L1 20~35%, L2 35~55%, L3 55~100%
             var steps = [
-                { id: 'status_L1', fn: step_L1, pctStart: 0,  pctEnd: 25,  label: 'L1', selfProgress: false },
-                { id: 'status_L2', fn: step_L2, pctStart: 25, pctEnd: 55,  label: 'L2', selfProgress: false },
+                { id: 'status_P1', fn: step_P1, pctStart: 0,  pctEnd: 10,  label: 'P1', selfProgress: false },
+                { id: 'status_P2', fn: step_P2, pctStart: 10, pctEnd: 20,  label: 'P2', selfProgress: false },
+                { id: 'status_L1', fn: step_L1, pctStart: 20, pctEnd: 35,  label: 'L1', selfProgress: false },
+                { id: 'status_L2', fn: step_L2, pctStart: 35, pctEnd: 55,  label: 'L2', selfProgress: false },
                 { id: 'status_L3', fn: step_L3, pctStart: 55, pctEnd: 100, label: 'L3', selfProgress: true }
             ];
 
@@ -974,7 +1130,8 @@
                     state.credentialId = null; state.fidoPublicKey = null;
                     state.keyHandle = null; state.pkiPublicKeyPem = null;
                     state.csrPem = null; state.signature = null;
-                    ['status_L1','status_L2','status_L3','status_R1','status_R2','status_R3','status_R4']
+                    ['status_P1','status_P2','status_L1','status_L2','status_L3',
+                     'status_R1','status_R2','status_R3','status_R4']
                         .forEach(function(id){ setStatus(id, 'wait'); });
                 } else {
                     statusEl.innerHTML = '<span style="color:#f38ba8;">❌ Factory Reset 失敗: ' + showFIDOErrorMessage(resp) + '</span>';
