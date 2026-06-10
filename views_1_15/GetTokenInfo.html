@@ -546,6 +546,15 @@
             var b0 = cfg[0];
             var isSession = (b0 === 0x02);
 
+            // configs 原始資料
+            var rawHex = Array.prototype.map.call(cfg, function (v) {
+                return ('0' + v.toString(16).toUpperCase()).slice(-2);
+            }).join(' ');
+            html += '<div class="info-row">';
+            html += '<div class="info-label">configs (Raw)</div>';
+            html += '<div class="info-value mono">' + rawHex + '</div>';
+            html += '</div>';
+
             // 驗證模式
             html += '<div class="detail-group">';
             html += '<div class="detail-group-title">驗證模式</div>';
@@ -568,11 +577,13 @@
             // 以下僅 Session 模式才顯示
 
             // Command Clear Mask
+            var hasCmd = false; // b1 是否有選定任何 Re-auth / Clear after 指令（SCE 的前提條件）
             if (cfg.length >= 2) {
                 var b1 = cfg[1];
                 var cmdNames = ['匯入憑證', '放行', '建立金鑰', '搜尋憑證'];
                 var hiNibble = (b1 >> 4) & 0x0F;
                 var loNibble = b1 & 0x0F;
+                hasCmd = (hiNibble !== 0x00) || (loNibble !== 0x00);
 
                 // Re-auth (high nibble)
                 html += '<div class="detail-group">';
@@ -615,7 +626,13 @@
                     html += '<div class="detail-item">PIN 驗證後 <b>' + (pinKT * 30) + '</b> 秒內有效</div>';
                 }
                 if (pinSCE) {
-                    html += '<div class="detail-item optional">執行上述指定操作後，PIN 驗證立即失效</div>';
+                    if (hasCmd) {
+                        html += '<div class="detail-item required">SCE：已啟用 — 執行上述指定操作後，PIN 驗證立即失效</div>';
+                    } else {
+                        html += '<div class="detail-item inactive">SCE：已啟用，但 Re-auth / Clear after 皆未指定操作，故無實際作用</div>';
+                    }
+                } else {
+                    html += '<div class="detail-item optional">SCE：未啟用 — PIN 驗證維持原有效期</div>';
                 }
                 html += '</div>';
             }
@@ -634,7 +651,13 @@
                     html += '<div class="detail-item">觸碰後 <b>' + (touchKT * 30) + '</b> 秒內有效</div>';
                 }
                 if (touchSCE) {
-                    html += '<div class="detail-item optional">執行上述指定操作後，觸碰狀態立即失效</div>';
+                    if (hasCmd) {
+                        html += '<div class="detail-item required">SCE：已啟用 — 執行上述指定操作後，觸碰狀態立即失效</div>';
+                    } else {
+                        html += '<div class="detail-item inactive">SCE：已啟用，但 Re-auth / Clear after 皆未指定操作，故無實際作用</div>';
+                    }
+                } else {
+                    html += '<div class="detail-item optional">SCE：未啟用 — 觸碰狀態維持原有效期</div>';
                 }
                 html += '</div>';
             }
