@@ -80,6 +80,21 @@
         .result.fail { background: #fce9e6; color: #c0341d; }
         .result .result-icon { font-size: 1.6em; display: block; margin-bottom: 6px; }
         .result .result-sub { font-size: 0.7em; font-weight: 400; margin-top: 8px; color: inherit; opacity: 0.85; word-break: break-all; }
+
+        .note {
+            margin-top: 28px;
+            padding: 16px 18px;
+            background: #f4f6fb;
+            border-left: 4px solid #3498db;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 0.82em;
+            line-height: 1.7;
+            color: #4a5568;
+        }
+        .note .note-title { font-weight: 700; color: #2c3e50; margin-bottom: 6px; display: block; }
+        .note ul { margin: 0; padding-left: 18px; }
+        .note li { margin-bottom: 4px; }
     </style>
 </head>
 
@@ -91,6 +106,15 @@
         <button class="btn-verify" id="btn_verify">驗證使用者金鑰</button>
 
         <div class="result" id="result"></div>
+
+        <div class="note">
+            <span class="note-title">說明</span>
+            <ul>
+                <li>本網頁使用標準 FIDO 功能，讓使用者驗證預設 PIN 是否正確。</li>
+                <li>密碼驗證失敗仍會減少剩餘嘗試次數。</li>
+                <li>無論密碼驗證成功與否，都不會影響 PKI 的初始化與佔用載具空間。</li>
+            </ul>
+        </div>
     </div>
 
     <script>
