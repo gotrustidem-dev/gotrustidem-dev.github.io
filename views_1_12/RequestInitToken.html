@@ -141,6 +141,13 @@
                                                 Token</button>
                                         </form>
                                         </p>
+                                        <p>
+                                        <form style="text-align: center;" id="form_getinfo_init_btn"
+                                            onsubmit="return false">
+                                            <button class="btn btn-primary" action="submit"
+                                                style="width: 280px; height:34px;background-color: #27ae60;">Get Token Info + Init Token (一鍵完成)</button>
+                                        </form>
+                                        </p>
                                     </td>
                                 </tr>
                             </table>
@@ -170,17 +177,19 @@
             }
         }
         var flags = undefined;
-        document.getElementById('form_tokeninfo_btn').addEventListener('submit', function (event) {
-            event.preventDefault();
+
+        // Run GetTokenInfo: fill in SN + random number fields. Resolves on success, rejects otherwise.
+        // ignoreInputSn=true 時忽略 SN 輸入框，自動偵測連接的載具（不檢查序號）。
+        function runGetTokenInfo(ignoreInputSn) {
             let token_sn = document.getElementById('form_token_sn').token_sn.value;
             console.log(token_sn);
 
             var bToken_sn = undefined;
-            if (token_sn.length != 0) {
+            if (!ignoreInputSn && token_sn.length != 0) {
                 bToken_sn = hexStringToArrayBuffer(token_sn);
 
             }
-            GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
+            return GTIDEM_GetTokenInfo(bToken_sn).then((response) => {
 
                 console.log('SUCCESS', response);
                 if (response.statusCode == CTAP1_ERR_SUCCESS) {
@@ -188,20 +197,29 @@
                         .sn);
                     document.getElementById('label_random_number').innerText = ConverSNFormat(response
                         .rn);
-
                 } else {
-                    alert(showFIDOErrorMessage(response));
+                    throw response;
                 }
-            }).catch((error) => {
-                alert(error)
-                console.log('FAIL', error)
             });
+        }
 
+        // Reproduce the original handlers' alert behaviour: FIDO status -> showFIDOErrorMessage, otherwise raw error.
+        function reportGetTokenInfoError(error) {
+            if (error && error.statusCode != undefined) {
+                alert(showFIDOErrorMessage(error));
+            } else {
+                alert(error);
+            }
+            console.log('FAIL', error);
+        }
+
+        document.getElementById('form_tokeninfo_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+            runGetTokenInfo().catch(reportGetTokenInfoError);
         });
 
-        document.getElementById('form_init_btn').addEventListener('submit', function (event) {
-
-            event.preventDefault();
+        // Run InitToken using the currently-filled SN + random number. Returns the InitToken promise.
+        function runInitToken() {
             let bRandom = [];
 
             let random = document.getElementById('label_random_number').textContent;
@@ -267,9 +285,9 @@
             //PINLevel = getPINLevelParam();
             PINLevel = getPinLevelParamSetup();
 
-            var para = buildInitToken(bSOPINArray, bRandom, bToken_sn, bNewSOPINArray, bNewUserPINArray,AllowHostDomains,isPINExpired,PINMaxRetry,sPinMinLen, PINLevel)
+            return buildInitToken(bSOPINArray, bRandom, bToken_sn, bNewSOPINArray, bNewUserPINArray,AllowHostDomains,isPINExpired,PINMaxRetry,sPinMinLen, PINLevel)
                 .then(result => {
-                    GTIDEM_InitToken(bToken_sn, result.bEncryptedInitData, result.bHashMacofInitData).then(
+                    return GTIDEM_InitToken(bToken_sn, result.bEncryptedInitData, result.bHashMacofInitData).then(
                         response => {
 
                             if (response.statusCode == CTAP1_ERR_SUCCESS) {
@@ -291,6 +309,20 @@
                 }) .catch((response) => {
                     alert(showFIDOErrorMessage(response));
                 })
+        }
+
+        document.getElementById('form_init_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+            runInitToken();
+        });
+
+        // One-click: GetTokenInfo (to obtain SN + random) then InitToken.
+        // runInitToken handles its own success/error alerts; this catch only covers the GetTokenInfo step.
+        document.getElementById('form_getinfo_init_btn').addEventListener('submit', function (event) {
+            event.preventDefault();
+            runGetTokenInfo(true)
+                .then(() => runInitToken())
+                .catch(reportGetTokenInfoError);
         });
 
         async function buildInitToken(bSOPIN, bRandom, bToken_sn, bNewSOPin, bNewUserPIN, AllowHostDomains, isPinExpired, sPinRetry, sPinMinLen, sPinLevel) {
