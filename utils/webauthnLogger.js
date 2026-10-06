@@ -64,12 +64,41 @@
         }
 
         console.log('[WebAuthn] ' + fn + ' response', out, cred);
+
+        // Full values as plain strings, so they are not truncated in the
+        // console preview or in a "Save as..." log file.
+        logHexLine(fn + ' rawId', cred.rawId);
+        logHexLine(fn + ' signature', r.signature);
+        logHexLine(fn + ' authenticatorData', r.authenticatorData);
+        logHexLine(fn + ' userHandle', r.userHandle);
+        logHexLine(fn + ' attestationObject', r.attestationObject);
+    };
+
+    // One line per value: label, byte length (hex length / 2) and full hex.
+    var logHexLine = function (label, buf) {
+        if (buf == null) return;
+        var h = toHex(buf);
+        console.log('[WebAuthn] ' + label + ' (' + h.length / 2 + ' bytes): ' + h);
+    };
+
+    var logRequestIds = function (fn, options) {
+        var pk = options && options.publicKey;
+        if (!pk) return;
+        if (pk.user && pk.user.id) logHexLine(fn + ' user.id', pk.user.id);
+        (pk.allowCredentials || []).forEach(function (c, i) {
+            logHexLine(fn + ' allowCredentials[' + i + '].id', c.id);
+        });
     };
 
     ['create', 'get'].forEach(function (fn) {
         var orig = navigator.credentials[fn].bind(navigator.credentials);
         navigator.credentials[fn] = function (options) {
             console.log('[WebAuthn] ' + fn + ' request', options);
+            try {
+                logRequestIds(fn, options);
+            } catch (e) {
+                console.warn('[WebAuthn] ' + fn + ' request dump failed', e);
+            }
             return orig(options).then(function (cred) {
                 try {
                     if (cred && cred.response) dumpResponse(fn, cred);
